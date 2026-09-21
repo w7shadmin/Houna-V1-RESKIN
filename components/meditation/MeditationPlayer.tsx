@@ -1,0 +1,787 @@
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { View, Text, Pressable, Animated, StyleSheet } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
+import { StatusBar } from 'expo-status-bar';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  ArrowLeft,
+  Play,
+  Pause,
+  RotateCcw,
+  Video as VideoIcon,
+  Headphones,
+  Maximize2,
+  Minimize2,
+  Infinity as InfinityIcon,
+  CheckCircle2,
+} from 'lucide-react-native';
+import { useAudioPlayer } from 'expo-audio';
+import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
+import * as NavigationBar from 'expo-navigation-bar';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { spacing, radius, typography } from '@/constants/theme';
+import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
+import AmbientVisual from './AmbientVisual';
+import type { MeditationScene } from './scenes';
+
+const SESSION_OPTIONS = [5, 10, 15, 20] as const;
+/** How long the player's UI stays visible without interaction before fading out, while actively playing. */
+const CONTROLS_IDLE_MS = 3000;
+const CONTROLS_FADE_IN_MS = 200;
+const CONTROLS_FADE_OUT_MS = 400;
+const CUSTOM_MIN_MINUTES = 1;
+const CUSTOM_MAX_MINUTES = 180;
+const DEFAULT_CUSTOM_MINUTES = 25;
+const CUSTOM_MAX_HOURS = Math.floor(CUSTOM_MAX_MINUTES / 60);
+const HOUR_OPTIONS = Array.from({ length: CUSTOM_MAX_HOURS + 1 }, (_, i) => i);
+const MINUTE_OPTIONS = Array.from({ length: 60 }, (_, i) => i);
+const TICK_MS = 1000;
+/** Ambient audio fades out over the last few seconds instead of cutting abruptly at completion. */
+const FADE_OUT_SECONDS = 5;
+/** Persists across sessions — mainly for people who fall asleep to the audio and don't want video re-enabled by default next time. */
+const AUDIO_ONLY_STORAGE_KEY = 'houna-meditation-audio-only';
+
+interface MeditationPlayerProps {
+  scene: MeditationScene;
+  sceneName: string;
+  sceneDescription: string;
+  placeholderNotice: string;
+  onExit: () => void;
+}
+
+/**
+ * Ambient meditation player — hardcoded dark/white regardless of theme, per
+ * CLAUDE.md's explicit exception for the meditation player. Open-ended
+ * ambience rather than phase-cycling, so this doesn't reuse
+ * PhaseBreathingSession; the session-length/pause/resume/complete shape is
+ * still deliberately consistent with it.
+ */
+export default function MeditationPlayer({
+  scene,
+  sceneName,
+  sceneDescription,
+  placeholderNotice,
+  onExit,
+}: MeditationPlayerProps) {
+  const { t, isRTL, fonts } = useLanguage();
+  const p = t.tanafas.meditation.player;
+
+  useEffect(() => {
+    const tag = 'houna-meditation';
+    // useKeepAwake() leaves its web wake-lock request unhandled on
+    // rejection (denied permission, unsupported browser); calling the
+    // underlying functions directly lets us swallow that non-fatal case.
+    activateKeepAwakeAsync(tag).catch(() => {});
+    return () => {
+      deactivateKeepAwake(tag).catch(() => {});
+    };
+  }, []);
+
+  const [sessionMinutes, setSessionMinutes] = useState<number>(10);
+  const [isCustomMode, setIsCustomMode] = useState(false);
+  const [isInfiniteSession, setIsInfiniteSession] = useState(false);
+  const [isRunning, setIsRunning] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
+  const [isComplete, setIsComplete] = useState(false);
+  const [visualEnabled, setVisualEnabled] = useState(true);
+  const [isFullscreen, setIsFullscreen] = useState(true);
+
+  useEffect(() => {
+    AsyncStorage.getItem(AUDIO_ONLY_STORAGE_KEY).then((value) => {
+      if (value === 'true') setVisualEnabled(false);
+    });
+  }, []);
+
+  // Android system nav bar — a no-op promise on iOS/web. Restored to
+  // visible on unmount rather than left hidden after exiting the player.
+  useEffect(() => {
+    NavigationBar.setVisibilityAsync(isFullscreen ? 'hidden' : 'visible').catch(() => {});
+  }, [isFullscreen]);
+
+  useEffect(() => {
+    return () => {
+      NavigationBar.setVisibilityAsync('visible').catch(() => {});
+    };
+  }, []);
+
+  const handleToggleAudioOnly = () => {
+    setVisualEnabled((prev) => {
+      const next = !prev;
+      AsyncStorage.setItem(AUDIO_ONLY_STORAGE_KEY, String(!next)).catch(() => {});
+      return next;
+    });
+  };
+
+  const selectPreset = (mins: number) => {
+    setIsCustomMode(false);
+    setIsInfiniteSession(false);
+    setSessionMinutes(mins);
+  };
+
+  const selectCustom = () => {
+    setIsCustomMode(true);
+    setIsInfiniteSession(false);
+    setSessionMinutes((prev) => ((SESSION_OPTIONS as readonly number[]).includes(prev) ? DEFAULT_CUSTOM_MINUTES : prev));
+  };
+
+  const selectInfinite = () => {
+    setIsCustomMode(true);
+    setIsInfiniteSession(true);
+  };
+
+  const clampCustomMinutes = (total: number) => Math.min(CUSTOM_MAX_MINUTES, Math.max(CUSTOM_MIN_MINUTES, total));
+  const hoursPart = Math.floor(sessionMinutes / 60);
+  const minutesPart = sessionMinutes % 60;
+
+  const pickHours = (h: number) => {
+    setIsInfiniteSession(false);
+    setSessionMinutes(clampCustomMinutes(h * 60 + minutesPart));
+  };
+
+  const pickMinutes = (m: number) => {
+    setIsInfiniteSession(false);
+    setSessionMinutes(clampCustomMinutes(hoursPart * 60 + m));
+  };
+
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // A genuinely infinite total (not a huge finite number) so the completion
+  // check below (`next >= totalSeconds`) and the near-end audio fade-out
+  // never trigger — the session only ever ends when the user stops it.
+  const totalSeconds = isInfiniteSession ? Infinity : sessionMinutes * 60;
+  const hasRealMedia = !!scene.video;
+
+  const audioPlayer = useAudioPlayer(scene.audio);
+  const fadingOutRef = useRef(false);
+  const fadeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    audioPlayer.loop = true;
+  }, [audioPlayer]);
+
+  const stopFade = useCallback(() => {
+    if (fadeIntervalRef.current) {
+      clearInterval(fadeIntervalRef.current);
+      fadeIntervalRef.current = null;
+    }
+  }, []);
+
+  const fadeAudioOut = useCallback(() => {
+    if (!scene.audio) return;
+    stopFade();
+    const steps = 10;
+    const stepDuration = (FADE_OUT_SECONDS * 1000) / steps;
+    let step = 0;
+    fadeIntervalRef.current = setInterval(() => {
+      step++;
+      audioPlayer.volume = Math.max(0, 1 - step / steps);
+      if (step >= steps) {
+        stopFade();
+        audioPlayer.pause();
+      }
+    }, stepDuration);
+  }, [audioPlayer, scene.audio, stopFade]);
+
+  const stop = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, []);
+
+  const reset = useCallback(() => {
+    stop();
+    stopFade();
+    setIsRunning(false);
+    setIsPaused(false);
+    setElapsed(0);
+    setIsComplete(false);
+    fadingOutRef.current = false;
+    if (scene.audio) audioPlayer.volume = 1;
+  }, [stop, stopFade, scene.audio, audioPlayer]);
+
+  useEffect(() => {
+    if (!isRunning || isPaused) return;
+    intervalRef.current = setInterval(() => {
+      setElapsed((prev) => {
+        const next = prev + 1;
+        const remaining = totalSeconds - next;
+        if (remaining > 0 && remaining <= FADE_OUT_SECONDS && !fadingOutRef.current) {
+          fadingOutRef.current = true;
+          fadeAudioOut();
+        }
+        if (next >= totalSeconds) {
+          stop();
+          setIsRunning(false);
+          setIsComplete(true);
+          return totalSeconds;
+        }
+        return next;
+      });
+    }, TICK_MS);
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [isRunning, isPaused, totalSeconds, stop, fadeAudioOut]);
+
+  const isActive = isRunning && !isPaused;
+
+  useEffect(() => {
+    if (!scene.audio) return;
+    if (isActive) audioPlayer.play();
+    else audioPlayer.pause();
+  }, [isActive, scene.audio, audioPlayer]);
+
+  // Auto-hide the header/timer/controls while actively playing, so the
+  // ambient scene is unobstructed — matches ordinary video-player UX. Stays
+  // fully visible whenever not actively playing (choosing a session, paused,
+  // complete), since the user needs those controls reachable then.
+  const controlsOpacity = useRef(new Animated.Value(1)).current;
+  const [controlsInteractive, setControlsInteractive] = useState(true);
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearHideTimer = useCallback(() => {
+    if (hideTimerRef.current) {
+      clearTimeout(hideTimerRef.current);
+      hideTimerRef.current = null;
+    }
+  }, []);
+
+  const showControls = useCallback(() => {
+    clearHideTimer();
+    setControlsInteractive(true);
+    Animated.timing(controlsOpacity, {
+      toValue: 1,
+      duration: CONTROLS_FADE_IN_MS,
+      useNativeDriver: true,
+    }).start();
+  }, [clearHideTimer, controlsOpacity]);
+
+  const scheduleHide = useCallback(() => {
+    clearHideTimer();
+    hideTimerRef.current = setTimeout(() => {
+      Animated.timing(controlsOpacity, {
+        toValue: 0,
+        duration: CONTROLS_FADE_OUT_MS,
+        useNativeDriver: true,
+      }).start(({ finished }) => {
+        if (finished) setControlsInteractive(false);
+      });
+    }, CONTROLS_IDLE_MS);
+  }, [clearHideTimer, controlsOpacity]);
+
+  useEffect(() => {
+    if (isActive) {
+      showControls();
+      scheduleHide();
+    } else {
+      clearHideTimer();
+      showControls();
+    }
+    return clearHideTimer;
+  }, [isActive, showControls, scheduleHide, clearHideTimer]);
+
+  const handleScreenTap = () => {
+    if (!isActive) return;
+    showControls();
+    scheduleHide();
+  };
+
+  useEffect(() => {
+    // No explicit pause here: useAudioPlayer releases its native player on
+    // unmount by itself, which already stops playback. Calling pause()
+    // afterward would race that release and crash on an already-destroyed
+    // shared object.
+    return () => {
+      stopFade();
+    };
+  }, [stopFade]);
+
+  const handleStart = () => {
+    if (isComplete) reset();
+    setIsRunning(true);
+    setIsPaused(false);
+  };
+  const handlePause = () => setIsPaused(true);
+  const handleResume = () => setIsPaused(false);
+  const handleReset = () => reset();
+  const handleExit = () => {
+    stop();
+    onExit();
+  };
+
+  // Infinite sessions have no "remaining" to count down — show elapsed
+  // time counting up instead, with a matching "elapsed" label below.
+  const displaySeconds = isInfiniteSession ? elapsed : Math.max(totalSeconds - elapsed, 0);
+  const mins = Math.floor(displaySeconds / 60);
+  const secs = displaySeconds % 60;
+  const num = (n: number | string) => (isRTL ? arabicNumber(n) : String(n));
+  const timeLabel = `${num(mins)}:${num(String(secs).padStart(2, '0'))}`;
+
+  return (
+    <View style={styles.container}>
+      <StatusBar hidden={isFullscreen} style="light" />
+      {visualEnabled ? (
+        <AmbientVisual scene={scene} animate={isActive} />
+      ) : (
+        <View style={styles.audioOnlyBg}>
+          <Headphones size={40} color="rgba(255,255,255,0.22)" strokeWidth={1.2} />
+        </View>
+      )}
+
+      {/* Sits above the ambient visual but below the controls overlay — an
+          independent sibling, not a parent, of the button Pressables below,
+          so it only ever catches taps that miss an active button rather
+          than racing/swallowing their touches. DOM source order alone
+          doesn't reliably decide stacking here on web, so the zIndex on
+          both this and the overlay below is load-bearing, not decorative —
+          don't remove it. */}
+      <Pressable style={[StyleSheet.absoluteFillObject, styles.tapCatcher]} onPress={handleScreenTap} />
+
+      <Animated.View
+        style={[styles.overlay, { opacity: controlsOpacity }]}
+        pointerEvents={controlsInteractive ? 'auto' : 'none'}
+      >
+        <SafeAreaView style={styles.overlayInner} edges={['top', 'bottom']}>
+        <View style={styles.header}>
+          <Pressable
+            onPress={handleExit}
+            hitSlop={16}
+            style={({ pressed }) => [
+              styles.iconBtn,
+              pressed && { backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: radius.full },
+            ]}
+          >
+            <ArrowLeft size={22} color="#ffffff" style={isRTL ? styles.flip : undefined} />
+          </Pressable>
+          <View style={styles.headerTextWrap}>
+            <Text style={[styles.headerTitle, { fontFamily: fonts.bold }]}>{sceneName}</Text>
+            {!isRunning && !isComplete && (
+              <Text style={[styles.headerSubtitle, { fontFamily: fonts.regular }]}>{sceneDescription}</Text>
+            )}
+          </View>
+          <Pressable
+            onPress={() => setIsFullscreen((v) => !v)}
+            hitSlop={16}
+            style={({ pressed }) => [
+              styles.iconBtn,
+              pressed && { backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: radius.full },
+            ]}
+            accessibilityLabel={isFullscreen ? p.exitFullscreen : p.fullscreen}
+          >
+            {isFullscreen ? (
+              <Minimize2 size={20} color="#ffffff" />
+            ) : (
+              <Maximize2 size={20} color="#ffffff" />
+            )}
+          </Pressable>
+        </View>
+
+        <View style={styles.main}>
+          {isComplete ? (
+            <View style={styles.completionWrap}>
+              <CheckCircle2 size={56} color="#ffffff" strokeWidth={1.5} />
+              <Text style={[styles.completionTitle, { fontFamily: fonts.bold }]}>{p.wellDone}</Text>
+              <Text style={[styles.completionBody, { fontFamily: fonts.regular }]}>{p.completionBody}</Text>
+            </View>
+          ) : isRunning ? (
+            <View style={styles.timeWrap}>
+              <Text style={[styles.timeText, { fontFamily: fonts.bold }]}>{timeLabel}</Text>
+              <Text style={[styles.remainingLabel, { fontFamily: fonts.regular }]}>
+                {isInfiniteSession ? p.elapsed : p.remaining}
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.selectorWrap}>
+              <Text style={[styles.selectorLabel, { fontFamily: fonts.semiBold }]}>{p.chooseSession}</Text>
+              <View style={styles.selectorRow}>
+                {SESSION_OPTIONS.map((mins) => {
+                  const active = !isCustomMode && mins === sessionMinutes;
+                  return (
+                    <Pressable
+                      key={mins}
+                      onPress={() => selectPreset(mins)}
+                      style={({ pressed }) => [
+                        styles.pill,
+                        active && styles.pillActive,
+                        pressed && (active ? { opacity: 0.85 } : { backgroundColor: 'rgba(255,255,255,0.15)' }),
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.pillText,
+                          { fontFamily: fonts.semiBold },
+                          active && styles.pillTextActive,
+                        ]}
+                      >
+                        {num(mins)} {arabicPlural(mins, p.min)}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+                <Pressable
+                  onPress={selectCustom}
+                  style={({ pressed }) => [
+                    styles.pill,
+                    isCustomMode && styles.pillActive,
+                    pressed && (isCustomMode ? { opacity: 0.85 } : { backgroundColor: 'rgba(255,255,255,0.15)' }),
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.pillText,
+                      { fontFamily: fonts.semiBold },
+                      isCustomMode && styles.pillTextActive,
+                    ]}
+                  >
+                    {p.custom}
+                  </Text>
+                </Pressable>
+              </View>
+
+              {isCustomMode && (
+                <View style={styles.customWrap}>
+                  <View style={styles.pickerRow}>
+                    <View style={styles.pickerCol}>
+                      <Picker
+                        selectedValue={hoursPart}
+                        onValueChange={(value) => pickHours(Number(value))}
+                        style={styles.picker}
+                        itemStyle={styles.pickerItem}
+                        enabled={!isInfiniteSession}
+                      >
+                        {HOUR_OPTIONS.map((h) => (
+                          <Picker.Item key={h} label={`${num(h)} ${p.hours}`} value={h} color="#000000" />
+                        ))}
+                      </Picker>
+                    </View>
+                    <View style={styles.pickerCol}>
+                      <Picker
+                        selectedValue={minutesPart}
+                        onValueChange={(value) => pickMinutes(Number(value))}
+                        style={styles.picker}
+                        itemStyle={styles.pickerItem}
+                        enabled={!isInfiniteSession}
+                      >
+                        {MINUTE_OPTIONS.map((m) => (
+                          <Picker.Item key={m} label={`${num(m)} ${p.minutes}`} value={m} color="#000000" />
+                        ))}
+                      </Picker>
+                    </View>
+                  </View>
+
+                  <Pressable
+                    onPress={selectInfinite}
+                    style={({ pressed }) => [
+                      styles.infinityPill,
+                      isInfiniteSession && styles.infinityPillActive,
+                      pressed && !isInfiniteSession && { backgroundColor: 'rgba(255,255,255,0.15)' },
+                    ]}
+                  >
+                    <InfinityIcon size={16} color={isInfiniteSession ? '#000000' : '#ffffff'} strokeWidth={2} />
+                    <Text
+                      style={[
+                        styles.infinityPillText,
+                        { fontFamily: fonts.semiBold },
+                        isInfiniteSession && styles.infinityPillTextActive,
+                      ]}
+                    >
+                      {p.noLimit}
+                    </Text>
+                  </Pressable>
+                </View>
+              )}
+            </View>
+          )}
+        </View>
+
+        {!hasRealMedia && (
+          <Text style={[styles.placeholderNotice, { fontFamily: fonts.regular }]}>{placeholderNotice}</Text>
+        )}
+
+        <View style={styles.controls}>
+          {!isComplete && (
+            <Pressable
+              onPress={handleToggleAudioOnly}
+              style={({ pressed }) => [styles.smallIconBtn, pressed && { backgroundColor: 'rgba(255,255,255,0.24)' }]}
+              accessibilityLabel={visualEnabled ? p.audioOnly : p.videoOn}
+            >
+              {visualEnabled ? (
+                <VideoIcon size={18} color="#ffffff" />
+              ) : (
+                <Headphones size={18} color="#ffffff" />
+              )}
+            </Pressable>
+          )}
+
+          {!isRunning && !isComplete && (
+            <Pressable
+              onPress={handleStart}
+              style={({ pressed }) => [styles.primaryBtn, pressed && { backgroundColor: 'rgba(255,255,255,0.32)' }]}
+            >
+              <Play size={22} color="#ffffff" fill="#ffffff" />
+              <Text style={[styles.primaryBtnText, { fontFamily: fonts.bold }]}>{p.begin}</Text>
+            </Pressable>
+          )}
+
+          {isActive && (
+            <Pressable
+              onPress={handlePause}
+              style={({ pressed }) => [styles.primaryBtn, pressed && { backgroundColor: 'rgba(255,255,255,0.32)' }]}
+            >
+              <Pause size={22} color="#ffffff" fill="#ffffff" />
+              <Text style={[styles.primaryBtnText, { fontFamily: fonts.bold }]}>{p.pause}</Text>
+            </Pressable>
+          )}
+
+          {isPaused && (
+            <Pressable
+              onPress={handleResume}
+              style={({ pressed }) => [styles.primaryBtn, pressed && { backgroundColor: 'rgba(255,255,255,0.32)' }]}
+            >
+              <Play size={22} color="#ffffff" fill="#ffffff" />
+              <Text style={[styles.primaryBtnText, { fontFamily: fonts.bold }]}>{p.resume}</Text>
+            </Pressable>
+          )}
+
+          {isComplete && (
+            <Pressable
+              onPress={handleStart}
+              style={({ pressed }) => [styles.primaryBtn, pressed && { backgroundColor: 'rgba(255,255,255,0.32)' }]}
+            >
+              <RotateCcw size={20} color="#ffffff" />
+              <Text style={[styles.primaryBtnText, { fontFamily: fonts.bold }]}>{p.startAgain}</Text>
+            </Pressable>
+          )}
+
+          {isRunning && (
+            <Pressable
+              onPress={handleReset}
+              style={({ pressed }) => [styles.smallIconBtn, pressed && { backgroundColor: 'rgba(255,255,255,0.24)' }]}
+              accessibilityLabel={p.startAgain}
+            >
+              <RotateCcw size={18} color="#ffffff" />
+            </Pressable>
+          )}
+        </View>
+        </SafeAreaView>
+      </Animated.View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#000000',
+  },
+  audioOnlyBg: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#000000',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tapCatcher: {
+    zIndex: 1,
+  },
+  overlay: {
+    flex: 1,
+    zIndex: 2,
+  },
+  overlayInner: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.sm,
+  },
+  iconBtn: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  flip: {
+    transform: [{ scaleX: -1 }],
+  },
+  headerTextWrap: {
+    alignItems: 'center',
+  },
+  headerTitle: {
+    color: '#ffffff',
+    fontSize: typography.fontSize.md,
+  },
+  headerSubtitle: {
+    color: 'rgba(255,255,255,0.75)',
+    fontSize: typography.fontSize.xs,
+    marginTop: 2,
+  },
+  main: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.lg,
+  },
+  selectorWrap: {
+    alignItems: 'center',
+  },
+  selectorLabel: {
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: typography.fontSize.sm,
+    marginBottom: spacing.md,
+  },
+  selectorRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: spacing.sm,
+  },
+  customWrap: {
+    alignItems: 'center',
+    gap: spacing.md,
+    marginTop: spacing.lg,
+  },
+  pickerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  pickerCol: {
+    width: 120,
+  },
+  picker: {
+    // The picker's open dropdown/wheel is an OS-native surface we can't
+    // theme (light background regardless of the dark player UI), so the
+    // control itself uses light-on-dark colors rather than trying to force
+    // white text onto that native surface, where it would be unreadable.
+    color: '#000000',
+    backgroundColor: '#ffffff',
+    borderRadius: radius.md,
+  },
+  pickerItem: {
+    color: '#000000',
+    fontSize: typography.fontSize.lg,
+  },
+  infinityPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    height: 34,
+    paddingHorizontal: spacing.lg,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.4)',
+  },
+  infinityPillActive: {
+    backgroundColor: '#ffffff',
+    borderColor: '#ffffff',
+  },
+  infinityPillText: {
+    color: '#ffffff',
+    fontSize: typography.fontSize.sm,
+    lineHeight: typography.lineHeight.sm,
+  },
+  infinityPillTextActive: {
+    color: '#000000',
+  },
+  pill: {
+    height: 34,
+    paddingHorizontal: spacing.lg,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  pillActive: {
+    backgroundColor: '#ffffff',
+    borderColor: '#ffffff',
+  },
+  pillText: {
+    color: '#ffffff',
+    fontSize: typography.fontSize.sm,
+    lineHeight: typography.lineHeight.sm,
+  },
+  pillTextActive: {
+    color: '#000000',
+  },
+  timeWrap: {
+    alignItems: 'center',
+  },
+  timeText: {
+    color: '#ffffff',
+    fontSize: 64,
+    fontVariant: ['tabular-nums'],
+  },
+  remainingLabel: {
+    color: 'rgba(255,255,255,0.75)',
+    fontSize: typography.fontSize.sm,
+    marginTop: spacing.xs,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  completionWrap: {
+    alignItems: 'center',
+    maxWidth: 300,
+  },
+  completionTitle: {
+    color: '#ffffff',
+    fontSize: typography.fontSize.xxl,
+    marginTop: spacing.lg,
+  },
+  completionBody: {
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: typography.fontSize.sm,
+    lineHeight: typography.lineHeight.body,
+    textAlign: 'center',
+    marginTop: spacing.md,
+  },
+  placeholderNotice: {
+    color: 'rgba(255,255,255,0.55)',
+    fontSize: 10,
+    textAlign: 'center',
+    paddingHorizontal: spacing.xl,
+    marginBottom: spacing.xs,
+  },
+  controls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.md,
+    paddingBottom: spacing.lg,
+  },
+  primaryBtn: {
+    height: 54,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.4)',
+    paddingHorizontal: spacing.xl,
+    borderRadius: radius.full,
+  },
+  primaryBtnText: {
+    color: '#ffffff',
+    fontSize: typography.fontSize.body,
+    lineHeight: typography.lineHeight.body,
+  },
+  smallIconBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: radius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
+  },
+});
