@@ -5,15 +5,19 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowRight, ArrowLeft } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { colors, palette, spacing, radius, typography } from '@/constants/theme';
-import { mix } from '@/lib/color';
+import { mix, tileTint } from '@/lib/color';
 import LottieTopicIcon from '@/components/directory/LottieTopicIcon';
 
-/** Same lighter→base→darker recipe as GradientTile, without the bevel border/shadow — this is a full-bleed banner strip clipped by the card's own overflow:hidden, not a floating badge. */
-const RAIL_ICON_GRADIENT: readonly [string, string, string] = [
-  mix(palette.turquoise, palette.white, 0.55),
-  palette.turquoise,
-  mix(palette.turquoise, palette.black, 0.12),
-];
+/**
+ * Same lighter→base→darker recipe as GradientTile (including its rest-state
+ * lightening and press-state saturation via `tileTint`), without the bevel
+ * border/shadow — this is a full-bleed banner strip clipped by the card's
+ * own overflow:hidden, not a floating badge.
+ */
+function railIconGradient(pressed: boolean): readonly [string, string, string] {
+  const base = tileTint(palette.turquoise, pressed);
+  return [mix(base, palette.white, 0.55), base, mix(base, palette.black, 0.12)];
+}
 
 const RAIL_CARD_W = 150;
 const RAIL_ICON_AREA_H = 100;
@@ -49,26 +53,30 @@ export default function ResourcesRail() {
               pressed && { opacity: 0.85 },
             ]}
           >
-            <LinearGradient
-              colors={RAIL_ICON_GRADIENT}
-              locations={[0, 0.55, 1]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.cardIconArea}
-            >
-              <LottieTopicIcon slug={topic.slug} size={48} />
-            </LinearGradient>
-            <View style={styles.cardText}>
-              <Text numberOfLines={2} style={[styles.cardTitle, { color: colors.text, fontFamily: fonts.bold }]}>
-                {topic.label}
-              </Text>
-              <Text
-                numberOfLines={2}
-                style={[styles.cardDesc, { color: colors.textSecondary, fontFamily: fonts.regular }]}
-              >
-                {topic.description}
-              </Text>
-            </View>
+            {({ pressed }) => (
+              <>
+                <LinearGradient
+                  colors={railIconGradient(pressed)}
+                  locations={[0, 0.55, 1]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.cardIconArea}
+                >
+                  <LottieTopicIcon slug={topic.slug} size={48} />
+                </LinearGradient>
+                <View style={styles.cardText}>
+                  <Text numberOfLines={2} style={[styles.cardTitle, { color: colors.text, fontFamily: fonts.bold }]}>
+                    {topic.label}
+                  </Text>
+                  <Text
+                    numberOfLines={2}
+                    style={[styles.cardDesc, { color: colors.textSecondary, fontFamily: fonts.regular }]}
+                  >
+                    {topic.description}
+                  </Text>
+                </View>
+              </>
+            )}
           </Pressable>
         ))}
       </ScrollView>

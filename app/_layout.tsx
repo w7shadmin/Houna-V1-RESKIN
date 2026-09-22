@@ -24,6 +24,7 @@ import * as SplashScreen from 'expo-splash-screen';
 
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { AuthProvider } from '@/contexts/AuthContext';
 import { colors } from '@/constants/theme';
 import SplashIntro from '@/components/SplashIntro';
 
@@ -52,6 +53,7 @@ function InnerLayout() {
         <Stack.Screen name="about" />
         <Stack.Screen name="get-involved" />
         <Stack.Screen name="contact" />
+        <Stack.Screen name="account" />
         <Stack.Screen name="+not-found" />
       </Stack>
       {/* Default status bar for light backgrounds. Tanafas overrides this
@@ -89,8 +91,10 @@ export default function RootLayout() {
 
   return (
     <LanguageProvider>
-      <InnerLayout />
-      {!introDone && <SplashIntro onFinish={() => setIntroDone(true)} />}
+      <AuthProvider>
+        <InnerLayout />
+        {!introDone && <SplashIntro onFinish={() => setIntroDone(true)} />}
+      </AuthProvider>
     </LanguageProvider>
   );
 }

@@ -15,7 +15,7 @@ export const meditationStrings = {
     scenes: {
       fire: { name: 'Fire', description: 'A crackling, warm glow' },
       rain: { name: 'Rain', description: 'Steady rainfall to settle the mind' },
-      forest: { name: 'Forest', description: 'Gentle rustling among the trees' },
+      forest: { name: 'Creek', description: 'A mountain stream flowing over stones' },
       ocean: { name: 'Ocean', description: 'Slow, rolling waves' },
     },
     player: {
@@ -49,7 +49,7 @@ export const meditationStrings = {
     scenes: {
       fire: { name: 'نار', description: 'توهّج دافئ ومتطاير' },
       rain: { name: 'مطر', description: 'هطول مطر ثابت يهدئ الذهن' },
-      forest: { name: 'غابة', description: 'حفيف أوراق لطيف بين الأشجار' },
+      forest: { name: 'جدول', description: 'جدول جبلي يتدفق بين الصخور' },
       ocean: { name: 'محيط', description: 'أمواج بطيئة ومتدحرجة' },
     },
     player: {

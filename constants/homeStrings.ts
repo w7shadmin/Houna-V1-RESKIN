@@ -35,6 +35,13 @@ export const homeStrings = {
       wellness: 'Wellness Centers',
       wellnessDesc: 'Discover clinics and wellness facilities offering specialized care.',
     },
+    impactStats: {
+      heading: 'Our Impact in Numbers',
+      professionals: 'Mental Health Professionals',
+      directory: 'Mental Health Directory',
+      articles: 'Articles',
+      events: 'Events',
+    },
     articlesRail: {
       heading: 'Latest Articles',
       seeAll: 'See all',
@@ -96,6 +103,13 @@ export const homeStrings = {
       organizationsDesc: 'استكشف منظمات الصحة النفسية في جميع أنحاء المنطقة.',
       wellness: 'مراكز العافية',
       wellnessDesc: 'اكتشف العيادات ومرافق العافية التي تقدم رعاية متخصصة.',
+    },
+    impactStats: {
+      heading: 'إنجازاتنا بالأرقام',
+      professionals: 'المختصون في الصحة النفسية',
+      directory: 'دليل الصحة النفسية',
+      articles: 'المقالات',
+      events: 'الفعاليات',
     },
     articlesRail: {
       heading: 'أحدث المقالات',

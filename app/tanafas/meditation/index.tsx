@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, typography } from '@/constants/theme';
+import { colors, spacing, typography } from '@/constants/theme';
 import { MEDITATION_SCENES } from '@/components/meditation/scenes';
+import SceneCard from '@/components/meditation/SceneCard';
 
 export default function MeditationSceneListScreen() {
   const router = useRouter();
@@ -35,19 +35,15 @@ export default function MeditationSceneListScreen() {
           {MEDITATION_SCENES.map((scene) => {
             const strings = sceneStrings[scene.id];
             return (
-              <Pressable
+              <SceneCard
                 key={scene.id}
+                scene={scene}
+                title={strings.name}
+                description={strings.description}
+                fontBold={fonts.bold}
+                fontRegular={fonts.regular}
                 onPress={() => router.push({ pathname: '/tanafas/meditation/[scene]', params: { scene: scene.id } })}
-                style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
-              >
-                <LinearGradient colors={scene.gradient} style={StyleSheet.absoluteFillObject} />
-                <View style={styles.cardOverlay}>
-                  <Text style={[styles.cardTitle, { fontFamily: fonts.bold }]}>{strings.name}</Text>
-                  <Text style={[styles.cardDesc, { fontFamily: fonts.regular }]} numberOfLines={2}>
-                    {strings.description}
-                  </Text>
-                </View>
-              </Pressable>
+              />
             );
           })}
         </View>
@@ -84,28 +80,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.md,
-  },
-  card: {
-    width: '47%',
-    aspectRatio: 1,
-    borderRadius: radius.lg,
-    overflow: 'hidden',
-  },
-  cardPressed: {
-    opacity: 0.85,
-  },
-  cardOverlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    padding: spacing.md,
-  },
-  cardTitle: {
-    color: '#ffffff',
-    fontSize: typography.fontSize.md,
-  },
-  cardDesc: {
-    color: 'rgba(255,255,255,0.85)',
-    fontSize: typography.fontSize.xs,
-    marginTop: 2,
   },
 });

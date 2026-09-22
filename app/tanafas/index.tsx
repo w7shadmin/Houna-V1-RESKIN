@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Wind, Moon, BookOpen, CheckCircle2, ChevronRight, type LucideIcon } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { colors, palette, spacing, radius, typography, shadows } from '@/constants/theme';
-import { mix } from '@/lib/color';
+import { mix, tileTint, OLD_MVP_ICON_HEX } from '@/lib/color';
 import IconTile3D from '@/components/IconTile3D';
 
 interface HubCard {
@@ -31,7 +31,7 @@ export default function TanafasHubScreen() {
       subtitle: hub.breathingSubtitle,
       description: hub.breathingDescription,
       icon: Wind,
-      color: palette.lightCyan,
+      color: OLD_MVP_ICON_HEX.lightCyan,
       available: true,
     },
     {
@@ -40,7 +40,7 @@ export default function TanafasHubScreen() {
       subtitle: hub.meditationSubtitle,
       description: hub.meditationDescription,
       icon: Moon,
-      color: palette.peach,
+      color: OLD_MVP_ICON_HEX.peach,
       available: true,
     },
     {
@@ -49,7 +49,7 @@ export default function TanafasHubScreen() {
       subtitle: hub.journalSubtitle,
       description: hub.journalDescription,
       icon: BookOpen,
-      color: palette.raspberry,
+      color: OLD_MVP_ICON_HEX.raspberry,
       available: true,
     },
   ];
@@ -89,22 +89,26 @@ export default function TanafasHubScreen() {
                   pressed && { backgroundColor: colors.cardPressed },
                 ]}
               >
-                <IconTile3D icon={Icon} color={card.color} size={52} />
-                <View style={styles.cardText}>
-                  <Text style={[styles.cardTitle, { color: colors.text, fontFamily: fonts.bold }]}>
-                    {card.title}
-                  </Text>
-                  <Text style={[styles.cardSubtitle, { color: colors.primary, fontFamily: fonts.semiBold }]}>
-                    {card.subtitle}
-                  </Text>
-                  <Text
-                    numberOfLines={2}
-                    style={[styles.cardDesc, { color: colors.textSecondary, fontFamily: fonts.regular }]}
-                  >
-                    {card.description}
-                  </Text>
-                </View>
-                <ChevronRight size={20} color={colors.textTertiary} strokeWidth={1.8} />
+                {({ pressed }) => (
+                  <>
+                    <IconTile3D icon={Icon} color={tileTint(card.color, pressed)} size={52} />
+                    <View style={styles.cardText}>
+                      <Text style={[styles.cardTitle, { color: colors.text, fontFamily: fonts.bold }]}>
+                        {card.title}
+                      </Text>
+                      <Text style={[styles.cardSubtitle, { color: colors.primary, fontFamily: fonts.semiBold }]}>
+                        {card.subtitle}
+                      </Text>
+                      <Text
+                        numberOfLines={2}
+                        style={[styles.cardDesc, { color: colors.textSecondary, fontFamily: fonts.regular }]}
+                      >
+                        {card.description}
+                      </Text>
+                    </View>
+                    <ChevronRight size={20} color={colors.textTertiary} strokeWidth={1.8} />
+                  </>
+                )}
               </Pressable>
             );
           })}

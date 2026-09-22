@@ -7,15 +7,22 @@ import Logo from '@/components/Logo';
 import LanguageSwitcherButton from '@/components/LanguageSwitcherButton';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { colors, palette, spacing, radius, typography, shadows } from '@/constants/theme';
-import { hexToRgba } from '@/lib/color';
+import { hexToRgba, mix } from '@/lib/color';
 
 /**
  * Ported from the old MVP's EntryChoiceScreen — same layered decorative
- * circles, centered logo + "You are Houna" subheading, and Calm/Explore
+ * circles, centered logo + "You are Houna" subheading, and Tanafas/Explore
  * choice. The old version also had a faint background pattern motif SVG;
  * dropped here per explicit instruction, so only the translucent circles
  * remain.
  */
+
+/** Same lighter→base→darker bevel recipe as the tab bar's floating Tanafas button, so the two visually match — lighter than a flat turquoise, and well clear of turquoiseDark. */
+const TANAFAS_BUTTON_GRADIENT: readonly [string, string, string] = [
+  mix(palette.turquoise, palette.white, 0.55),
+  palette.turquoise,
+  mix(palette.turquoise, palette.black, 0.12),
+];
 export default function EntryScreen() {
   const router = useRouter();
   const { t, fonts } = useLanguage();
@@ -42,15 +49,16 @@ export default function EntryScreen() {
       <View style={styles.actions}>
         <Pressable
           onPress={() => router.push('/tanafas')}
-          style={({ pressed }) => [styles.calmBtnOuter, pressed && { transform: [{ scale: 0.97 }] }]}
+          style={({ pressed }) => [styles.tanafasBtnOuter, pressed && { transform: [{ scale: 0.97 }] }]}
         >
           <LinearGradient
-            colors={[palette.turquoise, palette.turquoiseDark]}
+            colors={TANAFAS_BUTTON_GRADIENT}
+            locations={[0, 0.55, 1]}
             start={{ x: 0, y: 0 }}
             end={{ x: 0, y: 1 }}
-            style={[styles.calmBtn, shadows.cardLg]}
+            style={[styles.tanafasBtn, shadows.cardLg]}
           >
-            <Text style={[styles.calmBtnText, { fontFamily: fonts.semiBold }]}>{t.entry.calm}</Text>
+            <Text style={[styles.tanafasBtnText, { fontFamily: fonts.semiBold }]}>{t.tabs.tanafas}</Text>
           </LinearGradient>
         </Pressable>
 
@@ -130,10 +138,10 @@ const styles = StyleSheet.create({
   actions: {
     gap: spacing.sm + 4,
   },
-  calmBtnOuter: {
+  tanafasBtnOuter: {
     borderRadius: radius.full,
   },
-  calmBtn: {
+  tanafasBtn: {
     // Fixed height + explicit lineHeight on the text (not paddingVertical
     // sizing to content) — Scheherazade New's natural line-height is much
     // taller than Inter's at the same fontSize, so a padding-only button
@@ -144,7 +152,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  calmBtnText: {
+  tanafasBtnText: {
     color: '#ffffff',
     fontSize: typography.fontSize.body,
     lineHeight: typography.lineHeight.body,

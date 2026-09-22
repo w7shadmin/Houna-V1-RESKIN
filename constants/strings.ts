@@ -14,6 +14,7 @@ import { directoryStrings } from './directoryStrings';
 import { eventsStrings } from './eventsStrings';
 import { journalStrings } from './journalStrings';
 import { homeStrings } from './homeStrings';
+import { accountStrings } from './accountStrings';
 
 export type Language = 'en' | 'ar';
 
@@ -43,7 +44,6 @@ export const strings = {
     },
     entry: {
       subheading: 'You are Houna',
-      calm: 'Calm',
       explore: 'Explore Houna',
     },
     home: homeStrings.en,
@@ -60,8 +60,8 @@ export const strings = {
       advisor: 'Advisor',
       team: 'Team',
     },
-    // Ported from the old MVP's MoreScreen (About / Get Involved / Contact —
-    // there are no user accounts in this app, so no Profile/Sign Out etc).
+    // About / Get Involved / Contact ported from the old MVP's MoreScreen;
+    // Account section (see `account.more` below) is new.
     more: {
       title: 'More',
       subtitle: 'Learn about us and ways to connect.',
@@ -72,6 +72,7 @@ export const strings = {
       getInvolved: 'Get Involved',
       contact: 'Contact Us',
     },
+    account: accountStrings.en,
     tanafas: tanafasStrings.en,
     journal: journalStrings.en,
   },
@@ -101,7 +102,6 @@ export const strings = {
     },
     entry: {
       subheading: 'أنت هُنا',
-      calm: 'هدوء',
       explore: 'استكشف هُنا',
     },
     home: homeStrings.ar,
@@ -128,6 +128,7 @@ export const strings = {
       getInvolved: 'شارك معنا',
       contact: 'تواصل معنا',
     },
+    account: accountStrings.ar,
     tanafas: tanafasStrings.ar,
     journal: journalStrings.ar,
   },

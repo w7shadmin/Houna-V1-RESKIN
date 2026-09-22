@@ -6,9 +6,11 @@ export interface MeditationScene {
   id: SceneId;
   /** Gradient stops for the scene picker card, and the ambient fallback for scenes without real video. */
   gradient: [string, string];
-  /** Real ambient video — muted, looped, visual only. Only sourced for 'fire' so far. */
+  /** Still frame pulled from `video` — the scene picker card's resting background, before any preview plays. */
+  thumbnail?: number;
+  /** Real ambient video — muted, looped, visual only. Only sourced for 'fire', 'rain', and 'forest' so far. */
   video?: number;
-  /** Real ambient audio — looped, independent of the video track. Only sourced for 'fire' so far. */
+  /** Real ambient audio — looped, independent of the video track. Only sourced for 'fire', 'rain', and 'forest' so far. */
   audio?: number;
 }
 
@@ -19,10 +21,26 @@ export const MEDITATION_SCENES: MeditationScene[] = [
   {
     id: 'fire',
     gradient: [palette.peach, palette.raspberry],
+    thumbnail: require('@/assets/images/meditation/fire.jpg'),
     video: require('@/assets/video/fire.mp4'),
     audio: require('@/assets/audio/fire.m4a'),
   },
-  { id: 'rain', gradient: [palette.lightCyan, palette.turquoise] },
-  { id: 'forest', gradient: [palette.turquoise, palette.turquoiseDark] },
+  {
+    id: 'rain',
+    gradient: [palette.lightCyan, palette.turquoise],
+    thumbnail: require('@/assets/images/meditation/rain.jpg'),
+    video: require('@/assets/video/rain.mp4'),
+    // WAV, not AAC — a compressed codec needs to re-init its decoder each
+    // time the player loops, which reads as a brief dropout at the seam.
+    // Uncompressed PCM loops instantly instead.
+    audio: require('@/assets/audio/rain.wav'),
+  },
+  {
+    id: 'forest',
+    gradient: [palette.turquoise, palette.turquoiseDark],
+    thumbnail: require('@/assets/images/meditation/forest.jpg'),
+    video: require('@/assets/video/forest.mp4'),
+    audio: require('@/assets/audio/forest.wav'),
+  },
   { id: 'ocean', gradient: [palette.turquoiseDark, palette.black] },
 ];

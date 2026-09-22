@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Wind, Sparkles, ArrowRight, ArrowLeft, Stethoscope, Building2, HeartPulse, ChevronRight } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { colors, palette, layout, spacing, radius, typography, shadows } from '@/constants/theme';
-import { hexToRgba } from '@/lib/color';
+import { hexToRgba, tileTint, OLD_MVP_ICON_HEX } from '@/lib/color';
 import Logo from '@/components/Logo';
 import IconTile3D from '@/components/IconTile3D';
 import LanguageSwitcherButton from '@/components/LanguageSwitcherButton';
@@ -14,6 +14,7 @@ import HomeMoodCard from '@/components/home/HomeMoodCard';
 import ResourcesRail from '@/components/home/ResourcesRail';
 import ArticlesRail from '@/components/home/ArticlesRail';
 import PodcastsRail from '@/components/home/PodcastsRail';
+import ImpactStats from '@/components/home/ImpactStats';
 
 /**
  * Exact gradient from the old MVP's `.calm-card-gradient` (index.css) — not
@@ -59,7 +60,7 @@ export default function HomeScreen() {
       icon: Stethoscope,
       title: pro.professionals,
       desc: pro.professionalsDesc,
-      color: palette.raspberry,
+      color: OLD_MVP_ICON_HEX.raspberry,
       href: '/directory/professionals',
     },
     {
@@ -67,7 +68,7 @@ export default function HomeScreen() {
       icon: Building2,
       title: pro.organizations,
       desc: pro.organizationsDesc,
-      color: palette.peach,
+      color: OLD_MVP_ICON_HEX.peach,
       href: '/directory/organizations',
     },
     {
@@ -75,7 +76,7 @@ export default function HomeScreen() {
       icon: HeartPulse,
       title: pro.wellness,
       desc: pro.wellnessDesc,
-      color: palette.lightCyan,
+      color: OLD_MVP_ICON_HEX.lightCyan,
       href: '/directory/wellness-centers',
     },
   ];
@@ -181,32 +182,39 @@ export default function HomeScreen() {
                       pressed && { opacity: 0.85 },
                     ]}
                   >
-                    <IconTile3D icon={Icon} color={row.color} size={44} borderRadius={radius.md} />
-                    <View style={styles.proTextWrap}>
-                      <Text
-                        numberOfLines={1}
-                        style={[styles.proTitle, { color: colors.text, fontFamily: fonts.bold }]}
-                      >
-                        {row.title}
-                      </Text>
-                      <Text
-                        numberOfLines={2}
-                        style={[styles.proDesc, { color: colors.textSecondary, fontFamily: fonts.regular }]}
-                      >
-                        {row.desc}
-                      </Text>
-                    </View>
-                    <ChevronRight
-                      size={20}
-                      color={colors.textTertiary}
-                      strokeWidth={1.8}
-                      style={isRTL ? styles.flip : undefined}
-                    />
+                    {({ pressed }) => (
+                      <>
+                        <IconTile3D icon={Icon} color={tileTint(row.color, pressed)} size={44} borderRadius={radius.md} />
+                        <View style={styles.proTextWrap}>
+                          <Text
+                            numberOfLines={1}
+                            style={[styles.proTitle, { color: colors.text, fontFamily: fonts.bold }]}
+                          >
+                            {row.title}
+                          </Text>
+                          <Text
+                            numberOfLines={2}
+                            style={[styles.proDesc, { color: colors.textSecondary, fontFamily: fonts.regular }]}
+                          >
+                            {row.desc}
+                          </Text>
+                        </View>
+                        <ChevronRight
+                          size={20}
+                          color={colors.textTertiary}
+                          strokeWidth={1.8}
+                          style={isRTL ? styles.flip : undefined}
+                        />
+                      </>
+                    )}
                   </Pressable>
                 );
               })}
             </View>
           </View>
+
+          {/* Our Impact in Numbers */}
+          <ImpactStats />
 
           {/* Latest articles / podcasts */}
           <ArticlesRail />

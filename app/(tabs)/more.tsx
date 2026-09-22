@@ -2,6 +2,7 @@ import React from 'react';
 import {
   View,
   Text,
+  Image,
   ScrollView,
   Pressable,
   StyleSheet,
@@ -13,9 +14,11 @@ import {
   HandHeart,
   Phone,
   ChevronRight,
+  User,
   type LucideIcon,
 } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import type { Language } from '@/constants/strings';
 import {
   colors,
@@ -35,10 +38,12 @@ interface MenuItem {
 
 export default function MoreScreen() {
   const { language, setLanguage, t, fonts } = useLanguage();
+  const { loading: authLoading, isGuest, needsUsername, profile } = useAuth();
   const router = useRouter();
+  const ac = t.account.more;
 
-  // Ported from the old MVP's MoreScreen — About / Get Involved / Contact.
-  // No accounts in this app, so no Profile/Notifications/Sign Out etc.
+  // About / Get Involved / Contact ported from the old MVP's MoreScreen;
+  // the Account section below is new.
   const menuItems: MenuItem[] = [
     { icon: Info, label: t.more.about, href: '/about' },
     { icon: HandHeart, label: t.more.getInvolved, href: '/get-involved' },
@@ -75,6 +80,81 @@ export default function MoreScreen() {
         >
           {t.more.subtitle}
         </Text>
+
+        {/* Account section */}
+        {!authLoading && (
+          <View style={styles.accountSection}>
+            <Text
+              style={[
+                styles.sectionLabel,
+                styles.accountSectionLabel,
+                { color: colors.textTertiary, fontFamily: fonts.semiBold },
+              ]}
+            >
+              {ac.heading}
+            </Text>
+
+            {isGuest ? (
+              <View style={[styles.accountCard, { backgroundColor: colors.card, borderColor: colors.border, ...shadows.card }]}>
+                <Text style={[styles.accountTitle, { color: colors.text, fontFamily: fonts.bold }]}>{ac.guestTitle}</Text>
+                <Text style={[styles.accountBody, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{ac.guestBody}</Text>
+                <View style={styles.accountBtnRow}>
+                  <Pressable
+                    onPress={() => router.push('/account/sign-in')}
+                    style={({ pressed }) => [
+                      styles.accountBtnSecondary,
+                      { borderColor: colors.border },
+                      pressed && { backgroundColor: colors.cardPressed },
+                    ]}
+                  >
+                    <Text style={[styles.accountBtnSecondaryText, { color: colors.text, fontFamily: fonts.semiBold }]}>
+                      {ac.signIn}
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={() => router.push('/account/sign-up')}
+                    style={({ pressed }) => [styles.accountBtnPrimary, { backgroundColor: colors.primary }, pressed && { opacity: 0.85 }]}
+                  >
+                    <Text style={[styles.accountBtnPrimaryText, { color: colors.onPrimary, fontFamily: fonts.semiBold }]}>
+                      {ac.createAlias}
+                    </Text>
+                  </Pressable>
+                </View>
+              </View>
+            ) : needsUsername ? (
+              <Pressable
+                onPress={() => router.push('/account/username')}
+                style={({ pressed }) => [
+                  styles.accountCard,
+                  { backgroundColor: colors.card, borderColor: colors.border, ...shadows.card },
+                  pressed && { backgroundColor: colors.cardPressed },
+                ]}
+              >
+                <Text style={[styles.accountTitle, { color: colors.text, fontFamily: fonts.bold }]}>{ac.finishSetupTitle}</Text>
+                <Text style={[styles.accountBody, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{ac.finishSetupBody}</Text>
+              </Pressable>
+            ) : profile ? (
+              <Pressable
+                onPress={() => router.push('/account/profile')}
+                style={({ pressed }) => [
+                  styles.aliasRow,
+                  { backgroundColor: colors.card, borderColor: colors.border, ...shadows.card },
+                  pressed && { backgroundColor: colors.cardPressed },
+                ]}
+              >
+                <View style={[styles.aliasAvatar, { backgroundColor: colors.primaryLightest }]}>
+                  {profile.avatar_url ? (
+                    <Image source={{ uri: profile.avatar_url }} style={styles.aliasAvatarImg} resizeMode="cover" />
+                  ) : (
+                    <User size={20} color={colors.primary} />
+                  )}
+                </View>
+                <Text style={[styles.aliasUsername, { color: colors.text, fontFamily: fonts.semiBold }]}>{profile.username}</Text>
+                <ChevronRight size={18} color={colors.textTertiary} />
+              </Pressable>
+            ) : null}
+          </View>
+        )}
 
         {/* Language section */}
         <View style={styles.languageSection}>
@@ -199,6 +279,77 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.body,
     marginTop: spacing.xs,
     marginBottom: spacing.lg,
+  },
+
+  /* Account section */
+  accountSection: {
+    marginBottom: spacing.xl,
+  },
+  accountSectionLabel: {
+    marginBottom: spacing.sm,
+  },
+  accountCard: {
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    padding: spacing.md,
+  },
+  accountTitle: {
+    fontSize: typography.fontSize.body,
+  },
+  accountBody: {
+    fontSize: typography.fontSize.sm,
+    lineHeight: typography.lineHeight.sm,
+    marginTop: spacing.xs,
+  },
+  accountBtnRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    marginTop: spacing.md,
+  },
+  accountBtnSecondary: {
+    flex: 1,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radius.md,
+    borderWidth: 1,
+  },
+  accountBtnSecondaryText: {
+    fontSize: typography.fontSize.sm,
+  },
+  accountBtnPrimary: {
+    flex: 1,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radius.md,
+  },
+  accountBtnPrimaryText: {
+    fontSize: typography.fontSize.sm,
+  },
+  aliasRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    padding: spacing.md,
+  },
+  aliasAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  aliasAvatarImg: {
+    width: '100%',
+    height: '100%',
+  },
+  aliasUsername: {
+    flex: 1,
+    fontSize: typography.fontSize.body,
   },
 
   /* Language section */

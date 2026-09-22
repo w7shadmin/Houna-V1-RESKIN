@@ -32,7 +32,13 @@
       "expo-sqlite",
       "expo-video",
       "expo-audio",
-      "expo-navigation-bar"
+      "expo-navigation-bar",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Houna needs access to your photos so you can choose an avatar for your Alias."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { colors, spacing, radius, typography } from '@/constants/theme';
@@ -21,9 +22,13 @@ export default function ExerciseHeader({
   accentColor,
 }: ExerciseHeaderProps) {
   const { fonts, isRTL } = useLanguage();
+  // None of this header's callers wrap themselves in a SafeAreaView (they're
+  // plain flex:1 Views), so without this the header sits directly under the
+  // status bar / notch on a real device.
+  const insets = useSafeAreaInsets();
 
   return (
-    <View style={styles.header}>
+    <View style={[styles.header, { paddingTop: insets.top + spacing.md }]}>
       <Pressable
         onPress={onExit}
         hitSlop={12}
@@ -78,7 +83,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
     paddingBottom: spacing.sm,
   },
   iconBtn: {

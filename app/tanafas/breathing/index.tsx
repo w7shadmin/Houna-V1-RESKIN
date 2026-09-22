@@ -2,10 +2,11 @@ import React from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { useRouter, type Href } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Wind, Square, Footprints, Snowflake, Activity, Clock, type LucideIcon } from 'lucide-react-native';
+import { Wind, Square, Footprints, Activity, Clock, type LucideIcon } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { colors, palette, spacing, radius, typography, shadows } from '@/constants/theme';
 import IconTile3D from '@/components/IconTile3D';
+import { tileTint, OLD_MVP_ICON_HEX } from '@/lib/color';
 
 interface ExerciseEntry {
   id: string;
@@ -15,7 +16,10 @@ interface ExerciseEntry {
   description: string;
   duration: string;
   icon: LucideIcon;
+  /** Brand-correct — used for the subtitle text color. */
   accent: string;
+  /** Icon tile fill only — see OLD_MVP_ICON_HEX. */
+  tileColor: string;
 }
 
 export default function BreathingGroundingListScreen() {
@@ -34,6 +38,7 @@ export default function BreathingGroundingListScreen() {
       duration: ex.anxietyRelief.duration,
       icon: Wind,
       accent: palette.turquoise,
+      tileColor: palette.turquoise, // identical to the old MVP's primary-500, no substitution needed
     },
     {
       id: 'steady-mind',
@@ -44,6 +49,7 @@ export default function BreathingGroundingListScreen() {
       duration: ex.steadyMind.duration,
       icon: Square,
       accent: '#C9A600', // Yellow (#FFF200) darkened for legibility as an icon-badge fill
+      tileColor: OLD_MVP_ICON_HEX.gold,
     },
     {
       id: 'panic-relief',
@@ -54,16 +60,7 @@ export default function BreathingGroundingListScreen() {
       duration: ex.panicRelief.duration,
       icon: Footprints,
       accent: palette.raspberry,
-    },
-    {
-      id: 'nervous-system-reset',
-      href: '/tanafas/breathing/nervous-system-reset',
-      title: ex.nervousSystemReset.title,
-      subtitle: ex.nervousSystemReset.subtitle,
-      description: ex.nervousSystemReset.description,
-      duration: ex.nervousSystemReset.duration,
-      icon: Snowflake,
-      accent: palette.lightCyan,
+      tileColor: OLD_MVP_ICON_HEX.raspberry,
     },
     {
       id: 'tension-release',
@@ -74,6 +71,7 @@ export default function BreathingGroundingListScreen() {
       duration: ex.tensionRelease.duration,
       icon: Activity,
       accent: palette.peach,
+      tileColor: OLD_MVP_ICON_HEX.peach,
     },
   ];
 
@@ -108,27 +106,31 @@ export default function BreathingGroundingListScreen() {
                   pressed && { backgroundColor: colors.cardPressed },
                 ]}
               >
-                <IconTile3D icon={Icon} color={item.accent} size={56} iconSize={22} />
-                <View style={styles.text}>
-                  <Text style={[styles.cardTitle, { color: colors.text, fontFamily: fonts.bold }]}>
-                    {item.title}
-                  </Text>
-                  <Text style={[styles.cardSubtitle, { color: item.accent, fontFamily: fonts.semiBold }]}>
-                    {item.subtitle}
-                  </Text>
-                  <Text
-                    numberOfLines={2}
-                    style={[styles.cardDesc, { color: colors.textSecondary, fontFamily: fonts.regular }]}
-                  >
-                    {item.description}
-                  </Text>
-                  <View style={styles.durationRow}>
-                    <Clock size={11} color={colors.textTertiary} />
-                    <Text style={[styles.duration, { color: colors.textTertiary, fontFamily: fonts.regular }]}>
-                      {item.duration}
-                    </Text>
-                  </View>
-                </View>
+                {({ pressed }) => (
+                  <>
+                    <IconTile3D icon={Icon} color={tileTint(item.tileColor, pressed)} size={56} iconSize={22} />
+                    <View style={styles.text}>
+                      <Text style={[styles.cardTitle, { color: colors.text, fontFamily: fonts.bold }]}>
+                        {item.title}
+                      </Text>
+                      <Text style={[styles.cardSubtitle, { color: item.accent, fontFamily: fonts.semiBold }]}>
+                        {item.subtitle}
+                      </Text>
+                      <Text
+                        numberOfLines={2}
+                        style={[styles.cardDesc, { color: colors.textSecondary, fontFamily: fonts.regular }]}
+                      >
+                        {item.description}
+                      </Text>
+                      <View style={styles.durationRow}>
+                        <Clock size={11} color={colors.textTertiary} />
+                        <Text style={[styles.duration, { color: colors.textTertiary, fontFamily: fonts.regular }]}>
+                          {item.duration}
+                        </Text>
+                      </View>
+                    </View>
+                  </>
+                )}
               </Pressable>
             );
           })}

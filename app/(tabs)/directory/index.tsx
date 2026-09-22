@@ -5,11 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Users, Building2, HeartPulse, Newspaper, Headphones, BookOpen, ChevronRight, type LucideIcon } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { colors, palette, spacing, radius, typography, shadows } from '@/constants/theme';
-import { mix } from '@/lib/color';
+import { tileTint, OLD_MVP_ICON_HEX } from '@/lib/color';
 import IconTile3D from '@/components/IconTile3D';
-
-/** A muted gold derived from palette.yellow (mixed toward black) — full-saturation yellow reads poorly as an icon color on a light tinted tile. */
-const GOLD = mix(palette.yellow, palette.black, 0.35);
 
 interface HubCard {
   href:
@@ -36,35 +33,35 @@ export default function DirectoryHubScreen() {
       title: hub.professionalsTitle,
       subtitle: hub.professionalsSubtitle,
       icon: Users,
-      color: palette.raspberry,
+      color: OLD_MVP_ICON_HEX.raspberry,
     },
     {
       href: '/directory/organizations',
       title: hub.organizationsTitle,
       subtitle: hub.organizationsSubtitle,
       icon: Building2,
-      color: palette.peach,
+      color: OLD_MVP_ICON_HEX.peach,
     },
     {
       href: '/directory/wellness-centers',
       title: hub.wellnessTitle,
       subtitle: hub.wellnessSubtitle,
       icon: HeartPulse,
-      color: palette.lightCyan,
+      color: OLD_MVP_ICON_HEX.lightCyan,
     },
     {
       href: '/directory/articles',
       title: hub.articlesTitle,
       subtitle: hub.articlesSubtitle,
       icon: Newspaper,
-      color: GOLD,
+      color: OLD_MVP_ICON_HEX.gold,
     },
     {
       href: '/directory/podcasts',
       title: hub.podcastsTitle,
       subtitle: hub.podcastsSubtitle,
       icon: Headphones,
-      color: palette.turquoiseDark,
+      color: OLD_MVP_ICON_HEX.tealDark,
     },
     {
       href: '/directory/resources',
@@ -96,16 +93,20 @@ export default function DirectoryHubScreen() {
                   pressed && { backgroundColor: colors.cardPressed },
                 ]}
               >
-                <IconTile3D icon={Icon} color={card.color} size={56} iconSize={26} />
-                <View style={styles.cardText}>
-                  <Text style={[styles.cardTitle, { color: colors.text, fontFamily: fonts.bold }]}>
-                    {card.title}
-                  </Text>
-                  <Text style={[styles.cardSubtitle, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-                    {card.subtitle}
-                  </Text>
-                </View>
-                <ChevronRight size={20} color={colors.textTertiary} strokeWidth={1.8} />
+                {({ pressed }) => (
+                  <>
+                    <IconTile3D icon={Icon} color={tileTint(card.color, pressed)} size={56} iconSize={26} />
+                    <View style={styles.cardText}>
+                      <Text style={[styles.cardTitle, { color: colors.text, fontFamily: fonts.bold }]}>
+                        {card.title}
+                      </Text>
+                      <Text style={[styles.cardSubtitle, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
+                        {card.subtitle}
+                      </Text>
+                    </View>
+                    <ChevronRight size={20} color={colors.textTertiary} strokeWidth={1.8} />
+                  </>
+                )}
               </Pressable>
             );
           })}

@@ -69,6 +69,10 @@ export default function TabsLayout() {
             // tab switches, so re-pressing Directory lands back on whatever
             // subpage was last open instead of the hub.
             popToTopOnBlur: true,
+            // The two inner tabs sit right where the raised Tanafas button
+            // floats; nudge them outward so their labels clear it instead
+            // of crowding against its own label underneath.
+            tabBarItemStyle: styles.tabItemInnerStart,
           }}
         />
         <Tabs.Screen
@@ -78,6 +82,7 @@ export default function TabsLayout() {
             tabBarIcon: ({ color, size }) => (
               <CalendarDays size={size} color={color} strokeWidth={1.8} />
             ),
+            tabBarItemStyle: styles.tabItemInnerEnd,
           }}
         />
         <Tabs.Screen
@@ -133,6 +138,12 @@ export default function TabsLayout() {
 const styles = StyleSheet.create({
   fill: {
     flex: 1,
+  },
+  tabItemInnerStart: {
+    marginEnd: 32,
+  },
+  tabItemInnerEnd: {
+    marginStart: 32,
   },
   floatingWrap: {
     position: 'absolute',
