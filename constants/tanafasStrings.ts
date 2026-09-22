@@ -30,6 +30,7 @@ export const tanafasStrings = {
       comingSoonTitle: 'Coming Soon',
       comingSoonBody: (name: string) => `${name} is being crafted with care and will be available in a future update.`,
       gotIt: 'Got it',
+      storyOfWeek: 'Story of the Week',
     },
     breathingList: {
       title: 'Breathing & Grounding',
@@ -181,6 +182,7 @@ export const tanafasStrings = {
       comingSoonTitle: 'قريباً',
       comingSoonBody: (name: string) => `يتم إعداد ${name} بعناية وستكون متاحة في تحديث قادم.`,
       gotIt: 'حسناً',
+      storyOfWeek: 'قصة الأسبوع',
     },
     breathingList: {
       title: 'تمارين التنفس والتأريض',

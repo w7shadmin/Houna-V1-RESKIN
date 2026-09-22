@@ -24,6 +24,20 @@ export const homeStrings = {
       heading: 'How are you feeling today?',
       logged: 'Logged',
       viewHistory: 'View mood history',
+      /**
+       * Shown instead of `logged` when the day's mood-ping count (see
+       * lib/moodPings.ts) is 2 or more — i.e. never just the person who
+       * logged it. Plural-forms shaped like arabicPlural() expects even in
+       * English (which has no dual/few distinction) so both languages carry
+       * the same structure; `{n}` is replaced with the arabicNumber()'d or
+       * plain count by the caller.
+       */
+      notAlone: {
+        one: "You're not alone — {n} person felt this way today",
+        two: "You're not alone — {n} people felt this way today",
+        few: "You're not alone — {n} people felt this way today",
+        many: "You're not alone — {n} people felt this way today",
+      },
     },
     proResources: {
       heading: 'Professional Resources',
@@ -93,6 +107,12 @@ export const homeStrings = {
       heading: 'كيف تشعر اليوم؟',
       logged: 'تم التسجيل',
       viewHistory: 'عرض سجل المزاج',
+      notAlone: {
+        one: 'لست وحدك — شعر شخص واحد بهذا الشعور اليوم',
+        two: 'لست وحدك — شعر شخصان بهذا الشعور اليوم',
+        few: 'لست وحدك — شعر {n} أشخاص بهذا الشعور اليوم',
+        many: 'لست وحدك — شعر {n} شخصًا بهذا الشعور اليوم',
+      },
     },
     proResources: {
       heading: 'الموارد المهنية',

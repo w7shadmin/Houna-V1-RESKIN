@@ -38,7 +38,8 @@
         {
           "photosPermission": "Houna needs access to your photos so you can choose an avatar for your Alias."
         }
-      ]
+      ],
+      "expo-notifications"
     ],
     "experiments": {
       "typedRoutes": true

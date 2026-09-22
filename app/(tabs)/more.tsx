@@ -13,6 +13,7 @@ import {
   Info,
   HandHeart,
   Phone,
+  Bell,
   ChevronRight,
   User,
   type LucideIcon,
@@ -33,7 +34,7 @@ import {
 interface MenuItem {
   icon: LucideIcon;
   label: string;
-  href: '/about' | '/get-involved' | '/contact';
+  href: '/about' | '/get-involved' | '/contact' | '/account/notifications';
 }
 
 export default function MoreScreen() {
@@ -45,6 +46,7 @@ export default function MoreScreen() {
   // About / Get Involved / Contact ported from the old MVP's MoreScreen;
   // the Account section below is new.
   const menuItems: MenuItem[] = [
+    { icon: Bell, label: t.account.notifications.title, href: '/account/notifications' },
     { icon: Info, label: t.more.about, href: '/about' },
     { icon: HandHeart, label: t.more.getInvolved, href: '/get-involved' },
     { icon: Phone, label: t.more.contact, href: '/contact' },
