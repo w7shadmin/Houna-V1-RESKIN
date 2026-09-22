@@ -146,6 +146,21 @@ export default function ProfileScreen() {
             <ChevronRight size={16} color={colors.textTertiary} style={isRTL ? styles.flip : undefined} />
           </View>
         </Pressable>
+
+        <Pressable
+          onPress={() => router.push('/account/community')}
+          style={({ pressed }) => [
+            styles.row,
+            styles.rowPressable,
+            { borderTopColor: colors.borderLight },
+            pressed && { backgroundColor: colors.cardPressed },
+          ]}
+        >
+          <Text style={[styles.rowLabelFixed, styles.rowLabelGrow, { color: colors.text, fontFamily: fonts.semiBold }]}>
+            {s.communityMap}
+          </Text>
+          <ChevronRight size={16} color={colors.textTertiary} style={isRTL ? styles.flip : undefined} />
+        </Pressable>
       </View>
 
       <Pressable
@@ -258,6 +273,11 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     fontSize: typography.fontSize.sm,
     marginEnd: spacing.md,
+  },
+  /** For a row whose label is the only real content (no value text, just a chevron) — let it fill the row. */
+  rowLabelGrow: {
+    flex: 1,
+    fontSize: typography.fontSize.body,
   },
   rowValue: {
     fontSize: typography.fontSize.body,

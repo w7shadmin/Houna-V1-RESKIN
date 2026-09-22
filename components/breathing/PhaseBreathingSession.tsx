@@ -4,6 +4,7 @@ import { Play, Pause, RotateCcw } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { colors, spacing, radius, typography, shadows } from '@/constants/theme';
 import { arabicNumber } from '@/lib/arabicNumerals';
+import { recordTanafasSession } from '@/lib/usageTracking';
 import ExerciseHeader from './ExerciseHeader';
 import type { BreathingPhase, PhaseVisualProps } from './types';
 
@@ -62,6 +63,19 @@ export default function PhaseBreathingSession({
   const totalRounds = Math.ceil(totalSeconds / totalPhaseDuration);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Usage tracking (Alias users only — see lib/usageTracking.ts): set at the
+  // moment a session actually starts, recorded and cleared at whichever of
+  // the several ways it can end happens first — natural completion, a
+  // manual stop/restart, or exiting outright — so a session is counted
+  // exactly once whether it finished or was abandoned.
+  const sessionStartRef = useRef<Date | null>(null);
+  const recordIfStarted = useCallback((endedAt: Date) => {
+    if (sessionStartRef.current) {
+      recordTanafasSession('breathing', sessionStartRef.current, endedAt).catch(() => {});
+      sessionStartRef.current = null;
+    }
+  }, []);
+
   const stop = useCallback(() => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -71,6 +85,7 @@ export default function PhaseBreathingSession({
 
   const reset = useCallback(() => {
     stop();
+    recordIfStarted(new Date());
     setIsRunning(false);
     setIsPaused(false);
     setPhaseIndex(0);
@@ -78,7 +93,7 @@ export default function PhaseBreathingSession({
     setRound(1);
     setTotalElapsed(0);
     setIsComplete(false);
-  }, [stop]);
+  }, [stop, recordIfStarted]);
 
   // Main clock: advances elapsed time in 100ms ticks while running.
   useEffect(() => {
@@ -92,6 +107,7 @@ export default function PhaseBreathingSession({
           stop();
           setIsRunning(false);
           setIsComplete(true);
+          recordIfStarted(new Date());
           return totalSeconds;
         }
         return next;
@@ -104,7 +120,7 @@ export default function PhaseBreathingSession({
         intervalRef.current = null;
       }
     };
-  }, [isRunning, isPaused, totalSeconds, stop]);
+  }, [isRunning, isPaused, totalSeconds, stop, recordIfStarted]);
 
   // Phase advance: once the current phase's duration elapses, move to the
   // next phase, wrapping to a new round after the last one.
@@ -124,6 +140,7 @@ export default function PhaseBreathingSession({
 
   const handleStart = () => {
     if (isComplete) reset();
+    sessionStartRef.current = new Date();
     setIsRunning(true);
     setIsPaused(false);
   };
@@ -132,6 +149,7 @@ export default function PhaseBreathingSession({
   const handleStopReset = () => reset();
   const handleExit = () => {
     stop();
+    recordIfStarted(new Date());
     onExit();
   };
 

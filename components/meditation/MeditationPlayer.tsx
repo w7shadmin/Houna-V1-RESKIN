@@ -22,6 +22,7 @@ import * as NavigationBar from 'expo-navigation-bar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { spacing, radius, typography } from '@/constants/theme';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
+import { recordTanafasSession } from '@/lib/usageTracking';
 import AmbientVisual from './AmbientVisual';
 import type { MeditationScene } from './scenes';
 
@@ -190,16 +191,29 @@ export default function MeditationPlayer({
     }
   }, []);
 
+  // Usage tracking (Alias users only — see lib/usageTracking.ts): set when a
+  // session actually starts, recorded and cleared whichever way it ends
+  // first — natural completion, a manual reset, or exiting — so infinite
+  // sessions (which never hit natural completion) still get counted.
+  const sessionStartRef = useRef<Date | null>(null);
+  const recordIfStarted = useCallback((endedAt: Date) => {
+    if (sessionStartRef.current) {
+      recordTanafasSession('meditation', sessionStartRef.current, endedAt).catch(() => {});
+      sessionStartRef.current = null;
+    }
+  }, []);
+
   const reset = useCallback(() => {
     stop();
     stopFade();
+    recordIfStarted(new Date());
     setIsRunning(false);
     setIsPaused(false);
     setElapsed(0);
     setIsComplete(false);
     fadingOutRef.current = false;
     if (scene.audio) audioPlayer.volume = 1;
-  }, [stop, stopFade, scene.audio, audioPlayer]);
+  }, [stop, stopFade, recordIfStarted, scene.audio, audioPlayer]);
 
   useEffect(() => {
     if (!isRunning || isPaused) return;
@@ -215,6 +229,7 @@ export default function MeditationPlayer({
           stop();
           setIsRunning(false);
           setIsComplete(true);
+          recordIfStarted(new Date());
           return totalSeconds;
         }
         return next;
@@ -226,7 +241,7 @@ export default function MeditationPlayer({
         intervalRef.current = null;
       }
     };
-  }, [isRunning, isPaused, totalSeconds, stop, fadeAudioOut]);
+  }, [isRunning, isPaused, totalSeconds, stop, fadeAudioOut, recordIfStarted]);
 
   const isActive = isRunning && !isPaused;
 
@@ -303,6 +318,7 @@ export default function MeditationPlayer({
 
   const handleStart = () => {
     if (isComplete) reset();
+    sessionStartRef.current = new Date();
     setIsRunning(true);
     setIsPaused(false);
   };
@@ -311,6 +327,7 @@ export default function MeditationPlayer({
   const handleReset = () => reset();
   const handleExit = () => {
     stop();
+    recordIfStarted(new Date());
     onExit();
   };
 
