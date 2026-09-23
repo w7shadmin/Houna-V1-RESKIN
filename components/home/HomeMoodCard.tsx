@@ -9,6 +9,7 @@ import { hexToRgba } from '@/lib/color';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { getTodayEntry, logMoodForToday, MOOD_TAGS, MOOD_EMOJI, MOOD_COLORS, type MoodTag } from '@/lib/journal';
 import { pingMoodAndGetCount } from '@/lib/moodPings';
+import { recordTanafasSession } from '@/lib/usageTracking';
 
 /** Quick one-tap mood check-in — logs (or updates) today's journal entry's mood without requiring any text. */
 export default function HomeMoodCard() {
@@ -48,6 +49,11 @@ export default function HomeMoodCard() {
     setNotAloneCount(null);
     await logMoodForToday(mood);
     setJustLogged(true);
+
+    // Streak/leaderboard activity signal (Segment 5) — Alias-only, silent,
+    // no UI here reacts to it. Deliberately never surfaced in this
+    // check-in flow itself; see lib/streaks.ts and app/account/stats.tsx.
+    recordTanafasSession('mood', new Date()).catch(() => {});
     if (loggedTimeoutRef.current) clearTimeout(loggedTimeoutRef.current);
     loggedTimeoutRef.current = setTimeout(() => setJustLogged(false), 2500);
 

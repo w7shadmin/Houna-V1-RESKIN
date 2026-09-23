@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Wind, Moon, BookOpen, CheckCircle2, ChevronRight, type LucideIcon } from 'lucide-react-native';
+import { Wind, Moon, BookOpen, MessageCircle, CheckCircle2, ChevronRight, type LucideIcon } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { colors, palette, spacing, radius, typography, shadows } from '@/constants/theme';
 import { mix, tileTint, OLD_MVP_ICON_HEX } from '@/lib/color';
@@ -10,7 +10,7 @@ import IconTile3D from '@/components/IconTile3D';
 import StoryOfTheWeek from '@/components/tanafas/StoryOfTheWeek';
 
 interface HubCard {
-  id: 'breathing' | 'meditation' | 'journal';
+  id: 'breathing' | 'meditation' | 'journal' | 'voices';
   title: string;
   subtitle: string;
   description: string;
@@ -53,6 +53,15 @@ export default function TanafasHubScreen() {
       color: OLD_MVP_ICON_HEX.raspberry,
       available: true,
     },
+    {
+      id: 'voices',
+      title: t.tanafas.voices.hubTitle,
+      subtitle: t.tanafas.voices.hubSubtitle,
+      description: t.tanafas.voices.hubDescription,
+      icon: MessageCircle,
+      color: OLD_MVP_ICON_HEX.gold,
+      available: true,
+    },
   ];
 
   const handlePress = (card: HubCard) => {
@@ -66,6 +75,8 @@ export default function TanafasHubScreen() {
       router.push('/tanafas/meditation');
     } else if (card.id === 'journal') {
       router.push('/tanafas/journal');
+    } else if (card.id === 'voices') {
+      router.push('/tanafas/voices');
     }
   };
 

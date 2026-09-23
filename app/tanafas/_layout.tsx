@@ -28,6 +28,9 @@ export default function TanafasLayout() {
       />
       <Stack.Screen name="journal/index" />
       <Stack.Screen name="journal/entry/[id]" />
+      <Stack.Screen name="voices/index" />
+      <Stack.Screen name="voices/submit" />
+      <Stack.Screen name="voices/[id]" />
     </Stack>
   );
 }

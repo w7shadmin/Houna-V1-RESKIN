@@ -161,6 +161,21 @@ export default function ProfileScreen() {
           </Text>
           <ChevronRight size={16} color={colors.textTertiary} style={isRTL ? styles.flip : undefined} />
         </Pressable>
+
+        <Pressable
+          onPress={() => router.push('/account/stats')}
+          style={({ pressed }) => [
+            styles.row,
+            styles.rowPressable,
+            { borderTopColor: colors.borderLight },
+            pressed && { backgroundColor: colors.cardPressed },
+          ]}
+        >
+          <Text style={[styles.rowLabelFixed, styles.rowLabelGrow, { color: colors.text, fontFamily: fonts.semiBold }]}>
+            {s.streakStats}
+          </Text>
+          <ChevronRight size={16} color={colors.textTertiary} style={isRTL ? styles.flip : undefined} />
+        </Pressable>
       </View>
 
       <Pressable

@@ -27,6 +27,7 @@ import {
   type JournalEntry,
   type MoodTag,
 } from '@/lib/journal';
+import { recordTanafasSession } from '@/lib/usageTracking';
 import MoodPicker from '@/components/journal/MoodPicker';
 import ConfirmDialog from '@/components/journal/ConfirmDialog';
 
@@ -92,6 +93,11 @@ export default function JournalEntryScreen() {
     }
     setSaved(true);
     setIsEditing(false);
+
+    // Streak/leaderboard activity signal (Segment 5) — Alias-only, silent;
+    // same 'mood' kind HomeMoodCard's quick check-in uses, since either one
+    // marks the day as active for streak purposes.
+    recordTanafasSession('mood', new Date()).catch(() => {});
   };
 
   const handleDelete = async () => {

@@ -114,7 +114,12 @@ and never add streaks or personal bests. The user ends the hold themselves.
 
 Do not bury crisis resources behind generic labels or deep navigation.
 
-Do not add streaks or guilt mechanics to mood logging.
+Streak *tracking* (breathing, meditation, and mood/journal activity) is in
+scope for Alias accounts — see `lib/streaks.ts`. What's still off-limits is
+guilt framing *at the moment of logging*: `HomeMoodCard`/`MoodPicker` must
+never show "you broke your streak" or similar in the mood check-in flow
+itself. The streak number belongs on its own screen
+(`app/account/stats.tsx`), not inline in that flow.
 
 ## Working style
 
