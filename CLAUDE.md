@@ -1,129 +1,205 @@
 # Houna app
 
-Native mobile app for Houna (houna.org), a mental health nonprofit serving the
-Arab world. Expo / React Native, bilingual Arabic and English.
+A bilingual (Arabic/English) mental wellness app built with Expo / React
+Native. This file documents the **foundation** — the backend, data model,
+navigation shape, and bilingual/RTL infrastructure that should stay stable —
+separately from the **current skin** — today's specific colors, fonts, and
+visual language, which exists to be replaced. Starting a visual redesign?
+Read "Current skin" and "How to reskin" first. Extending features? Read
+"Foundation" first.
 
-Being rebuilt from a completed Vite/React web MVP. That MVP is a **working
-reference implementation** — port from it rather than reinventing. It lives at
-`../reference/old-mvp/` (start with `claude --add-dir ../reference`).
+## What this app is
 
-## Reference documents
+Feature-level description, independent of how any of it is currently styled:
 
-In `../reference/docs/`:
+- Bilingual EN/AR throughout, full RTL support, every string routed through
+  a central catalogue.
+- Two account types: Guest (anonymous, device-only) and Alias (a claimed
+  username, no real name or email required).
+- A content directory of therapists, organizations, wellness centers, and
+  articles, scraped and cached from an external site via a Supabase Edge
+  Function proxy.
+- Events and speaker listings.
+- Tanafas: a bundle of breathing exercises, guided meditation with ambient
+  audio/video scenes, and a private on-device journal with mood tracking.
+- A lightweight social layer: streaks and badges for exercise consistency,
+  an opt-in country-level community map, and Voices — a moderated
+  community post/photo forum.
+- Local and remote push notifications for reminders and broadcasts.
 
-- `houna-build-notes.md` — foundations, feature scope, storage decisions
-- `houna-port-reference.md` — exact timings, strings, and structures from the
-  old MVP
-- `houna-colour-palette.md` — the official brand palette
+## Foundation — do not casually change
 
-**Precedence:** build-notes wins on colour. port-reference wins on behaviour,
-timings and structure. Both beat anything in `Houna_Expo_Rebuild_Plan.docx`,
-which is outdated.
-
-## Commands
+### Tech stack & commands
 
 ```
 npx expo start          # dev server
-npx tsc --noEmit        # typecheck — run before claiming work is done
-npx expo install <pkg>  # always use this, not npm install, for Expo packages
+npx tsc --noEmit         # typecheck — run before claiming work is done
+npx expo install <pkg>   # always use this, not npm install, for Expo packages
 ```
 
-## Brand — do not improvise these
+Expo Router (file-based routing under `app/`), Supabase (Auth/Postgres/
+Storage/Edge Functions) as the sole backend, `expo-sqlite` for the
+on-device journal.
 
-**Primary:** White `#FFFFFF`, Turquoise `#3BAAA7`, Dark Turquoise `#196662`,
-Broken White `#EFF0EE`, Grey 30 `#BCBEC0`, Grey 50 `#939598`,
-Grey 80 `#58595B`, Black `#000000`
+Windows note: Metro's watcher can crash with a "spawn UNKNOWN" error if
+`node_modules` changes while it's running (e.g. mid-`npm install`). Restart
+with `--max-workers 2` if this happens.
 
-**Secondary (accents only, never large surfaces):** Yellow `#FFF200`,
-Raspberry `#F37B83`, Light Cyan `#20C4F4`, Peach `#F9A980`
+### Supabase conventions
 
-The logo's Arabic wordmark is `#525052` — part of the artwork, not a token.
+- **RLS everywhere.** Every table has row-level security; don't disable it
+  as a shortcut.
+- **`INSERT ... RETURNING` gotcha**: Postgres checks the SELECT policy on a
+  freshly inserted row whenever `.select()` is chained after `.insert()`.
+  If the caller's role has no SELECT policy on that table, the insert
+  itself fails even though its `WITH CHECK` passed. Don't chain `.select()`
+  onto an insert unless a SELECT policy actually exists for the caller.
+- **Embedded-join RLS gotcha**: `.select('...,profiles(username)')`
+  silently returns `null` for the joined field on any row the caller
+  doesn't own, because `profiles` RLS only allows reading your own row.
+  Don't rely on embedded joins across tables with owner-scoped RLS — write
+  a `SECURITY DEFINER` RPC that pre-joins and returns only the safe fields
+  instead (see `get_voice_feed`, `get_leaderboard`, `get_country_counts`
+  for the pattern).
+- **Storage buckets** follow an owner-folder-scoped convention:
+  `{bucket}/{user_id}/{filename}`, public read, write restricted to the
+  owning folder. `lib/storageUpload.ts`'s `uploadToBucket()` is the shared
+  upload helper — use it for any new user-photo upload rather than
+  re-inlining the fetch → arrayBuffer → upload → getPublicUrl sequence.
+- **Key format**: this project has both legacy JWT-style keys (`eyJ...`)
+  and new-format keys (`sb_publishable_...` / `sb_secret_...`). An Edge
+  Function's auto-injected `SUPABASE_SERVICE_ROLE_KEY` env var is the new
+  `sb_secret_...` format, not the legacy JWT — don't assume which format
+  you're comparing against.
 
-Fonts: **Inter** for Latin UI, **Scheherazade New** for Arabic. Never
-Scheherazade for Latin body text.
+### Bilingual & RTL infrastructure
 
-Card shadows are tinted with the brand turquoise, not neutral grey:
-`0 2px 12px rgba(59,170,167,0.08)`. Content caps at 430px.
+The *mechanism* is foundation; the *copy* is content, and belongs to
+whichever skin is using it.
 
-The old MVP's palette had several **wrong** values (`#1A7452`, `#FF59A6`,
-`#59FFFF`, `#FF9980`, and a gold). When porting, take structure and layout
-from it but colour from the palette above.
-
-## Theme
-
-**Light mode only.** Dark mode has been removed. Do not add dark variants,
-`prefers-color-scheme` handling, or `useColorScheme` branches.
-
-Two deliberate exceptions, hardcoded dark regardless of theme: the splash
-screen and the meditation player.
-
-## Bilingual and RTL
-
-Arabic is a first-class language, not an afterthought. Every screen must work
-in both directions.
-
-- All user-facing strings go through the string catalogue. Never hardcode
-  English in a component.
+- All user-facing strings go through the string catalogue
+  (`constants/*Strings.ts`, assembled in `constants/strings.ts`). Never
+  hardcode a string in a component.
 - Use `paddingStart`/`paddingEnd`, `marginStart`/`marginEnd`, `start`/`end`.
   **Never** `left`/`right` for layout.
-- Let `flexDirection: 'row'` auto-reverse. Don't manually reorder arrays based
-  on `isRTL` — that double-reverses.
-- `isRTL` should only be used where the framework genuinely can't help:
-  choosing a font family, and flipping directional icons like chevrons.
-- All numbers render as Arabic-Indic numerals (٠-٩) in Arabic, via the shared
-  helper.
-- Arabic plural agreement matters: numbers 3–10 take the plural. ٣ دقائق,
-  not ٣ دقيقة.
-- Do not machine-translate. Arabic strings already exist in the old MVP for
-  most screens — port them.
+- Let `flexDirection: 'row'` auto-reverse. Don't manually reorder arrays
+  based on `isRTL` — that double-reverses.
+- `isRTL` (from `useLanguage()`) is only needed where the framework
+  genuinely can't help: choosing a font family, and flipping directional
+  icons (chevrons, back arrows).
+- All numbers render as Arabic-Indic numerals (٠-٩) in Arabic via
+  `lib/arabicNumerals.ts`'s `arabicNumber()`; plural forms go through
+  `arabicPlural()`, which enforces Arabic agreement — 0/1/2/3–10/11+ each
+  take a different form (٣ دقائق, not ٣ دقيقة).
+- Direction switching (`contexts/LanguageContext.tsx`) uses
+  `I18nManager.forceRTL()` plus a native reload (`expo-updates`, with a
+  `DevSettings.reload()` fallback for Expo Go, and a visible restart
+  prompt if both fail) on native, and `document.documentElement.dir` on
+  web. Test any change to this file on both platforms — a fix that only
+  reloads correctly on web can silently leave native mid-transition.
 
-## Architecture notes
+### Safety requirements — not preferences
 
-- Navigation: Home | Directory | [Tanafas] | Events | More.
-  Tanafas is **not a tab** — it's a raised centre button opening a modal. It
-  never shows an active state.
-- Tanafas contains breathing exercises, meditation, and journal + mood.
-- The breathing session shell is a **reusable component**. Exercises are phase
-  configs passed into it. Never hardcode one exercise's timings into the shell.
+This is a mental health app; some users are in distress. These hold
+regardless of visual skin:
 
-## Journal and mood
+- **Wim Hof / Nervous System Reset**
+  (`app/tanafas/breathing/nervous-system-reset.tsx`) must show a
+  full-screen safety warning before every session, acknowledged
+  explicitly, never persisted across sessions. The breath-retention timer
+  counts **up**, never auto-advances at a target, never pressures
+  continuation, and has no streaks or personal bests. The user ends the
+  hold themselves.
+- Crisis resources must never be buried behind a generic label or deep
+  navigation.
+- No streaks or guilt mechanics on mood logging (`lib/streaks.ts` tracks
+  exercise-session consistency only, never mood).
 
-On-device only, `expo-sqlite`. Not tied to an account, not synced.
+### Journal & mood — privacy requirements
 
-No PIN or biometric lock for the MVP — accounts and their security come after
-launch.
+On-device only (`expo-sqlite`, `lib/journal.ts`), not tied to an account,
+not synced. No PIN or biometric lock for the MVP.
 
-Entries carry a UUID and an `updatedAt` timestamp even though nothing syncs
-yet, so sync can be added later rather than rebuilt.
+- Entries carry a UUID and an `updatedAt` timestamp even though nothing
+  syncs yet, so sync can be added later without a data migration.
+- Must provide an export — a local-only journal with no export means a
+  lost phone is total data loss.
+- Never write copy claiming the journal "never leaves the device" — it's
+  included in the phone's normal OS backup.
 
-Provide an export. A local-only journal with no export means a lost phone is
-total data loss.
+### Navigation shape
 
-Never write copy claiming the journal "never leaves your device" — it is
-included in the phone's normal OS backup.
+Home | Directory | [Tanafas] | Events | More. Tanafas is **not a tab** —
+it's a raised center button opening a modal, and it never shows an active
+state. This is information architecture, separable from how the tab bar is
+*rendered* (icons, colors, the raised-button treatment).
 
-## Safety requirements — not preferences
+### The breathing session shell
 
-This is a mental health app. Some of its users are in distress.
+`components/breathing/PhaseBreathingSession.tsx` is a reusable component;
+each exercise (`app/tanafas/breathing/*.tsx`) passes in a phase-timing
+config. Never hardcode one exercise's timings into the shell itself.
 
-**Wim Hof / Nervous System Reset** must show a full-screen safety warning
-before every session, acknowledged explicitly. Do not persist the
-acknowledgement across sessions. The breath-retention timer counts **up** and
-must never auto-advance at the target, never pressure the user to continue,
-and never add streaks or personal bests. The user ends the hold themselves.
+## Current skin — the part to replace for a new visual direction
 
-Do not bury crisis resources behind generic labels or deep navigation.
+Everything below is today's specific visual choice, not a requirement. A
+reskin is free to change all of it.
 
-Streak *tracking* (breathing, meditation, and mood/journal activity) is in
-scope for Alias accounts — see `lib/streaks.ts`. What's still off-limits is
-guilt framing *at the moment of logging*: `HomeMoodCard`/`MoodPicker` must
-never show "you broke your streak" or similar in the mood check-in flow
-itself. The streak number belongs on its own screen
-(`app/account/stats.tsx`), not inline in that flow.
+**Brand palette** (`constants/theme.ts`): White `#FFFFFF`, Turquoise
+`#3BAAA7`, Dark Turquoise `#196662`, Broken White `#EFF0EE`, Grey 30/50/80,
+Black; accents Yellow, Raspberry, Light Cyan, Peach. Card shadows tinted
+turquoise (`shadows.card`/`cardLg`/`tab`). Content caps at 430px
+(`layout.maxContentWidth`).
 
-## Working style
+**Fonts**: Inter for Latin UI, Scheherazade New for Arabic
+(`latinFontFamily`/`arabicFontFamily` in `theme.ts`) — swap both if
+changing the type system; keeping distinct Latin/Arabic families is a
+reasonable choice to preserve even in a reskin, whatever the specific fonts
+become.
 
-- Read the relevant old-MVP file before building a screen that exists there.
-- Run `npx tsc --noEmit` before reporting work complete.
-- When something in the reference docs conflicts with what's in the code, say
-  so rather than silently picking one.
+**Logo**: `components/Logo.tsx`, used in exactly 2 places (splash, entry
+screen). Swapping the logo replaces the whole asset, not a color.
+
+**Two hardcoded-dark exceptions**: the splash screen
+(`components/SplashIntro*.tsx`) and the meditation player
+(`app/tanafas/meditation/*.tsx`) use `palette.turquoise` /
+`palette.turquoiseDark` / plain white/black directly, bypassing the
+light-mode-only `colors` token surface. Decide deliberately whether a new
+skin keeps this pattern (a permanently-dark "focus mode" for these two
+screens) or unifies them with the rest of the light UI.
+
+**Legacy icon-tile exception**: `OLD_MVP_ICON_HEX` (`lib/color.ts`) is a
+small hardcoded hex set used only for topic icon tiles, in
+`app/(tabs)/index.tsx`, `app/(tabs)/directory/index.tsx`,
+`app/tanafas/index.tsx`, and `app/tanafas/breathing/index.tsx`. It predates
+the current token system and isn't part of the brand palette — safe to
+drop entirely in a reskin, replacing it with tokens from `theme.ts` or a
+new palette.
+
+**Known inconsistency, not fixed here**: about 6 screens hand-roll their
+own loading/error state instead of the shared `LoadingState`/`ErrorState`/
+`InlineError` components (`components/directory/AsyncState.tsx`) used in
+~13 others. Cosmetic only — worth normalizing next time one of those
+screens is touched, not urgent enough on its own to justify a
+wide-reaching pass.
+
+## How to reskin
+
+1. Update `constants/theme.ts`'s `palette`/`colors`/`shadows` — this alone
+   recolors nearly the entire app, since virtually every screen consumes
+   tokens rather than hardcoded values.
+2. Decide on new `latinFontFamily`/`arabicFontFamily` values and update the
+   font-loading setup (`app/_layout.tsx`) to match.
+3. Review the two hardcoded-dark exceptions (splash, meditation player) and
+   decide whether that pattern still fits the new visual direction.
+4. Drop `OLD_MVP_ICON_HEX` (`lib/color.ts`) and its call sites in favor of
+   the new token system.
+5. Swap `components/Logo.tsx`'s asset.
+6. If the brand name or voice is changing — not just the colors — update
+   the copy in `constants/*Strings.ts` too. The brand name and tone are
+   woven into full sentences, not isolated as a single swappable token.
+7. For anything structurally different (not just color/font/spacing), use
+   `components/ui/Button.tsx` and `components/ui/Card.tsx` as the starting
+   primitives rather than hand-rolling new one-off styles per screen.
+8. Re-verify RTL after any layout change — reflow bugs show up specifically
+   in the Arabic direction even when the English layout still looks fine.

@@ -4,8 +4,8 @@ import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { Stethoscope, BookOpen, FileText, Calendar, type LucideIcon } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, palette, spacing, radius, typography } from '@/constants/theme';
-import { tileTint } from '@/lib/color';
+import { colors, spacing, radius, typography } from '@/constants/theme';
+import { tileTint, OLD_MVP_ICON_HEX } from '@/lib/color';
 import { arabicNumber } from '@/lib/arabicNumerals';
 import { fetchTherapists, fetchResourceDirectory, fetchArticles, fetchEvents } from '@/lib/hounaApi';
 import IconTile3D from '@/components/IconTile3D';
@@ -19,16 +19,23 @@ interface ImpactCounts {
 
 const EMPTY_COUNTS: ImpactCounts = { professionals: null, directory: null, articles: null, events: null };
 
-/** Hard cap so a backend bug in `lastPage` can't trigger unbounded requests. */
+/** Hard cap so a broken end-of-data signal can't trigger unbounded requests. */
 const MAX_THERAPIST_PAGES = 50;
 
-/** `fetchTherapists` is paginated with no total-count field — page through everything and sum. Sequential, not parallel: this is a scraper-backed proxy with no known rate-limit tolerance, and `lastPage` is only known after page 1 resolves anyway. */
+/**
+ * `fetchTherapists` is paginated with no usable total-count field — its
+ * `lastPage` is broken upstream (it always reports `currentPage + 1`, never
+ * the true final page, confirmed by probing the proxy directly), so it
+ * can't be used as a loop bound. The only real end-of-data signal is an
+ * empty `therapists` array. Sequential, not parallel: this is a
+ * scraper-backed proxy with no known rate-limit tolerance.
+ */
 async function countAllTherapists(language: 'en' | 'ar'): Promise<number> {
-  const first = await fetchTherapists(1, {}, language);
-  let total = first.therapists.length;
-  const lastPage = Math.min(first.lastPage, MAX_THERAPIST_PAGES);
-  for (let page = 2; page <= lastPage; page++) {
-    total += (await fetchTherapists(page, {}, language)).therapists.length;
+  let total = 0;
+  for (let page = 1; page <= MAX_THERAPIST_PAGES; page++) {
+    const { therapists } = await fetchTherapists(page, {}, language);
+    if (therapists.length === 0) break;
+    total += therapists.length;
   }
   return total;
 }
@@ -79,10 +86,10 @@ export default function ImpactStats() {
   );
 
   const rows: StatRow[] = [
-    { id: 'professionals', icon: Stethoscope, label: s.professionals, color: palette.turquoise, href: '/directory/professionals' },
-    { id: 'directory', icon: BookOpen, label: s.directory, color: palette.turquoiseDark, href: '/directory/resources' },
-    { id: 'articles', icon: FileText, label: s.articles, color: palette.lightCyan, href: '/directory/articles' },
-    { id: 'events', icon: Calendar, label: s.events, color: palette.peach, href: '/events' },
+    { id: 'professionals', icon: Stethoscope, label: s.professionals, color: OLD_MVP_ICON_HEX.raspberry, href: '/directory/professionals' },
+    { id: 'directory', icon: BookOpen, label: s.directory, color: OLD_MVP_ICON_HEX.tealDark, href: '/directory/resources' },
+    { id: 'articles', icon: FileText, label: s.articles, color: OLD_MVP_ICON_HEX.gold, href: '/directory/articles' },
+    { id: 'events', icon: Calendar, label: s.events, color: OLD_MVP_ICON_HEX.peach, href: '/events' },
   ];
 
   const num = (n: number | null) => (n === null ? '—' : isRTL ? arabicNumber(n) : String(n));

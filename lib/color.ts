@@ -36,9 +36,10 @@ export function tileTint(color: string, pressed: boolean): string {
  * ("The old MVP's palette had several wrong values") and forbids reusing
  * them everywhere else in the app. Explicit exception, by request, for only
  * the icon tiles reworked in this pass (Directory hub, Home's Professional
- * Resources rows, Tanafas hub, the breathing exercise list). Every other
- * color in the app — text, buttons, shadows, and any icon tile not in that
- * list — still comes from constants/theme.ts's palette.
+ * Resources rows and Impact stats, Tanafas hub, the breathing exercise
+ * list). Every other color in the app — text, buttons, shadows, and any
+ * icon tile not in that list — still comes from constants/theme.ts's
+ * palette.
  */
 export const OLD_MVP_ICON_HEX = {
   raspberry: '#FF59A6',

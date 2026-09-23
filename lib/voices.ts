@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { uploadToBucket } from './storageUpload';
 
 export type VoicePostStatus = 'pending' | 'approved' | 'rejected';
 
@@ -63,16 +64,7 @@ export async function submitPost(input: SubmitPostInput): Promise<{ error: strin
       const ext = input.imageUri.split('.').pop()?.toLowerCase() || 'jpg';
       const unique = `${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
       const path = `${input.userId}/${unique}.${ext}`;
-      const response = await fetch(input.imageUri);
-      const arrayBuffer = await response.arrayBuffer();
-
-      const { error: uploadError } = await supabase.storage
-        .from('voices')
-        .upload(path, arrayBuffer, { contentType: input.imageMimeType ?? 'image/jpeg' });
-      if (uploadError) throw uploadError;
-
-      const { data } = supabase.storage.from('voices').getPublicUrl(path);
-      imageUrl = data.publicUrl;
+      imageUrl = await uploadToBucket('voices', path, input.imageUri, input.imageMimeType);
     }
 
     const { error: insertError } = await supabase.from('voice_posts').insert({

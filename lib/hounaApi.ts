@@ -343,23 +343,6 @@ export async function fetchAbout(lang: 'en' | 'ar' = 'en'): Promise<AboutData> {
   return resp.json();
 }
 
-// ===== Profile Detail (shared by team and board) =====
-
-export interface ProfileDetail {
-  name: string;
-  role: string;
-  bio: string;
-  imageUrl: string | null;
-  info: Record<string, string>;
-  socials: SocialLink[];
-}
-
-export async function fetchTeamMemberDetail(id: string, lang: 'en' | 'ar' = 'en'): Promise<ProfileDetail> {
-  const resp = await apiFetch(`/profile/team/${id}`, { lang });
-  if (!resp.ok) throw new Error(`Failed to load team member (${resp.status})`);
-  return resp.json();
-}
-
 // ===== Mental Health Directory =====
 
 export interface ResourceTopic {
@@ -408,40 +391,3 @@ export async function fetchResourceDetail(slug: string, lang: 'en' | 'ar' = 'en'
   return resp.json();
 }
 
-// ===== Real Stories =====
-
-export interface StoryItem {
-  title: string;
-  description: string;
-  imageUrl: string | null;
-  url: string | null;
-}
-
-export interface StoryListResponse {
-  stories: StoryItem[];
-}
-
-export async function fetchRealStories(): Promise<StoryListResponse> {
-  const resp = await apiFetch('/real-stories');
-  if (!resp.ok) throw new Error(`Failed to load real stories (${resp.status})`);
-  return resp.json();
-}
-
-// ===== Support Groups =====
-
-export interface SupportGroupItem {
-  title: string;
-  description: string;
-  imageUrl: string | null;
-  url: string | null;
-}
-
-export interface SupportGroupListResponse {
-  groups: SupportGroupItem[];
-}
-
-export async function fetchSupportGroups(): Promise<SupportGroupListResponse> {
-  const resp = await apiFetch('/support-groups');
-  if (!resp.ok) throw new Error(`Failed to load support groups (${resp.status})`);
-  return resp.json();
-}

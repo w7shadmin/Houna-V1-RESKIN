@@ -31,6 +31,7 @@ export const strings = {
       back: 'Back',
       // placeholder — real content not built yet
       comingSoon: 'Coming Soon',
+      restartRequired: 'Restart the app to finish switching text direction.',
     },
     notFound: {
       title: 'Oops!',
@@ -89,6 +90,7 @@ export const strings = {
     common: {
       back: 'رجوع',
       comingSoon: 'قريباً',
+      restartRequired: 'أعد تشغيل التطبيق لإكمال تغيير اتجاه النص.',
     },
     notFound: {
       title: 'عذراً!',

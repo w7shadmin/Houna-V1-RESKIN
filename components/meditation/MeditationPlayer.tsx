@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, Pressable, Animated, StyleSheet } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -15,6 +14,8 @@ import {
   Minimize2,
   Infinity as InfinityIcon,
   CheckCircle2,
+  Minus,
+  Plus,
 } from 'lucide-react-native';
 import { useAudioPlayer } from 'expo-audio';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
@@ -26,7 +27,7 @@ import { recordTanafasSession } from '@/lib/usageTracking';
 import AmbientVisual from './AmbientVisual';
 import type { MeditationScene } from './scenes';
 
-const SESSION_OPTIONS = [5, 10, 15, 20] as const;
+const SESSION_OPTIONS = [5, 10, 20] as const;
 /** How long the player's UI stays visible without interaction before fading out, while actively playing. */
 const CONTROLS_IDLE_MS = 3000;
 const CONTROLS_FADE_IN_MS = 200;
@@ -34,9 +35,7 @@ const CONTROLS_FADE_OUT_MS = 400;
 const CUSTOM_MIN_MINUTES = 1;
 const CUSTOM_MAX_MINUTES = 180;
 const DEFAULT_CUSTOM_MINUTES = 25;
-const CUSTOM_MAX_HOURS = Math.floor(CUSTOM_MAX_MINUTES / 60);
-const HOUR_OPTIONS = Array.from({ length: CUSTOM_MAX_HOURS + 1 }, (_, i) => i);
-const MINUTE_OPTIONS = Array.from({ length: 60 }, (_, i) => i);
+const CUSTOM_STEP_MINUTES = 5;
 const TICK_MS = 1000;
 /** Ambient audio fades out over the last few seconds instead of cutting abruptly at completion. */
 const FADE_OUT_SECONDS = 5;
@@ -133,17 +132,10 @@ export default function MeditationPlayer({
   };
 
   const clampCustomMinutes = (total: number) => Math.min(CUSTOM_MAX_MINUTES, Math.max(CUSTOM_MIN_MINUTES, total));
-  const hoursPart = Math.floor(sessionMinutes / 60);
-  const minutesPart = sessionMinutes % 60;
 
-  const pickHours = (h: number) => {
+  const stepCustom = (delta: number) => {
     setIsInfiniteSession(false);
-    setSessionMinutes(clampCustomMinutes(h * 60 + minutesPart));
-  };
-
-  const pickMinutes = (m: number) => {
-    setIsInfiniteSession(false);
-    setSessionMinutes(clampCustomMinutes(hoursPart * 60 + m));
+    setSessionMinutes((prev) => clampCustomMinutes(prev + delta));
   };
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -462,33 +454,42 @@ export default function MeditationPlayer({
 
               {isCustomMode && (
                 <View style={styles.customWrap}>
-                  <View style={styles.pickerRow}>
-                    <View style={styles.pickerCol}>
-                      <Picker
-                        selectedValue={hoursPart}
-                        onValueChange={(value) => pickHours(Number(value))}
-                        style={styles.picker}
-                        itemStyle={styles.pickerItem}
-                        enabled={!isInfiniteSession}
-                      >
-                        {HOUR_OPTIONS.map((h) => (
-                          <Picker.Item key={h} label={`${num(h)} ${p.hours}`} value={h} color="#000000" />
-                        ))}
-                      </Picker>
-                    </View>
-                    <View style={styles.pickerCol}>
-                      <Picker
-                        selectedValue={minutesPart}
-                        onValueChange={(value) => pickMinutes(Number(value))}
-                        style={styles.picker}
-                        itemStyle={styles.pickerItem}
-                        enabled={!isInfiniteSession}
-                      >
-                        {MINUTE_OPTIONS.map((m) => (
-                          <Picker.Item key={m} label={`${num(m)} ${p.minutes}`} value={m} color="#000000" />
-                        ))}
-                      </Picker>
-                    </View>
+                  <View style={styles.stepperRow}>
+                    <Pressable
+                      onPress={() => stepCustom(-CUSTOM_STEP_MINUTES)}
+                      disabled={isInfiniteSession}
+                      hitSlop={8}
+                      style={({ pressed }) => [
+                        styles.stepperBtn,
+                        isInfiniteSession && styles.stepperBtnDisabled,
+                        pressed && !isInfiniteSession && { backgroundColor: 'rgba(255,255,255,0.28)' },
+                      ]}
+                    >
+                      <Minus size={20} color={isInfiniteSession ? 'rgba(255,255,255,0.35)' : '#ffffff'} strokeWidth={2.4} />
+                    </Pressable>
+
+                    <Text
+                      style={[
+                        styles.customValue,
+                        { fontFamily: fonts.bold },
+                        isInfiniteSession && styles.customValueDisabled,
+                      ]}
+                    >
+                      {num(sessionMinutes)} {arabicPlural(sessionMinutes, p.min)}
+                    </Text>
+
+                    <Pressable
+                      onPress={() => stepCustom(CUSTOM_STEP_MINUTES)}
+                      disabled={isInfiniteSession}
+                      hitSlop={8}
+                      style={({ pressed }) => [
+                        styles.stepperBtn,
+                        isInfiniteSession && styles.stepperBtnDisabled,
+                        pressed && !isInfiniteSession && { backgroundColor: 'rgba(255,255,255,0.28)' },
+                      ]}
+                    >
+                      <Plus size={20} color={isInfiniteSession ? 'rgba(255,255,255,0.35)' : '#ffffff'} strokeWidth={2.4} />
+                    </Pressable>
                   </View>
 
                   <Pressable
@@ -665,26 +666,33 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     marginTop: spacing.lg,
   },
-  pickerRow: {
+  stepperRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: spacing.lg,
   },
-  pickerCol: {
-    width: 120,
+  stepperBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: radius.full,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.14)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.4)',
   },
-  picker: {
-    // The picker's open dropdown/wheel is an OS-native surface we can't
-    // theme (light background regardless of the dark player UI), so the
-    // control itself uses light-on-dark colors rather than trying to force
-    // white text onto that native surface, where it would be unreadable.
-    color: '#000000',
-    backgroundColor: '#ffffff',
-    borderRadius: radius.md,
+  stepperBtnDisabled: {
+    opacity: 0.4,
   },
-  pickerItem: {
-    color: '#000000',
-    fontSize: typography.fontSize.lg,
+  customValue: {
+    color: '#ffffff',
+    fontSize: typography.fontSize.xxl,
+    minWidth: 130,
+    textAlign: 'center',
+  },
+  customValueDisabled: {
+    color: 'rgba(255,255,255,0.5)',
   },
   infinityPill: {
     flexDirection: 'row',

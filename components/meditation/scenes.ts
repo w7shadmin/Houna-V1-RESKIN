@@ -23,7 +23,8 @@ export const MEDITATION_SCENES: MeditationScene[] = [
     gradient: [palette.peach, palette.raspberry],
     thumbnail: require('@/assets/images/meditation/fire.jpg'),
     video: require('@/assets/video/fire.mp4'),
-    audio: require('@/assets/audio/fire.m4a'),
+    // WAV, not AAC — see the note on 'rain' below.
+    audio: require('@/assets/audio/fire.wav'),
   },
   {
     id: 'rain',

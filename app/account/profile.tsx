@@ -6,8 +6,8 @@ import { User, Camera, ChevronRight, X, Check } from 'lucide-react-native';
 import DetailScreen from '@/components/DetailScreen';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
 import { GCC_CODES, getCountryList, getCountryName } from '@/lib/countries';
+import { uploadToBucket } from '@/lib/storageUpload';
 import { colors, spacing, radius, typography, shadows } from '@/constants/theme';
 
 export default function ProfileScreen() {
@@ -47,18 +47,10 @@ export default function ProfileScreen() {
       const asset = result.assets[0];
       const ext = asset.uri.split('.').pop()?.toLowerCase() || 'jpg';
       const path = `${session.user.id}/avatar.${ext}`;
-      const response = await fetch(asset.uri);
-      const arrayBuffer = await response.arrayBuffer();
-
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(path, arrayBuffer, { contentType: asset.mimeType ?? 'image/jpeg', upsert: true });
-      if (uploadError) throw uploadError;
-
-      const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+      const publicUrl = await uploadToBucket('avatars', path, asset.uri, asset.mimeType ?? null);
       // Cache-bust — the path is stable per user, so a reused filename won't
       // otherwise pick up the new image from any CDN/browser cache.
-      await updateProfile({ avatar_url: `${data.publicUrl}?t=${Date.now()}` });
+      await updateProfile({ avatar_url: `${publicUrl}?t=${Date.now()}` });
     } catch {
       Alert.alert(t.account.errors.unknown);
     } finally {

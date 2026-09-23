@@ -26,8 +26,3 @@ export function arabicPlural(n: number, forms: ArabicPluralForms): string {
   if (n >= 3 && n <= 10) return forms.few;
   return forms.many ?? forms.few;
 }
-
-/** Formats a count + Arabic plural label, digits rendered as Arabic-Indic. e.g. arabicCount(3, {...}) -> "٣ دقائق" */
-export function arabicCount(n: number, forms: ArabicPluralForms): string {
-  return `${arabicNumber(n)} ${arabicPlural(n, forms)}`;
-}

@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, Text, ActivityIndicator, Pressable, StyleSheet } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { RotateCw } from 'lucide-react-native';
 import DetailScreen from '@/components/DetailScreen';
 import WorldMap, { type CountryCount } from '@/components/community/WorldMap';
@@ -28,9 +29,11 @@ export default function CommunityMapScreen() {
     setLoading(false);
   }, []);
 
-  useEffect(() => {
-    load();
-  }, [load]);
+  useFocusEffect(
+    useCallback(() => {
+      load();
+    }, [load]),
+  );
 
   const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
   const totalMembers = counts?.reduce((sum, c) => sum + c.count, 0) ?? 0;

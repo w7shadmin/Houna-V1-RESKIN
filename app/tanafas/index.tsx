@@ -7,7 +7,6 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { colors, palette, spacing, radius, typography, shadows } from '@/constants/theme';
 import { mix, tileTint, OLD_MVP_ICON_HEX } from '@/lib/color';
 import IconTile3D from '@/components/IconTile3D';
-import StoryOfTheWeek from '@/components/tanafas/StoryOfTheWeek';
 
 interface HubCard {
   id: 'breathing' | 'meditation' | 'journal' | 'voices';
@@ -87,8 +86,6 @@ export default function TanafasHubScreen() {
         <Text style={[styles.subtitle, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
           {hub.subtitle}
         </Text>
-
-        <StoryOfTheWeek />
 
         <View style={styles.cards}>
           {cards.map((card) => {

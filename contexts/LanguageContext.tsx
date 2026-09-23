@@ -6,7 +6,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { I18nManager, Platform } from 'react-native';
+import { Alert, DevSettings, I18nManager, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Localization from 'expo-localization';
 import { strings, type Language, type StringCatalogue } from '@/constants/strings';
@@ -96,15 +96,22 @@ export function LanguageProvider({ children }: LanguageProviderProps) {
     if (Platform.OS === 'web') return; // RN Web re-renders without a reload
 
     // RTL only takes effect after a native reload. expo-updates works in
-    // dev builds and standalone binaries; it's unavailable in Expo Go, so
-    // we swallow that case rather than crash — the user can still restart
-    // the app manually and the new direction will be there.
+    // dev builds and standalone binaries; it's unavailable in Expo Go.
     import('expo-updates')
       .then((Updates) => Updates.reloadAsync())
       .catch(() => {
-        console.warn(
-          'Restart the app to apply the new text direction (expo-updates reload unavailable in this environment).',
-        );
+        // DevSettings.reload() works in Expo Go/dev clients where
+        // expo-updates doesn't — try it before giving up.
+        if (DevSettings?.reload) {
+          DevSettings.reload();
+          return;
+        }
+        // Neither reload path worked. I18nManager's internal state is
+        // already flipped, but nothing has re-rendered the native layout
+        // to match — text and layout direction would silently disagree
+        // until some other reload happens. A console.warn here is
+        // invisible to the person using the app, so surface it instead.
+        Alert.alert(strings[next].common.restartRequired);
       });
   }, []);
 

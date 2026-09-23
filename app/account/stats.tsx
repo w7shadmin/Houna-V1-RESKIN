@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { View, Text, Pressable, ActivityIndicator, Share, StyleSheet } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { Award, Share2 } from 'lucide-react-native';
 import DetailScreen from '@/components/DetailScreen';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -41,16 +42,20 @@ export default function StatsScreen() {
     setEarnedBadges(await getMyEarnedBadgeCodes());
   }, [session]);
 
-  useEffect(() => {
-    loadStreak();
-  }, [loadStreak]);
+  useFocusEffect(
+    useCallback(() => {
+      loadStreak();
+    }, [loadStreak]),
+  );
 
-  useEffect(() => {
-    setLoadingBoard(true);
-    getLeaderboard(period)
-      .then(setLeaderboard)
-      .finally(() => setLoadingBoard(false));
-  }, [period]);
+  useFocusEffect(
+    useCallback(() => {
+      setLoadingBoard(true);
+      getLeaderboard(period)
+        .then(setLeaderboard)
+        .finally(() => setLoadingBoard(false));
+    }, [period]),
+  );
 
   const handleShare = () => {
     if (!streak || streak.current === 0) return;
