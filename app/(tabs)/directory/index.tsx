@@ -5,8 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Users, Building2, HeartPulse, Newspaper, Headphones, BookOpen, ChevronRight, type LucideIcon } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { colors, palette, spacing, radius, typography, shadows } from '@/constants/theme';
-import { tileTint, OLD_MVP_ICON_HEX } from '@/lib/color';
-import IconTile3D from '@/components/IconTile3D';
+import { OLD_MVP_ICON_HEX, OLD_MVP_ICON_HEX_PALE } from '@/lib/color';
+import FlatIconTile from '@/components/ui/FlatIconTile';
 
 interface HubCard {
   href:
@@ -20,6 +20,7 @@ interface HubCard {
   subtitle: string;
   icon: LucideIcon;
   color: string;
+  bg: string;
 }
 
 export default function DirectoryHubScreen() {
@@ -33,42 +34,48 @@ export default function DirectoryHubScreen() {
       title: hub.professionalsTitle,
       subtitle: hub.professionalsSubtitle,
       icon: Users,
-      color: OLD_MVP_ICON_HEX.raspberry,
+      color: palette.turquoise,
+      bg: OLD_MVP_ICON_HEX_PALE.primary,
     },
     {
       href: '/directory/organizations',
       title: hub.organizationsTitle,
       subtitle: hub.organizationsSubtitle,
       icon: Building2,
-      color: OLD_MVP_ICON_HEX.peach,
+      color: OLD_MVP_ICON_HEX.gold,
+      bg: OLD_MVP_ICON_HEX_PALE.gold,
     },
     {
       href: '/directory/wellness-centers',
       title: hub.wellnessTitle,
       subtitle: hub.wellnessSubtitle,
       icon: HeartPulse,
-      color: OLD_MVP_ICON_HEX.lightCyan,
+      color: OLD_MVP_ICON_HEX.peach,
+      bg: OLD_MVP_ICON_HEX_PALE.peach,
     },
     {
       href: '/directory/articles',
       title: hub.articlesTitle,
       subtitle: hub.articlesSubtitle,
       icon: Newspaper,
-      color: OLD_MVP_ICON_HEX.gold,
+      color: OLD_MVP_ICON_HEX.lightCyan,
+      bg: OLD_MVP_ICON_HEX_PALE.lightCyan,
     },
     {
       href: '/directory/podcasts',
       title: hub.podcastsTitle,
       subtitle: hub.podcastsSubtitle,
       icon: Headphones,
-      color: OLD_MVP_ICON_HEX.tealDark,
+      color: OLD_MVP_ICON_HEX.raspberry,
+      bg: OLD_MVP_ICON_HEX_PALE.raspberry,
     },
     {
       href: '/directory/resources',
       title: hub.resourcesTitle,
       subtitle: hub.resourcesSubtitle,
       icon: BookOpen,
-      color: palette.turquoise,
+      color: OLD_MVP_ICON_HEX.tealDark,
+      bg: OLD_MVP_ICON_HEX_PALE.tealDark,
     },
   ];
 
@@ -93,20 +100,16 @@ export default function DirectoryHubScreen() {
                   pressed && { backgroundColor: colors.cardPressed },
                 ]}
               >
-                {({ pressed }) => (
-                  <>
-                    <IconTile3D icon={Icon} color={tileTint(card.color, pressed)} size={56} iconSize={26} />
-                    <View style={styles.cardText}>
-                      <Text style={[styles.cardTitle, { color: colors.text, fontFamily: fonts.bold }]}>
-                        {card.title}
-                      </Text>
-                      <Text style={[styles.cardSubtitle, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-                        {card.subtitle}
-                      </Text>
-                    </View>
-                    <ChevronRight size={20} color={colors.textTertiary} strokeWidth={1.8} />
-                  </>
-                )}
+                <FlatIconTile icon={Icon} color={card.color} bg={card.bg} size={56} iconSize={26} />
+                <View style={styles.cardText}>
+                  <Text style={[styles.cardTitle, { color: colors.text, fontFamily: fonts.bold }]}>
+                    {card.title}
+                  </Text>
+                  <Text style={[styles.cardSubtitle, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
+                    {card.subtitle}
+                  </Text>
+                </View>
+                <ChevronRight size={20} color={colors.textTertiary} strokeWidth={1.8} />
               </Pressable>
             );
           })}

@@ -4,11 +4,11 @@ import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { Stethoscope, BookOpen, FileText, Calendar, type LucideIcon } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, typography } from '@/constants/theme';
-import { tileTint, OLD_MVP_ICON_HEX } from '@/lib/color';
+import { colors, palette, spacing, radius, typography } from '@/constants/theme';
+import { OLD_MVP_ICON_HEX, OLD_MVP_ICON_HEX_PALE } from '@/lib/color';
 import { arabicNumber } from '@/lib/arabicNumerals';
 import { fetchTherapists, fetchResourceDirectory, fetchArticles, fetchEvents } from '@/lib/hounaApi';
-import IconTile3D from '@/components/IconTile3D';
+import FlatIconTile from '@/components/ui/FlatIconTile';
 
 interface ImpactCounts {
   professionals: number | null;
@@ -44,7 +44,10 @@ interface StatRow {
   id: keyof ImpactCounts;
   icon: LucideIcon;
   label: string;
+  /** Full-saturation icon color. */
   color: string;
+  /** Pale tile background paired with `color` — see `OLD_MVP_ICON_HEX_PALE`. */
+  bg: string;
   href: '/directory/professionals' | '/directory/resources' | '/directory/articles' | '/events';
 }
 
@@ -86,10 +89,10 @@ export default function ImpactStats() {
   );
 
   const rows: StatRow[] = [
-    { id: 'professionals', icon: Stethoscope, label: s.professionals, color: OLD_MVP_ICON_HEX.raspberry, href: '/directory/professionals' },
-    { id: 'directory', icon: BookOpen, label: s.directory, color: OLD_MVP_ICON_HEX.tealDark, href: '/directory/resources' },
-    { id: 'articles', icon: FileText, label: s.articles, color: OLD_MVP_ICON_HEX.gold, href: '/directory/articles' },
-    { id: 'events', icon: Calendar, label: s.events, color: OLD_MVP_ICON_HEX.peach, href: '/events' },
+    { id: 'professionals', icon: Stethoscope, label: s.professionals, color: palette.turquoise, bg: OLD_MVP_ICON_HEX_PALE.primary, href: '/directory/professionals' },
+    { id: 'directory', icon: BookOpen, label: s.directory, color: OLD_MVP_ICON_HEX.tealDark, bg: OLD_MVP_ICON_HEX_PALE.tealDark, href: '/directory/resources' },
+    { id: 'articles', icon: FileText, label: s.articles, color: OLD_MVP_ICON_HEX.lightCyan, bg: OLD_MVP_ICON_HEX_PALE.lightCyan, href: '/directory/articles' },
+    { id: 'events', icon: Calendar, label: s.events, color: OLD_MVP_ICON_HEX.peach, bg: OLD_MVP_ICON_HEX_PALE.peach, href: '/events' },
   ];
 
   const num = (n: number | null) => (n === null ? '—' : isRTL ? arabicNumber(n) : String(n));
@@ -114,17 +117,13 @@ export default function ImpactStats() {
                   pressed && { opacity: 0.85 },
                 ]}
               >
-                {({ pressed }) => (
-                  <>
-                    <IconTile3D icon={Icon} color={tileTint(row.color, pressed)} size={44} borderRadius={radius.md} style={styles.cardIcon} />
-                    <Text style={[styles.cardNumber, { color: colors.text, fontFamily: fonts.bold }]}>
-                      {num(counts[row.id])}
-                    </Text>
-                    <Text style={[styles.cardLabel, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-                      {row.label}
-                    </Text>
-                  </>
-                )}
+                <FlatIconTile icon={Icon} color={row.color} bg={row.bg} size={44} borderRadius={radius.md} style={styles.cardIcon} />
+                <Text style={[styles.cardNumber, { color: colors.text, fontFamily: fonts.bold }]}>
+                  {num(counts[row.id])}
+                </Text>
+                <Text style={[styles.cardLabel, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
+                  {row.label}
+                </Text>
               </Pressable>
             );
           })}

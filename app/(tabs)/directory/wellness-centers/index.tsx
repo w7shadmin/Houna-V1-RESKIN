@@ -114,7 +114,7 @@ export default function WellnessCentersListScreen() {
               <ListItemCard
                 imageUrl={item.imageUrl}
                 title={item.name}
-                description={item.summary}
+                tags={item.services}
                 imageResizeMode="contain"
                 onPress={() =>
                   router.push({ pathname: '/directory/wellness-centers/[id]', params: { id: item.id } })

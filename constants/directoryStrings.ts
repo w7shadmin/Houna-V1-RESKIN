@@ -46,6 +46,7 @@ export const directoryStrings = {
       reachedEnd: "You've reached the end",
       loadMore: 'Load more',
       noResults: 'No results found',
+      moreCount: (n: string) => `+${n} more`,
     },
     professionals: {
       title: 'Professionals',
@@ -158,6 +159,7 @@ export const directoryStrings = {
       reachedEnd: 'لقد وصلت إلى النهاية',
       loadMore: 'تحميل المزيد',
       noResults: 'لا توجد نتائج',
+      moreCount: (n: string) => `+${n} أخرى`,
     },
     professionals: {
       title: 'المختصون',

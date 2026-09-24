@@ -1,4 +1,5 @@
 import { palette } from '@/constants/theme';
+import { OLD_MVP_ICON_HEX } from '@/lib/color';
 
 export type SceneId = 'fire' | 'rain' | 'forest' | 'ocean';
 
@@ -20,7 +21,7 @@ export interface MeditationScene {
 export const MEDITATION_SCENES: MeditationScene[] = [
   {
     id: 'fire',
-    gradient: [palette.peach, palette.raspberry],
+    gradient: [OLD_MVP_ICON_HEX.peach, OLD_MVP_ICON_HEX.raspberry],
     thumbnail: require('@/assets/images/meditation/fire.jpg'),
     video: require('@/assets/video/fire.mp4'),
     // WAV, not AAC — see the note on 'rain' below.
@@ -28,7 +29,7 @@ export const MEDITATION_SCENES: MeditationScene[] = [
   },
   {
     id: 'rain',
-    gradient: [palette.lightCyan, palette.turquoise],
+    gradient: [OLD_MVP_ICON_HEX.lightCyan, palette.turquoise],
     thumbnail: require('@/assets/images/meditation/rain.jpg'),
     video: require('@/assets/video/rain.mp4'),
     // WAV, not AAC — a compressed codec needs to re-init its decoder each

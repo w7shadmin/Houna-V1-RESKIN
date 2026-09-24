@@ -48,3 +48,22 @@ export const OLD_MVP_ICON_HEX = {
   tealDark: '#1A7452',
   gold: '#B8860B',
 } as const;
+
+/**
+ * The exact pale "-50" background shades paired with `OLD_MVP_ICON_HEX`
+ * above (plus `primary`, matching `palette.turquoise`) — read directly off
+ * the reference app's own tailwind config rather than computed at runtime
+ * via `mix()`, so flat icon tiles match it pixel-for-pixel. Use as the tile
+ * background with the full-saturation `OLD_MVP_ICON_HEX` color as the icon
+ * itself — a flat pale-bg-plus-colored-icon treatment, not IconTile3D's
+ * glossy bevel-plus-white-icon one. Only where that flatter look is
+ * explicitly wanted (currently: Home's Impact stats).
+ */
+export const OLD_MVP_ICON_HEX_PALE = {
+  primary: '#f0fafa',
+  raspberry: '#fff0f7',
+  peach: '#fff5f2',
+  lightCyan: '#e8ffff',
+  tealDark: '#e8f5f0',
+  gold: '#fffbeb',
+} as const;

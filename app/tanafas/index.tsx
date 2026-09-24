@@ -5,8 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Wind, Moon, BookOpen, MessageCircle, CheckCircle2, ChevronRight, type LucideIcon } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { colors, palette, spacing, radius, typography, shadows } from '@/constants/theme';
-import { mix, tileTint, OLD_MVP_ICON_HEX } from '@/lib/color';
-import IconTile3D from '@/components/IconTile3D';
+import { mix, OLD_MVP_ICON_HEX, OLD_MVP_ICON_HEX_PALE } from '@/lib/color';
+import FlatIconTile from '@/components/ui/FlatIconTile';
 
 interface HubCard {
   id: 'breathing' | 'meditation' | 'journal' | 'voices';
@@ -15,6 +15,7 @@ interface HubCard {
   description: string;
   icon: LucideIcon;
   color: string;
+  bg: string;
   available: boolean;
 }
 
@@ -32,6 +33,7 @@ export default function TanafasHubScreen() {
       description: hub.breathingDescription,
       icon: Wind,
       color: OLD_MVP_ICON_HEX.lightCyan,
+      bg: OLD_MVP_ICON_HEX_PALE.lightCyan,
       available: true,
     },
     {
@@ -41,6 +43,7 @@ export default function TanafasHubScreen() {
       description: hub.meditationDescription,
       icon: Moon,
       color: OLD_MVP_ICON_HEX.peach,
+      bg: OLD_MVP_ICON_HEX_PALE.peach,
       available: true,
     },
     {
@@ -50,6 +53,7 @@ export default function TanafasHubScreen() {
       description: hub.journalDescription,
       icon: BookOpen,
       color: OLD_MVP_ICON_HEX.raspberry,
+      bg: OLD_MVP_ICON_HEX_PALE.raspberry,
       available: true,
     },
     {
@@ -59,6 +63,7 @@ export default function TanafasHubScreen() {
       description: t.tanafas.voices.hubDescription,
       icon: MessageCircle,
       color: OLD_MVP_ICON_HEX.gold,
+      bg: OLD_MVP_ICON_HEX_PALE.gold,
       available: true,
     },
   ];
@@ -100,26 +105,22 @@ export default function TanafasHubScreen() {
                   pressed && { backgroundColor: colors.cardPressed },
                 ]}
               >
-                {({ pressed }) => (
-                  <>
-                    <IconTile3D icon={Icon} color={tileTint(card.color, pressed)} size={52} />
-                    <View style={styles.cardText}>
-                      <Text style={[styles.cardTitle, { color: colors.text, fontFamily: fonts.bold }]}>
-                        {card.title}
-                      </Text>
-                      <Text style={[styles.cardSubtitle, { color: colors.primary, fontFamily: fonts.semiBold }]}>
-                        {card.subtitle}
-                      </Text>
-                      <Text
-                        numberOfLines={2}
-                        style={[styles.cardDesc, { color: colors.textSecondary, fontFamily: fonts.regular }]}
-                      >
-                        {card.description}
-                      </Text>
-                    </View>
-                    <ChevronRight size={20} color={colors.textTertiary} strokeWidth={1.8} />
-                  </>
-                )}
+                <FlatIconTile icon={Icon} color={card.color} bg={card.bg} size={52} />
+                <View style={styles.cardText}>
+                  <Text style={[styles.cardTitle, { color: colors.text, fontFamily: fonts.bold }]}>
+                    {card.title}
+                  </Text>
+                  <Text style={[styles.cardSubtitle, { color: colors.primary, fontFamily: fonts.semiBold }]}>
+                    {card.subtitle}
+                  </Text>
+                  <Text
+                    numberOfLines={2}
+                    style={[styles.cardDesc, { color: colors.textSecondary, fontFamily: fonts.regular }]}
+                  >
+                    {card.description}
+                  </Text>
+                </View>
+                <ChevronRight size={20} color={colors.textTertiary} strokeWidth={1.8} />
               </Pressable>
             );
           })}
