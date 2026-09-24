@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, Text, Pressable, Animated, StyleSheet } from 'react-native';
+import { AppState, View, Text, Pressable, Animated, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -17,7 +17,7 @@ import {
   Minus,
   Plus,
 } from 'lucide-react-native';
-import { useAudioPlayer } from 'expo-audio';
+import { setAudioModeAsync, useAudioPlayer } from 'expo-audio';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import * as NavigationBar from 'expo-navigation-bar';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -76,6 +76,28 @@ export default function MeditationPlayer({
     return () => {
       deactivateKeepAwake(tag).catch(() => {});
     };
+  }, []);
+
+  // Lets audio keep playing once the app is backgrounded or the phone is
+  // locked (Android only for now — untested on iOS, which additionally
+  // needs `UIBackgroundModes: ["audio"]` in app.json and a build that
+  // isn't Expo Go). `doNotMix` requests real audio focus, which is also
+  // what makes an incoming-call interruption actually reach the app.
+  useEffect(() => {
+    setAudioModeAsync({
+      shouldPlayInBackground: true,
+      playsInSilentMode: true,
+      interruptionMode: 'doNotMix',
+    }).catch(() => {});
+  }, []);
+
+  // Tracks foreground/background so the muted ambient video can stop
+  // decoding while backgrounded — it isn't visible then anyway. Audio
+  // playback itself is untouched by this; see the `isActive` effect below.
+  const [isForeground, setIsForeground] = useState(AppState.currentState === 'active');
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (state) => setIsForeground(state === 'active'));
+    return () => sub.remove();
   }, []);
 
   const [sessionMinutes, setSessionMinutes] = useState<number>(10);
@@ -145,6 +167,22 @@ export default function MeditationPlayer({
   const totalSeconds = isInfiniteSession ? Infinity : sessionMinutes * 60;
   const hasRealMedia = !!scene.video;
 
+  // `elapsed` is derived from wall-clock time, not ticked up by the
+  // interval below — the JS thread (and therefore any setInterval) is
+  // suspended while the app is backgrounded/locked, but the native audio
+  // keeps playing regardless. Deriving from real timestamps means the
+  // displayed time (and the completion/fade-out check) self-corrects the
+  // instant the app returns to the foreground, instead of having silently
+  // frozen for however long it was backgrounded. `elapsedBaseRef` is the
+  // total of all previously-completed running segments; `segmentStartMsRef`
+  // is when the current segment began (null while paused/not running).
+  const elapsedBaseRef = useRef(0);
+  const segmentStartMsRef = useRef<number | null>(null);
+  const computeElapsedSeconds = useCallback(() => {
+    if (segmentStartMsRef.current === null) return elapsedBaseRef.current;
+    return elapsedBaseRef.current + Math.floor((Date.now() - segmentStartMsRef.current) / 1000);
+  }, []);
+
   const audioPlayer = useAudioPlayer(scene.audio);
   const fadingOutRef = useRef(false);
   const fadeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -204,36 +242,49 @@ export default function MeditationPlayer({
     setElapsed(0);
     setIsComplete(false);
     fadingOutRef.current = false;
+    elapsedBaseRef.current = 0;
+    segmentStartMsRef.current = null;
     if (scene.audio) audioPlayer.volume = 1;
   }, [stop, stopFade, recordIfStarted, scene.audio, audioPlayer]);
 
+  const tickAndCheckCompletion = useCallback(() => {
+    const rawElapsed = computeElapsedSeconds();
+    const remaining = totalSeconds - rawElapsed;
+    if (remaining > 0 && remaining <= FADE_OUT_SECONDS && !fadingOutRef.current) {
+      fadingOutRef.current = true;
+      fadeAudioOut();
+    }
+    if (rawElapsed >= totalSeconds) {
+      setElapsed(totalSeconds);
+      stop();
+      setIsRunning(false);
+      setIsComplete(true);
+      recordIfStarted(new Date());
+    } else {
+      setElapsed(rawElapsed);
+    }
+  }, [computeElapsedSeconds, totalSeconds, fadeAudioOut, stop, recordIfStarted]);
+
   useEffect(() => {
     if (!isRunning || isPaused) return;
-    intervalRef.current = setInterval(() => {
-      setElapsed((prev) => {
-        const next = prev + 1;
-        const remaining = totalSeconds - next;
-        if (remaining > 0 && remaining <= FADE_OUT_SECONDS && !fadingOutRef.current) {
-          fadingOutRef.current = true;
-          fadeAudioOut();
-        }
-        if (next >= totalSeconds) {
-          stop();
-          setIsRunning(false);
-          setIsComplete(true);
-          recordIfStarted(new Date());
-          return totalSeconds;
-        }
-        return next;
-      });
-    }, TICK_MS);
+    intervalRef.current = setInterval(tickAndCheckCompletion, TICK_MS);
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
     };
-  }, [isRunning, isPaused, totalSeconds, stop, fadeAudioOut, recordIfStarted]);
+  }, [isRunning, isPaused, tickAndCheckCompletion]);
+
+  // Recompute immediately on returning to the foreground, rather than
+  // waiting up to a full tick — this is what makes a session that finished
+  // its target duration while backgrounded actually complete (fade-out,
+  // isComplete, usage tracking) as soon as the app is reopened.
+  useEffect(() => {
+    if (isForeground && isRunning && !isPaused) {
+      tickAndCheckCompletion();
+    }
+  }, [isForeground, isRunning, isPaused, tickAndCheckCompletion]);
 
   const isActive = isRunning && !isPaused;
 
@@ -311,11 +362,20 @@ export default function MeditationPlayer({
   const handleStart = () => {
     if (isComplete) reset();
     sessionStartRef.current = new Date();
+    segmentStartMsRef.current = Date.now();
     setIsRunning(true);
     setIsPaused(false);
   };
-  const handlePause = () => setIsPaused(true);
-  const handleResume = () => setIsPaused(false);
+  const handlePause = () => {
+    elapsedBaseRef.current = computeElapsedSeconds();
+    segmentStartMsRef.current = null;
+    setElapsed(elapsedBaseRef.current);
+    setIsPaused(true);
+  };
+  const handleResume = () => {
+    segmentStartMsRef.current = Date.now();
+    setIsPaused(false);
+  };
   const handleReset = () => reset();
   const handleExit = () => {
     stop();
@@ -335,7 +395,7 @@ export default function MeditationPlayer({
     <View style={styles.container}>
       <StatusBar hidden={isFullscreen} style="light" />
       {visualEnabled ? (
-        <AmbientVisual scene={scene} animate={isActive} />
+        <AmbientVisual scene={scene} animate={isActive && isForeground} />
       ) : (
         <View style={styles.audioOnlyBg}>
           <Headphones size={40} color="rgba(255,255,255,0.22)" strokeWidth={1.2} />
