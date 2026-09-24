@@ -105,7 +105,7 @@ export default function TanafasHubScreen() {
                   pressed && { backgroundColor: colors.cardPressed },
                 ]}
               >
-                <FlatIconTile icon={Icon} color={card.color} bg={card.bg} size={52} bevel />
+                <FlatIconTile icon={Icon} color={card.color} bg={card.bg} size={52} />
                 <View style={styles.cardText}>
                   <Text style={[styles.cardTitle, { color: colors.text, fontFamily: fonts.bold }]}>
                     {card.title}

@@ -112,7 +112,7 @@ export default function BreathingGroundingListScreen() {
                   pressed && { backgroundColor: colors.cardPressed },
                 ]}
               >
-                <FlatIconTile icon={Icon} color={item.tileColor} bg={item.tileBg} size={56} iconSize={22} bevel />
+                <FlatIconTile icon={Icon} color={item.tileColor} bg={item.tileBg} size={56} iconSize={22} />
                 <View style={styles.text}>
                   <Text style={[styles.cardTitle, { color: colors.text, fontFamily: fonts.bold }]}>
                     {item.title}
