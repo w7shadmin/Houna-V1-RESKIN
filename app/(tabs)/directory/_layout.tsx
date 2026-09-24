@@ -2,6 +2,13 @@ import React from 'react';
 import { Stack } from 'expo-router';
 import { colors } from '@/constants/theme';
 
+// Ensures a direct deep link into a subpage (e.g. Home linking straight
+// into /directory/professionals) still gets the hub route synthesized
+// beneath it, so `router.back()` from the subpage has somewhere to land.
+export const unstable_settings = {
+  initialRouteName: 'index',
+};
+
 /** Nested stack for the Directory tab — hub, then per-category list & detail. */
 export default function DirectoryLayout() {
   return (

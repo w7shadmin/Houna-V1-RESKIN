@@ -14,6 +14,9 @@ interface Props extends PhaseVisualProps {
 }
 
 const SQUARE = 200;
+/** Keeps the tracing dot's path inside the dashed border instead of sitting directly on it. */
+const TRACK_INSET = 16;
+const TRACK_SIZE = SQUARE - TRACK_INSET * 2;
 
 /** Square with a dot tracing the perimeter (one edge per phase) — for box/4x4 breathing. */
 export default function TracingSquareVisual({
@@ -34,10 +37,10 @@ export default function TracingSquareVisual({
   if (!isComplete) {
     const p = progressInPhase;
     switch (phaseIndex % 4) {
-      case 0: dotX = p * SQUARE; dotY = 0; break;
-      case 1: dotX = SQUARE; dotY = p * SQUARE; break;
-      case 2: dotX = (1 - p) * SQUARE; dotY = SQUARE; break;
-      case 3: dotX = 0; dotY = (1 - p) * SQUARE; break;
+      case 0: dotX = TRACK_INSET + p * TRACK_SIZE; dotY = TRACK_INSET; break;
+      case 1: dotX = SQUARE - TRACK_INSET; dotY = TRACK_INSET + p * TRACK_SIZE; break;
+      case 2: dotX = TRACK_INSET + (1 - p) * TRACK_SIZE; dotY = SQUARE - TRACK_INSET; break;
+      case 3: dotX = TRACK_INSET; dotY = TRACK_INSET + (1 - p) * TRACK_SIZE; break;
     }
   }
 

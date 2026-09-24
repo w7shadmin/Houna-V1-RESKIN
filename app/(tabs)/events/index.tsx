@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Calendar, Video, CheckCircle2, Clock, ChevronRight, ArrowUpDown, Mic } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { colors, spacing, radius, typography, shadows } from '@/constants/theme';
-import { fetchEvents, fetchSpeakers, type EventItem, type Speaker } from '@/lib/hounaApi';
+import { fetchEvents, fetchSpeakers, resolveImageUrl, type EventItem, type Speaker } from '@/lib/hounaApi';
 import { LoadingState, ErrorState, InlineError } from '@/components/directory/AsyncState';
 
 type EventFilter = 'all' | 'upcoming' | 'virtual' | 'past';
@@ -137,13 +137,13 @@ export default function EventsListScreen() {
                 style={({ pressed }) => [
                   styles.eventCard,
                   { backgroundColor: colors.card, borderColor: colors.border, ...shadows.card },
-                  pressed && { backgroundColor: colors.cardPressed },
+                  pressed && styles.pressed,
                 ]}
               >
-                {!!event.imageUrl && (
+                {!!resolveImageUrl(event.imageUrl) && (
                   <View style={styles.eventImageWrap}>
-                    <Image source={{ uri: event.imageUrl }} style={styles.eventImage} resizeMode="cover" />
-                    <View style={[styles.badgeRow, isRTL ? { start: spacing.sm } : { end: spacing.sm }]}>
+                    <Image source={{ uri: resolveImageUrl(event.imageUrl)! }} style={styles.eventImage} resizeMode="cover" />
+                    <View style={[styles.badgeRow, { end: spacing.sm }]}>
                       {event.isVirtual && (
                         <View style={[styles.badge, { backgroundColor: colors.primary }]}>
                           <Video size={10} color={colors.onPrimary} />
@@ -227,8 +227,8 @@ export default function EventsListScreen() {
                     ]}
                   >
                     <View style={[styles.speakerAvatar, { backgroundColor: colors.surface }]}>
-                      {!!speaker.imageUrl && (
-                        <Image source={{ uri: speaker.imageUrl }} style={styles.speakerAvatarImg} resizeMode="cover" />
+                      {!!resolveImageUrl(speaker.imageUrl) && (
+                        <Image source={{ uri: resolveImageUrl(speaker.imageUrl)! }} style={styles.speakerAvatarImg} resizeMode="cover" />
                       )}
                     </View>
                     <Text
@@ -315,6 +315,9 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     borderWidth: 1,
     overflow: 'hidden',
+  },
+  pressed: {
+    opacity: 0.85,
   },
   eventImageWrap: {
     height: 128,

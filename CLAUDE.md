@@ -45,6 +45,21 @@ Windows note: Metro's watcher can crash with a "spawn UNKNOWN" error if
 `node_modules` changes while it's running (e.g. mid-`npm install`). Restart
 with `--max-workers 2` if this happens.
 
+Changing the app icon or any native splash asset (`app.json`'s `icon`,
+`android.adaptiveIcon`, or the `expo-splash-screen` plugin config) requires
+`npx expo prebuild --clean` followed by reinstalling the Android dev client
+— a plain JS reload won't pick up native asset changes.
+
+**Known follow-up, not resolved**: `assets/images/icon.png`'s mark was
+recentered and `android.adaptiveIcon` was added (`foregroundImage` set to
+the same full `icon.png`), but the on-device launcher icon still doesn't
+look right. Unconfirmed but worth checking first: Android's adaptive-icon
+mask only shows the center ~66% of the foreground layer as a safe zone —
+using the full icon (background circle + mark, no extra padding) as
+`foregroundImage` is a common way to get it cropped unevenly by the
+launcher. A dedicated foreground-only asset with proper safe-zone padding
+would likely fix it.
+
 ### Supabase conventions
 
 - **RLS everywhere.** Every table has row-level security; don't disable it
@@ -71,6 +86,12 @@ with `--max-workers 2` if this happens.
   Function's auto-injected `SUPABASE_SERVICE_ROLE_KEY` env var is the new
   `sb_secret_...` format, not the legacy JWT — don't assume which format
   you're comparing against.
+- **Google sign-in requires dashboard setup, not just code**: the Google
+  provider must be enabled in the Supabase dashboard (Authentication →
+  Providers → Google) with a client ID/secret. It's currently disabled on
+  this project, which produces an `"Unsupported provider: provider is not
+  enabled"` error at sign-in — that's a project setting, not a bug in
+  `components/account/GoogleButton.tsx` or the auth call.
 
 ### Bilingual & RTL infrastructure
 
@@ -133,6 +154,32 @@ Home | Directory | [Tanafas] | Events | More. Tanafas is **not a tab** —
 it's a raised center button opening a modal, and it never shows an active
 state. This is information architecture, separable from how the tab bar is
 *rendered* (icons, colors, the raised-button treatment).
+
+**Hub-first navigation gotcha**: a nested tab's subpage (e.g.
+`/directory/professionals`) can be entered two ways — via its own hub
+(`/directory`) or via a shortcut link from elsewhere (e.g. Home's
+"Professional Resources" row). `router.back()` from the subpage only
+reliably returns to the hub for the first path; on the shortcut path, the
+hub may not actually be in the navigation history (confirmed: pushing the
+hub then the subpage in two `router.push` calls does **not** reliably
+create two history entries — they can collapse into one, especially on
+web, where `back()` maps to real browser history). The robust fix used
+here: subpages that are conceptually always children of a hub
+(`professionals/index.tsx`, `organizations/index.tsx`,
+`wellness-centers/index.tsx`) have their back button call
+`router.replace('/directory')` explicitly instead of `router.back()` —
+deterministic regardless of entry point or platform.
+
+### Pressed-state convention
+
+Cards that combine a border with `shadows.card` (an always-visible
+turquoise-tinted shadow/elevation) must dim the whole card via
+`pressed && { opacity: 0.85 }` on press, never overlay a separate
+`colors.cardPressed` background fill. Overlaying a new-colored fill on top
+of a shadow/border that stays static reads as two competing highlights
+instead of one. Plain bordered buttons/chips without `shadows.card` can
+still use the `cardPressed` background-overlay pattern — it only breaks
+when combined with a static tinted shadow.
 
 ### The breathing session shell
 

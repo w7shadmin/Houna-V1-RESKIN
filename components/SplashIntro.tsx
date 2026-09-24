@@ -31,12 +31,13 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import Svg, { G, Path } from 'react-native-svg';
+import { palette } from '@/constants/theme';
 
 /* ------------------------------------------------------------------ */
 /* Brand                                                               */
 /* ------------------------------------------------------------------ */
 
-const GROUND = '#F2F7F5'; // Broken White
+const GROUND = palette.brokenWhite; // Broken White — must match constants/theme.ts, not a hardcoded approximation
 const LETTER = '#3BAAA7'; // Primary Turquoise — Latin letterforms
 const MARK = '#36A9A7'; // the o + figure (as exported in the source SVG)
 const INK = '#525052'; // Arabic wordmark

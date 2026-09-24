@@ -97,7 +97,7 @@ export default function VoicesScreen() {
                 style={({ pressed }) => [
                   styles.card,
                   { backgroundColor: colors.card, borderColor: colors.border, ...shadows.card },
-                  pressed && { backgroundColor: colors.cardPressed },
+                  pressed && styles.pressed,
                 ]}
               >
                 <View style={[styles.cardImage, { backgroundColor: colors.surface }]}>
@@ -204,6 +204,9 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     borderWidth: 1,
     padding: spacing.sm + 4,
+  },
+  pressed: {
+    opacity: 0.85,
   },
   cardImage: {
     width: 64,

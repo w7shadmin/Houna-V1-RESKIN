@@ -109,7 +109,7 @@ export default function BreathingGroundingListScreen() {
                 style={({ pressed }) => [
                   styles.card,
                   { backgroundColor: colors.card, borderColor: colors.border, ...shadows.card },
-                  pressed && { backgroundColor: colors.cardPressed },
+                  pressed && styles.pressed,
                 ]}
               >
                 <FlatIconTile icon={Icon} color={item.tileColor} bg={item.tileBg} size={56} iconSize={22} />
@@ -175,6 +175,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: spacing.md,
     gap: spacing.md,
+  },
+  pressed: {
+    opacity: 0.85,
   },
   text: {
     flex: 1,

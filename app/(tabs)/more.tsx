@@ -129,7 +129,7 @@ export default function MoreScreen() {
                 style={({ pressed }) => [
                   styles.accountCard,
                   { backgroundColor: colors.card, borderColor: colors.border, ...shadows.card },
-                  pressed && { backgroundColor: colors.cardPressed },
+                  pressed && styles.pressed,
                 ]}
               >
                 <Text style={[styles.accountTitle, { color: colors.text, fontFamily: fonts.bold }]}>{ac.finishSetupTitle}</Text>
@@ -141,7 +141,7 @@ export default function MoreScreen() {
                 style={({ pressed }) => [
                   styles.aliasRow,
                   { backgroundColor: colors.card, borderColor: colors.border, ...shadows.card },
-                  pressed && { backgroundColor: colors.cardPressed },
+                  pressed && styles.pressed,
                 ]}
               >
                 <View style={[styles.aliasAvatar, { backgroundColor: colors.primaryLightest }]}>
@@ -294,6 +294,9 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     borderWidth: 1,
     padding: spacing.md,
+  },
+  pressed: {
+    opacity: 0.85,
   },
   accountTitle: {
     fontSize: typography.fontSize.body,

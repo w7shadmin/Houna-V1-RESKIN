@@ -102,7 +102,7 @@ export default function TanafasHubScreen() {
                 style={({ pressed }) => [
                   styles.card,
                   { backgroundColor: colors.card, borderColor: colors.border, ...shadows.card },
-                  pressed && { backgroundColor: colors.cardPressed },
+                  pressed && styles.pressed,
                 ]}
               >
                 <FlatIconTile icon={Icon} color={card.color} bg={card.bg} size={52} />
@@ -185,6 +185,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: spacing.md,
     gap: spacing.md,
+  },
+  pressed: {
+    opacity: 0.85,
   },
   cardText: {
     flex: 1,

@@ -107,7 +107,7 @@ export default function ProfessionalsListScreen() {
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
       <View style={styles.headerRow}>
         <Pressable
-          onPress={() => router.back()}
+          onPress={() => router.replace('/directory')}
           hitSlop={12}
           style={({ pressed }) => [
             styles.backBtn,
@@ -131,6 +131,13 @@ export default function ProfessionalsListScreen() {
           contentContainerStyle={styles.listContent}
           onEndReachedThreshold={0.4}
           onEndReached={handleEndReached}
+          // This list grows via infinite scroll to ~300 rows (the real
+          // professional count) — tuned batching keeps that from
+          // triggering RN's "large list slow to update" warning.
+          initialNumToRender={8}
+          maxToRenderPerBatch={8}
+          windowSize={7}
+          removeClippedSubviews
           ListHeaderComponent={
             <View>
               <FilterToggle

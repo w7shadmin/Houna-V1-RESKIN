@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Play, Pause, RotateCcw } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { colors, spacing, radius, typography, shadows } from '@/constants/theme';
@@ -160,6 +161,7 @@ export default function PhaseBreathingSession({
   const isActive = isRunning && !isPaused;
 
   const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
+  const insets = useSafeAreaInsets();
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -262,7 +264,7 @@ export default function PhaseBreathingSession({
         )}
       </View>
 
-      <View style={styles.controls}>
+      <View style={[styles.controls, { paddingBottom: spacing.xxl + insets.bottom }]}>
         {!isRunning && !isComplete && (
           <Pressable
             onPress={handleStart}

@@ -58,7 +58,7 @@ export default function OrganizationsListScreen() {
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
       <View style={styles.headerRow}>
         <Pressable
-          onPress={() => router.back()}
+          onPress={() => router.replace('/directory')}
           hitSlop={12}
           style={({ pressed }) => [
             styles.backBtn,

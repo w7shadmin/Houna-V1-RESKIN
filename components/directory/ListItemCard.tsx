@@ -3,6 +3,7 @@ import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { colors, spacing, radius, typography, shadows } from '@/constants/theme';
 import { arabicNumber } from '@/lib/arabicNumerals';
+import { resolveImageUrl } from '@/lib/hounaApi';
 
 /** Tags beyond this many collapse into a "+N more" label rather than wrapping indefinitely. */
 const MAX_VISIBLE_TAGS = 3;
@@ -18,7 +19,14 @@ interface ListItemCardProps {
   imageResizeMode?: 'cover' | 'contain';
 }
 
-export default function ListItemCard({
+/**
+ * Memoized — this renders inside long FlatLists (professionals can run to
+ * ~300 rows via infinite scroll), and without this every already-mounted
+ * row re-renders whenever the list's backing array changes (e.g. on each
+ * page appended), which is exactly what triggers RN's own "large list slow
+ * to update" warning.
+ */
+export default React.memo(function ListItemCard({
   imageUrl,
   title,
   subtitle,
@@ -31,6 +39,7 @@ export default function ListItemCard({
   const common = t.directory.common;
   const visibleTags = tags?.slice(0, MAX_VISIBLE_TAGS) ?? [];
   const hiddenTagCount = (tags?.length ?? 0) - visibleTags.length;
+  const resolvedImageUrl = resolveImageUrl(imageUrl);
 
   return (
     <Pressable
@@ -38,12 +47,12 @@ export default function ListItemCard({
       style={({ pressed }) => [
         styles.card,
         { backgroundColor: colors.card, borderColor: colors.border, ...shadows.card },
-        pressed && { backgroundColor: colors.cardPressed },
+        pressed && styles.pressed,
       ]}
     >
       <View style={[styles.image, { backgroundColor: colors.surface }]}>
-        {imageUrl && (
-          <Image source={{ uri: imageUrl }} style={styles.imageImg} resizeMode={imageResizeMode} />
+        {!!resolvedImageUrl && (
+          <Image source={{ uri: resolvedImageUrl }} style={styles.imageImg} resizeMode={imageResizeMode} />
         )}
       </View>
       <View style={styles.text}>
@@ -82,7 +91,7 @@ export default function ListItemCard({
       </View>
     </Pressable>
   );
-}
+});
 
 const styles = StyleSheet.create({
   card: {
@@ -92,6 +101,9 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     borderWidth: 1,
     padding: spacing.sm + 4,
+  },
+  pressed: {
+    opacity: 0.85,
   },
   image: {
     width: 64,

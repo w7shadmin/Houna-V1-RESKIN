@@ -22,7 +22,7 @@ export default function EntryCard({ entry, onPress }: EntryCardProps) {
       style={({ pressed }) => [
         styles.card,
         { backgroundColor: colors.card, borderColor: colors.border, ...shadows.card },
-        pressed && { backgroundColor: colors.cardPressed },
+        pressed && styles.pressed,
       ]}
     >
       <Text style={styles.emoji}>{MOOD_EMOJI[entry.mood]}</Text>
@@ -51,6 +51,9 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     borderWidth: 1,
     padding: spacing.sm + 4,
+  },
+  pressed: {
+    opacity: 0.85,
   },
   emoji: {
     fontSize: 22,
