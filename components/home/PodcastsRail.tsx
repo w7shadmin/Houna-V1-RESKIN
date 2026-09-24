@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { ArrowRight, ArrowLeft, Mic, Headphones, Play } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { colors, spacing, radius, typography } from '@/constants/theme';
-import { fetchPodcasts, safeUrl, type Podcast } from '@/lib/hounaApi';
+import { fetchPodcasts, safeUrl, resolveImageUrl, type Podcast } from '@/lib/hounaApi';
 
 const RAIL_CARD_W = 150;
 const RAIL_IMAGE_H = 100;
@@ -70,8 +70,8 @@ export default function PodcastsRail() {
               ]}
             >
               <View style={[styles.cardImage, { backgroundColor: colors.primaryLightest }]}>
-                {podcast.imageUrl ? (
-                  <Image source={{ uri: podcast.imageUrl }} style={styles.cardImageImg} resizeMode="cover" />
+                {resolveImageUrl(podcast.imageUrl) ? (
+                  <Image source={{ uri: resolveImageUrl(podcast.imageUrl)! }} style={styles.cardImageImg} resizeMode="cover" />
                 ) : (
                   <Headphones size={22} color={colors.primary} strokeWidth={1.6} />
                 )}

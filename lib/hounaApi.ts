@@ -42,6 +42,26 @@ export function safeUrl(raw: string | null | undefined): string | null {
   }
 }
 
+/**
+ * Resolves a possibly-relative image path from the scraped content against
+ * houna.org, unlike `safeUrl` which passes the original value through
+ * as-is. The proxy sometimes returns a relative fallback-avatar path (e.g.
+ * `/assets/images/avatar-female.jpg`, used when a professional has no real
+ * photo) instead of a full URL — `<Image>` needs the resolved absolute URL
+ * or it 404s by resolving against this app's own origin instead.
+ */
+export function resolveImageUrl(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const value = String(raw).trim();
+  if (!value) return null;
+  try {
+    const parsed = new URL(value, 'https://houna.org');
+    return SAFE_URL_SCHEMES.includes(parsed.protocol) ? parsed.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
 export interface Therapist {
   name: string;
   role: string;

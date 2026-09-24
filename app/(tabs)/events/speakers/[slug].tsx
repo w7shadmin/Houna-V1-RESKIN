@@ -4,7 +4,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, MapPin, Globe, Users } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { colors, palette, spacing, radius, typography } from '@/constants/theme';
-import { fetchSpeakerDetail, safeUrl, type SpeakerDetail } from '@/lib/hounaApi';
+import { fetchSpeakerDetail, safeUrl, resolveImageUrl, type SpeakerDetail } from '@/lib/hounaApi';
 import { LoadingState, ErrorState } from '@/components/directory/AsyncState';
 import InfoRow from '@/components/directory/InfoRow';
 
@@ -78,8 +78,8 @@ export default function SpeakerDetailScreen() {
             <ArrowLeft size={20} color={colors.text} style={isRTL ? styles.flip : undefined} />
           </Pressable>
           <View style={[styles.avatar, { borderColor: 'rgba(255,255,255,0.8)', backgroundColor: colors.card }]}>
-            {!!detail.imageUrl && (
-              <Image source={{ uri: detail.imageUrl }} style={styles.avatarImg} resizeMode="cover" />
+            {!!resolveImageUrl(detail.imageUrl) && (
+              <Image source={{ uri: resolveImageUrl(detail.imageUrl)! }} style={styles.avatarImg} resizeMode="cover" />
             )}
           </View>
         </View>

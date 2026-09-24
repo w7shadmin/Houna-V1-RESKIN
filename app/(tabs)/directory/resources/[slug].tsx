@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, ScrollView, Pressable, useWindowDimensions, StyleSheet } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -9,17 +9,26 @@ import { colors, spacing, radius, typography, shadows } from '@/constants/theme'
 import { fetchResourceDetail, type ResourceDetailData } from '@/lib/hounaApi';
 import { LoadingState, ErrorState } from '@/components/directory/AsyncState';
 
-const htmlTagsStyles = {
-  p: { marginBottom: 10, marginTop: 0 },
-  h1: { fontSize: 18, fontWeight: '700' as const, marginBottom: 8 },
-  h2: { fontSize: 16, fontWeight: '700' as const, marginBottom: 8 },
-  h3: { fontSize: 15, fontWeight: '600' as const, marginBottom: 6 },
-  ul: { marginStart: 16, marginBottom: 10 },
-  ol: { marginStart: 16, marginBottom: 10 },
-  li: { marginBottom: 4 },
-  strong: { fontWeight: '600' as const },
-  a: { textDecorationLine: 'underline' as const },
-};
+/**
+ * `react-native-render-html`'s style engine doesn't support RN's logical
+ * `marginStart`/`marginEnd` (it only maps physical CSS-style properties) —
+ * unlike plain RN StyleSheet, it won't auto-flip these for RTL, so this is
+ * one of the few places `isRTL` has to pick the physical side by hand.
+ */
+function getHtmlTagsStyles(isRTL: boolean) {
+  const listIndent = isRTL ? { marginRight: 16 } : { marginLeft: 16 };
+  return {
+    p: { marginBottom: 10, marginTop: 0 },
+    h1: { fontSize: 18, fontWeight: '700' as const, marginBottom: 8 },
+    h2: { fontSize: 16, fontWeight: '700' as const, marginBottom: 8 },
+    h3: { fontSize: 15, fontWeight: '600' as const, marginBottom: 6 },
+    ul: { ...listIndent, marginBottom: 10 },
+    ol: { ...listIndent, marginBottom: 10 },
+    li: { marginBottom: 4 },
+    strong: { fontWeight: '600' as const },
+    a: { textDecorationLine: 'underline' as const },
+  };
+}
 
 export default function ResourceDetailScreen() {
   const router = useRouter();
@@ -55,6 +64,7 @@ export default function ResourceDetailScreen() {
 
   const section = detail?.sections[activeSection];
   const contentWidth = Math.min(width, 430) - spacing.lg * 2 - (spacing.md + 4) * 2;
+  const htmlTagsStyles = useMemo(() => getHtmlTagsStyles(isRTL), [isRTL]);
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>

@@ -4,7 +4,7 @@ import { Award, HeartHandshake, Users, RotateCw, ChevronRight } from 'lucide-rea
 import DetailScreen from '@/components/DetailScreen';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { colors, spacing, radius, typography, shadows } from '@/constants/theme';
-import { fetchAbout, type AboutData, type TeamMember } from '@/lib/hounaApi';
+import { fetchAbout, resolveImageUrl, type AboutData, type TeamMember } from '@/lib/hounaApi';
 
 // Members who've left since this content was scraped — filtered client-side
 // rather than waiting on the source site to update, matching the old MVP.
@@ -48,8 +48,8 @@ export default function AboutScreen() {
       style={[styles.memberRow, { backgroundColor: colors.card, borderColor: colors.border }]}
     >
       <View style={[styles.memberAvatar, { backgroundColor: colors.surface }]}>
-        {member.imageUrl && (
-          <Image source={{ uri: member.imageUrl }} style={styles.memberAvatarImg} resizeMode="cover" />
+        {!!resolveImageUrl(member.imageUrl) && (
+          <Image source={{ uri: resolveImageUrl(member.imageUrl)! }} style={styles.memberAvatarImg} resizeMode="cover" />
         )}
       </View>
       <View style={styles.memberText}>

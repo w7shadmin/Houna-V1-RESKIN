@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { ArrowRight, ArrowLeft, ExternalLink, FileText } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { colors, spacing, radius, typography } from '@/constants/theme';
-import { fetchArticles, safeUrl, type Article } from '@/lib/hounaApi';
+import { fetchArticles, safeUrl, resolveImageUrl, type Article } from '@/lib/hounaApi';
 
 const RAIL_CARD_W = 150;
 const RAIL_IMAGE_H = 100;
@@ -70,8 +70,8 @@ export default function ArticlesRail() {
               ]}
             >
               <View style={[styles.cardImage, { backgroundColor: colors.surface }]}>
-                {article.imageUrl ? (
-                  <Image source={{ uri: article.imageUrl }} style={styles.cardImageImg} resizeMode="cover" />
+                {resolveImageUrl(article.imageUrl) ? (
+                  <Image source={{ uri: resolveImageUrl(article.imageUrl)! }} style={styles.cardImageImg} resizeMode="cover" />
                 ) : (
                   <FileText size={22} color={colors.textTertiary} strokeWidth={1.6} />
                 )}

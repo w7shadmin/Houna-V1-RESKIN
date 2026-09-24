@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { colors, palette, radius } from '@/constants/theme';
+import { resolveImageUrl } from '@/lib/hounaApi';
 
 interface DetailHeroProps {
   imageUrl: string | null;
@@ -14,15 +15,16 @@ interface DetailHeroProps {
 export default function DetailHero({ imageUrl, imageResizeMode = 'cover', height = 200 }: DetailHeroProps) {
   const router = useRouter();
   const { isRTL } = useLanguage();
+  const resolvedImageUrl = resolveImageUrl(imageUrl);
 
   return (
     <View style={[styles.hero, { height, backgroundColor: palette.turquoise }]}>
-      {imageUrl && imageResizeMode === 'contain' ? (
+      {resolvedImageUrl && imageResizeMode === 'contain' ? (
         <View style={styles.imageContainWrap}>
-          <Image source={{ uri: imageUrl }} style={styles.image} resizeMode="contain" />
+          <Image source={{ uri: resolvedImageUrl }} style={styles.image} resizeMode="contain" />
         </View>
       ) : (
-        imageUrl && <Image source={{ uri: imageUrl }} style={styles.image} resizeMode="cover" />
+        resolvedImageUrl && <Image source={{ uri: resolvedImageUrl }} style={styles.image} resizeMode="cover" />
       )}
       <Pressable
         onPress={() => router.back()}
