@@ -117,7 +117,7 @@ export default function ImpactStats() {
                   pressed && { opacity: 0.85 },
                 ]}
               >
-                <FlatIconTile icon={Icon} color={row.color} bg={row.bg} size={44} borderRadius={radius.md} style={styles.cardIcon} />
+                <FlatIconTile icon={Icon} color={row.color} bg={row.bg} size={44} borderRadius={radius.md} bevel style={styles.cardIcon} />
                 <Text style={[styles.cardNumber, { color: colors.text, fontFamily: fonts.bold }]}>
                   {num(counts[row.id])}
                 </Text>

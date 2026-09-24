@@ -186,7 +186,7 @@ export default function HomeScreen() {
                       pressed && { opacity: 0.85 },
                     ]}
                   >
-                    <FlatIconTile icon={Icon} color={row.color} bg={row.bg} size={44} borderRadius={radius.md} />
+                    <FlatIconTile icon={Icon} color={row.color} bg={row.bg} size={44} borderRadius={radius.md} bevel />
                     <View style={styles.proTextWrap}>
                       <Text
                         numberOfLines={1}

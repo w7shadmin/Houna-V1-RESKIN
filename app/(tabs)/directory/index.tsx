@@ -100,7 +100,7 @@ export default function DirectoryHubScreen() {
                   pressed && { backgroundColor: colors.cardPressed },
                 ]}
               >
-                <FlatIconTile icon={Icon} color={card.color} bg={card.bg} size={56} iconSize={26} />
+                <FlatIconTile icon={Icon} color={card.color} bg={card.bg} size={56} iconSize={26} bevel />
                 <View style={styles.cardText}>
                   <Text style={[styles.cardTitle, { color: colors.text, fontFamily: fonts.bold }]}>
                     {card.title}
