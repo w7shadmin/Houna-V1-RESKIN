@@ -108,9 +108,7 @@ export default function HomeScreen() {
             <IconButton
               variant="subtle"
               accessibilityLabel={moodPending ? h.topBar.moodCheckInPending : h.topBar.moodCheckIn}
-              // Until the Houna bloom check-in (FEATURES_BRIEF §2) exists, the
-              // journal is where mood is logged.
-              onPress={() => router.push('/tanafas/journal')}
+              onPress={() => router.push('/check-in')}
               renderIcon={() => <MoodBloom size={26} color={accent} shape={HOME_BLOOM} />}
             />
             {moodPending && (

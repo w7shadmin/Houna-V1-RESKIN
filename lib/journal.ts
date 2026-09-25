@@ -191,18 +191,21 @@ export async function getTodayEntry(): Promise<JournalEntry | null> {
 }
 
 /**
- * One-tap mood log from the Home screen. Updates today's most recent entry's
- * mood if one exists (preserving any text already written), or creates a new
- * text-less entry otherwise — it becomes an ordinary journal entry the user
- * can add text to later, rather than a separate mood-only record.
+ * Mood check-in log. Updates today's most recent entry's mood if one exists
+ * (preserving any text already written, with `note` appended), or creates a
+ * new entry otherwise — it becomes an ordinary journal entry the user can
+ * add to later, rather than a separate mood-only record.
  */
-export async function logMoodForToday(mood: MoodTag): Promise<JournalEntry> {
+export async function logMoodForToday(mood: MoodTag, note = ''): Promise<JournalEntry> {
+  const words = note.trim();
   const existing = await getTodayEntry();
   if (existing) {
-    await updateEntry(existing.id, existing.text, mood);
-    return { ...existing, mood, updatedAt: Date.now() };
+    const prior = existing.text.trim();
+    const text = !words ? existing.text : prior ? `${prior}\n\n${words}` : words;
+    await updateEntry(existing.id, text, mood);
+    return { ...existing, text, mood, updatedAt: Date.now() };
   }
-  return saveEntry('', mood);
+  return saveEntry(words, mood);
 }
 
 interface DateNames {

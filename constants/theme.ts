@@ -161,6 +161,12 @@ export interface ColorTokens {
 
   /** Unlit country dot on the community map. */
   mapDot: string;
+
+  /** Bottom sheet (mood check-in) and the scrim above it. */
+  sheet: string;
+  scrim: string;
+  /** Grabber, inactive slider ticks and track. */
+  faint: string;
 }
 
 const N = nightPalette;
@@ -182,7 +188,7 @@ export const nightColors: ColorTokens = {
   surface: N.nightfall,
   card: alpha(N.moonlight, 0.045),
   cardPressed: alpha(N.moonlight, 0.1),
-  inputBackground: alpha(N.moonlight, 0.06),
+  inputBackground: alpha(N.moonlight, 0.05),
 
   text: N.moonlight,
   textSecondary: N.mist,
@@ -229,6 +235,10 @@ export const nightColors: ColorTokens = {
   logo: { primary: N.hounaGlow, secondary: N.moonlight },
 
   mapDot: alpha(N.moonlight, 0.26),
+
+  sheet: N.nightfall,
+  scrim: '#070B1C',
+  faint: alpha(N.moonlight, 0.25),
 };
 
 export const dayColors: ColorTokens = {
@@ -286,6 +296,11 @@ export const dayColors: ColorTokens = {
   logo: { primary: D.hounaTeal, secondary: '#525052' },
 
   mapDot: alpha(D.ink, 0.26),
+
+  // Check-in artboard (Day): a warmer-than-Paper sheet over a stone scrim.
+  sheet: '#FBF8F2',
+  scrim: '#CBC7BD',
+  faint: alpha(D.ink, 0.25),
 };
 
 export const themeColors: Record<ColorScheme, ColorTokens> = {

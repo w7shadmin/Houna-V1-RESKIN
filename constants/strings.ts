@@ -16,6 +16,7 @@ import { journalStrings } from './journalStrings';
 import { homeStrings } from './homeStrings';
 import { accountStrings } from './accountStrings';
 import { crisisStrings } from './crisisStrings';
+import { checkInStrings } from './checkInStrings';
 
 export type Language = 'en' | 'ar';
 
@@ -50,6 +51,7 @@ export const strings = {
     },
     home: homeStrings.en,
     crisis: crisisStrings.en,
+    checkIn: checkInStrings.en,
     directory: directoryStrings.en,
     events: eventsStrings.en,
     about: {
@@ -110,6 +112,7 @@ export const strings = {
     },
     home: homeStrings.ar,
     crisis: crisisStrings.ar,
+    checkIn: checkInStrings.ar,
     directory: directoryStrings.ar,
     events: eventsStrings.ar,
     about: {
