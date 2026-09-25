@@ -290,6 +290,13 @@ Events (list, event, speaker) uses the same pieces; event dates go through
 `start`/`end` offsets as LTR even in Arabic; lucide icons with an RTL flip
 transform draw off-screen on web (use `DirectionalIcon`).
 
+**RTL gotcha for measured positions (native only)**: in Arabic, Android
+swaps `left`/`right` style offsets too (RN's `swapLeftAndRightInRTL`), so
+anything placed by measured, physical screen pixels (e.g. the starfield's
+moon, handed over from `measureInWindow`) lands mirrored. Such scenes set
+`direction: 'ltr'` on their root (native only; web never swaps and rejects the
+style), as `app/starfield.tsx` does. The web preview can't show this bug.
+
 **Known inconsistency, not fixed here**: about 6 screens hand-roll their
 own loading/error state instead of the shared `LoadingState`/`ErrorState`/
 `InlineError` components (`components/directory/AsyncState.tsx`) used in

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { AppState, Animated, BackHandler, Easing, Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
+import { AppState, Animated, BackHandler, Easing, Platform, Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import Svg, { Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
@@ -172,7 +172,7 @@ export default function StarfieldScreen() {
   }, [setHaloHidden]);
 
   return (
-    <View ref={rootRef} collapsable={false} onLayout={onLayout} style={StyleSheet.absoluteFill}>
+    <View ref={rootRef} collapsable={false} onLayout={onLayout} style={[StyleSheet.absoluteFill, styles.physical]}>
       <StatusBar hidden style="light" />
       {/* The night: the ground darkens first, the stars come out just behind it. */}
       <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.night, { opacity: sky }]} />
@@ -244,6 +244,10 @@ export default function StarfieldScreen() {
 }
 
 const styles = StyleSheet.create({
+  // The scene is placed in physical screen pixels (the moon lands on Home's measured mark), so it
+  // lays out left-to-right in either language: in Arabic, Android otherwise swaps every left/right
+  // below and the moon lands off the far edge. (Web never swaps them, and has no direction style.)
+  physical: Platform.OS === 'web' ? {} : { direction: 'ltr' },
   night: {
     backgroundColor: nightPalette.midnight,
   },
