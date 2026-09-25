@@ -66,9 +66,9 @@ export function BreathStage({ shape, tone, breath, trace, showTracer, progress, 
   // Glass rather than solid: the same lit sphere (highlight at the top left, the tone deepening
   // to the rim), but translucent, so the sky and the dots show faintly through it.
   const stops: [string, number][] = [
-    [alpha('#FFFFFF', 0.55), 0],
-    [alpha(flatten(alpha(fg, 0.35), '#FFFFFF'), 0.34), 0.4],
-    [alpha(fg, 0.28), 1],
+    [alpha('#FFFFFF', 0.68), 0],
+    [alpha(flatten(alpha(fg, 0.35), '#FFFFFF'), 0.45), 0.4],
+    [alpha(fg, 0.37), 1],
   ];
   // The mark pressed into it: a shade deeper than the surface, with the letterpress edges of a
   // hollow lit from the top left (a dark sliver along its top, a lit one along its bottom).
@@ -104,7 +104,7 @@ export function BreathStage({ shape, tone, breath, trace, showTracer, progress, 
           fx={0.34}
           fy={0.3}
           stops={stops}
-          glow={`0 0 90px ${alpha(fg, 0.3)}`}
+          glow={`0 0 90px ${alpha(fg, 0.35)}`}
         />
         {/* Inside the breathing scale, so the mark grows and shrinks as one with the shape. */}
         <View style={styles.centre} pointerEvents="none">
