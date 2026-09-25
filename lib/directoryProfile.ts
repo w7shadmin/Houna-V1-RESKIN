@@ -25,22 +25,6 @@ export function ownSocials(socials: SocialLink[]): SocialLink[] {
   });
 }
 
-/** Short mark for a social button (the canvas's "IG" / "IN"). */
-export function socialMark(platform: string): string {
-  const marks: Record<string, string> = {
-    instagram: 'IG',
-    linkedin: 'IN',
-    facebook: 'FB',
-    twitter: 'X',
-    x: 'X',
-    youtube: 'YT',
-    tiktok: 'TT',
-    whatsapp: 'WA',
-    snapchat: 'SC',
-  };
-  return marks[platform.toLowerCase()] ?? platform.slice(0, 2).toUpperCase();
-}
-
 /** In-app organization id from a houna.org organization URL (".../organizations/28"). */
 export function organizationIdFromUrl(url: string | null | undefined): string | null {
   const m = url?.match(/\/organizations\/(\d+)/);

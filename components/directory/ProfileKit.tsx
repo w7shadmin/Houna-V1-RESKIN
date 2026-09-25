@@ -5,7 +5,9 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { grid, radius } from '@/constants/theme';
 import { resolveImageUrl, type SocialLink } from '@/lib/hounaApi';
-import { decodeEntities, socialMark, type Fact, type FactId } from '@/lib/directoryProfile';
+import { decodeEntities, type Fact, type FactId } from '@/lib/directoryProfile';
+import SocialIcon from './SocialIcon';
+import { PLATFORM_NAME, platformOf } from '@/lib/socialPlatform';
 import Button from '@/components/ui/Button';
 import IconButton from '@/components/ui/IconButton';
 import IconTile, { type IconTileTone } from '@/components/ui/IconTile';
@@ -245,27 +247,30 @@ export function GroupLabel({ children }: { children: string }) {
 
 export function FollowRow({ socials }: { socials: SocialLink[] }) {
   const { colors } = useTheme();
-  const { t, fonts } = useLanguage();
+  const { t } = useLanguage();
   if (socials.length === 0) return null;
   return (
     <View style={styles.group}>
       <GroupLabel>{t.directory.common.follow}</GroupLabel>
       <View style={styles.followRow}>
-        {socials.map((s) => (
-          <Pressable
-            key={s.url}
-            onPress={() => Linking.openURL(s.url).catch(() => {})}
-            accessibilityRole="link"
-            accessibilityLabel={s.platform}
-            style={({ pressed }) => [
-              styles.follow,
-              { backgroundColor: colors.control, borderColor: colors.borderControl },
-              pressed && styles.pressed,
-            ]}
-          >
-            <Text style={[styles.followMark, { color: colors.text, fontFamily: fonts.labelRegular }]}>{socialMark(s.platform)}</Text>
-          </Pressable>
-        ))}
+        {socials.map((s) => {
+          const platform = platformOf(s.url, s.platform);
+          return (
+            <Pressable
+              key={s.url}
+              onPress={() => Linking.openURL(s.url).catch(() => {})}
+              accessibilityRole="link"
+              accessibilityLabel={PLATFORM_NAME[platform]}
+              style={({ pressed }) => [
+                styles.follow,
+                { backgroundColor: colors.control, borderColor: colors.borderControl },
+                pressed && styles.pressed,
+              ]}
+            >
+              <SocialIcon platform={platform} size={20} color={colors.text} />
+            </Pressable>
+          );
+        })}
       </View>
     </View>
   );
@@ -540,9 +545,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  followMark: {
-    fontSize: 13,
   },
   actions: {
     flexDirection: 'row',
