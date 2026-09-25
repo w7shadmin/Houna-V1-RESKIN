@@ -123,7 +123,7 @@ export default function MoodSlider({
 
 const styles = StyleSheet.create({
   wrap: {
-    gap: 10,
+    gap: 12,
   },
   hit: {
     height: 32,

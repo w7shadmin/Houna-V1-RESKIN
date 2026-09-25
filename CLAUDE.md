@@ -205,11 +205,14 @@ Figtree body + Marcellus display + DM Mono tracked-caps labels for Latin;
 IBM Plex Sans Arabic body + Amiri display for Arabic, whose labels are
 untracked Plex (`fonts.labelTracked` is false).
 
-**8-point grid**: sizes, gaps and paddings are multiples of 8, with 4
-(`grid(0.5)`) for tight inner spacing — `grid(n)` / `spacing` in `theme.ts`.
-`TabBar` is the reference: 64 above the inset (8 · 24 icon · 4 · 20 label ·
-8), raised button 56 sharing the icons' bottom edge. Older screens still
-carry off-grid literals; snap them when touched.
+**8-point grid**: sizes, gaps and paddings are multiples of 8, with 4 and
+12 (`grid(0.5)`, `grid(1.5)`) for tight inner spacing — `grid(n)` /
+`spacing` in `theme.ts`. Screen side padding is 16 (`layout.screenPadding`),
+not the canvas's 20. `TabBar` is the reference: 64 above the inset (8 · 24
+icon · 4 · 20 label · 8), raised button 56 sharing the icons' bottom edge.
+Spacing is on the grid everywhere except About, Voices and the Tanafas hub
+and player (`app/tanafas/index.tsx`, `components/tanafas/`); snap those when
+touched.
 
 **Android nav bar**: the tab bar runs edge-to-edge under the system
 buttons. RN 0.81 re-enables the nav-bar contrast scrim at startup (a dark

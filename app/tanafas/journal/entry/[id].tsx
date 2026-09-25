@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
     gap: grid(1.5),
     borderWidth: 1,
     borderRadius: radius.cardLg,
-    padding: 20,
+    padding: 16,
   },
   promptText: {
     fontSize: 20,
@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
     borderColor: 'transparent',
     backgroundColor: 'transparent',
     // A hair of inset so the first glyph isn't clipped at the field's edge.
-    paddingHorizontal: 2,
+    paddingHorizontal: 4,
     paddingVertical: 0,
   },
   moodSection: {

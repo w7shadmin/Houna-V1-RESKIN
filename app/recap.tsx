@@ -379,12 +379,12 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: layout.maxContentWidth,
     alignSelf: 'center',
-    paddingTop: 18,
+    paddingTop: 16,
     paddingHorizontal: layout.screenPadding,
     paddingBottom: 40,
   },
   top: {
-    gap: 14,
+    gap: 16,
     zIndex: 2,
   },
   segments: {
@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 18,
+    gap: 16,
   },
   eyebrowLatin: {
     fontSize: 12,
@@ -455,7 +455,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
     paddingVertical: 16,
-    paddingHorizontal: 22,
+    paddingHorizontal: 24,
     borderRadius: 20,
     borderWidth: 1,
   },
@@ -507,9 +507,9 @@ const styles = StyleSheet.create({
   shareCard: {
     width: 300,
     alignItems: 'center',
-    gap: 14,
-    paddingVertical: 26,
-    paddingHorizontal: 22,
+    gap: 16,
+    paddingVertical: 24,
+    paddingHorizontal: 24,
     borderRadius: 28,
     borderWidth: 1,
   },
@@ -523,7 +523,7 @@ const styles = StyleSheet.create({
   },
   shareRows: {
     alignSelf: 'stretch',
-    gap: 10,
+    gap: 12,
   },
   shareRow: {
     flexDirection: 'row',
@@ -535,7 +535,7 @@ const styles = StyleSheet.create({
   shareButtons: {
     width: 300,
     flexDirection: 'row',
-    gap: 10,
+    gap: 12,
   },
   flexButton: {
     flex: 1,

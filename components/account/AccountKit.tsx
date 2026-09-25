@@ -361,7 +361,7 @@ const styles = StyleSheet.create({
   rowText: {
     flex: 1,
     minWidth: 0,
-    gap: 2,
+    gap: 4,
   },
   rowTitle: {
     fontSize: 15.5,

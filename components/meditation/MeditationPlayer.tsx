@@ -735,7 +735,7 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     color: alpha(FOCUS.moonlight, 0.75),
     fontSize: typography.fontSize.xs,
-    marginTop: 2,
+    marginTop: 4,
   },
   main: {
     flex: 1,

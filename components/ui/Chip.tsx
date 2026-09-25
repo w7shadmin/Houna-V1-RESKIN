@@ -61,7 +61,7 @@ export default function Chip({ label, selected = false, size = 'md', onPress, st
 const styles = StyleSheet.create({
   base: {
     height: 40,
-    paddingHorizontal: 18,
+    paddingHorizontal: 16,
     borderRadius: radius.full,
     borderWidth: 1,
     alignItems: 'center',
@@ -75,7 +75,7 @@ const styles = StyleSheet.create({
   },
   baseSm: {
     height: 36,
-    paddingHorizontal: 14,
+    paddingHorizontal: 12,
   },
   labelLatinSm: {
     fontSize: 11.5,

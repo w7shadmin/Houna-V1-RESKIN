@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
     paddingVertical: 16,
-    paddingHorizontal: 18,
+    paddingHorizontal: 16,
   },
   topicTitle: {
     fontSize: 24,
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
+    gap: 16,
     padding: 12,
   },
   media56: {
@@ -321,8 +321,8 @@ const styles = StyleSheet.create({
   },
   place: {
     flex: 1,
-    gap: 6,
-    padding: 14,
+    gap: 8,
+    padding: 16,
   },
   placeCount: {
     fontSize: 14.5,
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    paddingVertical: 14,
+    paddingVertical: 16,
     paddingHorizontal: 16,
     borderRadius: radius.card,
     borderWidth: 1,

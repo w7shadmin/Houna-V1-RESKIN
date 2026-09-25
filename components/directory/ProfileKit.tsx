@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
   },
   section: {
     gap: grid(1.5),
-    padding: 20,
+    padding: 16,
     borderRadius: 22,
     borderWidth: 1,
   },

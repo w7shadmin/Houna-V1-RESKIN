@@ -48,7 +48,7 @@ export default function Button({
       style={({ pressed }) => [
         styles.base,
         isPrimary
-          ? { backgroundColor: colors.action, paddingHorizontal: 26 }
+          ? { backgroundColor: colors.action, paddingHorizontal: 24 }
           : {
               backgroundColor: colors.control,
               borderWidth: 1,

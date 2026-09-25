@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 14,
+    gap: 16,
     borderRadius: 22,
   },
   image: {
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
   text: {
     flex: 1,
     minWidth: 0,
-    gap: 3,
+    gap: 4,
   },
   title: {
     fontSize: 16,
@@ -121,20 +121,20 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 13,
     lineHeight: 13 * 1.45,
-    marginTop: 2,
+    marginTop: 4,
   },
   tagRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
-    gap: spacing.xs + 2,
+    gap: spacing.sm,
     marginTop: spacing.xs,
   },
   tag: {
     borderRadius: radius.full,
     borderWidth: 1,
-    paddingHorizontal: 10,
-    paddingVertical: 3,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
   },
   tagText: {
     fontSize: 12,

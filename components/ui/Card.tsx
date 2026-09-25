@@ -50,11 +50,11 @@ const styles = StyleSheet.create({
   },
   row: {
     borderRadius: radius.card,
-    padding: 14,
+    padding: 16,
   },
   feature: {
     borderRadius: radius.cardLg,
-    paddingTop: 14,
+    paddingTop: 16,
     paddingHorizontal: 16,
     paddingBottom: 16,
   },

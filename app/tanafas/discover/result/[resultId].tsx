@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     padding: layout.screenPadding,
     paddingBottom: 40,
-    gap: 22,
+    gap: 24,
   },
   header: {
     flexDirection: 'row',
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
   },
   trait: {
     gap: 8,
-    paddingVertical: 14,
+    paddingVertical: 16,
     paddingHorizontal: 16,
     borderRadius: 18,
     borderWidth: 1,
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     lineHeight: 21,
   },
   actions: {
-    gap: 10,
+    gap: 12,
   },
   primary: {
     height: 56,

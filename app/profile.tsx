@@ -379,7 +379,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     padding: layout.screenPadding,
     paddingBottom: 40,
-    gap: 22,
+    gap: 24,
   },
   header: {
     flexDirection: 'row',
@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
   },
   identity: {
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
   },
   avatarRing: {
     width: 92,
@@ -419,16 +419,16 @@ const styles = StyleSheet.create({
   countryRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
   },
   country: {
     fontSize: 14,
   },
   guest: {
     alignItems: 'center',
-    gap: 14,
-    paddingVertical: 26,
-    paddingHorizontal: 20,
+    gap: 16,
+    paddingVertical: 24,
+    paddingHorizontal: 16,
     borderRadius: 24,
     borderWidth: 1,
   },
@@ -447,21 +447,21 @@ const styles = StyleSheet.create({
   },
   guestButtons: {
     flexDirection: 'row',
-    gap: 10,
+    gap: 12,
   },
   recap: {
     minHeight: 120,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
-    padding: 20,
+    gap: 16,
+    padding: 16,
     borderRadius: 24,
     borderWidth: 1,
     overflow: 'hidden',
   },
   recapText: {
     flex: 1,
-    gap: 6,
+    gap: 8,
   },
   recapTitle: {
     fontSize: 25,
@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   streak: {
-    gap: 14,
+    gap: 16,
   },
   cardText: {
     flex: 1,
@@ -510,7 +510,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   cardLink: {
-    marginTop: 2,
+    marginTop: 4,
     fontSize: 14,
   },
   streakLink: {
@@ -541,7 +541,7 @@ const styles = StyleSheet.create({
   segmented: {
     flexDirection: 'row',
     gap: 4,
-    padding: 3,
+    padding: 4,
     borderRadius: 999,
   },
   segment: {
@@ -557,7 +557,7 @@ const styles = StyleSheet.create({
   signOut: {
     alignSelf: 'center',
     height: 44,
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     justifyContent: 'center',
   },
   signOutText: {

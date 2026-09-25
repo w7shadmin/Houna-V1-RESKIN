@@ -238,7 +238,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
   },
   grabber: {
     width: 40,
@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
   },
   figure: {
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
   },
   moodLabel: {
     fontSize: 30,
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
   note: {
     minHeight: 76,
     paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingVertical: 16,
     borderRadius: 18,
     borderWidth: 1,
     fontSize: 15,

@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     padding: layout.screenPadding,
     paddingBottom: 40,
-    gap: 22,
+    gap: 24,
   },
   header: {
     flexDirection: 'row',
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
     lineHeight: 21,
   },
   progressWrap: {
-    gap: 10,
+    gap: 12,
   },
   progressText: {
     flexDirection: 'row',
@@ -272,8 +272,8 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   question: {
-    gap: 10,
-    paddingTop: 18,
+    gap: 12,
+    paddingTop: 16,
   },
   promptLatin: {
     fontSize: 11.5,
@@ -291,14 +291,14 @@ const styles = StyleSheet.create({
     lineHeight: 44,
   },
   options: {
-    gap: 10,
+    gap: 12,
   },
   option: {
     minHeight: 52,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
-    paddingHorizontal: 18,
+    gap: 16,
+    paddingHorizontal: 16,
     borderRadius: 18,
     borderWidth: 1,
   },
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
   },
   navRow: {
     flexDirection: 'row',
-    gap: 10,
+    gap: 12,
   },
   primary: {
     height: 56,

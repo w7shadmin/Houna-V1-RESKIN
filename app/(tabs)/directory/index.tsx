@@ -369,10 +369,10 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     padding: layout.screenPadding,
     paddingBottom: 40,
-    gap: 20,
+    gap: 16,
   },
   header: {
-    gap: 6,
+    gap: 8,
   },
   eyebrowLatin: {
     fontSize: 12,
@@ -393,8 +393,8 @@ const styles = StyleSheet.create({
     height: 52,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    paddingStart: 18,
+    gap: 12,
+    paddingStart: 16,
     paddingEnd: 8,
     borderRadius: 999,
     borderWidth: 1,
@@ -416,20 +416,20 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   section: {
-    gap: 10,
+    gap: 12,
   },
   places: {
     flexDirection: 'row',
-    gap: 10,
+    gap: 12,
   },
   hubRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
+    gap: 16,
   },
   hubText: {
     flex: 1,
-    gap: 3,
+    gap: 4,
   },
   hubTitle: {
     fontSize: 15.5,
@@ -443,7 +443,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   empty: {
-    gap: 6,
+    gap: 8,
   },
   emptyTitle: {
     fontSize: 16,

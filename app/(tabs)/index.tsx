@@ -391,7 +391,7 @@ const styles = StyleSheet.create({
   },
   hero: {
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
   },
   halo: {
     width: 190,
@@ -450,12 +450,12 @@ const styles = StyleSheet.create({
   periods: {
     flexDirection: 'row',
     gap: 4,
-    padding: 3,
+    padding: 4,
     borderRadius: 999,
   },
   period: {
     height: 28,
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     borderRadius: 999,
     alignItems: 'center',
     justifyContent: 'center',
@@ -482,8 +482,8 @@ const styles = StyleSheet.create({
   },
   countText: {
     flex: 1,
-    gap: 3,
-    paddingBottom: 2,
+    gap: 4,
+    paddingBottom: 4,
   },
   countSentence: {
     fontSize: 14,
@@ -510,7 +510,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     height: 44,
-    paddingHorizontal: 18,
+    paddingHorizontal: 16,
     borderRadius: 999,
     borderWidth: 1,
   },

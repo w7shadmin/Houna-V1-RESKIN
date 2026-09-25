@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     padding: layout.screenPadding,
     paddingBottom: 40,
-    gap: 22,
+    gap: 24,
   },
   header: {
     gap: 8,
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   section: {
-    gap: 10,
+    gap: 12,
   },
   sectionTitle: {
     fontSize: 16,
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   },
   lineText: {
     flex: 1,
-    gap: 3,
+    gap: 4,
   },
   lineName: {
     fontSize: 15.5,

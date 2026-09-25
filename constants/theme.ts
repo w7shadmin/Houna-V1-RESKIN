@@ -356,8 +356,8 @@ export function schemeFromSystem(system: string | null | undefined): ColorScheme
 export const layout = {
   /** Content caps at 430px, centered. */
   maxContentWidth: 430,
-  /** Screen side padding on every canvas artboard. */
-  screenPadding: 20,
+  /** Screen side padding — grid(2); the canvas artboards use 20, snapped to the 8-point grid. */
+  screenPadding: 16,
 } as const;
 
 /* ──────────────────────── Spacing ──────────────────────── */
