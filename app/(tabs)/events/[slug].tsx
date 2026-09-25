@@ -3,7 +3,8 @@ import { View, Text, Image, ScrollView, Pressable, Linking, StyleSheet } from 'r
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Calendar, Play } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, typography } from '@/constants/theme';
+import { spacing, radius, typography } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { fetchEventDetail, type EventDetail } from '@/lib/hounaApi';
 import { stripHtml } from '@/lib/html';
 import { LoadingState, ErrorState } from '@/components/directory/AsyncState';
@@ -11,6 +12,7 @@ import DetailHero from '@/components/directory/DetailHero';
 import InfoRow from '@/components/directory/InfoRow';
 
 export default function EventDetailScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const { t, language, fonts } = useLanguage();

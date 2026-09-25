@@ -2,7 +2,8 @@ import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { Search, ChevronDown } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, typography } from '@/constants/theme';
+import { spacing, radius, typography } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface FilterToggleProps {
   label: string;
@@ -12,6 +13,7 @@ interface FilterToggleProps {
 }
 
 export default function FilterToggle({ label, activeCount, expanded, onPress }: FilterToggleProps) {
+  const { colors } = useTheme();
   const { fonts, isRTL } = useLanguage();
 
   return (

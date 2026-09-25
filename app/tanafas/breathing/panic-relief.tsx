@@ -14,7 +14,8 @@ import {
   type LucideIcon,
 } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, palette, spacing, radius, typography, shadows } from '@/constants/theme';
+import { palette, spacing, radius, typography, shadows } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { arabicNumber } from '@/lib/arabicNumerals';
 import ExerciseHeader from '@/components/breathing/ExerciseHeader';
 
@@ -22,6 +23,7 @@ const ACCENT = palette.raspberry;
 const STEP_ICONS: LucideIcon[] = [Eye, Hand, Ear, Flower2, Coffee];
 
 export default function PanicReliefGroundingScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
   const { t, isRTL, fonts } = useLanguage();
   const ex = t.tanafas.exercises.panicRelief;

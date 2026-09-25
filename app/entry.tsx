@@ -6,7 +6,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Logo from '@/components/Logo';
 import LanguageSwitcherButton from '@/components/LanguageSwitcherButton';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, palette, spacing, radius, typography, shadows } from '@/constants/theme';
+import { palette, spacing, radius, typography, shadows } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { hexToRgba, mix } from '@/lib/color';
 
 /**
@@ -24,6 +25,7 @@ const TANAFAS_BUTTON_GRADIENT: readonly [string, string, string] = [
   mix(palette.turquoise, palette.black, 0.12),
 ];
 export default function EntryScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
   const { t, fonts } = useLanguage();
 

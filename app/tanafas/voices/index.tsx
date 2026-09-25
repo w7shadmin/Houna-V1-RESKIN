@@ -6,12 +6,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Plus, MessageCircle, Sparkles, ImageIcon } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { colors, spacing, radius, typography, shadows } from '@/constants/theme';
+import { spacing, radius, typography, shadows } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { fetchApprovedPosts, fetchMyPosts, type VoicePost } from '@/lib/voices';
 
 type Tab = 'feed' | 'mine';
 
 export default function VoicesScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
   const { t, isRTL, fonts } = useLanguage();
   const { session, isGuest } = useAuth();

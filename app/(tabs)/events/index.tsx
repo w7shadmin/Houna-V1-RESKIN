@@ -4,7 +4,8 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Calendar, Video, CheckCircle2, Clock, ChevronRight, ArrowUpDown, Mic } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, typography, shadows } from '@/constants/theme';
+import { spacing, radius, typography, shadows } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { fetchEvents, fetchSpeakers, resolveImageUrl, type EventItem, type Speaker } from '@/lib/hounaApi';
 import { LoadingState, ErrorState, InlineError } from '@/components/directory/AsyncState';
 
@@ -17,6 +18,7 @@ function parseEventDate(dateStr: string): number {
 }
 
 export default function EventsListScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
   const { t, language, isRTL, fonts } = useLanguage();
   const s = t.events.list;

@@ -4,7 +4,8 @@ import { useRouter, type Href } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Wind, Square, Footprints, Activity, Clock, type LucideIcon } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, palette, spacing, radius, typography, shadows } from '@/constants/theme';
+import { palette, spacing, radius, typography, shadows } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import FlatIconTile from '@/components/ui/FlatIconTile';
 import { OLD_MVP_ICON_HEX, OLD_MVP_ICON_HEX_PALE } from '@/lib/color';
 
@@ -25,6 +26,7 @@ interface ExerciseEntry {
 }
 
 export default function BreathingGroundingListScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
   const { t, fonts } = useLanguage();
   const ex = t.tanafas.exercises;

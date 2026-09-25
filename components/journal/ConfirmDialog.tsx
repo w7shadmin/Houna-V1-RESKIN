@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, Pressable, Modal, StyleSheet } from 'react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, palette, spacing, radius, typography } from '@/constants/theme';
+import { palette, spacing, radius, typography } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { mix } from '@/lib/color';
 
 interface ConfirmDialogProps {
@@ -25,6 +26,7 @@ export default function ConfirmDialog({
   onCancel,
   onConfirm,
 }: ConfirmDialogProps) {
+  const { colors } = useTheme();
   const { fonts } = useLanguage();
 
   return (

@@ -7,9 +7,11 @@ import AuthField from '@/components/account/AuthField';
 import GoogleButton from '@/components/account/GoogleButton';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { colors, spacing, radius, typography } from '@/constants/theme';
+import { spacing, radius, typography } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function SignUpScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
   const { t, fonts } = useLanguage();
   const { signUpWithEmail, signInWithGoogle } = useAuth();

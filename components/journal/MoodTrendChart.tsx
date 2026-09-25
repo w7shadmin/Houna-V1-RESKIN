@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { View, StyleSheet } from 'react-native';
 import Svg, { Path, Circle, Line, Text as SvgText } from 'react-native-svg';
-import { colors } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { MOOD_COLORS, MOOD_VALUES, localDateString, type JournalEntry, type MoodTag } from '@/lib/journal';
 
 export interface DayPoint {
@@ -34,6 +34,7 @@ export default function MoodTrendChart({
   selectedDateStr,
   onSelectDate,
 }: MoodTrendChartProps) {
+  const { colors } = useTheme();
   const days = useMemo<DayPoint[]>(() => {
     const result: DayPoint[] = [];
     const today = new Date();

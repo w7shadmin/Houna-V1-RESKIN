@@ -2,7 +2,8 @@ import React from 'react';
 import { Pressable, Text, StyleSheet } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, typography } from '@/constants/theme';
+import { spacing, radius, typography } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface GoogleButtonProps {
   label: string;
@@ -11,6 +12,7 @@ interface GoogleButtonProps {
 }
 
 export default function GoogleButton({ label, onPress, disabled }: GoogleButtonProps) {
+  const { colors } = useTheme();
   const { fonts } = useLanguage();
 
   return (

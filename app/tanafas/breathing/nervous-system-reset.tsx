@@ -4,8 +4,10 @@ import { useRouter } from 'expo-router';
 import Svg, { Circle } from 'react-native-svg';
 import { Play, Pause, RotateCcw, Snowflake, CheckCircle2, TriangleAlert } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, palette, spacing, radius, typography, shadows } from '@/constants/theme';
+import { palette, spacing, radius, typography, shadows } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { arabicNumber } from '@/lib/arabicNumerals';
+import { pingActivity } from '@/lib/usageTracking';
 import ExerciseHeader from '@/components/breathing/ExerciseHeader';
 
 const ACCENT = palette.lightCyan;
@@ -24,6 +26,7 @@ const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 type Phase = 'breathe' | 'hold' | 'recovery';
 
 export default function NervousSystemResetScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
   const { t, isRTL, fonts } = useLanguage();
   const ex = t.tanafas.exercises.nervousSystemReset;
@@ -115,6 +118,9 @@ export default function NervousSystemResetScreen() {
 
   const handleStart = () => {
     if (isComplete) reset();
+    // Community counter only — never recordTanafasSession, which feeds
+    // streaks and the leaderboard (CLAUDE.md: no streaks on this exercise).
+    pingActivity('breathing').catch(() => {});
     setIsRunning(true);
     setIsPaused(false);
     setPhase('breathe');

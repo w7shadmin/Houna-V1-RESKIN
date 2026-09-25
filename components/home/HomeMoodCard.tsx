@@ -4,7 +4,8 @@ import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { Check, Users } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, typography, shadows } from '@/constants/theme';
+import { spacing, radius, typography, shadows } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { hexToRgba } from '@/lib/color';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { getTodayEntry, logMoodForToday, MOOD_TAGS, MOOD_EMOJI, MOOD_COLORS, type MoodTag } from '@/lib/journal';
@@ -13,6 +14,7 @@ import { recordTanafasSession } from '@/lib/usageTracking';
 
 /** Quick one-tap mood check-in — logs (or updates) today's journal entry's mood without requiring any text. */
 export default function HomeMoodCard() {
+  const { colors } = useTheme();
   const router = useRouter();
   const { t, isRTL, fonts } = useLanguage();
   const m = t.home.mood;

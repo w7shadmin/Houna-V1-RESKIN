@@ -3,7 +3,8 @@ import { View, Image, Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, palette, radius } from '@/constants/theme';
+import { palette, radius } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { resolveImageUrl } from '@/lib/hounaApi';
 
 interface DetailHeroProps {
@@ -13,6 +14,7 @@ interface DetailHeroProps {
 }
 
 export default function DetailHero({ imageUrl, imageResizeMode = 'cover', height = 200 }: DetailHeroProps) {
+  const { colors } = useTheme();
   const router = useRouter();
   const { isRTL } = useLanguage();
   const resolvedImageUrl = resolveImageUrl(imageUrl);

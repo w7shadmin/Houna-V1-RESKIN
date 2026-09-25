@@ -2,7 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Wind, CheckCircle2 } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, typography } from '@/constants/theme';
+import { typography } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { arabicNumber } from '@/lib/arabicNumerals';
 import type { PhaseVisualProps } from './types';
 
@@ -24,6 +25,7 @@ export default function PulsingCircleVisual({
   readyLabel,
   secSuffix,
 }: Props) {
+  const { colors } = useTheme();
   const { isRTL, fonts } = useLanguage();
 
   let scale = 1;
@@ -69,7 +71,7 @@ export default function PulsingCircleVisual({
         ) : (
           <>
             <Wind size={32} color={accentColor} strokeWidth={1.5} />
-            <Text style={[styles.readyLabel, { fontFamily: fonts.regular }]}>{readyLabel}</Text>
+            <Text style={[styles.readyLabel, { color: colors.textTertiary, fontFamily: fonts.regular }]}>{readyLabel}</Text>
           </>
         )}
       </View>
@@ -113,7 +115,6 @@ const styles = StyleSheet.create({
   },
   readyLabel: {
     fontSize: typography.fontSize.sm,
-    color: colors.textTertiary,
     marginTop: 8,
   },
 });

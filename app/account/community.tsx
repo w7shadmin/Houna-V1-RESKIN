@@ -7,9 +7,11 @@ import WorldMap, { type CountryCount } from '@/components/community/WorldMap';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
 import { arabicNumber } from '@/lib/arabicNumerals';
-import { colors, spacing, radius, typography } from '@/constants/theme';
+import { spacing, radius, typography } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function CommunityMapScreen() {
+  const { colors } = useTheme();
   const { t, language, isRTL, fonts } = useLanguage();
   const s = t.account.community;
 

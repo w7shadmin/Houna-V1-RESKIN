@@ -56,3 +56,15 @@ export const LOGO_WHITE_XML = `<svg xmlns="http://www.w3.org/2000/svg" width="93
     <path id="w-Path_11806" d="M60.245,26.672A2.672,2.672,0,1,1,57.572,24a2.71,2.71,0,0,1,2.672,2.672" transform="translate(-19.592 -7.713)" fill="#3baaa7"/>
   </g>
 </svg>`;
+
+/**
+ * The official logo with its three fills swapped — used by the Nightlight /
+ * Daylight themes, whose canvas wordmarks are exactly this artwork with
+ * recoloured fills (teal → `primary`, grey → `secondary`, white pin dot →
+ * `dot`). Paths are untouched.
+ */
+export function tintedLogoXml(primary: string, secondary: string, dot: string): string {
+  return LOGO_GREEN_XML.replace(/fill="#3baaa7"/g, `fill="${primary}"`)
+    .replace(/fill="#525052"/g, `fill="${secondary}"`)
+    .replace(/fill="#fff"/g, `fill="${dot}"`);
+}

@@ -3,7 +3,8 @@ import { View, Text, ScrollView, Pressable, Linking, StyleSheet } from 'react-na
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Phone, Mail, Globe, MapPin, Award, Users, ExternalLink } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, typography } from '@/constants/theme';
+import { spacing, radius, typography } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { fetchTherapistDetail, safeUrl, type TherapistDetail } from '@/lib/hounaApi';
 import { LoadingState, ErrorState } from '@/components/directory/AsyncState';
 import DetailHero from '@/components/directory/DetailHero';
@@ -17,6 +18,7 @@ const INFO_ICONS: Record<string, typeof MapPin> = {
 };
 
 export default function ProfessionalDetailScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const { t, language, fonts } = useLanguage();

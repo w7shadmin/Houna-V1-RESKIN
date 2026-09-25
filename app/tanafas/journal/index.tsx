@@ -5,7 +5,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, Plus, BookOpen, TrendingUp, Calendar, Download, ChevronLeft } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, typography, shadows } from '@/constants/theme';
+import { spacing, radius, typography, shadows } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { arabicNumber } from '@/lib/arabicNumerals';
 import {
   loadEntries,
@@ -23,6 +24,7 @@ type JournalTab = 'entries' | 'insights';
 type RangeKey = 7 | 30;
 
 export default function JournalHomeScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
   const { tab: initialTab } = useLocalSearchParams<{ tab?: string }>();
   const { t, isRTL, fonts } = useLanguage();

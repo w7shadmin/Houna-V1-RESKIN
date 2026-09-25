@@ -21,15 +21,8 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import type { Language } from '@/constants/strings';
-import {
-  colors,
-  spacing,
-  typography,
-  radius,
-  shadows,
-  latinFontFamily,
-  arabicFontFamily,
-} from '@/constants/theme';
+import { spacing, typography, radius, shadows, latinFontFamily, arabicFontFamily } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface MenuItem {
   icon: LucideIcon;
@@ -38,6 +31,7 @@ interface MenuItem {
 }
 
 export default function MoreScreen() {
+  const { colors } = useTheme();
   const { language, setLanguage, t, fonts } = useLanguage();
   const { loading: authLoading, isGuest, needsUsername, profile } = useAuth();
   const router = useRouter();

@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, typography } from '@/constants/theme';
+import { spacing, radius, typography } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface AuthFieldProps {
   label: string;
@@ -22,6 +23,7 @@ export default function AuthField({
   keyboardType = 'default',
   autoCapitalize = 'sentences',
 }: AuthFieldProps) {
+  const { colors } = useTheme();
   const { isRTL, fonts } = useLanguage();
 
   return (

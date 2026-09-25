@@ -6,10 +6,12 @@ import { ImagePlus, X, CheckCircle2 } from 'lucide-react-native';
 import DetailScreen from '@/components/DetailScreen';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { colors, spacing, radius, typography } from '@/constants/theme';
+import { spacing, radius, typography } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { submitPost } from '@/lib/voices';
 
 export default function VoicesSubmitScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
   const { t, isRTL, fonts } = useLanguage();
   const { session } = useAuth();

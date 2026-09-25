@@ -4,7 +4,8 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft, ChevronRight } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, palette, spacing, radius, typography, shadows } from '@/constants/theme';
+import { palette, spacing, radius, typography, shadows } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { fetchResourceDirectory, safeUrl, type ResourceDirectoryData, type ResourceArticle } from '@/lib/hounaApi';
 import { LoadingState, ErrorState } from '@/components/directory/AsyncState';
 import ListItemCard from '@/components/directory/ListItemCard';
@@ -12,6 +13,7 @@ import LottieTopicIcon from '@/components/directory/LottieTopicIcon';
 import GradientTile from '@/components/GradientTile';
 
 export default function ResourceDirectoryScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
   const { t, language, isRTL, fonts } = useLanguage();
   const s = t.directory.resources;

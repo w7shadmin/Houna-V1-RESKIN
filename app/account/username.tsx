@@ -6,13 +6,15 @@ import DetailScreen from '@/components/DetailScreen';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { colors, spacing, radius, typography } from '@/constants/theme';
+import { spacing, radius, typography } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const USERNAME_PATTERN = /^[A-Za-z0-9_]{3,20}$/;
 
 type Status = 'idle' | 'invalid' | 'checking' | 'available' | 'taken';
 
 export default function UsernameScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
   const { t, isRTL, fonts } = useLanguage();
   const { claimUsername } = useAuth();

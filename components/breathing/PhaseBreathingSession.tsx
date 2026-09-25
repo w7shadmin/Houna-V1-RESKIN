@@ -3,9 +3,10 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Play, Pause, RotateCcw } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, typography, shadows } from '@/constants/theme';
+import { spacing, radius, typography, shadows } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { arabicNumber } from '@/lib/arabicNumerals';
-import { recordTanafasSession } from '@/lib/usageTracking';
+import { pingActivity, recordTanafasSession } from '@/lib/usageTracking';
 import ExerciseHeader from './ExerciseHeader';
 import type { BreathingPhase, PhaseVisualProps } from './types';
 
@@ -47,6 +48,7 @@ export default function PhaseBreathingSession({
   onExit,
   renderVisual,
 }: PhaseBreathingSessionProps) {
+  const { colors } = useTheme();
   const { t, isRTL, fonts } = useLanguage();
   const s = t.tanafas.session;
 
@@ -142,6 +144,7 @@ export default function PhaseBreathingSession({
   const handleStart = () => {
     if (isComplete) reset();
     sessionStartRef.current = new Date();
+    pingActivity('breathing').catch(() => {});
     setIsRunning(true);
     setIsPaused(false);
   };
@@ -234,7 +237,7 @@ export default function PhaseBreathingSession({
 
         {isRunning && (
           <View style={styles.progressWrap}>
-            <View style={styles.progressTrack}>
+            <View style={[styles.progressTrack, { backgroundColor: colors.border }]}>
               <View
                 style={[
                   styles.progressFill,
@@ -404,7 +407,6 @@ const styles = StyleSheet.create({
   progressTrack: {
     height: 8,
     borderRadius: radius.full,
-    backgroundColor: colors.border,
     overflow: 'hidden',
   },
   progressFill: {

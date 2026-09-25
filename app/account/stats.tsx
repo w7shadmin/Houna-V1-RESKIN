@@ -5,7 +5,8 @@ import { Award, Share2 } from 'lucide-react-native';
 import DetailScreen from '@/components/DetailScreen';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { colors, palette, spacing, radius, typography, shadows } from '@/constants/theme';
+import { palette, spacing, radius, typography, shadows } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import {
   getMyStreak,
@@ -21,6 +22,7 @@ import {
 type Period = 'week' | 'all';
 
 export default function StatsScreen() {
+  const { colors } = useTheme();
   const { t, isRTL, fonts } = useLanguage();
   const { session, profile } = useAuth();
   const s = t.account.stats;

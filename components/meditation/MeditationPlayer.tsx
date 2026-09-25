@@ -23,7 +23,7 @@ import * as NavigationBar from 'expo-navigation-bar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { spacing, radius, typography } from '@/constants/theme';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
-import { recordTanafasSession } from '@/lib/usageTracking';
+import { pingActivity, recordTanafasSession } from '@/lib/usageTracking';
 import AmbientVisual from './AmbientVisual';
 import type { MeditationScene } from './scenes';
 
@@ -362,6 +362,7 @@ export default function MeditationPlayer({
   const handleStart = () => {
     if (isComplete) reset();
     sessionStartRef.current = new Date();
+    pingActivity('meditation').catch(() => {});
     segmentStartMsRef.current = Date.now();
     setIsRunning(true);
     setIsPaused(false);

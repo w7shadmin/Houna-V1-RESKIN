@@ -4,7 +4,8 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Wind, Moon, BookOpen, MessageCircle, CheckCircle2, ChevronRight, type LucideIcon } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, palette, spacing, radius, typography, shadows } from '@/constants/theme';
+import { palette, spacing, radius, typography, shadows } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { mix, OLD_MVP_ICON_HEX, OLD_MVP_ICON_HEX_PALE } from '@/lib/color';
 import FlatIconTile from '@/components/ui/FlatIconTile';
 
@@ -20,6 +21,7 @@ interface HubCard {
 }
 
 export default function TanafasHubScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
   const { t, fonts } = useLanguage();
   const hub = t.tanafas.hub;

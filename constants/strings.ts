@@ -15,6 +15,7 @@ import { eventsStrings } from './eventsStrings';
 import { journalStrings } from './journalStrings';
 import { homeStrings } from './homeStrings';
 import { accountStrings } from './accountStrings';
+import { crisisStrings } from './crisisStrings';
 
 export type Language = 'en' | 'ar';
 
@@ -48,6 +49,7 @@ export const strings = {
       explore: 'Explore Houna',
     },
     home: homeStrings.en,
+    crisis: crisisStrings.en,
     directory: directoryStrings.en,
     events: eventsStrings.en,
     about: {
@@ -107,6 +109,7 @@ export const strings = {
       explore: 'استكشف هُنا',
     },
     home: homeStrings.ar,
+    crisis: crisisStrings.ar,
     directory: directoryStrings.ar,
     events: eventsStrings.ar,
     about: {

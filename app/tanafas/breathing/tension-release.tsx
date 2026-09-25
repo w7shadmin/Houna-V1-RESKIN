@@ -3,7 +3,8 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ArrowLeft, ArrowRight, Pause, Play, RotateCcw, CheckCircle2 } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, palette, spacing, radius, typography, shadows } from '@/constants/theme';
+import { palette, spacing, radius, typography, shadows } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { arabicNumber } from '@/lib/arabicNumerals';
 import ExerciseHeader from '@/components/breathing/ExerciseHeader';
 
@@ -28,6 +29,7 @@ function blend(from: string, to: string, t: number): string {
 }
 
 export default function TensionReleaseScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
   const { t, isRTL, fonts } = useLanguage();
   const ex = t.tanafas.exercises.tensionRelease;
@@ -213,7 +215,7 @@ export default function TensionReleaseScreen() {
             </Text>
 
             {isRunning && !isPaused && (
-              <View style={styles.progressTrack}>
+              <View style={[styles.progressTrack, { backgroundColor: colors.border }]}>
                 <View
                   style={[
                     styles.progressFill,
@@ -386,7 +388,6 @@ const styles = StyleSheet.create({
     width: 160,
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.border,
     overflow: 'hidden',
     marginTop: spacing.md,
   },

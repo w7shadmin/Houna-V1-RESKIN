@@ -1,7 +1,7 @@
 import React from 'react';
 import LottieView, { type AnimationObject } from 'lottie-react-native';
 import { Brain, type LucideIcon } from 'lucide-react-native';
-import { colors } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 
 /**
  * Real API topic slugs → their bundled Lottie animation. Ported from the
@@ -43,6 +43,7 @@ interface LottieTopicIconProps {
 }
 
 export default function LottieTopicIcon({ slug, size, fallbackIcon: FallbackIcon = Brain }: LottieTopicIconProps) {
+  const { colors } = useTheme();
   const source = LOTTIE_MAP[slug];
   if (!source) {
     return <FallbackIcon size={size * 0.8} color={colors.primary} strokeWidth={1.6} />;

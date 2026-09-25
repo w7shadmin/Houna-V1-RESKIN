@@ -3,7 +3,8 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ArrowLeft } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, typography } from '@/constants/theme';
+import { spacing, radius, typography } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface ExerciseHeaderProps {
   title: string;
@@ -21,6 +22,7 @@ export default function ExerciseHeader({
   onExit,
   accentColor,
 }: ExerciseHeaderProps) {
+  const { colors } = useTheme();
   const { fonts, isRTL } = useLanguage();
   // None of this header's callers wrap themselves in a SafeAreaView (they're
   // plain flex:1 Views), so without this the header sits directly under the

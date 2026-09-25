@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, typography, shadows } from '@/constants/theme';
+import { spacing, radius, typography, shadows } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { arabicNumber } from '@/lib/arabicNumerals';
 import { MOOD_EMOJI, formatEntryDateShort, type JournalEntry } from '@/lib/journal';
 
@@ -11,6 +12,7 @@ interface EntryCardProps {
 }
 
 export default function EntryCard({ entry, onPress }: EntryCardProps) {
+  const { colors } = useTheme();
   const { t, isRTL, fonts } = useLanguage();
   const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
   const dateLabel = formatEntryDateShort(entry.date, t.journal.dateNames, num);

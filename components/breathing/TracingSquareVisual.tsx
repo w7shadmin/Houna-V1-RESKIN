@@ -2,7 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Square, CheckCircle2 } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, typography } from '@/constants/theme';
+import { typography } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { arabicNumber } from '@/lib/arabicNumerals';
 import type { PhaseVisualProps } from './types';
 
@@ -30,6 +31,7 @@ export default function TracingSquareVisual({
   secSuffix,
   phaseCount,
 }: Props) {
+  const { colors } = useTheme();
   const { isRTL, fonts } = useLanguage();
 
   let dotX = SQUARE / 2;

@@ -1,36 +1,44 @@
 import React from 'react';
 import { Pressable, StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
-import { colors, radius, shadows, spacing } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
+import { radius } from '@/constants/theme';
 
 interface CardProps {
   children: React.ReactNode;
   onPress?: () => void;
-  /** Defaults to true — the small stat-tile screens that omit it are the exception, not the rule. */
-  shadow?: boolean;
-  /** Content density: 'md' (24px, default) for standalone cards, 'sm' (12px) for list rows. */
-  padding?: 'sm' | 'md';
+  accessibilityLabel?: string;
+  /**
+   * `row` — list card (20 radius, 14 padding), e.g. a directory entry with
+   * an icon tile. `feature` — a standalone section card (24 radius), e.g.
+   * Home's community card.
+   */
+  variant?: 'row' | 'feature';
   style?: StyleProp<ViewStyle>;
 }
 
 /**
- * Shared card primitive, codifying the bordered-white-surface pattern used
- * almost everywhere content needs grouping (journal entries, directory list
- * items, stat tiles, mood card). New screens should use this instead of
- * hand-rolling another copy; existing screens aren't migrated as part of
- * introducing it.
+ * Card from the Nightlight/Daylight sheets: a faint Moonlight wash (Night)
+ * or Paper (Day) with a hairline border and no shadow. Pressable cards dim
+ * the whole card via opacity — CLAUDE.md's pressed-state convention.
  */
-export default function Card({ children, onPress, shadow = true, padding = 'md', style }: CardProps) {
+export default function Card({ children, onPress, accessibilityLabel, variant = 'row', style }: CardProps) {
+  const { colors } = useTheme();
   const base = [
     styles.base,
-    { backgroundColor: colors.card, borderColor: colors.border, padding: padding === 'sm' ? spacing.sm + 4 : spacing.lg },
-    shadow && shadows.card,
+    variant === 'feature' ? styles.feature : styles.row,
+    { backgroundColor: colors.card, borderColor: colors.border },
     style,
   ];
 
   if (!onPress) return <View style={base}>{children}</View>;
 
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => [...base, pressed && { backgroundColor: colors.cardPressed }]}>
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      style={({ pressed }) => [...base, pressed && styles.pressed]}
+    >
       {children}
     </Pressable>
   );
@@ -39,6 +47,18 @@ export default function Card({ children, onPress, shadow = true, padding = 'md',
 const styles = StyleSheet.create({
   base: {
     borderWidth: 1,
-    borderRadius: radius.lg,
+  },
+  row: {
+    borderRadius: radius.card,
+    padding: 14,
+  },
+  feature: {
+    borderRadius: radius.cardLg,
+    paddingTop: 14,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+  },
+  pressed: {
+    opacity: 0.85,
   },
 });

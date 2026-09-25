@@ -4,7 +4,8 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, typography } from '@/constants/theme';
+import { spacing, radius, typography } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { arabicNumber } from '@/lib/arabicNumerals';
 import { fetchWellnessCenters, type WellnessCenter, type CountryOption } from '@/lib/hounaApi';
 import { LoadingState, ErrorState, InlineError } from '@/components/directory/AsyncState';
@@ -13,6 +14,7 @@ import FilterToggle from '@/components/directory/FilterToggle';
 import ChipFilter from '@/components/directory/ChipFilter';
 
 export default function WellnessCentersListScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
   const { t, language, isRTL, fonts } = useLanguage();
   const s = t.directory.wellnessCenters;

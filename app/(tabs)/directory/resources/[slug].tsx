@@ -5,7 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import RenderHTML from 'react-native-render-html';
 import { ArrowLeft } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, typography, shadows } from '@/constants/theme';
+import { spacing, radius, typography, shadows } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { fetchResourceDetail, type ResourceDetailData } from '@/lib/hounaApi';
 import { LoadingState, ErrorState } from '@/components/directory/AsyncState';
 
@@ -31,6 +32,7 @@ function getHtmlTagsStyles(isRTL: boolean) {
 }
 
 export default function ResourceDetailScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const { t, language, isRTL, fonts } = useLanguage();

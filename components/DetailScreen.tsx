@@ -4,7 +4,8 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, typography, radius } from '@/constants/theme';
+import { spacing, typography, radius } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface DetailScreenProps {
   title: string;
@@ -13,6 +14,7 @@ interface DetailScreenProps {
 
 /** Shared shell for pushed detail screens: header with a back button + title. */
 export default function DetailScreen({ title, children }: DetailScreenProps) {
+  const { colors } = useTheme();
   const router = useRouter();
   const { t, isRTL, fonts } = useLanguage();
 

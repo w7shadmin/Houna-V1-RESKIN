@@ -8,9 +8,11 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { GCC_CODES, getCountryList, getCountryName } from '@/lib/countries';
 import { uploadToBucket } from '@/lib/storageUpload';
-import { colors, spacing, radius, typography, shadows } from '@/constants/theme';
+import { spacing, radius, typography, shadows } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function ProfileScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
   const { t, language, isRTL, fonts } = useLanguage();
   const { loading: authLoading, session, profile, updateProfile, signOut } = useAuth();

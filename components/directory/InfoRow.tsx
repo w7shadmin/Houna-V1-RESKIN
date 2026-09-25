@@ -2,7 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import type { LucideIcon } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, typography } from '@/constants/theme';
+import { spacing, radius, typography } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface InfoRowProps {
   icon: LucideIcon;
@@ -11,6 +12,7 @@ interface InfoRowProps {
 }
 
 export default function InfoRow({ icon: Icon, label, value }: InfoRowProps) {
+  const { colors } = useTheme();
   const { fonts } = useLanguage();
   return (
     <View style={[styles.row, { backgroundColor: colors.card, borderColor: colors.border }]}>

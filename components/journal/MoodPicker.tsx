@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, typography } from '@/constants/theme';
+import { spacing, radius, typography } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { MOOD_TAGS, MOOD_EMOJI, type MoodTag } from '@/lib/journal';
 
 interface MoodPickerProps {
@@ -11,6 +12,7 @@ interface MoodPickerProps {
 }
 
 export default function MoodPicker({ value, onChange, disabled }: MoodPickerProps) {
+  const { colors } = useTheme();
   const { t, fonts } = useLanguage();
   const labels = t.journal.moodLabels;
 

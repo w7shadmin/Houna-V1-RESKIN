@@ -1,11 +1,12 @@
 import React from 'react';
 import { Stack } from 'expo-router';
-import { colors } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 
 /** Internal stack for everything opened from the raised Tanafas button — the
  * whole group is presented as one modal (see app/_layout.tsx), and this
  * navigator handles hub → breathing list → exercise within it. */
 export default function TanafasLayout() {
+  const { colors } = useTheme();
   return (
     <Stack
       screenOptions={{

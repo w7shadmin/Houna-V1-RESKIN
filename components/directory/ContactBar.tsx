@@ -3,7 +3,8 @@ import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { LucideIcon } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, typography, shadows } from '@/constants/theme';
+import { spacing, radius, typography, shadows } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface ContactBarProps {
   icon: LucideIcon;
@@ -13,6 +14,7 @@ interface ContactBarProps {
 
 /** Bottom action bar for detail screens — sits below the scroll area, not layered over it. */
 export default function ContactBar({ icon: Icon, label, onPress }: ContactBarProps) {
+  const { colors } = useTheme();
   const { fonts } = useLanguage();
   return (
     <SafeAreaView edges={['bottom']} style={[styles.wrap, { backgroundColor: colors.card, borderTopColor: colors.border }]}>

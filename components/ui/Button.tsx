@@ -1,9 +1,10 @@
 import React from 'react';
 import { ActivityIndicator, Pressable, StyleProp, StyleSheet, Text, ViewStyle } from 'react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, palette, radius, spacing, typography } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
+import { radius } from '@/constants/theme';
 
-type ButtonVariant = 'primary' | 'secondary' | 'destructive';
+type ButtonVariant = 'primary' | 'secondary';
 
 interface ButtonProps {
   label: string;
@@ -11,40 +12,66 @@ interface ButtonProps {
   variant?: ButtonVariant;
   disabled?: boolean;
   loading?: boolean;
+  /** Stretch to the parent's width instead of hugging the label. */
+  block?: boolean;
   style?: StyleProp<ViewStyle>;
 }
 
 /**
- * Shared button primitive, codifying the fixed-height/opacity-press pattern
- * already used ad hoc across ~8 screens (sign-in, sign-up, username claim,
- * Voices submit, etc). New screens should use this instead of hand-rolling
- * another copy; existing screens aren't migrated as part of introducing it.
+ * Pill button from the Nightlight/Daylight sheets: 52px tall, fully round.
+ * `primary` is the Moonlight (Night) / Ink (Day) fill; `secondary` is the
+ * quiet control fill with a hairline border. Both dim via opacity on press
+ * — one change, never a second colour on top.
  */
-export default function Button({ label, onPress, variant = 'primary', disabled, loading, style }: ButtonProps) {
+export default function Button({
+  label,
+  onPress,
+  variant = 'primary',
+  disabled,
+  loading,
+  block,
+  style,
+}: ButtonProps) {
   const { fonts } = useLanguage();
+  const { colors } = useTheme();
   const isDisabled = disabled || loading;
-
-  const fillColor = variant === 'destructive' ? palette.raspberry : colors.primary;
-  const textColor = variant === 'secondary' ? colors.text : colors.onPrimary;
+  const isPrimary = variant === 'primary';
+  const textColor = isPrimary ? colors.onAction : colors.text;
 
   return (
     <Pressable
       onPress={onPress}
       disabled={isDisabled}
+      accessibilityRole="button"
+      aria-disabled={!!isDisabled}
+      aria-busy={!!loading}
       style={({ pressed }) => [
         styles.base,
-        variant === 'secondary'
-          ? { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border }
-          : { backgroundColor: fillColor },
-        pressed && !isDisabled && (variant === 'secondary' ? { backgroundColor: colors.cardPressed } : { opacity: 0.7 }),
-        isDisabled && { opacity: 0.5 },
+        isPrimary
+          ? { backgroundColor: colors.action, paddingHorizontal: 26 }
+          : {
+              backgroundColor: colors.control,
+              borderWidth: 1,
+              borderColor: colors.borderStrong,
+              paddingHorizontal: 24,
+            },
+        block && styles.block,
+        pressed && !isDisabled && styles.pressed,
+        isDisabled && styles.disabled,
         style,
       ]}
     >
       {loading ? (
         <ActivityIndicator color={textColor} />
       ) : (
-        <Text style={[styles.label, { color: textColor, fontFamily: fonts.semiBold }]}>{label}</Text>
+        <Text
+          style={[
+            styles.label,
+            { color: textColor, fontFamily: isPrimary ? fonts.semiBold : fonts.medium },
+          ]}
+        >
+          {label}
+        </Text>
       )}
     </Pressable>
   );
@@ -52,13 +79,22 @@ export default function Button({ label, onPress, variant = 'primary', disabled, 
 
 const styles = StyleSheet.create({
   base: {
-    height: 48,
-    borderRadius: radius.md,
+    height: 52,
+    borderRadius: radius.full,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: spacing.lg,
+    alignSelf: 'flex-start',
+  },
+  block: {
+    alignSelf: 'stretch',
   },
   label: {
-    fontSize: typography.fontSize.body,
+    fontSize: 16,
+  },
+  pressed: {
+    opacity: 0.85,
+  },
+  disabled: {
+    opacity: 0.5,
   },
 });

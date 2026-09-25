@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import Svg, { Line, Circle } from 'react-native-svg';
-import { getCountry } from '@/lib/countries';
+import Svg, { Line, Circle, G } from 'react-native-svg';
+import { COUNTRIES, getCountry } from '@/lib/countries';
 import { palette, spacing, radius, typography } from '@/constants/theme';
 import { arabicNumber } from '@/lib/arabicNumerals';
 
@@ -107,3 +107,62 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.sm,
   },
 });
+
+/* ──────────────── Community dot map (Nightlight Home) ──────────────── */
+
+/** Canvas map frame: 318×118, i.e. the 360° equirectangular strip scaled to 318 wide with 22px trimmed off the top. */
+const DOT_MAP_ASPECT = 318 / 118;
+const DOT_MAP_TOP_TRIM = 22 / 318;
+
+interface CommunityDotMapProps {
+  /** Countries to light up. */
+  lit: readonly string[];
+  /** Colour (and glow) of lit countries. */
+  accent: string;
+  /** Colour of every other country. */
+  dotColor: string;
+}
+
+/**
+ * Home's community card map, drawn exactly as on the canvas: every country
+ * in `lib/countries.ts` as a faint 2.4px dot at its capital (plain
+ * equirectangular projection, same as `WorldMap`), with active countries
+ * lit as 5px accent dots with a soft glow. No labels, no touch targets —
+ * it's ambience, the numbers beside it carry the meaning.
+ */
+export function CommunityDotMap({ lit, accent, dotColor }: CommunityDotMapProps) {
+  const [width, setWidth] = useState(0);
+  const litSet = useMemo(() => new Set(lit), [lit]);
+  const scale = width / 360;
+  const height = width / DOT_MAP_ASPECT;
+  const trim = width * DOT_MAP_TOP_TRIM;
+
+  return (
+    <View
+      style={{ width: '100%', aspectRatio: DOT_MAP_ASPECT, overflow: 'hidden', direction: 'ltr' }}
+      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+    >
+      {width > 0 && (
+        <Svg width={width} height={height}>
+          {COUNTRIES.filter((c) => !litSet.has(c.code)).map((c) => (
+            <Circle key={c.code} cx={(c.lon + 180) * scale} cy={(90 - c.lat) * scale - trim} r={1.2} fill={dotColor} />
+          ))}
+          {COUNTRIES.filter((c) => litSet.has(c.code)).map((c) => {
+            const cx = (c.lon + 180) * scale;
+            const cy = (90 - c.lat) * scale - trim;
+            return (
+              <G key={c.code}>
+                {/* CSS `0 0 8px accent` approximated as two soft halo rings. */}
+                <Circle cx={cx} cy={cy} r={6.5} fill={accent} opacity={0.12} />
+                <Circle cx={cx} cy={cy} r={4.5} fill={accent} opacity={0.25} />
+                <Circle cx={cx} cy={cy} r={2.5} fill={accent} />
+              </G>
+            );
+          })}
+        </Svg>
+      )}
+    </View>
+  );
+}

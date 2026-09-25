@@ -42,3 +42,28 @@ export async function recordTanafasSession(
     // Non-fatal — usage tracking is a nice-to-have, never worth surfacing an error for.
   }
 }
+
+/**
+ * Anonymous "someone just started a session" ping for Home's community
+ * counter (`activity_pings`, FEATURES_BRIEF §1). Sent for Guests and Aliases
+ * alike, with no user id — only the Alias's opted-in country, if any.
+ * Unlike `recordTanafasSession`, it never feeds streaks or the leaderboard,
+ * which is why Nervous System Reset uses only this.
+ *
+ * Fire-and-forget; a no-op until the table exists.
+ */
+export async function pingActivity(kind: 'breathing' | 'meditation'): Promise<void> {
+  try {
+    let country: string | null = null;
+    const { data } = await supabase.auth.getSession();
+    const userId = data.session?.user.id;
+    if (userId) {
+      const { data: profile } = await supabase.from('profiles').select('country').eq('id', userId).maybeSingle();
+      country = profile?.country ?? null;
+    }
+    // No `.select()` after the insert — there's deliberately no SELECT policy (CLAUDE.md).
+    await supabase.from('activity_pings').insert({ kind, country });
+  } catch {
+    // Non-fatal, like recordTanafasSession.
+  }
+}

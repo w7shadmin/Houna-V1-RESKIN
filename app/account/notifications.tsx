@@ -4,7 +4,8 @@ import { useRouter } from 'expo-router';
 import DetailScreen from '@/components/DetailScreen';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { colors, spacing, radius, typography, shadows } from '@/constants/theme';
+import { spacing, radius, typography, shadows } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import {
   isDailyReminderEnabled,
   setDailyReminderEnabled,
@@ -13,6 +14,7 @@ import {
 } from '@/lib/notifications';
 
 export default function NotificationSettingsScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
   const { t, fonts } = useLanguage();
   const { session, isGuest } = useAuth();

@@ -15,6 +15,41 @@ export const homeStrings = {
       body: 'A non-profit haven for mental health support, knowledge, and resources in the Arab world.',
       cta: 'Explore Resources',
     },
+    /** Nightlight one-screen Home (canvas "Home — English"). */
+    topBar: {
+      moodCheckIn: 'Mood check-in',
+      moodCheckInPending: 'Mood check-in — not done today',
+      profile: 'Your profile',
+      logo: 'Houna',
+    },
+    /**
+     * Rotating line under "You're not alone" — one per community period, in
+     * the same order as `community.periods`. DRAFT copy from the canvas;
+     * awaiting final lines.
+     */
+    lines: [
+      'Every breath here is shared with someone, somewhere.',
+      'Small pauses, taken together, change a day.',
+      'You are one light among many.',
+    ],
+    community: {
+      a11yLabel: 'Houna community',
+      label: 'Breathing together',
+      periodsLabel: 'Time period',
+      periods: ['24H', 'Week', 'Month'],
+      periodText: ['in the last 24 hours', 'this week', 'this month'],
+      /** Follows the large count. `{period}` is one of `periodText`. */
+      people: {
+        one: 'person breathed and meditated with Houna {period}',
+        few: 'people breathed and meditated with Houna {period}',
+      },
+      countries: {
+        one: 'In {n} country',
+        few: 'Across {n} countries',
+      },
+      unavailable: 'Community activity will appear here soon.',
+    },
+    crisisButton: 'Need to talk now?',
     tanafasCard: {
       eyebrow: 'BREATHE',
       title: 'Tanafas',
@@ -98,6 +133,40 @@ export const homeStrings = {
       body: 'ملاذ غير ربحي لدعم الصحة النفسية والموارد في العالم العربي.',
       cta: 'استكشف الموارد',
     },
+    /** Nightlight one-screen Home (canvas "Home — Arabic"). */
+    topBar: {
+      moodCheckIn: 'تسجيل المزاج',
+      moodCheckInPending: 'تسجيل المزاج — لم يتم اليوم',
+      profile: 'ملفك الشخصي',
+      logo: 'هُنا',
+    },
+    /** DRAFT copy from the canvas; awaiting final lines. Same order as `community.periods`. */
+    lines: [
+      'كل نفَس هنا يشاركك فيه أحدٌ ما، في مكانٍ ما.',
+      'لحظات هدوء صغيرة، معاً، تغيّر يوماً كاملاً.',
+      'أنت نورٌ بين أنوارٍ كثيرة.',
+    ],
+    community: {
+      a11yLabel: 'مجتمع هُنا',
+      label: 'نتنفّس معاً',
+      periodsLabel: 'الفترة',
+      periods: ['٢٤ ساعة', 'أسبوع', 'شهر'],
+      periodText: ['خلال آخر ٢٤ ساعة', 'هذا الأسبوع', 'هذا الشهر'],
+      people: {
+        one: 'شخص تنفّس وتأمّل مع هُنا {period}',
+        two: 'شخصان تنفّسا وتأمّلا مع هُنا {period}',
+        few: 'أشخاص تنفّسوا وتأمّلوا مع هُنا {period}',
+        many: 'شخصاً تنفّسوا وتأمّلوا مع هُنا {period}',
+      },
+      countries: {
+        one: 'في دولة واحدة',
+        two: 'في دولتين',
+        few: 'في {n} دول',
+        many: 'في {n} دولة',
+      },
+      unavailable: 'سيظهر نشاط المجتمع هنا قريباً.',
+    },
+    crisisButton: 'تحتاج إلى التحدث الآن؟',
     tanafasCard: {
       eyebrow: 'تنفس',
       title: 'تنفّس',

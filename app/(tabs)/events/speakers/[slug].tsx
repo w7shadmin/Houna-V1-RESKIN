@@ -3,7 +3,8 @@ import { View, Text, Image, ScrollView, Pressable, Linking, StyleSheet } from 'r
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, MapPin, Globe, Users } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, palette, spacing, radius, typography } from '@/constants/theme';
+import { palette, spacing, radius, typography } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { fetchSpeakerDetail, safeUrl, resolveImageUrl, type SpeakerDetail } from '@/lib/hounaApi';
 import { LoadingState, ErrorState } from '@/components/directory/AsyncState';
 import InfoRow from '@/components/directory/InfoRow';
@@ -16,6 +17,7 @@ const INFO_ICONS: Record<string, typeof MapPin> = {
 };
 
 export default function SpeakerDetailScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const { t, language, isRTL, fonts } = useLanguage();

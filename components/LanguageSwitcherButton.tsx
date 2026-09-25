@@ -3,7 +3,8 @@ import { View, Pressable, Text, StyleSheet } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, shadows } from '@/constants/theme';
+import { spacing, radius, shadows } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 
 /**
  * "E" / "ع" are identity glyphs for the language itself, not translatable
@@ -25,6 +26,7 @@ const LABELS = { en: 'E', ar: 'ع' } as const;
  * a hard border.
  */
 export default function LanguageSwitcherButton() {
+  const { colors } = useTheme();
   const { language, setLanguage, fonts } = useLanguage();
   const next = language === 'en' ? 'ar' : 'en';
   // Scheherazade New's "ع" sits visually lower in its own em-box than

@@ -1,10 +1,11 @@
 import React from 'react';
 import { Stack } from 'expo-router';
-import { colors } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 
 /** Internal stack for the Account area, opened from More — sign in, sign up,
  * claim a username, and manage the profile once signed in. */
 export default function AccountLayout() {
+  const { colors } = useTheme();
   return (
     <Stack
       screenOptions={{
