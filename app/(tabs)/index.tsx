@@ -127,7 +127,7 @@ export default function HomeScreen() {
           <IconButton
             variant="subtle"
             accessibilityLabel={h.topBar.profile}
-            onPress={() => router.push('/account/profile')}
+            onPress={() => router.push('/profile')}
             renderIcon={(c) => <CanvasIcon name="profile" size={20} strokeWidth={1.7} color={c} />}
           />
         </View>

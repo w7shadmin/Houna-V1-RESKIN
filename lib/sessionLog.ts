@@ -57,3 +57,19 @@ export async function sessionsBetween(from: Date, to: Date): Promise<LoggedSessi
     durationSeconds: r.duration_seconds,
   }));
 }
+
+/**
+ * Local yyyy-mm-dd days with at least one breathing/meditation session —
+ * feeds the Profile practice streak (`computeStreak` in lib/streaks.ts).
+ * Built from this log only, so mood/journal activity can never count.
+ */
+export async function sessionDays(): Promise<Set<string>> {
+  const db = await getLocalDb();
+  const rows = await db.getAllAsync<{ started_at: number }>('SELECT started_at FROM sessions;');
+  const days = new Set<string>();
+  for (const { started_at } of rows) {
+    const d = new Date(started_at);
+    days.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`);
+  }
+  return days;
+}

@@ -14,7 +14,7 @@ interface RadarChartProps {
   axes: RadarAxis[];
   /** Series colour (fill at 28%, 2px stroke). */
   color: string;
-  /** Width of the chart; height follows the canvas's 350:320 frame. */
+  /** Width of the chart; height follows the canvas's 350:320 frame (square when compact). */
   width?: number;
   /** Small version (Profile) — no labels, no point dots. */
   compact?: boolean;
@@ -30,11 +30,12 @@ interface RadarChartProps {
 export default function RadarChart({ axes, color, width = 350, compact = false }: RadarChartProps) {
   const { colors } = useTheme();
   const { fonts } = useLanguage();
+  // Full: the results artboard's 350×320 frame. Compact: Profile's 120×120 thumbnail (outer radius 46).
   const scale = width / 350;
-  const height = (compact ? 300 : 320) * scale;
+  const height = compact ? width : 320 * scale;
   const cx = width / 2;
-  const cy = (compact ? 150 : 160) * scale;
-  const R = 108 * scale * (compact ? 1.25 : 1);
+  const cy = compact ? width / 2 : 160 * scale;
+  const R = compact ? width * (46 / 120) : 108 * scale;
   const labelR = 134 * scale;
   const n = axes.length;
   if (n < 3) return null;

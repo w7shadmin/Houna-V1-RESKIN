@@ -59,6 +59,7 @@ function InnerLayout() {
           name="recap"
           options={{ presentation: 'fullScreenModal', animation: 'fade' }}
         />
+        <Stack.Screen name="profile" />
         <Stack.Screen name="crisis" />
         <Stack.Screen name="about" />
         <Stack.Screen name="get-involved" />
