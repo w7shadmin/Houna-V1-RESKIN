@@ -146,7 +146,7 @@ export default function HomeScreen() {
             accent={accent}
             dusk={colors.tones.dusk.fg}
             glow={isNight ? colors.glow : dayPalette.hounaTeal}
-            glowStrength={isNight ? 0.55 : 0.7}
+            glowStrength={isNight ? 0.4 : 0.5}
           />
           <View style={styles.notAloneRow}>
             <View style={[styles.notAloneDot, { backgroundColor: accent }]} />
@@ -284,8 +284,17 @@ const NATIVE = Platform.OS !== 'web';
 const DRIFT_MS = 8000;
 const BREATH_MS = 5000;
 const TURN_MS = 120000;
-/** The halo round the mark (70px): clear inside its ring, brightest at its outer edge. */
-const HALO = 136;
+/** The halo round the mark (70px): clear inside its ring, brightest at its outer edge, ~26px of falloff. */
+const HALO = 112;
+/**
+ * The halo's layers: each a few % oval, turning a whole number of laps per
+ * TURN_MS (so the loop is seamless), at its own pace and direction.
+ */
+const HALO_LAYERS = [
+  { sx: 1.04, sy: 0.96, from: 0, turns: 1 },
+  { sx: 0.96, sy: 1.04, from: 45, turns: -1 },
+  { sx: 1.03, sy: 0.97, from: 100, turns: 2 },
+];
 
 /** A sine wave sampled across one loop (0 → 1), offset by `phase` laps — for piecewise interpolation. */
 const WAVE_STEPS = Array.from({ length: 17 }, (_, k) => k / 16);
@@ -362,6 +371,12 @@ function MarkHalo({ accent, dusk, glow, glowStrength }: { accent: string; dusk: 
   const ringTurn = turn.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
   const haloScale = breath.interpolate({ inputRange: [0, 1], outputRange: [0.95, 1.1] });
   const haloOpacity = breath.interpolate({ inputRange: [0, 1], outputRange: [0.6, 1] });
+  const layerTurns = useMemo(
+    () => HALO_LAYERS.map((l) => turn.interpolate({ inputRange: [0, 1], outputRange: [`${l.from}deg`, `${l.from + l.turns * 360}deg`] })),
+    [turn],
+  );
+  // Where all three overlap their light adds up; each is set so the sum is glowStrength.
+  const layerStrength = 1 - Math.pow(1 - glowStrength, 1 / HALO_LAYERS.length);
 
   return (
     <View style={styles.halo} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
@@ -385,21 +400,38 @@ function MarkHalo({ accent, dusk, glow, glowStrength }: { accent: string; dusk: 
           />
         ))}
       </Animated.View>
-      {/* A halo, not a disc: clear behind the mark so it stays crisp, the light starting at its
-          edge and breathing outward with the ring. */}
+      {/* A halo, not a disc: clear inside the mark's ring so it stays crisp, the light joined
+          to its edge. Three slightly oval layers turn at their own pace, so the outline shifts
+          a little round the mark, and all three breathe out and in together. */}
       <Animated.View style={[styles.markGlow, { opacity: haloOpacity, transform: [{ scale: haloScale }] }]}>
-        <Svg width={HALO} height={HALO}>
-          <Defs>
-            <RadialGradient id="markGlow" cx="50%" cy="50%" r="50%">
-              {/* The mark's ring runs ~22.5–30px from its centre: the light begins under it (so it's
-                  always joined to the edge) and never reaches the inside, round the heart. */}
-              <Stop offset="0.36" stopColor={glow} stopOpacity={0} />
-              <Stop offset="0.45" stopColor={glow} stopOpacity={glowStrength} />
-              <Stop offset="1" stopColor={glow} stopOpacity={0} />
-            </RadialGradient>
-          </Defs>
-          <Circle cx={HALO / 2} cy={HALO / 2} r={HALO / 2} fill="url(#markGlow)" />
-        </Svg>
+        {HALO_LAYERS.map((l, k) => (
+          <Animated.View
+            key={k}
+            style={[
+              StyleSheet.absoluteFill,
+              {
+                transform: [
+                  { rotate: layerTurns[k] },
+                  { scaleX: l.sx },
+                  { scaleY: l.sy },
+                ],
+              },
+            ]}
+          >
+            <Svg width={HALO} height={HALO}>
+              <Defs>
+                <RadialGradient id={`markGlow${k}`} cx="50%" cy="50%" r="50%">
+                  {/* The mark's ring runs ~22.5–30px from its centre: the light begins under it (so
+                      it's always joined to the edge) and never reaches the inside, round the heart. */}
+                  <Stop offset={25.5 / (HALO / 2)} stopColor={glow} stopOpacity={0} />
+                  <Stop offset={31 / (HALO / 2)} stopColor={glow} stopOpacity={layerStrength} />
+                  <Stop offset="1" stopColor={glow} stopOpacity={0} />
+                </RadialGradient>
+              </Defs>
+              <Circle cx={HALO / 2} cy={HALO / 2} r={HALO / 2} fill={`url(#markGlow${k})`} />
+            </Svg>
+          </Animated.View>
+        ))}
       </Animated.View>
       <HounaMark size={70} />
     </View>
