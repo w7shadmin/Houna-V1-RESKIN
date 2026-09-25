@@ -7,7 +7,7 @@ import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import * as NavigationBar from 'expo-navigation-bar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStarfield } from '@/contexts/StarfieldContext';
-import { nightColors, nightPalette } from '@/constants/theme';
+import { grid, nightColors, nightPalette } from '@/constants/theme';
 import { NATIVE, useReduceMotion } from '@/hooks/useCalmLoop';
 import { logSession } from '@/lib/sessionLog';
 import { pingActivity, recordTanafasSession } from '@/lib/usageTracking';
@@ -45,7 +45,7 @@ interface Frame {
  */
 export default function StarfieldScreen() {
   const router = useRouter();
-  const { t, fonts, isRTL } = useLanguage();
+  const { t, fonts } = useLanguage();
   const starfield = useStarfield()!;
   const { clock, setHaloHidden } = starfield;
   const reduceMotion = useReduceMotion();
@@ -83,8 +83,16 @@ export default function StarfieldScreen() {
           Animated.timing(glide, { toValue: 1, duration: 1400, easing: Easing.inOut(Easing.cubic), useNativeDriver: NATIVE }),
         ]),
       ]),
-      Animated.timing(word, { toValue: 1, duration: 800, easing: Easing.out(Easing.quad), useNativeDriver: NATIVE }),
-    ]).start(({ finished }) => finished && setSettled(true));
+    ]).start(({ finished }) => {
+      if (!finished) return;
+      setSettled(true);
+      // The label: in once the moon has settled, three seconds, then gone for the rest of the visit.
+      Animated.sequence([
+        Animated.timing(word, { toValue: 1, duration: 800, easing: Easing.out(Easing.quad), useNativeDriver: NATIVE }),
+        Animated.delay(3000),
+        Animated.timing(word, { toValue: 0, duration: 1200, easing: Easing.inOut(Easing.quad), useNativeDriver: NATIVE }),
+      ]).start();
+    });
     return () => cancelAnimationFrame(raf);
     // Once, when the frame is first known.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -94,6 +102,7 @@ export default function StarfieldScreen() {
     if (closing.current) return;
     closing.current = true;
     setSettled(false);
+    word.stopAnimation();
     Animated.sequence([
       Animated.timing(word, { toValue: 0, duration: 250, useNativeDriver: NATIVE }),
       Animated.parallel([
@@ -176,7 +185,7 @@ export default function StarfieldScreen() {
               style={[
                 styles.moonglow,
                 {
-                  opacity: Animated.multiply(glide, clock.breath.interpolate({ inputRange: [0, 1], outputRange: [0.7, 1] })),
+                  opacity: Animated.multiply(glide, clock.breath.interpolate({ inputRange: [0, 1], outputRange: [0.3, 1] })),
                   transform: [{ scale: clock.breath.interpolate({ inputRange: [0, 1], outputRange: [0.92, 1.08] }) }],
                 },
               ]}
@@ -200,13 +209,12 @@ export default function StarfieldScreen() {
           <Animated.Text
             pointerEvents="none"
             style={[
-              styles.word,
-              isRTL && styles.wordArabic,
+              fonts.labelTracked ? styles.wordLatin : styles.wordArabic,
               {
-                top: to.y + (HALO_BOX / 2) * MOON_SCALE - 8,
-                fontFamily: fonts.display,
+                bottom: grid(7),
+                fontFamily: fonts.labelTracked ? fonts.labelRegular : fonts.label,
                 opacity: word,
-                transform: [{ translateY: word.interpolate({ inputRange: [0, 1], outputRange: [6, 0] }) }],
+                transform: [{ translateY: word.interpolate({ inputRange: [0, 1], outputRange: [4, 0] }) }],
               },
             ]}
           >
@@ -236,19 +244,23 @@ const styles = StyleSheet.create({
     width: GLOW,
     height: GLOW,
   },
-  word: {
+  // A quiet label, as the app's tracked labels: never competing with the moon.
+  wordLatin: {
     position: 'absolute',
     left: 0,
     right: 0,
     textAlign: 'center',
-    color: nightPalette.moonlight,
-    fontSize: 28,
-    lineHeight: 36,
-    letterSpacing: 1,
+    color: nightPalette.haze,
+    fontSize: 12,
+    letterSpacing: 12 * 0.3,
+    textTransform: 'uppercase',
   },
   wordArabic: {
-    fontSize: 30,
-    lineHeight: 48,
-    letterSpacing: 0,
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    textAlign: 'center',
+    color: nightPalette.haze,
+    fontSize: 14,
   },
 });

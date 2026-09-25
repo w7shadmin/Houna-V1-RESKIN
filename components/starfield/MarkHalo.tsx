@@ -71,7 +71,8 @@ export default function MarkHalo({ accent, dusk, glow, glowStrength, ringOpacity
   const ringScale = breath.interpolate({ inputRange: [0, 1], outputRange: [1, 1.07] });
   const ringTurn = turn.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
   const haloScale = breath.interpolate({ inputRange: [0, 1], outputRange: [0.95, 1.1] });
-  const haloOpacity = breath.interpolate({ inputRange: [0, 1], outputRange: [0.6, 1] });
+  // Most of the glow ebbs away on each breath out, and returns as the mark breathes in.
+  const haloOpacity = breath.interpolate({ inputRange: [0, 1], outputRange: [0.2, 1] });
   const layerTurns = useMemo(
     () => HALO_LAYERS.map((l) => turn.interpolate({ inputRange: [0, 1], outputRange: [`${l.from}deg`, `${l.from + l.turns * 360}deg`] })),
     [turn],
