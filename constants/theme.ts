@@ -161,6 +161,8 @@ export interface ColorTokens {
 
   /** Unlit country dot on the community map. */
   mapDot: string;
+  /** Land fill for the solid-silhouette community map. */
+  mapLand: string;
 
   /** Bottom sheet (mood check-in) and the scrim above it. */
   sheet: string;
@@ -241,6 +243,7 @@ export const nightColors: ColorTokens = {
   logo: { primary: N.hounaGlow, secondary: N.moonlight },
 
   mapDot: alpha(N.moonlight, 0.34),
+  mapLand: alpha(N.moonlight, 0.14),
 
   sheet: N.nightfall,
   scrim: '#070B1C',
@@ -306,6 +309,7 @@ export const dayColors: ColorTokens = {
   logo: { primary: D.hounaTeal, secondary: '#525052' },
 
   mapDot: alpha(D.ink, 0.3),
+  mapLand: alpha(D.ink, 0.1),
 
   // Check-in artboard (Day): a warmer-than-Paper sheet over a stone scrim.
   sheet: '#FBF8F2',

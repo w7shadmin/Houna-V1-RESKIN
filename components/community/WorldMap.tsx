@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Svg, { Line, Circle, G, Path } from 'react-native-svg';
 import { WORLD_DOTS_HEIGHT, WORLD_DOTS_PATH, WORLD_DOTS_WIDTH, snapToLand } from '@/constants/worldDots';
+import { WORLD_LAND_HEIGHT, WORLD_LAND_PATH, WORLD_LAND_WIDTH, WORLD_LAND_Y_SHIFT } from '@/constants/worldLand';
 import { getCountry } from '@/lib/countries';
 import { palette, spacing, radius, typography } from '@/constants/theme';
 import { arabicNumber } from '@/lib/arabicNumerals';
@@ -116,8 +117,10 @@ interface CommunityDotMapProps {
   lit: readonly string[];
   /** Colour (and glow) of lit countries. */
   accent: string;
-  /** Colour of the land dots. */
+  /** Colour of the land: dots, or the filled silhouette. */
   dotColor: string;
+  /** Halftone dots (default) or the traced solid silhouette. */
+  variant?: 'dots' | 'solid';
 }
 
 /**
@@ -128,26 +131,36 @@ interface CommunityDotMapProps {
  * labels or touch targets — it's ambience, the numbers beside it carry the
  * meaning.
  */
-export function CommunityDotMap({ lit, accent, dotColor }: CommunityDotMapProps) {
+export function CommunityDotMap({ lit, accent, dotColor, variant = 'dots' }: CommunityDotMapProps) {
+  const solid = variant === 'solid';
+  const width = solid ? WORLD_LAND_WIDTH : WORLD_DOTS_WIDTH;
+  const height = solid ? WORLD_LAND_HEIGHT : WORLD_DOTS_HEIGHT;
+  const shiftY = solid ? WORLD_LAND_Y_SHIFT : 0;
   const markers = useMemo(
     () =>
       lit
         .map((code) => {
           const c = getCountry(code);
-          return c ? { code, ...snapToLand(c.lat, c.lon) } : null;
+          if (!c) return null;
+          const p = snapToLand(c.lat, c.lon);
+          return { code, x: p.x, y: p.y + shiftY };
         })
         .filter((m): m is NonNullable<typeof m> => m !== null),
-    [lit],
+    [lit, shiftY],
   );
 
   return (
     <View
-      style={{ width: '100%', aspectRatio: WORLD_DOTS_WIDTH / WORLD_DOTS_HEIGHT }}
+      style={{ width: '100%', aspectRatio: width / height }}
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"
     >
-      <Svg width="100%" height="100%" viewBox={`0 0 ${WORLD_DOTS_WIDTH} ${WORLD_DOTS_HEIGHT}`}>
-        <Path d={WORLD_DOTS_PATH} fill={dotColor} />
+      <Svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`}>
+        {solid ? (
+          <Path d={WORLD_LAND_PATH} fill={dotColor} fillRule="evenodd" />
+        ) : (
+          <Path d={WORLD_DOTS_PATH} fill={dotColor} />
+        )}
         {markers.map((m) => (
           <G key={m.code}>
             {/* CSS `0 0 8px accent` approximated as two soft halo rings. */}

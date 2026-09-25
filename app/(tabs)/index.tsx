@@ -201,7 +201,7 @@ export default function HomeScreen() {
             </View>
           </View>
 
-          <CommunityDotMap lit={lit} accent={accent} dotColor={colors.mapDot} />
+          <CommunityDotMap lit={lit} accent={accent} dotColor={colors.mapLand} variant="solid" />
 
           {current ? (
             <View style={styles.countRow}>
