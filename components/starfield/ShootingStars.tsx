@@ -18,7 +18,8 @@ interface Streak {
  * Now and then a shooting star: one at a time, every 3–9s at random. It
  * enters from just off one side of the sky (somewhere in its upper half),
  * slants 15–35° down, and streaks right across and out the other side in
- * ~1.3–1.9s, with a fading tail.
+ * ~1.7–2.4s, with a fading tail. Drawn as if far off: behind the stars and
+ * the moon, fainter, finer and a touch slower than something near would be.
  * Off while `active` is false (opening, closing, Reduce Motion).
  */
 export default function ShootingStars({ width, height, active }: { width: number; height: number; active: boolean }) {
@@ -35,7 +36,8 @@ export default function ShootingStars({ width, height, active }: { width: number
         if (!alive) return;
         const rightward = Math.random() < 0.5;
         const slant = 15 + Math.random() * 20;
-        const length = 80 + Math.random() * 60;
+        // Far away: a shorter tail, and a little slower across the sky than something near would be.
+        const length = 60 + Math.random() * 50;
         // From just off one side, all the way across and out past the other (or the bottom).
         const travel = (width + length * 2) / Math.cos((slant * Math.PI) / 180);
         const next: Streak = {
@@ -45,7 +47,7 @@ export default function ShootingStars({ width, height, active }: { width: number
           angle: rightward ? slant : 180 - slant,
           length,
           travel,
-          duration: 1300 + Math.random() * 600,
+          duration: 1700 + Math.random() * 700,
         };
         setStreak(next);
         progress.setValue(0);
@@ -75,7 +77,7 @@ export default function ShootingStars({ width, height, active }: { width: number
             width: streak.length,
             left: streak.x - streak.length / 2,
             top: streak.y,
-            opacity: progress.interpolate({ inputRange: [0, 0.12, 0.75, 1], outputRange: [0, 1, 0.9, 0.2] }),
+            opacity: progress.interpolate({ inputRange: [0, 0.12, 0.75, 1], outputRange: [0, 0.55, 0.5, 0.1] }),
             // Along its own heading: rotate first, then travel.
             transform: [{ rotate: `${streak.angle}deg` }, { translateX: progress.interpolate({ inputRange: [0, 1], outputRange: [0, streak.travel] }) }],
           },
@@ -83,7 +85,7 @@ export default function ShootingStars({ width, height, active }: { width: number
       >
         {/* The tail fades behind the bright head, which leads. */}
         <LinearGradient
-          colors={[alpha(nightPalette.moonlight, 0), alpha(nightPalette.moonlight, 0.9)]}
+          colors={[alpha(nightPalette.moonlight, 0), alpha(nightPalette.moonlight, 0.7)]}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
           style={styles.tail}
@@ -99,24 +101,24 @@ const styles = StyleSheet.create({
   // don't swap in Arabic, since the heading, not the layout, sets the way.
   streak: {
     position: 'absolute',
-    height: 3,
+    height: 2,
   },
   tail: {
     position: 'absolute',
     left: 0,
-    right: 2,
-    top: 0.75,
-    height: 1.5,
-    borderRadius: 1,
+    right: 1.5,
+    top: 0.5,
+    height: 1,
+    borderRadius: 0.5,
   },
   head: {
     position: 'absolute',
     right: 0,
     top: 0,
-    width: 3,
-    height: 3,
-    borderRadius: 1.5,
+    width: 2,
+    height: 2,
+    borderRadius: 1,
     backgroundColor: nightPalette.moonlight,
-    boxShadow: `0 0 6px ${nightPalette.moonlight}`,
+    boxShadow: `0 0 4px ${nightPalette.moonlight}`,
   },
 });

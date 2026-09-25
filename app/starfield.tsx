@@ -179,8 +179,9 @@ export default function StarfieldScreen() {
       {frame && from && to && (
         <>
           <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { opacity: sky.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0, 0.3, 1] }) }]}>
-            <StarSky cx={to.x} cy={to.y} diagonal={Math.hypot(frame.width, frame.height)} />
+            {/* Shooting stars first, so the stars (and the moon, above all this) pass in front of them. */}
             <ShootingStars width={frame.width} height={frame.height} active={settled && !reduceMotion} />
+            <StarSky cx={to.x} cy={to.y} diagonal={Math.hypot(frame.width, frame.height)} />
           </Animated.View>
 
           {/* The moon: Home's mark without its ring, rising to the middle. Placed by its centre in
