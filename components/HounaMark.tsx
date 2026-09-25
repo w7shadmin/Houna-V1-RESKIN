@@ -5,7 +5,7 @@ import { FIGURE_WITH_HEAD_HOLE_D } from '@/constants/logoSvg';
 
 interface HounaMarkProps {
   size: number;
-  /** Fill override (the starfield's silver moon); defaults to the theme's logo colour. */
+  /** Fill override (the breathing orbs' pressed-in mark); defaults to the theme's logo colour. */
   color?: string;
 }
 

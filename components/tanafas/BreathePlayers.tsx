@@ -408,13 +408,8 @@ function GroundingPlayer({ exercise, breath, nav }: PlayerProps) {
           tone={tone}
           breath={breath}
           progress={running ? (step + 1) / steps.length : status === 'complete' ? 1 : undefined}
-        >
-          {running && (
-            <FadeIn key={step}>
-              <Text style={[styles.count, isRTL && styles.countArabic, { color: nightPalette.midnight, fontFamily: fonts.semiBold }]}>{num(current.count)}</Text>
-            </FadeIn>
-          )}
-        </BreathStage>
+          // The mark sits in the orb; the step's count is in the prompt beneath.
+        />
       }
       heading={
         running ? (
@@ -596,13 +591,8 @@ function TensionPlayer({ exercise, breath, nav }: PlayerProps) {
       nav={status === 'idle' ? nav : null}
       stage={
         // The same lit orb as the other exercises; the count sits on it in ink, as the play icon does on its light button.
-        <BreathStage shape="ring" tone={tone} breath={breath}>
-          {inSession && (
-            <Text style={[styles.count, isRTL && styles.countArabic, { color: nightPalette.midnight, fontFamily: fonts.semiBold }]}>
-              {num(secondsLeft)}
-            </Text>
-          )}
-        </BreathStage>
+        // The mark sits in the orb; the countdown joins the Tense / Release label.
+        <BreathStage shape="ring" tone={tone} breath={breath} />
       }
       heading={
         inSession ? (
@@ -618,7 +608,7 @@ function TensionPlayer({ exercise, breath, nav }: PlayerProps) {
       label={
         inSession ? (
           <FadeIn key={phase}>
-            <TrackedLabel color={accent}>{isTense ? ex.tense : ex.release}</TrackedLabel>
+            <TrackedLabel color={accent}>{`${isTense ? ex.tense : ex.release} · ${num(secondsLeft)}`}</TrackedLabel>
           </FadeIn>
         ) : status === 'complete' ? (
           <TrackedLabel color={accent}>{ex.releasedTension}</TrackedLabel>
@@ -708,14 +698,5 @@ const styles = StyleSheet.create({
   stepBar: {
     height: 8,
     borderRadius: 4,
-  },
-  // The body face, not the display one: steadier numerals.
-  count: {
-    fontSize: 40,
-    lineHeight: 48,
-    textAlign: 'center',
-  },
-  countArabic: {
-    lineHeight: 56,
   },
 });

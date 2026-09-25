@@ -268,9 +268,12 @@ leaderboard.
 `components/tanafas/PlayerFrame.tsx` (stage, title row, tag, description,
 tiles, round button). Pressing play on a breathing exercise keeps the
 layout and fades each slot over to the session (round, phase, time left).
-The stage (`BreatheStages.tsx`) is a ring of dots around an orb that
-inflates and deflates (box breathing: a square of dots around a rounded-
-square orb), and the screen glow breathes with it. Tones: 4-7-8 glow, box
+The stage (`BreatheStages.tsx`) is a ring of dots around a translucent,
+glassy orb that inflates and deflates (box breathing: a square of dots
+around a rounded-square orb), with the Houna mark pressed into its middle
+(letterpress edges, scaling with it); the screen glow breathes with it.
+Nothing is drawn over the orb: grounding's count is in its prompt, muscle
+relaxation's countdown in its Tense / Release label. Tones: 4-7-8 glow, box
 dusk, five senses dawn, muscle relaxation bloom (a fourth tone, the mood palette's rose, so neighbours in the carousel never share a colour). Meditate's stage
 (`SceneStage.tsx`) plays the scene's footage muted inside its orb, cropped
 to `videoFocus` in `components/meditation/scenes.ts`; the plain orb shows
