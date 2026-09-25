@@ -293,6 +293,12 @@ Events (list, event, speaker) uses the same pieces; event dates go through
 `start`/`end` offsets as LTR even in Arabic; lucide icons with an RTL flip
 transform draw off-screen on web (use `DirectionalIcon`).
 
+**SVG gradient gotcha (native only)**: react-native-svg drops a `<Stop>`'s
+`stopColor` alpha on the phone and uses `stopOpacity` alone, so an
+`rgba(...)` stop (e.g. from `alpha()`) draws fully opaque there while web
+draws it translucent. Always spread `lib/svgStop.ts`'s `stopProps(color,
+opacity?)` into a `<Stop>` rather than passing an rgba `stopColor`.
+
 **RTL gotcha for measured positions (native only)**: in Arabic, Android
 swaps `left`/`right` style offsets too (RN's `swapLeftAndRightInRTL`), so
 anything placed by measured, physical screen pixels (e.g. the starfield's

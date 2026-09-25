@@ -3,6 +3,7 @@ import { AccessibilityInfo, Animated, Easing, StyleSheet, View } from 'react-nat
 import Svg, { Circle, Defs, Path, RadialGradient, Stop } from 'react-native-svg';
 import { MOOD_STYLE } from '@/constants/moods';
 import { MOOD_ORDER, type Mood } from '@/lib/journal';
+import { stopProps } from '@/lib/svgStop';
 
 export interface BloomShape {
   /** Leaf rotation in degrees about the leaf base; negative opens the bloom. */
@@ -72,8 +73,8 @@ export default function MoodBloom({ size, color, shape, hi, ringWidth = 14, ring
       {hi && (
         <Defs>
           <RadialGradient id={gradId} cx="50%" cy="40%" r="60%">
-            <Stop offset="0" stopColor={hi} />
-            <Stop offset="1" stopColor={color} />
+            <Stop offset="0" {...stopProps(hi)} />
+            <Stop offset="1" {...stopProps(color)} />
           </RadialGradient>
         </Defs>
       )}
@@ -192,8 +193,8 @@ export function BreathingBloom({ mood, size }: BreathingBloomProps) {
         <Svg width={size} height={size}>
           <Defs>
             <RadialGradient id={haloId} cx="50%" cy="50%" r="50%">
-              <Stop offset="0" stopColor={style.glow} />
-              <Stop offset="1" stopColor={style.glow} stopOpacity={0} />
+              <Stop offset="0" {...stopProps(style.glow)} />
+              <Stop offset="1" {...stopProps(style.glow, 0)} />
             </RadialGradient>
           </Defs>
           <Circle cx={size / 2} cy={size / 2} r={size / 2} fill={`url(#${haloId})`} />

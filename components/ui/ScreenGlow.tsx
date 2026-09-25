@@ -1,6 +1,7 @@
 import React, { useId } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
+import { stopProps } from '@/lib/svgStop';
 
 interface ScreenGlowProps {
   /** Glow colour, alpha included (e.g. `rgba(179,167,245,0.20)`). */
@@ -27,8 +28,8 @@ export default function ScreenGlow({ color, rx, ry, cy, cx = 50, fade = 0.72 }: 
       <Svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
         <Defs>
           <RadialGradient id={id} gradientUnits="userSpaceOnUse" cx={cx} cy={cy} rx={rx} ry={ry} fx={cx} fy={cy}>
-            <Stop offset="0" stopColor={color} />
-            <Stop offset={fade} stopColor={color} stopOpacity={0} />
+            <Stop offset="0" {...stopProps(color)} />
+            <Stop offset={fade} {...stopProps(color, 0)} />
           </RadialGradient>
         </Defs>
         <Rect x={0} y={0} width={100} height={100} fill={`url(#${id})`} />

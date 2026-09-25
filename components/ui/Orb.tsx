@@ -1,6 +1,7 @@
 import React, { useId } from 'react';
 import { View } from 'react-native';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
+import { stopProps } from '@/lib/svgStop';
 
 interface OrbProps {
   size: number;
@@ -29,7 +30,7 @@ export default function Orb({ size, stops, fx, fy, glow, radius = size / 2 }: Or
         <Defs>
           <RadialGradient id={id} cx={`${fx * 100}%`} cy={`${fy * 100}%`} fx={`${fx * 100}%`} fy={`${fy * 100}%`} r={`${r * 100}%`}>
             {stops.map(([c, o]) => (
-              <Stop key={o} offset={o} stopColor={c} />
+              <Stop key={o} offset={o} {...stopProps(c)} />
             ))}
           </RadialGradient>
         </Defs>
