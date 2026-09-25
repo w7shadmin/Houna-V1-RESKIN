@@ -4,14 +4,23 @@ import { useRouter } from 'expo-router';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { raisedButtonShadow } from '@/constants/theme';
+import { grid, raisedButtonShadow } from '@/constants/theme';
 import CanvasIcon, { type CanvasIconName } from './CanvasIcon';
 
-/** Height of the bar above the bottom inset — canvas nav is 100 with 24 of bottom padding. */
-export const TAB_BAR_CONTENT_HEIGHT = 76;
-const MIN_BOTTOM_PADDING = 24;
-/** Space between the labels and the system navigation area when there is one. */
-const SYSTEM_BAR_GAP = 12;
+/**
+ * Laid out on the 8-point grid (`grid` in theme.ts). Above the bottom inset
+ * the bar is 64: 8 top · 24 icon · 4 gap · 20 label · 8 bottom (20 leaves
+ * Arabic marks like the shadda room above the 12px text). The raised
+ * Tanafas button (56, plus a 4 ring) takes the icon's place with the same
+ * bottom edge, so it rises 24 above the bar and every label shares one line.
+ */
+export const TAB_BAR_CONTENT_HEIGHT = grid(8);
+const ICON = grid(3);
+const LABEL_LINE = grid(2.5);
+const RAISED = grid(7);
+const RAISED_RING = grid(0.5);
+/** Bottom padding when the OS reports no inset (no system buttons or home indicator). */
+const MIN_BOTTOM_INSET = grid(1);
 
 const ROUTE_ICONS: Record<string, CanvasIconName> = {
   index: 'home',
@@ -27,11 +36,9 @@ const ROUTE_ICONS: Record<string, CanvasIconName> = {
  * shape). Five equal slots; `flexDirection: 'row'` mirrors itself in RTL.
  */
 export default function TabBar({ state, descriptors, navigation, insets }: BottomTabBarProps) {
-  const { t, fonts, isRTL } = useLanguage();
+  const { t, fonts } = useLanguage();
   const { colors } = useTheme();
   const router = useRouter();
-
-  const labelSize = isRTL ? 12 : 11.5;
 
   const tabs = state.routes.map((route, index) => {
     const focused = state.index === index;
@@ -56,13 +63,10 @@ export default function TabBar({ state, descriptors, navigation, insets }: Botto
         accessibilityLabel={label}
         style={({ pressed }) => [styles.slot, pressed && styles.pressed]}
       >
-        <CanvasIcon name={ROUTE_ICONS[route.name] ?? 'home'} color={color} />
+        <CanvasIcon name={ROUTE_ICONS[route.name] ?? 'home'} size={ICON} color={color} />
         <Text
           numberOfLines={1}
-          style={[
-            styles.label,
-            { color, fontSize: labelSize, fontFamily: focused ? fonts.semiBold : fonts.medium },
-          ]}
+          style={[styles.label, { color, fontFamily: focused ? fonts.semiBold : fonts.medium }]}
         >
           {label}
         </Text>
@@ -82,30 +86,30 @@ export default function TabBar({ state, descriptors, navigation, insets }: Botto
         style={[
           styles.raised,
           { backgroundColor: colors.tabBarRaised },
-          raisedButtonShadow(colors.tabBarRaisedRing),
+          raisedButtonShadow(colors.tabBarRaisedRing, RAISED_RING),
         ]}
       >
-        <CanvasIcon name="tanafas" size={28} strokeWidth={1.7} color={colors.onTabBarRaised} />
+        <CanvasIcon name="tanafas" size={ICON} strokeWidth={1.7} color={colors.onTabBarRaised} />
       </View>
       <Text
         numberOfLines={1}
-        style={[styles.label, { color: colors.tabBarInactive, fontSize: labelSize, fontFamily: fonts.medium }]}
+        style={[styles.label, { color: colors.tabBarInactive, fontFamily: fonts.medium }]}
       >
         {t.tabs.tanafas}
       </Text>
     </Pressable>
   );
 
-  // With Android's system buttons (or a home indicator) under the bar, keep
-  // clear space above them; with none, use the canvas's 24.
-  const bottom = insets.bottom > 0 ? insets.bottom + SYSTEM_BAR_GAP : MIN_BOTTOM_PADDING;
+  // The bar runs edge-to-edge under Android's system buttons (or the iOS home
+  // indicator); the 8 inside the content height keeps labels clear of them.
+  const bottom = insets.bottom > 0 ? insets.bottom : MIN_BOTTOM_INSET;
 
   return (
     <View
       style={[
         styles.bar,
         {
-          height: TAB_BAR_CONTENT_HEIGHT + bottom,
+          // Height comes from the slots (64) + this inset + the 1px border.
           paddingBottom: bottom,
           backgroundColor: colors.tabBarBackground,
           borderTopColor: colors.tabBarBorder,
@@ -122,23 +126,30 @@ export default function TabBar({ state, descriptors, navigation, insets }: Botto
 const styles = StyleSheet.create({
   bar: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
-    paddingHorizontal: 10,
+    alignItems: 'flex-start',
+    paddingHorizontal: grid(1),
     borderTopWidth: 1,
   },
   slot: {
     flex: 1,
+    height: TAB_BAR_CONTENT_HEIGHT,
     alignItems: 'center',
-    gap: 5,
+    paddingTop: grid(1),
+    gap: grid(0.5),
   },
   label: {
+    height: LABEL_LINE,
+    fontSize: 12,
+    lineHeight: LABEL_LINE,
     textAlign: 'center',
+    includeFontPadding: false,
   },
   raised: {
-    width: 64,
-    height: 64,
-    marginTop: -34,
-    borderRadius: 32,
+    width: RAISED,
+    height: RAISED,
+    // Same bottom edge as a 24 icon: 56 − 24 = 32 rises above the slot's icon line.
+    marginTop: ICON - RAISED,
+    borderRadius: RAISED / 2,
     alignItems: 'center',
     justifyContent: 'center',
   },

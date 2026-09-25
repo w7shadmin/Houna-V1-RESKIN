@@ -337,6 +337,14 @@ export const layout = {
 
 /* ──────────────────────── Spacing ──────────────────────── */
 
+/**
+ * The 8-point grid: sizes, gaps and paddings are multiples of 8, with 4
+ * (`grid(0.5)`) allowed for tight inner spacing. `spacing` holds the named
+ * steps; use `grid(n)` for one-off layout numbers so they stay on the grid.
+ */
+export const GRID = 8;
+export const grid = (n: number) => n * GRID;
+
 export const spacing = {
   xxs: 2,
   xs: 4,
@@ -461,6 +469,6 @@ export const shadows = {
 } as const;
 
 /** Raised Tanafas button: a ring in the ground colour, then the brand glow. */
-export function raisedButtonShadow(ring: string) {
-  return { boxShadow: `0 0 0 6px ${ring}, 0 0 34px ${alpha(N.hounaGlow, 0.45)}` };
+export function raisedButtonShadow(ring: string, ringWidth = 6) {
+  return { boxShadow: `0 0 0 ${ringWidth}px ${ring}, 0 0 32px ${alpha(N.hounaGlow, 0.45)}` };
 }

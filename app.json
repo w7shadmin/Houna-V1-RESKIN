@@ -37,6 +37,7 @@
       "expo-video",
       "expo-audio",
       "expo-navigation-bar",
+      "./plugins/withNavigationBarContrastOff",
       [
         "expo-image-picker",
         {
