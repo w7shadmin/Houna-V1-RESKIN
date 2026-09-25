@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Defs, Ellipse, RadialGradient, Stop } from 'react-native-svg';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { flatten, layout, typography } from '@/constants/theme';
+import { dayPalette, flatten, layout, typography } from '@/constants/theme';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { getTodayEntry } from '@/lib/journal';
 import { ACTIVITY_PERIODS, fetchCommunityActivity, type CommunityActivity } from '@/lib/communityActivity';
@@ -141,7 +141,13 @@ export default function HomeScreen() {
 
         {/* Mark, "You're not alone", rotating line */}
         <View style={styles.hero}>
-          <MarkHalo accent={accent} dusk={colors.tones.dusk.fg} glow={colors.glow} />
+          {/* Day: the logo's deeper teal, a little stronger — the pale Night glow vanishes on Daybreak. */}
+          <MarkHalo
+            accent={accent}
+            dusk={colors.tones.dusk.fg}
+            glow={isNight ? colors.glow : dayPalette.hounaTeal}
+            glowStrength={isNight ? 0.5 : 0.6}
+          />
           <View style={styles.notAloneRow}>
             <View style={[styles.notAloneDot, { backgroundColor: accent }]} />
             <Text
@@ -311,7 +317,7 @@ function useCalmLoop(make: (v: Animated.Value) => Animated.CompositeAnimation) {
  * fades out and back in, a little behind its neighbour, so a slow ripple
  * travels round the ring; behind the mark, its glow breathes.
  */
-function MarkHalo({ accent, dusk, glow }: { accent: string; dusk: string; glow: string }) {
+function MarkHalo({ accent, dusk, glow, glowStrength }: { accent: string; dusk: string; glow: string; glowStrength: number }) {
   const N = 28;
   const R = 86;
   const drift = useCalmLoop((v) => Animated.loop(Animated.timing(v, { toValue: 1, duration: DRIFT_MS, easing: Easing.linear, useNativeDriver: NATIVE })));
@@ -372,7 +378,7 @@ function MarkHalo({ accent, dusk, glow }: { accent: string; dusk: string; glow: 
         <Svg width={110} height={110}>
           <Defs>
             <RadialGradient id="markGlow" cx="50%" cy="50%" r="50%">
-              <Stop offset="0" stopColor={glow} stopOpacity={0.5} />
+              <Stop offset="0" stopColor={glow} stopOpacity={glowStrength} />
               <Stop offset="1" stopColor={glow} stopOpacity={0} />
             </RadialGradient>
           </Defs>
