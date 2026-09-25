@@ -31,16 +31,15 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import Svg, { G, Path } from 'react-native-svg';
-import { palette } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 
 /* ------------------------------------------------------------------ */
 /* Brand                                                               */
 /* ------------------------------------------------------------------ */
 
-const GROUND = palette.brokenWhite; // Broken White — must match constants/theme.ts, not a hardcoded approximation
-const LETTER = '#3BAAA7'; // Primary Turquoise — Latin letterforms
-const MARK = '#36A9A7'; // the o + figure (as exported in the source SVG)
-const INK = '#525052'; // Arabic wordmark
+// Colours come from the active theme (useTheme in SplashIntro): the ground
+// is the screen background and the logo uses the same `logo` tokens as the
+// themed wordmark, so the intro dissolves into Night or Day seamlessly.
 
 /* ------------------------------------------------------------------ */
 /* Geometry, taken straight from logo-green.svg                        */
@@ -121,6 +120,11 @@ type Props = {
 
 export default function SplashIntro({ onFinish }: Props) {
   const { width } = useWindowDimensions();
+  const { colors } = useTheme();
+  const GROUND = colors.background;
+  const LETTER = colors.logo.primary;
+  const MARK = colors.logo.primary;
+  const INK = colors.logo.secondary;
   const reduceMotion = useReducedMotion();
 
   const LOGO_W = Math.min(width * 0.58, 268);
@@ -283,7 +287,7 @@ export default function SplashIntro({ onFinish }: Props) {
   );
 
   return (
-    <Animated.View style={[styles.root, overlayStyle]} pointerEvents="none">
+    <Animated.View style={[styles.root, { backgroundColor: GROUND }, overlayStyle]} pointerEvents="none">
       <View style={{ width: LOGO_W, height: LOGO_H }}>
         {/* breath ring, behind everything */}
         <Animated.View
@@ -296,6 +300,7 @@ export default function SplashIntro({ onFinish }: Props) {
               left: ringLeft,
               top: ringTop,
               borderWidth: Math.max(1, unit * 0.5),
+              borderColor: MARK,
             },
             rippleStyle,
           ]}
@@ -311,7 +316,7 @@ export default function SplashIntro({ onFinish }: Props) {
               <Path d={D.figure} fill={MARK} />
             </G>
             <G transform={OFF.head}>
-              <Path d={D.head} fill="#FFFFFF" />
+              <Path d={D.head} fill={GROUND} />
             </G>
           </Layer>
         </Animated.View>
@@ -385,7 +390,6 @@ export const SPLASH_DURATION = TOTAL;
 const styles = StyleSheet.create({
   root: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: GROUND,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 999,
@@ -403,6 +407,5 @@ const styles = StyleSheet.create({
   },
   ripple: {
     position: 'absolute',
-    borderColor: MARK,
   },
 });

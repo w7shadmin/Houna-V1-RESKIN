@@ -21,12 +21,19 @@ import { setAudioModeAsync, useAudioPlayer } from 'expo-audio';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import * as NavigationBar from 'expo-navigation-bar';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { spacing, radius, typography } from '@/constants/theme';
+import { spacing, radius, typography, alpha, nightPalette } from '@/constants/theme';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { pingActivity, recordTanafasSession } from '@/lib/usageTracking';
 import { logSession } from '@/lib/sessionLog';
 import AmbientVisual from './AmbientVisual';
 import type { MeditationScene } from './scenes';
+
+/**
+ * The player is a permanently dark focus mode in both themes: its controls
+ * sit over full-screen video, so they use the Nightlight palette directly
+ * (Midnight ground, Moonlight chrome) rather than switching with Day.
+ */
+const FOCUS = { midnight: nightPalette.midnight, moonlight: nightPalette.moonlight };
 
 const SESSION_OPTIONS = [5, 10, 20] as const;
 /** How long the player's UI stays visible without interaction before fading out, while actively playing. */
@@ -401,7 +408,7 @@ export default function MeditationPlayer({
         <AmbientVisual scene={scene} animate={isActive && isForeground} />
       ) : (
         <View style={styles.audioOnlyBg}>
-          <Headphones size={40} color="rgba(255,255,255,0.22)" strokeWidth={1.2} />
+          <Headphones size={40} color={alpha(FOCUS.moonlight, 0.22)} strokeWidth={1.2} />
         </View>
       )}
 
@@ -425,10 +432,10 @@ export default function MeditationPlayer({
             hitSlop={16}
             style={({ pressed }) => [
               styles.iconBtn,
-              pressed && { backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: radius.full },
+              pressed && { backgroundColor: alpha(FOCUS.moonlight, 0.15), borderRadius: radius.full },
             ]}
           >
-            <ArrowLeft size={22} color="#ffffff" style={isRTL ? styles.flip : undefined} />
+            <ArrowLeft size={22} color={FOCUS.moonlight} style={isRTL ? styles.flip : undefined} />
           </Pressable>
           <View style={styles.headerTextWrap}>
             <Text style={[styles.headerTitle, { fontFamily: fonts.bold }]}>{sceneName}</Text>
@@ -441,14 +448,14 @@ export default function MeditationPlayer({
             hitSlop={16}
             style={({ pressed }) => [
               styles.iconBtn,
-              pressed && { backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: radius.full },
+              pressed && { backgroundColor: alpha(FOCUS.moonlight, 0.15), borderRadius: radius.full },
             ]}
             accessibilityLabel={isFullscreen ? p.exitFullscreen : p.fullscreen}
           >
             {isFullscreen ? (
-              <Minimize2 size={20} color="#ffffff" />
+              <Minimize2 size={20} color={FOCUS.moonlight} />
             ) : (
-              <Maximize2 size={20} color="#ffffff" />
+              <Maximize2 size={20} color={FOCUS.moonlight} />
             )}
           </Pressable>
         </View>
@@ -456,7 +463,7 @@ export default function MeditationPlayer({
         <View style={styles.main}>
           {isComplete ? (
             <View style={styles.completionWrap}>
-              <CheckCircle2 size={56} color="#ffffff" strokeWidth={1.5} />
+              <CheckCircle2 size={56} color={FOCUS.moonlight} strokeWidth={1.5} />
               <Text style={[styles.completionTitle, { fontFamily: fonts.bold }]}>{p.wellDone}</Text>
               <Text style={[styles.completionBody, { fontFamily: fonts.regular }]}>{p.completionBody}</Text>
             </View>
@@ -480,7 +487,7 @@ export default function MeditationPlayer({
                       style={({ pressed }) => [
                         styles.pill,
                         active && styles.pillActive,
-                        pressed && (active ? { opacity: 0.85 } : { backgroundColor: 'rgba(255,255,255,0.15)' }),
+                        pressed && (active ? { opacity: 0.85 } : { backgroundColor: alpha(FOCUS.moonlight, 0.15) }),
                       ]}
                     >
                       <Text
@@ -500,7 +507,7 @@ export default function MeditationPlayer({
                   style={({ pressed }) => [
                     styles.pill,
                     isCustomMode && styles.pillActive,
-                    pressed && (isCustomMode ? { opacity: 0.85 } : { backgroundColor: 'rgba(255,255,255,0.15)' }),
+                    pressed && (isCustomMode ? { opacity: 0.85 } : { backgroundColor: alpha(FOCUS.moonlight, 0.15) }),
                   ]}
                 >
                   <Text
@@ -525,10 +532,10 @@ export default function MeditationPlayer({
                       style={({ pressed }) => [
                         styles.stepperBtn,
                         isInfiniteSession && styles.stepperBtnDisabled,
-                        pressed && !isInfiniteSession && { backgroundColor: 'rgba(255,255,255,0.28)' },
+                        pressed && !isInfiniteSession && { backgroundColor: alpha(FOCUS.moonlight, 0.28) },
                       ]}
                     >
-                      <Minus size={20} color={isInfiniteSession ? 'rgba(255,255,255,0.35)' : '#ffffff'} strokeWidth={2.4} />
+                      <Minus size={20} color={isInfiniteSession ? alpha(FOCUS.moonlight, 0.35) : FOCUS.moonlight} strokeWidth={2.4} />
                     </Pressable>
 
                     <Text
@@ -548,10 +555,10 @@ export default function MeditationPlayer({
                       style={({ pressed }) => [
                         styles.stepperBtn,
                         isInfiniteSession && styles.stepperBtnDisabled,
-                        pressed && !isInfiniteSession && { backgroundColor: 'rgba(255,255,255,0.28)' },
+                        pressed && !isInfiniteSession && { backgroundColor: alpha(FOCUS.moonlight, 0.28) },
                       ]}
                     >
-                      <Plus size={20} color={isInfiniteSession ? 'rgba(255,255,255,0.35)' : '#ffffff'} strokeWidth={2.4} />
+                      <Plus size={20} color={isInfiniteSession ? alpha(FOCUS.moonlight, 0.35) : FOCUS.moonlight} strokeWidth={2.4} />
                     </Pressable>
                   </View>
 
@@ -560,10 +567,10 @@ export default function MeditationPlayer({
                     style={({ pressed }) => [
                       styles.infinityPill,
                       isInfiniteSession && styles.infinityPillActive,
-                      pressed && !isInfiniteSession && { backgroundColor: 'rgba(255,255,255,0.15)' },
+                      pressed && !isInfiniteSession && { backgroundColor: alpha(FOCUS.moonlight, 0.15) },
                     ]}
                   >
-                    <InfinityIcon size={16} color={isInfiniteSession ? '#000000' : '#ffffff'} strokeWidth={2} />
+                    <InfinityIcon size={16} color={isInfiniteSession ? FOCUS.midnight : FOCUS.moonlight} strokeWidth={2} />
                     <Text
                       style={[
                         styles.infinityPillText,
@@ -588,13 +595,13 @@ export default function MeditationPlayer({
           {!isComplete && (
             <Pressable
               onPress={handleToggleAudioOnly}
-              style={({ pressed }) => [styles.smallIconBtn, pressed && { backgroundColor: 'rgba(255,255,255,0.24)' }]}
+              style={({ pressed }) => [styles.smallIconBtn, pressed && { backgroundColor: alpha(FOCUS.moonlight, 0.24) }]}
               accessibilityLabel={visualEnabled ? p.audioOnly : p.videoOn}
             >
               {visualEnabled ? (
-                <VideoIcon size={18} color="#ffffff" />
+                <VideoIcon size={18} color={FOCUS.moonlight} />
               ) : (
-                <Headphones size={18} color="#ffffff" />
+                <Headphones size={18} color={FOCUS.moonlight} />
               )}
             </Pressable>
           )}
@@ -602,9 +609,9 @@ export default function MeditationPlayer({
           {!isRunning && !isComplete && (
             <Pressable
               onPress={handleStart}
-              style={({ pressed }) => [styles.primaryBtn, pressed && { backgroundColor: 'rgba(255,255,255,0.32)' }]}
+              style={({ pressed }) => [styles.primaryBtn, pressed && { backgroundColor: alpha(FOCUS.moonlight, 0.32) }]}
             >
-              <Play size={22} color="#ffffff" fill="#ffffff" />
+              <Play size={22} color={FOCUS.moonlight} fill={FOCUS.moonlight} />
               <Text style={[styles.primaryBtnText, { fontFamily: fonts.bold }]}>{p.begin}</Text>
             </Pressable>
           )}
@@ -612,9 +619,9 @@ export default function MeditationPlayer({
           {isActive && (
             <Pressable
               onPress={handlePause}
-              style={({ pressed }) => [styles.primaryBtn, pressed && { backgroundColor: 'rgba(255,255,255,0.32)' }]}
+              style={({ pressed }) => [styles.primaryBtn, pressed && { backgroundColor: alpha(FOCUS.moonlight, 0.32) }]}
             >
-              <Pause size={22} color="#ffffff" fill="#ffffff" />
+              <Pause size={22} color={FOCUS.moonlight} fill={FOCUS.moonlight} />
               <Text style={[styles.primaryBtnText, { fontFamily: fonts.bold }]}>{p.pause}</Text>
             </Pressable>
           )}
@@ -622,9 +629,9 @@ export default function MeditationPlayer({
           {isPaused && (
             <Pressable
               onPress={handleResume}
-              style={({ pressed }) => [styles.primaryBtn, pressed && { backgroundColor: 'rgba(255,255,255,0.32)' }]}
+              style={({ pressed }) => [styles.primaryBtn, pressed && { backgroundColor: alpha(FOCUS.moonlight, 0.32) }]}
             >
-              <Play size={22} color="#ffffff" fill="#ffffff" />
+              <Play size={22} color={FOCUS.moonlight} fill={FOCUS.moonlight} />
               <Text style={[styles.primaryBtnText, { fontFamily: fonts.bold }]}>{p.resume}</Text>
             </Pressable>
           )}
@@ -632,9 +639,9 @@ export default function MeditationPlayer({
           {isComplete && (
             <Pressable
               onPress={handleStart}
-              style={({ pressed }) => [styles.primaryBtn, pressed && { backgroundColor: 'rgba(255,255,255,0.32)' }]}
+              style={({ pressed }) => [styles.primaryBtn, pressed && { backgroundColor: alpha(FOCUS.moonlight, 0.32) }]}
             >
-              <RotateCcw size={20} color="#ffffff" />
+              <RotateCcw size={20} color={FOCUS.moonlight} />
               <Text style={[styles.primaryBtnText, { fontFamily: fonts.bold }]}>{p.startAgain}</Text>
             </Pressable>
           )}
@@ -642,10 +649,10 @@ export default function MeditationPlayer({
           {isRunning && (
             <Pressable
               onPress={handleReset}
-              style={({ pressed }) => [styles.smallIconBtn, pressed && { backgroundColor: 'rgba(255,255,255,0.24)' }]}
+              style={({ pressed }) => [styles.smallIconBtn, pressed && { backgroundColor: alpha(FOCUS.moonlight, 0.24) }]}
               accessibilityLabel={p.startAgain}
             >
-              <RotateCcw size={18} color="#ffffff" />
+              <RotateCcw size={18} color={FOCUS.moonlight} />
             </Pressable>
           )}
         </View>
@@ -658,11 +665,11 @@ export default function MeditationPlayer({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: FOCUS.midnight,
   },
   audioOnlyBg: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#000000',
+    backgroundColor: FOCUS.midnight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -696,11 +703,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitle: {
-    color: '#ffffff',
+    color: FOCUS.moonlight,
     fontSize: typography.fontSize.md,
   },
   headerSubtitle: {
-    color: 'rgba(255,255,255,0.75)',
+    color: alpha(FOCUS.moonlight, 0.75),
     fontSize: typography.fontSize.xs,
     marginTop: 2,
   },
@@ -714,7 +721,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   selectorLabel: {
-    color: 'rgba(255,255,255,0.85)',
+    color: alpha(FOCUS.moonlight, 0.85),
     fontSize: typography.fontSize.sm,
     marginBottom: spacing.md,
   },
@@ -741,21 +748,21 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.14)',
+    backgroundColor: alpha(FOCUS.moonlight, 0.14),
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.4)',
+    borderColor: alpha(FOCUS.moonlight, 0.4),
   },
   stepperBtnDisabled: {
     opacity: 0.4,
   },
   customValue: {
-    color: '#ffffff',
+    color: FOCUS.moonlight,
     fontSize: typography.fontSize.xxl,
     minWidth: 130,
     textAlign: 'center',
   },
   customValueDisabled: {
-    color: 'rgba(255,255,255,0.5)',
+    color: alpha(FOCUS.moonlight, 0.5),
   },
   infinityPill: {
     flexDirection: 'row',
@@ -765,51 +772,51 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     borderRadius: radius.full,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.4)',
+    borderColor: alpha(FOCUS.moonlight, 0.4),
   },
   infinityPillActive: {
-    backgroundColor: '#ffffff',
-    borderColor: '#ffffff',
+    backgroundColor: FOCUS.moonlight,
+    borderColor: FOCUS.moonlight,
   },
   infinityPillText: {
-    color: '#ffffff',
+    color: FOCUS.moonlight,
     fontSize: typography.fontSize.sm,
     lineHeight: typography.lineHeight.sm,
   },
   infinityPillTextActive: {
-    color: '#000000',
+    color: FOCUS.midnight,
   },
   pill: {
     height: 34,
     paddingHorizontal: spacing.lg,
     borderRadius: radius.full,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.4)',
+    borderColor: alpha(FOCUS.moonlight, 0.4),
     alignItems: 'center',
     justifyContent: 'center',
   },
   pillActive: {
-    backgroundColor: '#ffffff',
-    borderColor: '#ffffff',
+    backgroundColor: FOCUS.moonlight,
+    borderColor: FOCUS.moonlight,
   },
   pillText: {
-    color: '#ffffff',
+    color: FOCUS.moonlight,
     fontSize: typography.fontSize.sm,
     lineHeight: typography.lineHeight.sm,
   },
   pillTextActive: {
-    color: '#000000',
+    color: FOCUS.midnight,
   },
   timeWrap: {
     alignItems: 'center',
   },
   timeText: {
-    color: '#ffffff',
+    color: FOCUS.moonlight,
     fontSize: 64,
     fontVariant: ['tabular-nums'],
   },
   remainingLabel: {
-    color: 'rgba(255,255,255,0.75)',
+    color: alpha(FOCUS.moonlight, 0.75),
     fontSize: typography.fontSize.sm,
     marginTop: spacing.xs,
     textTransform: 'uppercase',
@@ -820,19 +827,19 @@ const styles = StyleSheet.create({
     maxWidth: 300,
   },
   completionTitle: {
-    color: '#ffffff',
+    color: FOCUS.moonlight,
     fontSize: typography.fontSize.xxl,
     marginTop: spacing.lg,
   },
   completionBody: {
-    color: 'rgba(255,255,255,0.85)',
+    color: alpha(FOCUS.moonlight, 0.85),
     fontSize: typography.fontSize.sm,
     lineHeight: typography.lineHeight.body,
     textAlign: 'center',
     marginTop: spacing.md,
   },
   placeholderNotice: {
-    color: 'rgba(255,255,255,0.55)',
+    color: alpha(FOCUS.moonlight, 0.55),
     fontSize: 10,
     textAlign: 'center',
     paddingHorizontal: spacing.xl,
@@ -851,14 +858,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: 'rgba(255,255,255,0.18)',
+    backgroundColor: alpha(FOCUS.moonlight, 0.18),
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.4)',
+    borderColor: alpha(FOCUS.moonlight, 0.4),
     paddingHorizontal: spacing.xl,
     borderRadius: radius.full,
   },
   primaryBtnText: {
-    color: '#ffffff',
+    color: FOCUS.moonlight,
     fontSize: typography.fontSize.body,
     lineHeight: typography.lineHeight.body,
   },
@@ -868,8 +875,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.12)',
+    backgroundColor: alpha(FOCUS.moonlight, 0.12),
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
+    borderColor: alpha(FOCUS.moonlight, 0.3),
   },
 });

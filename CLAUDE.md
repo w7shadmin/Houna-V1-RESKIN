@@ -172,14 +172,12 @@ deterministic regardless of entry point or platform.
 
 ### Pressed-state convention
 
-Cards that combine a border with `shadows.card` (an always-visible
-turquoise-tinted shadow/elevation) must dim the whole card via
-`pressed && { opacity: 0.85 }` on press, never overlay a separate
-`colors.cardPressed` background fill. Overlaying a new-colored fill on top
-of a shadow/border that stays static reads as two competing highlights
-instead of one. Plain bordered buttons/chips without `shadows.card` can
-still use the `cardPressed` background-overlay pattern — it only breaks
-when combined with a static tinted shadow.
+Pressing a card or control dims it — `pressed && { opacity: 0.85 }` — as
+one coherent change (`components/ui/Card.tsx`, `Button.tsx`). Never overlay
+a second colour fill on top of a surface that also has a static border or
+glow: two highlights read as competing. Plain chips may use the
+`colors.cardPressed` fill instead (`Chip.tsx`), since they have nothing
+else lit.
 
 ### The breathing session shell
 
@@ -187,66 +185,73 @@ when combined with a static tinted shadow.
 each exercise (`app/tanafas/breathing/*.tsx`) passes in a phase-timing
 config. Never hardcode one exercise's timings into the shell itself.
 
-## Current skin — the part to replace for a new visual direction
+## Current skin — "Nightlight" / "Daylight"
 
-Everything below is today's specific visual choice, not a requirement. A
-reskin is free to change all of it.
+Designed on the canvas at https://claude.ai/artifact/EMxmwt7o1Uq6kx32BdAUA7
+(Night row = primary, Day row = light theme). Everything below is today's
+visual choice, not a requirement; take values from the canvas, never by eye.
 
-**Brand palette** (`constants/theme.ts`): White `#FFFFFF`, Turquoise
-`#3BAAA7`, Dark Turquoise `#196662`, Broken White `#EFF0EE`, Grey 30/50/80,
-Black; accents Yellow, Raspberry, Light Cyan, Peach. Card shadows tinted
-turquoise (`shadows.card`/`cardLg`/`tab`). Content caps at 430px
-(`layout.maxContentWidth`).
+**Themes** (`constants/theme.ts`): `nightColors` / `dayColors`, built from
+the Nightlight and Daylight sheet swatches (`nightPalette`, `dayPalette`).
+`ThemeProvider` (`contexts/ThemeContext.tsx`) follows the phone's light/dark
+setting, with a System / Night / Day override in Profile persisted locally.
+**Read tokens with `useTheme()`** — there is no static `colors` export; a
+theme switch re-renders in place. Cards are border-only (no drop shadows);
+light comes from glows (`shadows.glow`, `raisedButtonShadow`, `ScreenGlow`).
+Content caps at 430px (`layout.maxContentWidth`).
 
-**Fonts**: Inter for Latin UI, Scheherazade New for Arabic
-(`latinFontFamily`/`arabicFontFamily` in `theme.ts`) — swap both if
-changing the type system; keeping distinct Latin/Arabic families is a
-reasonable choice to preserve even in a reskin, whatever the specific fonts
-become.
+**Fonts** (`latinFontFamily` / `arabicFontFamily`, via `useLanguage().fonts`):
+Figtree body + Marcellus display + DM Mono tracked-caps labels for Latin;
+IBM Plex Sans Arabic body + Amiri display for Arabic, whose labels are
+untracked Plex (`fonts.labelTracked` is false).
 
-**Logo**: `components/Logo.tsx`, used in exactly 2 places (splash, entry
-screen). Swapping the logo replaces the whole asset, not a color.
+**Primitives** (`components/ui/`): `Button`, `IconButton`, `Chip`, `Card`,
+`IconTile` (the one tile pattern: glow / dawn / dusk tones), `Label`,
+`TabBar`, `CanvasIcon` (canvas stroke icons; use `DirectionalIcon` for ones
+that mirror in RTL), `Orb`, `ScreenGlow`. Build new UI from these.
 
-**Two hardcoded-dark exceptions**: the splash screen
-(`components/SplashIntro*.tsx`) and the meditation player
-(`app/tanafas/meditation/*.tsx`) use `palette.turquoise` /
-`palette.turquoiseDark` / plain white/black directly, bypassing the
-light-mode-only `colors` token surface. Decide deliberately whether a new
-skin keeps this pattern (a permanently-dark "focus mode" for these two
-screens) or unifies them with the rest of the light UI.
+**Logo**: `components/Logo.tsx` (`variant="themed"` recolours the official
+artwork's fills from `colors.logo`; paths untouched) and `HounaMark.tsx`
+(the pin alone). The splash intro uses the same tokens.
 
-**Legacy icon-tile exception**: `OLD_MVP_ICON_HEX` (`lib/color.ts`) is a
-small hardcoded hex set used only for topic icon tiles, in
-`app/(tabs)/index.tsx`, `app/(tabs)/directory/index.tsx`,
-`app/tanafas/index.tsx`, and `app/tanafas/breathing/index.tsx`. It predates
-the current token system and isn't part of the brand palette — safe to
-drop entirely in a reskin, replacing it with tokens from `theme.ts` or a
-new palette.
+**Meditation player — permanent dark focus mode, decided**: its chrome sits
+over full-screen video, so `components/meditation/MeditationPlayer.tsx`
+uses Nightlight Midnight/Moonlight in both themes (`FOCUS`). Its background
+audio can only be verified in an Android dev-client build.
+
+**Native splash**: `app.json` has Daybreak and Midnight (`dark`) grounds;
+needs `npx expo prebuild --clean` + reinstalling the dev client to apply,
+like `userInterfaceStyle: "automatic"`.
+
+**Legacy, still to migrate**: the old `palette` export and `OLD_MVP_ICON_HEX`
+/ `FlatIconTile` / `GradientTile` / `IconTile3D` remain on screens the
+canvas doesn't design (topic grid, breathing list, stats, exercise accents,
+entry, some detail screens). Move them onto `IconTile` and tokens when
+touched, then delete the legacy exports.
+
+**Known web-only quirks (native is fine)**: react-native-web resolves
+`start`/`end` offsets as LTR even in Arabic; lucide icons with an RTL flip
+transform draw off-screen on web (use `DirectionalIcon`).
 
 **Known inconsistency, not fixed here**: about 6 screens hand-roll their
 own loading/error state instead of the shared `LoadingState`/`ErrorState`/
 `InlineError` components (`components/directory/AsyncState.tsx`) used in
 ~13 others. Cosmetic only — worth normalizing next time one of those
-screens is touched, not urgent enough on its own to justify a
-wide-reaching pass.
+screens is touched.
 
 ## How to reskin
 
-1. Update `constants/theme.ts`'s `palette`/`colors`/`shadows` — this alone
-   recolors nearly the entire app, since virtually every screen consumes
-   tokens rather than hardcoded values.
-2. Decide on new `latinFontFamily`/`arabicFontFamily` values and update the
-   font-loading setup (`app/_layout.tsx`) to match.
-3. Review the two hardcoded-dark exceptions (splash, meditation player) and
-   decide whether that pattern still fits the new visual direction.
-4. Drop `OLD_MVP_ICON_HEX` (`lib/color.ts`) and its call sites in favor of
-   the new token system.
-5. Swap `components/Logo.tsx`'s asset.
-6. If the brand name or voice is changing — not just the colors — update
+1. Update `nightPalette` / `dayPalette` and the `nightColors` / `dayColors`
+   token sets in `constants/theme.ts` — every screen reads them through
+   `useTheme()`.
+2. Change `latinFontFamily` / `arabicFontFamily` and the font loading in
+   `app/_layout.tsx` together.
+3. Re-decide the meditation player's focus mode (`FOCUS`) and the native
+   splash colours in `app.json`.
+4. Keep the logo artwork; recolour it only through `colors.logo`.
+5. If the brand name or voice is changing — not just the colors — update
    the copy in `constants/*Strings.ts` too. The brand name and tone are
    woven into full sentences, not isolated as a single swappable token.
-7. For anything structurally different (not just color/font/spacing), use
-   `components/ui/Button.tsx` and `components/ui/Card.tsx` as the starting
-   primitives rather than hand-rolling new one-off styles per screen.
-8. Re-verify RTL after any layout change — reflow bugs show up specifically
+6. Restyle `components/ui/*` first; screens compose those primitives.
+7. Re-verify RTL after any layout change — reflow bugs show up specifically
    in the Arabic direction even when the English layout still looks fine.

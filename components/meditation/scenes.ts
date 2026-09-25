@@ -1,11 +1,9 @@
-import { palette } from '@/constants/theme';
-import { OLD_MVP_ICON_HEX } from '@/lib/color';
 
 export type SceneId = 'fire' | 'rain' | 'forest' | 'ocean';
 
 export interface MeditationScene {
   id: SceneId;
-  /** Gradient stops for the scene picker card, and the ambient fallback for scenes without real video. */
+  /** Gradient stops for the scene picker card, and the ambient fallback for scenes without real video — the scene's canvas orb colours. */
   gradient: [string, string];
   /** Still frame pulled from `video` — the scene picker card's resting background, before any preview plays. */
   thumbnail?: number;
@@ -32,7 +30,7 @@ export const SCENE_ORBS: Record<SceneId, { hi: string; c: string; lo: string; gl
 export const MEDITATION_SCENES: MeditationScene[] = [
   {
     id: 'fire',
-    gradient: [OLD_MVP_ICON_HEX.peach, OLD_MVP_ICON_HEX.raspberry],
+    gradient: [SCENE_ORBS.fire.c, SCENE_ORBS.fire.lo],
     thumbnail: require('@/assets/images/meditation/fire.jpg'),
     video: require('@/assets/video/fire.mp4'),
     // WAV, not AAC — see the note on 'rain' below.
@@ -40,7 +38,7 @@ export const MEDITATION_SCENES: MeditationScene[] = [
   },
   {
     id: 'rain',
-    gradient: [OLD_MVP_ICON_HEX.lightCyan, palette.turquoise],
+    gradient: [SCENE_ORBS.rain.c, SCENE_ORBS.rain.lo],
     thumbnail: require('@/assets/images/meditation/rain.jpg'),
     video: require('@/assets/video/rain.mp4'),
     // WAV, not AAC — a compressed codec needs to re-init its decoder each
@@ -50,10 +48,10 @@ export const MEDITATION_SCENES: MeditationScene[] = [
   },
   {
     id: 'forest',
-    gradient: [palette.turquoise, palette.turquoiseDark],
+    gradient: [SCENE_ORBS.forest.c, SCENE_ORBS.forest.lo],
     thumbnail: require('@/assets/images/meditation/forest.jpg'),
     video: require('@/assets/video/forest.mp4'),
     audio: require('@/assets/audio/forest.wav'),
   },
-  { id: 'ocean', gradient: [palette.turquoiseDark, palette.black] },
+  { id: 'ocean', gradient: [SCENE_ORBS.ocean.c, SCENE_ORBS.ocean.lo] },
 ];

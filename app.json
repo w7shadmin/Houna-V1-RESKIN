@@ -26,7 +26,11 @@
         {
           "image": "./assets/images/icon.png",
           "resizeMode": "contain",
-          "backgroundColor": "#EFF0EE"
+          "backgroundColor": "#F5F1E8",
+          "dark": {
+            "image": "./assets/images/icon.png",
+            "backgroundColor": "#0B1026"
+          }
         }
       ],
       "expo-sqlite",
