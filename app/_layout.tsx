@@ -27,6 +27,7 @@ import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
+import { StarfieldProvider } from '@/contexts/StarfieldContext';
 import SplashIntro from '@/components/SplashIntro';
 
 SplashScreen.preventAutoHideAsync();
@@ -117,8 +118,11 @@ export default function RootLayout() {
     <LanguageProvider>
       <AuthProvider>
         <ThemeProvider>
-          <InnerLayout />
-          {!introDone && <SplashIntro onFinish={() => setIntroDone(true)} />}
+          {/* Shared by Home, the tab bar and the Houna starfield: the handoff state and the mark's clock. */}
+          <StarfieldProvider>
+            <InnerLayout />
+            {!introDone && <SplashIntro onFinish={() => setIntroDone(true)} />}
+          </StarfieldProvider>
         </ThemeProvider>
       </AuthProvider>
     </LanguageProvider>

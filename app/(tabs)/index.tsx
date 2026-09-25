@@ -95,7 +95,6 @@ export default function HomeScreen() {
   const starfieldRef = useRef(starfield);
   starfieldRef.current = starfield;
   const haloRef = useRef<View>(null);
-  const [haloHidden, setHaloHidden] = useState(false);
   const away = useRef(false);
 
   const openStarfield = () => {
@@ -105,21 +104,19 @@ export default function HomeScreen() {
     sf.setChromeHidden(true);
     Animated.timing(sf.chrome, { toValue: 0, duration: 450, easing: Easing.out(Easing.quad), useNativeDriver: NATIVE }).start(() => {
       haloRef.current?.measureInWindow((x, y, w, hgt) => {
+        // The starfield draws its moon over this exact spot, then hides this mark (haloHidden).
         router.push({ pathname: '/starfield', params: { x: String(x + w / 2), y: String(y + hgt / 2) } });
-        // The starfield's own moon is now drawn on top of this one; hand over once it's there.
-        setTimeout(() => setHaloHidden(true), 80);
       });
     });
   };
 
-  // Back from the starfield: its moon has just returned to this spot, so show ours and
-  // bring the rest of Home (and the tab bar) back.
+  // Back from the starfield: its moon has returned to this spot and shown our mark again
+  // just before leaving, so bring the rest of Home (the ring and the tab bar too) back.
   useFocusEffect(
     useCallback(() => {
       const sf = starfieldRef.current;
       if (!sf || !away.current) return;
       away.current = false;
-      setHaloHidden(false);
       Animated.timing(sf.chrome, { toValue: 1, duration: 500, easing: Easing.inOut(Easing.quad), useNativeDriver: NATIVE }).start(() =>
         sf.setChromeHidden(false),
       );
@@ -191,12 +188,14 @@ export default function HomeScreen() {
             accessibilityRole={isNight ? 'button' : undefined}
             accessibilityLabel={isNight ? h.starfield.open : undefined}
           >
-            <View ref={haloRef} collapsable={false} style={haloHidden && styles.hidden}>
+            <View ref={haloRef} collapsable={false} style={starfield?.haloHidden && styles.hidden}>
               {/* Day: the logo's deeper teal, a little stronger — the pale Night glow vanishes on Daybreak. */}
               <MarkHalo
                 accent={accent}
                 dusk={colors.tones.dusk.fg}
-                light={{ glow: isNight ? colors.glow : dayPalette.hounaTeal, glowStrength: isNight ? 0.4 : 0.5 }}
+                glow={isNight ? colors.glow : dayPalette.hounaTeal}
+                glowStrength={isNight ? 0.4 : 0.5}
+                ringOpacity={starfield?.chrome}
               />
             </View>
           </Pressable>
