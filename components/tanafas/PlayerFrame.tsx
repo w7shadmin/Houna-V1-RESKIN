@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 22,
+    gap: 24,
   },
   titleRow: {
     alignSelf: 'stretch',
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     minHeight: 104,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
+    gap: 12,
   },
   heading: {
     fontSize: 27,
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   tag: {
-    paddingVertical: 5,
+    paddingVertical: 4,
     paddingHorizontal: 12,
     borderRadius: 999,
     borderWidth: 1,
@@ -300,7 +300,7 @@ const styles = StyleSheet.create({
   },
   pager: {
     flexDirection: 'row',
-    gap: 6,
+    gap: 8,
   },
   pagerDot: {
     width: 6,
@@ -316,12 +316,12 @@ const styles = StyleSheet.create({
   },
   tiles: {
     flexDirection: 'row',
-    gap: 10,
+    gap: 12,
   },
   tile: {
     flex: 1,
     gap: 4,
-    paddingVertical: 14,
+    paddingVertical: 16,
     paddingHorizontal: 16,
     borderRadius: 18,
     borderWidth: 1,

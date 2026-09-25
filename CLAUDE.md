@@ -210,8 +210,7 @@ untracked Plex (`fonts.labelTracked` is false).
 `spacing` in `theme.ts`. Screen side padding is 16 (`layout.screenPadding`),
 not the canvas's 20. `TabBar` is the reference: 64 above the inset (8 · 24
 icon · 4 · 20 label · 8), raised button 56 sharing the icons' bottom edge.
-Spacing is on the grid everywhere except About, Voices and the Tanafas hub
-and player (`app/tanafas/index.tsx`, `components/tanafas/`); snap those when
+Spacing is on the grid everywhere except About and Voices; snap those when
 touched.
 
 **Android nav bar**: the tab bar runs edge-to-edge under the system

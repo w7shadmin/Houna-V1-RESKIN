@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: layout.maxContentWidth,
     alignSelf: 'center',
-    paddingTop: 20,
+    paddingTop: 16,
     paddingHorizontal: layout.screenPadding,
     paddingBottom: 24,
   },
@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
   },
   tab: {
     height: 44,
-    paddingHorizontal: 2,
+    paddingHorizontal: 4,
     justifyContent: 'center',
     borderBottomWidth: 2,
   },
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   discover: {
-    paddingTop: 22,
+    paddingTop: 24,
     gap: 16,
   },
   discoverHead: {
@@ -324,13 +324,13 @@ const styles = StyleSheet.create({
   note: {
     flexDirection: 'row',
     gap: 12,
-    padding: 14,
+    padding: 16,
     borderRadius: 18,
     borderWidth: 1,
   },
   noteText: {
     flex: 1,
-    gap: 6,
+    gap: 8,
   },
   noteBody: {
     fontSize: 13.5,
@@ -340,12 +340,12 @@ const styles = StyleSheet.create({
     fontSize: 13.5,
   },
   tests: {
-    gap: 10,
+    gap: 12,
   },
   testCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
+    gap: 16,
     padding: 16,
   },
   testText: {
