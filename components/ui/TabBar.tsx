@@ -1,9 +1,10 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useStarfield } from '@/contexts/StarfieldContext';
 import { grid, raisedButtonShadow } from '@/constants/theme';
 import CanvasIcon, { type CanvasIconName } from './CanvasIcon';
 
@@ -39,6 +40,7 @@ export default function TabBar({ state, descriptors, navigation, insets }: Botto
   const { t, fonts } = useLanguage();
   const { colors } = useTheme();
   const router = useRouter();
+  const starfield = useStarfield();
 
   const tabs = state.routes.map((route, index) => {
     const focused = state.index === index;
@@ -104,9 +106,16 @@ export default function TabBar({ state, descriptors, navigation, insets }: Botto
   // indicator); the 8 inside the content height keeps labels clear of them.
   const bottom = insets.bottom > 0 ? insets.bottom : MIN_BOTTOM_INSET;
 
+  // Fades (and sinks a little) with Home's chrome while the Houna starfield opens.
+  const fade = starfield
+    ? { opacity: starfield.chrome, transform: [{ translateY: starfield.chrome.interpolate({ inputRange: [0, 1], outputRange: [grid(3), 0] }) }] }
+    : null;
+
   return (
-    <View
+    <Animated.View
+      pointerEvents={starfield?.chromeHidden ? 'none' : 'auto'}
       style={[
+        fade,
         styles.bar,
         {
           // Height comes from the slots (64) + this inset + the 1px border.
@@ -119,7 +128,7 @@ export default function TabBar({ state, descriptors, navigation, insets }: Botto
       {tabs.slice(0, 2)}
       {tanafas}
       {tabs.slice(2)}
-    </View>
+    </Animated.View>
   );
 }
 

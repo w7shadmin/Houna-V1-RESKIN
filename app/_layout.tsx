@@ -66,6 +66,12 @@ function InnerLayout() {
           name="recap"
           options={{ presentation: 'fullScreenModal', animation: 'fade' }}
         />
+        {/* The Houna starfield draws over Home (which has already faded its own UI away), so it
+            arrives without a transition of its own and can't be swiped away mid-breath. */}
+        <Stack.Screen
+          name="starfield"
+          options={{ presentation: 'transparentModal', animation: 'none', gestureEnabled: false, contentStyle: { backgroundColor: 'transparent' } }}
+        />
         <Stack.Screen name="profile" />
         <Stack.Screen name="crisis" />
         <Stack.Screen name="about" />

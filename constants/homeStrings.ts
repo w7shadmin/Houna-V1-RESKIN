@@ -9,6 +9,11 @@
 
 export const homeStrings = {
   en: {
+    // The Houna starfield: only its accessibility labels; the scene's one visible word is "Tanafas".
+    starfield: {
+      open: 'Breathe under the stars',
+      close: 'Back to Home',
+    },
     hero: {
       badge: "You're not alone",
       headline: 'SELF-CARE IS HOW YOU GAIN CONTROL OF YOUR LIFE',
@@ -127,6 +132,10 @@ export const homeStrings = {
     },
   },
   ar: {
+    starfield: {
+      open: 'تنفّس تحت النجوم',
+      close: 'العودة إلى الرئيسية',
+    },
     hero: {
       badge: 'لست وحدك',
       headline: 'العناية بالنفس هي كيف تسيطر على حياتك',

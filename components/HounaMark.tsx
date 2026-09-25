@@ -5,6 +5,8 @@ import { FIGURE_WITH_HEAD_HOLE_D } from '@/constants/logoSvg';
 
 interface HounaMarkProps {
   size: number;
+  /** Fill override (the starfield's silver moon); defaults to the theme's logo colour. */
+  color?: string;
 }
 
 /**
@@ -13,9 +15,9 @@ interface HounaMarkProps {
  * the canvas "Houna mark" asset); only the fills follow the theme. The head
  * is a real hole, so glows behind the mark show through it.
  */
-export default function HounaMark({ size }: HounaMarkProps) {
+export default function HounaMark({ size, color }: HounaMarkProps) {
   const { colors } = useTheme();
-  const fill = colors.logo.primary;
+  const fill = color ?? colors.logo.primary;
 
   return (
     <Svg width={size} height={size} viewBox="17 5.4 20.6 20.6">

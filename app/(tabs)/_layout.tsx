@@ -2,11 +2,14 @@ import React from 'react';
 import { Tabs } from 'expo-router';
 import { useLanguage } from '@/contexts/LanguageContext';
 import TabBar from '@/components/ui/TabBar';
+import { StarfieldProvider } from '@/contexts/StarfieldContext';
 
 export default function TabsLayout() {
   const { t } = useLanguage();
 
   return (
+    // Lets Home fade the tab bar with its own chrome when the Houna starfield opens.
+    <StarfieldProvider>
     <Tabs
       tabBar={(props) => <TabBar {...props} />}
       screenOptions={{ headerShown: false }}
@@ -26,5 +29,6 @@ export default function TabsLayout() {
       <Tabs.Screen name="events" options={{ title: t.tabs.events }} />
       <Tabs.Screen name="more" options={{ title: t.tabs.more }} />
     </Tabs>
+    </StarfieldProvider>
   );
 }

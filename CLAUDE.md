@@ -250,6 +250,17 @@ eyebrow, display title), `Field`, `FormMessage`, `OrDivider`, `SwitchLink`,
 `SettingsGroup`/`SettingsRow` and `ThemedSwitch`. Use these for any new
 account or settings screen.
 
+**Houna starfield** (Night only): tapping Home's mark fades Home's chrome
+and the tab bar (`contexts/StarfieldContext.tsx`, one shared `chrome`
+value) and hands the mark to `app/starfield.tsx`, a transparent modal that
+draws its moon at the measured spot (`x`/`y` params), then glides it to the
+middle as a silver full moon over a turning, twinkling sky with shooting
+stars (`components/starfield/`). The only word is "Tanafas"; tapping the
+moon or Back reverses it. Home's mark and the moon are the same
+`components/starfield/MarkHalo.tsx` (dot ring, edge halo, 5s breath);
+ambient loops use `hooks/useCalmLoop.ts` (focus- and Reduce-Motion-aware).
+A visit of a minute or more counts as a breathing session (`starfield`).
+
 **Tanafas player**: the Breathe and Meditate carousels share
 `components/tanafas/PlayerFrame.tsx` (stage, title row, tag, description,
 tiles, round button). Pressing play on a breathing exercise keeps the

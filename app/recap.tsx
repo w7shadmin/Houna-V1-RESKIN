@@ -117,7 +117,12 @@ export default function RecapScreen() {
   const close = () => (router.canGoBack() ? router.back() : router.replace('/(tabs)'));
 
   const exerciseTitle = (id: string | null) =>
-    id && id in EXERCISE_KEYS ? t.tanafas.exercises[EXERCISE_KEYS[id as keyof typeof EXERCISE_KEYS]].title : null;
+    // The Houna starfield (breathing with the moon on Home) goes by the one word it shows.
+    id === 'starfield'
+      ? t.tabs.tanafas
+      : id && id in EXERCISE_KEYS
+        ? t.tanafas.exercises[EXERCISE_KEYS[id as keyof typeof EXERCISE_KEYS]].title
+        : null;
   const sceneName = (id: string | null) =>
     id && id in t.tanafas.meditation.scenes ? t.tanafas.meditation.scenes[id as keyof typeof t.tanafas.meditation.scenes].name : null;
 

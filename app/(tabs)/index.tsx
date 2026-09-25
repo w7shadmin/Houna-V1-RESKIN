@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AccessibilityInfo, Animated, Easing, Platform, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
-import { useIsFocused } from '@react-navigation/native';
+import { AccessibilityInfo, Animated, Easing, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Defs, Ellipse, RadialGradient, Stop } from 'react-native-svg';
@@ -12,7 +11,9 @@ import { getTodayEntry } from '@/lib/journal';
 import { ACTIVITY_PERIODS, fetchCommunityActivity, type CommunityActivity } from '@/lib/communityActivity';
 import { CommunityDotMap } from '@/components/community/WorldMap';
 import Logo from '@/components/Logo';
-import HounaMark from '@/components/HounaMark';
+import MarkHalo from '@/components/starfield/MarkHalo';
+import { useStarfield } from '@/contexts/StarfieldContext';
+import { NATIVE } from '@/hooks/useCalmLoop';
 import MoodBloom, { HOME_BLOOM } from '@/components/mood/MoodBloom';
 import Card from '@/components/ui/Card';
 import IconButton from '@/components/ui/IconButton';
@@ -88,6 +89,46 @@ export default function HomeScreen() {
   const current = activity[period];
   const lit = useMemo(() => current?.countries.map((c) => c.country) ?? [], [current]);
 
+  // The Houna starfield (Night only): tapping the mark fades everything else
+  // away, then hands the mark over to the starfield, drawn at exactly this spot.
+  const starfield = useStarfield();
+  const starfieldRef = useRef(starfield);
+  starfieldRef.current = starfield;
+  const haloRef = useRef<View>(null);
+  const [haloHidden, setHaloHidden] = useState(false);
+  const away = useRef(false);
+
+  const openStarfield = () => {
+    const sf = starfieldRef.current;
+    if (!sf || away.current) return;
+    away.current = true;
+    sf.setChromeHidden(true);
+    Animated.timing(sf.chrome, { toValue: 0, duration: 450, easing: Easing.out(Easing.quad), useNativeDriver: NATIVE }).start(() => {
+      haloRef.current?.measureInWindow((x, y, w, hgt) => {
+        router.push({ pathname: '/starfield', params: { x: String(x + w / 2), y: String(y + hgt / 2) } });
+        // The starfield's own moon is now drawn on top of this one; hand over once it's there.
+        setTimeout(() => setHaloHidden(true), 80);
+      });
+    });
+  };
+
+  // Back from the starfield: its moon has just returned to this spot, so show ours and
+  // bring the rest of Home (and the tab bar) back.
+  useFocusEffect(
+    useCallback(() => {
+      const sf = starfieldRef.current;
+      if (!sf || !away.current) return;
+      away.current = false;
+      setHaloHidden(false);
+      Animated.timing(sf.chrome, { toValue: 1, duration: 500, easing: Easing.inOut(Easing.quad), useNativeDriver: NATIVE }).start(() =>
+        sf.setChromeHidden(false),
+      );
+    }, []),
+  );
+  const chrome = starfield
+    ? { style: { opacity: starfield.chrome }, pointerEvents: (starfield.chromeHidden ? 'none' : 'auto') as 'none' | 'auto' }
+    : { style: null, pointerEvents: 'auto' as const };
+
   const pickPeriod = (i: number) => {
     setAutoRotate(false);
     setPeriod(i);
@@ -105,10 +146,12 @@ export default function HomeScreen() {
       {isNight && <Stars />}
 
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <TopGlow color={colors.glow} />
+        <Animated.View style={[styles.topGlowWrap, chrome.style]} pointerEvents="none">
+          <TopGlow color={colors.glow} />
+        </Animated.View>
 
         {/* Top bar */}
-        <View style={styles.topBar}>
+        <Animated.View style={[styles.topBar, chrome.style]} pointerEvents={chrome.pointerEvents}>
           <View>
             <IconButton
               variant="subtle"
@@ -137,17 +180,27 @@ export default function HomeScreen() {
             onPress={() => router.push('/profile')}
             renderIcon={(c) => <CanvasIcon name="profile" size={20} strokeWidth={1.7} color={c} />}
           />
-        </View>
+        </Animated.View>
 
         {/* Mark, "You're not alone", rotating line */}
         <View style={styles.hero}>
-          {/* Day: the logo's deeper teal, a little stronger — the pale Night glow vanishes on Daybreak. */}
-          <MarkHalo
-            accent={accent}
-            dusk={colors.tones.dusk.fg}
-            glow={isNight ? colors.glow : dayPalette.hounaTeal}
-            glowStrength={isNight ? 0.4 : 0.5}
-          />
+          {/* In Night the mark opens the Houna starfield; in Day it's decoration. */}
+          <Pressable
+            onPress={openStarfield}
+            disabled={!isNight}
+            accessibilityRole={isNight ? 'button' : undefined}
+            accessibilityLabel={isNight ? h.starfield.open : undefined}
+          >
+            <View ref={haloRef} collapsable={false} style={haloHidden && styles.hidden}>
+              {/* Day: the logo's deeper teal, a little stronger — the pale Night glow vanishes on Daybreak. */}
+              <MarkHalo
+                accent={accent}
+                dusk={colors.tones.dusk.fg}
+                light={{ glow: isNight ? colors.glow : dayPalette.hounaTeal, glowStrength: isNight ? 0.4 : 0.5 }}
+              />
+            </View>
+          </Pressable>
+          <Animated.View style={[styles.heroText, chrome.style]} pointerEvents={chrome.pointerEvents}>
           <View style={styles.notAloneRow}>
             <View style={[styles.notAloneDot, { backgroundColor: accent }]} />
             <Text
@@ -168,8 +221,10 @@ export default function HomeScreen() {
           >
             {h.lines[period]}
           </Text>
+          </Animated.View>
         </View>
 
+        <Animated.View style={[styles.lower, chrome.style]} pointerEvents={chrome.pointerEvents}>
         {/* Community card */}
         <Card variant="feature" style={[styles.community, { backgroundColor: solid(colors.card) }]}>
           <View style={styles.communityHead}>
@@ -271,172 +326,13 @@ export default function HomeScreen() {
             {h.crisisButton}
           </Text>
         </Pressable>
+        </Animated.View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 /* ──────────────── Decorative layers (canvas values) ──────────────── */
-
-/** Animations run on the UI thread on native (web has no native driver). */
-const NATIVE = Platform.OS !== 'web';
-/** One lap of the dots' drift, one breath of the ring (open + close), one slow turn of the ring. */
-const DRIFT_MS = 8000;
-const BREATH_MS = 5000;
-const TURN_MS = 120000;
-/** The halo round the mark (70px): clear inside its ring, brightest at its outer edge, ~26px of falloff. */
-const HALO = 112;
-/**
- * The halo's layers: each a few % oval, turning a whole number of laps per
- * TURN_MS (so the loop is seamless), at its own pace and direction.
- */
-const HALO_LAYERS = [
-  { sx: 1.04, sy: 0.96, from: 0, turns: 1 },
-  { sx: 0.96, sy: 1.04, from: 45, turns: -1 },
-  { sx: 1.03, sy: 0.97, from: 100, turns: 2 },
-];
-
-/** A sine wave sampled across one loop (0 → 1), offset by `phase` laps — for piecewise interpolation. */
-const WAVE_STEPS = Array.from({ length: 17 }, (_, k) => k / 16);
-const wave = (phase: number) => WAVE_STEPS.map((t) => Math.sin(2 * Math.PI * (t + phase)));
-
-/** Runs only while Home is on screen and Reduce Motion is off; otherwise holds still. */
-function useCalmLoop(make: (v: Animated.Value) => Animated.CompositeAnimation) {
-  const v = useRef(new Animated.Value(0)).current;
-  const focused = useIsFocused();
-  const [reduceMotion, setReduceMotion] = useState(false);
-  useEffect(() => {
-    AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotion).catch(() => {});
-    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduceMotion);
-    return () => sub.remove();
-  }, []);
-  useEffect(() => {
-    if (!focused || reduceMotion) return;
-    // Always from the top of a cycle: a loop replays from the value it started at, so
-    // resuming mid-cycle (after Home was covered) would jump back there every lap.
-    v.setValue(0);
-    const anim = make(v);
-    anim.start();
-    return () => anim.stop();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [focused, reduceMotion, v]);
-  return v;
-}
-
-/**
- * The 28-dot ring around the mark: first half brand accent, second half
- * Dusk, swelling toward the sides. Each dot drifts gently up and down and
- * fades out and back in, a little behind its neighbour, so a slow ripple
- * travels round the ring. The whole ring also turns slowly and breathes,
- * opening out and drawing back in, with a halo of light round the mark
- * breathing outward from its edge; the mark itself stays crisp and still.
- */
-function MarkHalo({ accent, dusk, glow, glowStrength }: { accent: string; dusk: string; glow: string; glowStrength: number }) {
-  const N = 28;
-  const R = 86;
-  const drift = useCalmLoop((v) => Animated.loop(Animated.timing(v, { toValue: 1, duration: DRIFT_MS, easing: Easing.linear, useNativeDriver: NATIVE })));
-  const turn = useCalmLoop((v) => Animated.loop(Animated.timing(v, { toValue: 1, duration: TURN_MS, easing: Easing.linear, useNativeDriver: NATIVE })));
-  const breath = useCalmLoop((v) =>
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(v, { toValue: 1, duration: BREATH_MS / 2, easing: Easing.inOut(Easing.sin), useNativeDriver: NATIVE }),
-        Animated.timing(v, { toValue: 0, duration: BREATH_MS / 2, easing: Easing.inOut(Easing.sin), useNativeDriver: NATIVE }),
-      ]),
-    ),
-  );
-
-  const dots = useMemo(
-    () =>
-      Array.from({ length: N }, (_, i) => {
-        const t = i / N;
-        const a = t * Math.PI * 2 - Math.PI / 2;
-        const s = 2.5 + 4 * Math.sin(t * Math.PI);
-        const o = 0.22 + 0.78 * Math.sin(t * Math.PI);
-        const x = R * Math.cos(a);
-        const y = R * Math.sin(a);
-        return {
-          s,
-          c: i < N / 2 ? accent : dusk,
-          x,
-          // Drift: 3px either way, one lap behind the next dot round the ring.
-          translateY: drift.interpolate({ inputRange: WAVE_STEPS, outputRange: wave(-t).map((w) => y + 3 * w) }),
-          // Fade: down to a fifth of its light and back, twice round the ring per lap.
-          opacity: drift.interpolate({ inputRange: WAVE_STEPS, outputRange: wave(-2 * t + 0.25).map((w) => o * (0.6 + 0.4 * w)) }),
-        };
-      }),
-    [accent, dusk, drift],
-  );
-
-  const ringScale = breath.interpolate({ inputRange: [0, 1], outputRange: [1, 1.07] });
-  const ringTurn = turn.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
-  const haloScale = breath.interpolate({ inputRange: [0, 1], outputRange: [0.95, 1.1] });
-  const haloOpacity = breath.interpolate({ inputRange: [0, 1], outputRange: [0.6, 1] });
-  const layerTurns = useMemo(
-    () => HALO_LAYERS.map((l) => turn.interpolate({ inputRange: [0, 1], outputRange: [`${l.from}deg`, `${l.from + l.turns * 360}deg`] })),
-    [turn],
-  );
-  // Where all three overlap their light adds up; each is set so the sum is glowStrength.
-  const layerStrength = 1 - Math.pow(1 - glowStrength, 1 / HALO_LAYERS.length);
-
-  return (
-    <View style={styles.halo} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-      {/* The ring turns slowly (a lap every two minutes) and breathes, opening out and drawing back. */}
-      <Animated.View style={[styles.haloRing, { transform: [{ rotate: ringTurn }, { scale: ringScale }] }]}>
-        {dots.map((d, i) => (
-          <Animated.View
-            key={i}
-            style={[
-              styles.haloDot,
-              {
-                width: d.s,
-                height: d.s,
-                borderRadius: d.s / 2,
-                backgroundColor: d.c,
-                opacity: d.opacity,
-                // Offsets from the centre rather than left/top, so it draws the same in either direction.
-                transform: [{ translateX: d.x }, { translateY: d.translateY }],
-              },
-            ]}
-          />
-        ))}
-      </Animated.View>
-      {/* A halo, not a disc: clear inside the mark's ring so it stays crisp, the light joined
-          to its edge. Three slightly oval layers turn at their own pace, so the outline shifts
-          a little round the mark, and all three breathe out and in together. */}
-      <Animated.View style={[styles.markGlow, { opacity: haloOpacity, transform: [{ scale: haloScale }] }]}>
-        {HALO_LAYERS.map((l, k) => (
-          <Animated.View
-            key={k}
-            style={[
-              StyleSheet.absoluteFill,
-              {
-                transform: [
-                  { rotate: layerTurns[k] },
-                  { scaleX: l.sx },
-                  { scaleY: l.sy },
-                ],
-              },
-            ]}
-          >
-            <Svg width={HALO} height={HALO}>
-              <Defs>
-                <RadialGradient id={`markGlow${k}`} cx="50%" cy="50%" r="50%">
-                  {/* The mark's ring runs ~22.5–30px from its centre: the light begins under it (so
-                      it's always joined to the edge) and never reaches the inside, round the heart. */}
-                  <Stop offset={25.5 / (HALO / 2)} stopColor={glow} stopOpacity={0} />
-                  <Stop offset={31 / (HALO / 2)} stopColor={glow} stopOpacity={layerStrength} />
-                  <Stop offset="1" stopColor={glow} stopOpacity={0} />
-                </RadialGradient>
-              </Defs>
-              <Circle cx={HALO / 2} cy={HALO / 2} r={HALO / 2} fill={`url(#markGlow${k})`} />
-            </Svg>
-          </Animated.View>
-        ))}
-      </Animated.View>
-      <HounaMark size={70} />
-    </View>
-  );
-}
 
 /** Soft brand glow behind the top of the screen (380×330 ellipse, 18% → 0). */
 function TopGlow({ color }: { color: string }) {
@@ -518,6 +414,9 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
     gap: 12,
   },
+  topGlowWrap: {
+    ...StyleSheet.absoluteFillObject,
+  },
   topGlow: {
     position: 'absolute',
     top: 30,
@@ -540,24 +439,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
-  halo: {
-    width: 190,
-    height: 190,
+  hidden: {
+    opacity: 0,
+  },
+  heroText: {
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: 12,
   },
-  haloRing: {
-    ...StyleSheet.absoluteFillObject,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  haloDot: {
-    position: 'absolute',
-  },
-  markGlow: {
-    position: 'absolute',
-    width: HALO,
-    height: HALO,
+  lower: {
+    gap: 12,
   },
   notAloneRow: {
     flexDirection: 'row',
