@@ -244,7 +244,8 @@ canvas "Professional profile" artboard) with data cleanup in
 `lib/directoryProfile.ts` — the scraped socials include Houna's own footer
 accounts (filtered by `ownSocials`), info labels arrive in the page's
 language (mapped by `profileFacts`), and text can carry HTML entities.
-Events still uses the older `DetailHero` / `InfoRow`.
+Events (list, event, speaker) uses the same pieces; event dates go through
+`lib/eventDate.ts` (the site sends "19/05/2026, 19:00 pm").
 
 **Known web-only quirks (native is fine)**: react-native-web resolves
 `start`/`end` offsets as LTR even in Arabic; lucide icons with an RTL flip

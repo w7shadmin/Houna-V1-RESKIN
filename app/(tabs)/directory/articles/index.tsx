@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { grid, layout } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
-import { arabicNumber } from '@/lib/arabicNumerals';
+import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { fetchArticles, safeUrl, type Article } from '@/lib/hounaApi';
 import { LoadingState, ErrorState, InlineError } from '@/components/directory/AsyncState';
 import ListItemCard from '@/components/directory/ListItemCard';
@@ -65,7 +65,7 @@ export default function ArticlesListScreen() {
             <View style={styles.listHeader}>
               {header}
               <Text style={[styles.count, { color: colors.textTertiary, fontFamily: fonts.medium }]}>
-                {num(articles.length)} {articles.length === 1 ? s.countOne : s.countOther}
+                {arabicPlural(articles.length, s.count).replace('{n}', num(articles.length))}
               </Text>
             </View>
           }

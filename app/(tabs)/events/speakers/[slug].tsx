@@ -1,26 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, ScrollView, Pressable, Linking, StyleSheet } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { ArrowLeft, MapPin, Globe, Users } from 'lucide-react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { palette, spacing, radius, typography } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
-import { fetchSpeakerDetail, safeUrl, resolveImageUrl, type SpeakerDetail } from '@/lib/hounaApi';
+import { grid, layout } from '@/constants/theme';
+import { fetchSpeakerDetail, type SpeakerDetail } from '@/lib/hounaApi';
+import { ownSocials, profileFacts } from '@/lib/directoryProfile';
 import { LoadingState, ErrorState } from '@/components/directory/AsyncState';
-import InfoRow from '@/components/directory/InfoRow';
+import { BodyText, FactGrid, FollowRow, ProfileHero, ProfileTopBar, SectionCard } from '@/components/directory/ProfileKit';
+import { tidyRole } from '@/components/events/EventPills';
+import ScreenGlow from '@/components/ui/ScreenGlow';
 
-const INFO_ICONS: Record<string, typeof MapPin> = {
-  location: MapPin,
-  language: Globe,
-  'work with': Users,
-  workwith: Users,
-};
-
+/** A speaker's profile, in the same language as a professional's (no contact actions). */
 export default function SpeakerDetailScreen() {
   const { colors } = useTheme();
   const router = useRouter();
   const { slug } = useLocalSearchParams<{ slug: string }>();
-  const { t, language, isRTL, fonts } = useLanguage();
+  const { t, language } = useLanguage();
   const s = t.events.speaker;
   const common = t.directory.common;
 
@@ -33,193 +30,78 @@ export default function SpeakerDetailScreen() {
     setLoading(true);
     setError(null);
     fetchSpeakerDetail(slug, language)
-      .then((data) => {
-        if (!cancelled) setDetail(data);
-      })
-      .catch((err) => {
-        if (!cancelled) setError(err instanceof Error ? err.message : common.notFound);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
+      .then((data) => !cancelled && setDetail(data))
+      .catch((err) => !cancelled && setError(err instanceof Error ? err.message : common.notFound))
+      .finally(() => !cancelled && setLoading(false));
     return () => {
       cancelled = true;
     };
   }, [slug, language, common.notFound]);
 
-  if (loading) {
+  const back = () => (router.canGoBack() ? router.back() : router.replace('/events'));
+
+  if (loading || error || !detail) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <LoadingState label={s.loading} />
-      </View>
+      <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
+        <View style={styles.stateWrap}>
+          <ProfileTopBar onBack={back} />
+          {loading ? (
+            <LoadingState label={s.loading} />
+          ) : (
+            <ErrorState message={error || common.notFound} retryLabel={common.goBack} onRetry={back} />
+          )}
+        </View>
+      </SafeAreaView>
     );
   }
 
-  if (error || !detail) {
-    return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <ErrorState message={error || common.notFound} retryLabel={common.goBack} onRetry={() => router.back()} />
-      </View>
-    );
-  }
-
-  const infoEntries = Object.entries(detail.info);
+  const facts = profileFacts(detail.info);
+  const socials = ownSocials(detail.socials);
+  const bio = detail.bio.trim();
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={[styles.hero, { backgroundColor: palette.turquoise }]}>
-          <Pressable
-            onPress={() => router.back()}
-            hitSlop={12}
-            style={({ pressed }) => [
-              styles.backBtn,
-              { backgroundColor: pressed ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.9)' },
-            ]}
-          >
-            <View style={isRTL ? styles.flip : undefined}>
-<ArrowLeft size={20} color={colors.text} />
-</View>
-          </Pressable>
-          <View style={[styles.avatar, { borderColor: 'rgba(255,255,255,0.8)', backgroundColor: colors.card }]}>
-            {!!resolveImageUrl(detail.imageUrl) && (
-              <Image source={{ uri: resolveImageUrl(detail.imageUrl)! }} style={styles.avatarImg} resizeMode="cover" />
-            )}
-          </View>
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <View style={styles.top}>
+          <ScreenGlow color={colors.glow} rx={60} ry={55} cy={55} />
+          <ProfileTopBar onBack={back} />
+          <ProfileHero name={detail.name} role={tidyRole(detail.role)} imageUrl={detail.imageUrl} kind="person" />
         </View>
 
-        <View style={styles.body}>
-          <Text style={[styles.name, { color: colors.text, fontFamily: fonts.bold }]}>{detail.name}</Text>
-          {!!detail.role && (
-            <Text style={[styles.role, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-              {detail.role}
-            </Text>
-          )}
+        {facts.length > 0 && <FactGrid facts={facts} />}
 
-          {infoEntries.length > 0 && (
-            <View style={styles.infoGrid}>
-              {infoEntries.map(([key, value]) => (
-                <InfoRow key={key} icon={INFO_ICONS[key.toLowerCase()] ?? MapPin} label={key} value={value} />
-              ))}
-            </View>
-          )}
+        {!!bio && (
+          <SectionCard title={s.about}>
+            <BodyText>{bio}</BodyText>
+          </SectionCard>
+        )}
 
-          {!!detail.bio && (
-            <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: colors.text, fontFamily: fonts.bold }]}>{s.about}</Text>
-              <Text style={[styles.sectionBody, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-                {detail.bio}
-              </Text>
-            </View>
-          )}
-
-          {detail.socials.length > 0 && (
-            <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: colors.text, fontFamily: fonts.bold }]}>
-                {common.follow}
-              </Text>
-              <View style={styles.socialRow}>
-                {detail.socials.map((social, i) => (
-                  <Pressable
-                    key={i}
-                    onPress={() => {
-                      const url = safeUrl(social.url);
-                      if (url) Linking.openURL(url);
-                    }}
-                    style={({ pressed }) => [
-                      styles.socialBtn,
-                      { backgroundColor: colors.card, borderColor: colors.border },
-                      pressed && { backgroundColor: colors.cardPressed },
-                    ]}
-                  >
-                    <Text style={[styles.socialText, { color: colors.textSecondary, fontFamily: fonts.semiBold }]}>
-                      {social.platform.slice(0, 2).toUpperCase()}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
-            </View>
-          )}
-        </View>
+        <FollowRow socials={socials} />
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safe: {
     flex: 1,
   },
-  hero: {
-    alignItems: 'center',
-    paddingTop: spacing.xxl + spacing.md,
-    paddingBottom: spacing.xl,
-  },
-  backBtn: {
-    position: 'absolute',
-    top: 16,
-    start: 16,
-    width: 36,
-    height: 36,
-    borderRadius: radius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  flip: {
-    transform: [{ scaleX: -1 }],
-  },
-  avatar: {
-    width: 112,
-    height: 112,
-    borderRadius: radius.full,
-    borderWidth: 4,
-    overflow: 'hidden',
-  },
-  avatarImg: {
+  stateWrap: {
+    flex: 1,
     width: '100%',
-    height: '100%',
+    maxWidth: layout.maxContentWidth,
+    alignSelf: 'center',
+    padding: grid(2),
   },
-  body: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.xl,
+  scroll: {
+    width: '100%',
+    maxWidth: layout.maxContentWidth,
+    alignSelf: 'center',
+    padding: grid(2),
+    paddingBottom: grid(5),
+    gap: grid(3),
   },
-  name: {
-    fontSize: typography.fontSize.lg,
-    textAlign: 'center',
-  },
-  role: {
-    fontSize: typography.fontSize.sm,
-    textAlign: 'center',
-    marginTop: spacing.xs,
-  },
-  infoGrid: {
-    marginTop: spacing.lg,
-  },
-  section: {
-    marginTop: spacing.lg,
-  },
-  sectionTitle: {
-    fontSize: typography.fontSize.md,
-    marginBottom: spacing.xs,
-  },
-  sectionBody: {
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.body,
-  },
-  socialRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  socialBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  socialText: {
-    fontSize: typography.fontSize.xs,
+  top: {
+    gap: grid(2),
   },
 });

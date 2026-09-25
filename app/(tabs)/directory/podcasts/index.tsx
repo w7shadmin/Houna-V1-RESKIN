@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { grid, layout } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
-import { arabicNumber } from '@/lib/arabicNumerals';
+import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { fetchPodcasts, safeUrl, type Podcast } from '@/lib/hounaApi';
 import { LoadingState, ErrorState, InlineError } from '@/components/directory/AsyncState';
 import ListItemCard from '@/components/directory/ListItemCard';
@@ -65,7 +65,7 @@ export default function PodcastsListScreen() {
             <View style={styles.listHeader}>
               {header}
               <Text style={[styles.count, { color: colors.textTertiary, fontFamily: fonts.medium }]}>
-                {num(podcasts.length)} {podcasts.length === 1 ? s.countOne : s.countOther}
+                {arabicPlural(podcasts.length, s.count).replace('{n}', num(podcasts.length))}
               </Text>
             </View>
           }

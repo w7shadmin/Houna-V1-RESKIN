@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { grid, layout, radius } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
-import { arabicNumber } from '@/lib/arabicNumerals';
+import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { fetchOrganizations, type Organization, type CountryOption } from '@/lib/hounaApi';
 import { LoadingState, ErrorState, InlineError } from '@/components/directory/AsyncState';
 import ListItemCard from '@/components/directory/ListItemCard';
@@ -99,7 +99,7 @@ export default function OrganizationsListScreen() {
                 </View>
               )}
               <Text style={[styles.count, { color: colors.textTertiary, fontFamily: fonts.medium }]}>
-                {num(orgs.length)} {orgs.length === 1 ? s.countOne : s.countOther}
+                {arabicPlural(orgs.length, s.count).replace('{n}', num(orgs.length))}
               </Text>
             </View>
           }

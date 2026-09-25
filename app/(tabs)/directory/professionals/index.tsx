@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { grid, layout, radius } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
-import { arabicNumber } from '@/lib/arabicNumerals';
+import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { fetchTherapists, type Therapist, type CountryOption } from '@/lib/hounaApi';
 import { LoadingState, ErrorState, InlineError } from '@/components/directory/AsyncState';
 import ListItemCard from '@/components/directory/ListItemCard';
@@ -182,7 +182,7 @@ export default function ProfessionalsListScreen() {
                 </View>
               )}
               <Text style={[styles.count, { color: colors.textTertiary, fontFamily: fonts.medium }]}>
-                {num(therapists.length)} {therapists.length === 1 ? s.countOne : s.countOther}
+                {arabicPlural(therapists.length, s.count).replace('{n}', num(therapists.length))}
               </Text>
             </View>
           }

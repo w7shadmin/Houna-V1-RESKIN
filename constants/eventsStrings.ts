@@ -9,6 +9,11 @@ export const eventsStrings = {
   en: {
     list: {
       title: 'Events',
+      eyebrow: 'Talks & workshops',
+      intro: 'Conversations with mental health professionals, in person and online.',
+      sort: 'Sort',
+      am: 'AM',
+      pm: 'PM',
       loading: 'Loading events...',
       error: 'Failed to load events',
       all: 'All',
@@ -17,8 +22,7 @@ export const eventsStrings = {
       past: 'Past',
       sortNewest: 'Sort by newest',
       sortOldest: 'Sort by oldest',
-      countOne: 'event',
-      countOther: 'events',
+      count: { one: '{n} event', few: '{n} events' },
       readMore: 'Read More',
       noEvents: 'No events found',
       speakers: 'Speakers',
@@ -36,6 +40,11 @@ export const eventsStrings = {
   ar: {
     list: {
       title: 'الفعاليات',
+      eyebrow: 'حوارات وورش عمل',
+      intro: 'لقاءات مع مختصين في الصحة النفسية، حضوريًا وعبر الإنترنت.',
+      sort: 'الترتيب',
+      am: 'ص',
+      pm: 'م',
       loading: 'جاري تحميل الفعاليات...',
       error: 'فشل تحميل الفعاليات',
       all: 'الكل',
@@ -44,8 +53,7 @@ export const eventsStrings = {
       past: 'السابقة',
       sortNewest: 'الترتيب: الأحدث',
       sortOldest: 'الترتيب: الأقدم',
-      countOne: 'فعالية',
-      countOther: 'فعاليات',
+      count: { one: 'فعالية واحدة', two: 'فعاليتان', few: '{n} فعاليات', many: '{n} فعالية' },
       readMore: 'اقرأ المزيد',
       noEvents: 'لا توجد فعاليات',
       speakers: 'المتحدثون',

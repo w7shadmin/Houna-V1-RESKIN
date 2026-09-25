@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { grid, layout, radius } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
-import { arabicNumber } from '@/lib/arabicNumerals';
+import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { fetchWellnessCenters, type WellnessCenter, type CountryOption } from '@/lib/hounaApi';
 import { LoadingState, ErrorState, InlineError } from '@/components/directory/AsyncState';
 import ListItemCard from '@/components/directory/ListItemCard';
@@ -100,7 +100,7 @@ export default function WellnessCentersListScreen() {
                 </View>
               )}
               <Text style={[styles.count, { color: colors.textTertiary, fontFamily: fonts.medium }]}>
-                {num(centers.length)} {centers.length === 1 ? s.countOne : s.countOther}
+                {arabicPlural(centers.length, s.count).replace('{n}', num(centers.length))}
               </Text>
             </View>
           }
