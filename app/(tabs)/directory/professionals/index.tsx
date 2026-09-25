@@ -2,9 +2,8 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, FlatList, Pressable, ActivityIndicator, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { spacing, radius, typography } from '@/constants/theme';
+import { grid, layout, radius } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
 import { arabicNumber } from '@/lib/arabicNumerals';
 import { fetchTherapists, type Therapist, type CountryOption } from '@/lib/hounaApi';
@@ -12,6 +11,7 @@ import { LoadingState, ErrorState, InlineError } from '@/components/directory/As
 import ListItemCard from '@/components/directory/ListItemCard';
 import FilterToggle from '@/components/directory/FilterToggle';
 import ChipFilter from '@/components/directory/ChipFilter';
+import PageHeader from '@/components/directory/PageHeader';
 
 interface Filters {
   availability: string;
@@ -105,29 +105,20 @@ export default function ProfessionalsListScreen() {
 
   const countryOptions = [{ value: '', label: common.all }, ...countries];
 
-  return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
-      <View style={styles.headerRow}>
-        <Pressable
-          onPress={() => router.replace('/directory')}
-          hitSlop={12}
-          style={({ pressed }) => [
-            styles.backBtn,
-            { backgroundColor: colors.card, borderColor: colors.border },
-            pressed && { backgroundColor: colors.cardPressed },
-          ]}
-        >
-          <View style={isRTL ? styles.flip : undefined}>
-<ArrowLeft size={18} color={colors.text} />
-</View>
-        </Pressable>
-        <Text style={[styles.title, { color: colors.text, fontFamily: fonts.bold }]}>{s.title}</Text>
-      </View>
+  const header = <PageHeader title={s.title} intro={t.directory.hub.professionalsSubtitle} />;
 
+  return (
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
       {loading && therapists.length === 0 ? (
-        <LoadingState label={s.loading} />
+        <View style={styles.stateWrap}>
+          {header}
+          <LoadingState label={s.loading} />
+        </View>
       ) : error && therapists.length === 0 ? (
-        <ErrorState message={error} retryLabel={common.tryAgain} onRetry={handleRetry} />
+        <View style={styles.stateWrap}>
+          {header}
+          <ErrorState message={error} retryLabel={common.tryAgain} onRetry={handleRetry} />
+        </View>
       ) : (
         <FlatList
           data={therapists}
@@ -143,7 +134,8 @@ export default function ProfessionalsListScreen() {
           windowSize={7}
           removeClippedSubviews
           ListHeaderComponent={
-            <View>
+            <View style={styles.listHeader}>
+              {header}
               <FilterToggle
                 label={common.filters}
                 activeCount={activeFilterCount}
@@ -179,7 +171,8 @@ export default function ProfessionalsListScreen() {
                   {activeFilterCount > 0 && (
                     <Pressable
                       onPress={() => setFilters(initialFilters)}
-                      style={({ pressed }) => pressed && { opacity: 0.6 }}
+                      accessibilityRole="button"
+                      style={({ pressed }) => pressed && styles.pressed}
                     >
                       <Text style={[styles.resetText, { color: colors.primary, fontFamily: fonts.semiBold }]}>
                         {common.resetFilters}
@@ -188,7 +181,7 @@ export default function ProfessionalsListScreen() {
                   )}
                 </View>
               )}
-              <Text style={[styles.count, { color: colors.textTertiary, fontFamily: fonts.regular }]}>
+              <Text style={[styles.count, { color: colors.textTertiary, fontFamily: fonts.medium }]}>
                 {num(therapists.length)} {therapists.length === 1 ? s.countOne : s.countOther}
               </Text>
             </View>
@@ -237,59 +230,53 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
   },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.md,
-  },
-  backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  flip: {
-    transform: [{ scaleX: -1 }],
-  },
-  title: {
-    fontSize: typography.fontSize.xl,
+  stateWrap: {
+    flex: 1,
+    width: '100%',
+    maxWidth: layout.maxContentWidth,
+    alignSelf: 'center',
+    padding: grid(2),
   },
   listContent: {
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xxl,
+    width: '100%',
+    maxWidth: layout.maxContentWidth,
+    alignSelf: 'center',
+    padding: grid(2),
+    paddingBottom: grid(5),
+  },
+  listHeader: {
+    gap: grid(2),
+    marginBottom: grid(1.5),
   },
   filterPanel: {
-    borderRadius: radius.lg,
+    gap: grid(1),
+    borderRadius: radius.cardLg,
     borderWidth: 1,
-    padding: spacing.md,
-    marginBottom: spacing.md,
+    padding: grid(2),
+  },
+  pressed: {
+    opacity: 0.6,
   },
   resetText: {
-    fontSize: typography.fontSize.sm,
-    marginTop: spacing.xs,
+    fontSize: 14,
   },
   count: {
-    fontSize: typography.fontSize.xs,
-    marginBottom: spacing.sm,
+    fontSize: 13,
+    lineHeight: 16,
   },
   itemWrap: {
-    marginBottom: spacing.sm,
+    marginBottom: grid(1.5),
   },
   empty: {
     textAlign: 'center',
-    fontSize: typography.fontSize.sm,
-    paddingVertical: spacing.xxl,
+    fontSize: 14,
+    paddingVertical: grid(6),
   },
   footer: {
-    paddingVertical: spacing.lg,
+    paddingVertical: grid(3),
     alignItems: 'center',
   },
   endText: {
-    fontSize: typography.fontSize.xs,
+    fontSize: 12,
   },
 });

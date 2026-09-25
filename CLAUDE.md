@@ -237,6 +237,15 @@ canvas doesn't design (topic grid, breathing list, stats, exercise accents,
 entry, some detail screens). Move them onto `IconTile` and tokens when
 touched, then delete the legacy exports.
 
+**Directory pages** are all in the canvas language now: list pages use
+`components/directory/PageHeader.tsx`; the professional / organization /
+wellness-center pages share `components/directory/ProfileKit.tsx` (from the
+canvas "Professional profile" artboard) with data cleanup in
+`lib/directoryProfile.ts` — the scraped socials include Houna's own footer
+accounts (filtered by `ownSocials`), info labels arrive in the page's
+language (mapped by `profileFacts`), and text can carry HTML entities.
+Events still uses the older `DetailHero` / `InfoRow`.
+
 **Known web-only quirks (native is fine)**: react-native-web resolves
 `start`/`end` offsets as LTR even in Arabic; lucide icons with an RTL flip
 transform draw off-screen on web (use `DirectionalIcon`).

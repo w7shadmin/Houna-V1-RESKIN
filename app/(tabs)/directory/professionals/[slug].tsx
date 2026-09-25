@@ -1,27 +1,33 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, Pressable, Linking, StyleSheet } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { Phone, Mail, Globe, MapPin, Award, Users, ExternalLink } from 'lucide-react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Building2 } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { spacing, radius, typography } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
-import { fetchTherapistDetail, safeUrl, type TherapistDetail } from '@/lib/hounaApi';
+import { grid, layout } from '@/constants/theme';
+import { fetchTherapistDetail, type TherapistDetail } from '@/lib/hounaApi';
+import { organizationIdFromUrl, ownSocials, profileFacts } from '@/lib/directoryProfile';
 import { LoadingState, ErrorState } from '@/components/directory/AsyncState';
-import DetailHero from '@/components/directory/DetailHero';
-import InfoRow from '@/components/directory/InfoRow';
-import ContactBar from '@/components/directory/ContactBar';
+import ScreenGlow from '@/components/ui/ScreenGlow';
+import {
+  BodyText,
+  ContactActions,
+  FactGrid,
+  FollowRow,
+  LinkRow,
+  ProfileHero,
+  ProfileTopBar,
+  SectionCard,
+} from '@/components/directory/ProfileKit';
+import { useContactActions } from '@/components/directory/useContactActions';
 
-const INFO_ICONS: Record<string, typeof MapPin> = {
-  location: MapPin,
-  languages: Globe,
-  organizations: Users,
-};
-
+/** A professional's profile, drawn to the canvas's "Professional profile" artboard. */
 export default function ProfessionalDetailScreen() {
   const { colors } = useTheme();
   const router = useRouter();
   const { slug } = useLocalSearchParams<{ slug: string }>();
-  const { t, language, fonts } = useLanguage();
+  const { t, language } = useLanguage();
   const s = t.directory.professionals;
   const common = t.directory.common;
 
@@ -34,177 +40,99 @@ export default function ProfessionalDetailScreen() {
     setLoading(true);
     setError(null);
     fetchTherapistDetail(slug, language)
-      .then((data) => {
-        if (!cancelled) setDetail(data);
-      })
-      .catch((err) => {
-        if (!cancelled) setError(err instanceof Error ? err.message : s.errorProfile);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
+      .then((data) => !cancelled && setDetail(data))
+      .catch((err) => !cancelled && setError(err instanceof Error ? err.message : s.errorProfile))
+      .finally(() => !cancelled && setLoading(false));
     return () => {
       cancelled = true;
     };
   }, [slug, language, s.errorProfile]);
 
-  if (loading) {
+  const actions = useContactActions(detail?.contacts ?? []);
+  const back = () => (router.canGoBack() ? router.back() : router.replace('/directory/professionals'));
+
+  if (loading || error || !detail) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <LoadingState label={s.loadingProfile} />
-      </View>
-    );
-  }
-
-  if (error || !detail) {
-    return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <ErrorState message={error || common.notFound} retryLabel={common.goBack} onRetry={() => router.back()} />
-      </View>
-    );
-  }
-
-  const primaryContact = detail.contacts.find((c) => c.type === 'phone') || detail.contacts.find((c) => c.type === 'email');
-  const contactHref = safeUrl(primaryContact?.href || detail.contacts[0]?.href || null);
-  const fallbackUrl = language === 'ar' ? 'https://houna.org/ar/contact-us' : 'https://houna.org/contact-us';
-
-  const handleContact = () => {
-    if (contactHref?.includes('email-protection') && primaryContact?.value) {
-      Linking.openURL(`mailto:${primaryContact.value}`);
-      return;
-    }
-    Linking.openURL(contactHref || fallbackUrl);
-  };
-
-  const contactIcon = primaryContact?.type === 'phone' ? Phone : primaryContact?.type === 'email' ? Mail : ExternalLink;
-  const contactLabel =
-    primaryContact?.type === 'phone' ? common.call : primaryContact?.type === 'email' ? common.sendEmail : common.contact;
-
-  const infoEntries = Object.entries(detail.info);
-
-  return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <DetailHero imageUrl={detail.imageUrl} />
-
-        <View style={styles.body}>
-          <Text style={[styles.name, { color: colors.text, fontFamily: fonts.bold }]}>{detail.name}</Text>
-          {!!detail.role && (
-            <Text style={[styles.role, { color: colors.primary, fontFamily: fonts.semiBold }]}>{detail.role}</Text>
-          )}
-          {!!detail.summary && (
-            <Text style={[styles.summary, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-              {detail.summary}
-            </Text>
-          )}
-
-          {infoEntries.length > 0 && (
-            <View style={styles.infoGrid}>
-              {infoEntries.map(([key, value]) => (
-                <InfoRow key={key} icon={INFO_ICONS[key] ?? Award} label={key} value={value} />
-              ))}
-            </View>
-          )}
-
-          {!!detail.fullBio && (
-            <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: colors.text, fontFamily: fonts.bold }]}>{common.profile}</Text>
-              <Text style={[styles.sectionBody, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-                {detail.fullBio}
-              </Text>
-            </View>
-          )}
-
-          {!!detail.specialties && (
-            <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: colors.text, fontFamily: fonts.bold }]}>{s.specialties}</Text>
-              <Text style={[styles.sectionBody, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-                {detail.specialties}
-              </Text>
-            </View>
-          )}
-
-          {detail.socials.length > 0 && (
-            <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: colors.text, fontFamily: fonts.bold }]}>{common.follow}</Text>
-              <View style={styles.socialRow}>
-                {detail.socials.map((social, i) => (
-                  <Pressable
-                    key={i}
-                    onPress={() => {
-                      const url = safeUrl(social.url);
-                      if (url) Linking.openURL(url);
-                    }}
-                    style={({ pressed }) => [
-                      styles.socialBtn,
-                      { backgroundColor: colors.card, borderColor: colors.border },
-                      pressed && { backgroundColor: colors.cardPressed },
-                    ]}
-                  >
-                    <Text style={[styles.socialText, { color: colors.textSecondary, fontFamily: fonts.semiBold }]}>
-                      {social.platform.slice(0, 2).toUpperCase()}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
-            </View>
+      <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
+        <View style={styles.stateWrap}>
+          <ProfileTopBar onBack={back} />
+          {loading ? (
+            <LoadingState label={s.loadingProfile} />
+          ) : (
+            <ErrorState message={error || common.notFound} retryLabel={common.goBack} onRetry={back} />
           )}
         </View>
+      </SafeAreaView>
+    );
+  }
+
+  const orgId = organizationIdFromUrl(detail.organization?.url);
+  // With a linked organization, it gets its own tappable row instead of a fact tile.
+  const facts = profileFacts(detail.info, orgId ? ['organizations'] : []);
+  const socials = ownSocials(detail.socials);
+  const bio = detail.fullBio.trim() || detail.summary.trim();
+
+  return (
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <View style={styles.top}>
+          <ScreenGlow color={colors.glow} rx={60} ry={55} cy={55} />
+          <ProfileTopBar onBack={back} />
+          <ProfileHero name={detail.name} role={detail.role} imageUrl={detail.imageUrl} kind="person" />
+        </View>
+
+        {facts.length > 0 && <FactGrid facts={facts} />}
+
+        {orgId && detail.organization && (
+          <LinkRow
+            label={common.partOf}
+            value={detail.organization.name}
+            icon={Building2}
+            tone="dawn"
+            onPress={() => router.push({ pathname: '/directory/organizations/[id]', params: { id: orgId } })}
+          />
+        )}
+
+        {!!bio && (
+          <SectionCard title={common.about}>
+            <BodyText>{bio}</BodyText>
+          </SectionCard>
+        )}
+
+        {!!detail.specialties?.trim() && (
+          <SectionCard title={s.specialties}>
+            <BodyText>{detail.specialties.trim()}</BodyText>
+          </SectionCard>
+        )}
+
+        <FollowRow socials={socials} />
       </ScrollView>
 
-      <ContactBar icon={contactIcon} label={contactLabel} onPress={handleContact} />
-    </View>
+      <ContactActions primary={actions.primary} secondary={actions.secondary} />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safe: {
     flex: 1,
   },
-  body: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.xl,
+  stateWrap: {
+    flex: 1,
+    width: '100%',
+    maxWidth: layout.maxContentWidth,
+    alignSelf: 'center',
+    padding: grid(2),
   },
-  name: {
-    fontSize: typography.fontSize.xl,
+  scroll: {
+    width: '100%',
+    maxWidth: layout.maxContentWidth,
+    alignSelf: 'center',
+    padding: grid(2),
+    paddingBottom: grid(4),
+    gap: grid(3),
   },
-  role: {
-    fontSize: typography.fontSize.sm,
-    marginTop: 2,
-  },
-  summary: {
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.body,
-    marginTop: spacing.sm,
-  },
-  infoGrid: {
-    marginTop: spacing.md,
-  },
-  section: {
-    marginTop: spacing.lg,
-  },
-  sectionTitle: {
-    fontSize: typography.fontSize.md,
-    marginBottom: spacing.xs,
-  },
-  sectionBody: {
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.body,
-  },
-  socialRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-  },
-  socialBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  socialText: {
-    fontSize: typography.fontSize.xs,
+  top: {
+    gap: grid(2),
   },
 });

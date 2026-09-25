@@ -11,7 +11,7 @@ import { fetchResourceDirectory, type ResourceDirectoryData, type ResourceTopic 
 import { LoadingState, ErrorState } from '@/components/directory/AsyncState';
 import { CrisisRow } from '@/components/directory/SearchResults';
 import LottieTopicIcon from '@/components/directory/LottieTopicIcon';
-import IconButton from '@/components/ui/IconButton';
+import PageHeader from '@/components/directory/PageHeader';
 import { DirectionalIcon } from '@/components/ui/CanvasIcon';
 
 /**
@@ -50,39 +50,9 @@ export default function ResourceDirectoryScreen() {
     load();
   }, [load]);
 
-  // Always a child of the Directory hub (CLAUDE.md, hub-first navigation).
-  const back = () => router.replace('/directory');
   const open = (topic: ResourceTopic) =>
     router.push({ pathname: '/directory/resources/[slug]', params: { slug: topic.slug } });
-
-  const labelLatin = fonts.labelTracked;
-  const header = (
-    <View style={styles.header}>
-      <IconButton
-        variant="control"
-        accessibilityLabel={common.goBack}
-        onPress={back}
-        renderIcon={(c) => <DirectionalIcon isRTL={isRTL} name="back" size={20} strokeWidth={1.8} color={c} />}
-      />
-      <View style={styles.headerText}>
-        <Text
-          style={[
-            labelLatin ? styles.eyebrowLatin : styles.eyebrowArabic,
-            { color: colors.primary, fontFamily: labelLatin ? fonts.labelRegular : fonts.label },
-          ]}
-        >
-          {t.directory.search.eyebrow}
-        </Text>
-        <Text
-          accessibilityRole="header"
-          style={[styles.title, isRTL && styles.titleArabic, { color: colors.text, fontFamily: fonts.display }]}
-        >
-          {t.directory.hub.resourcesTitle}
-        </Text>
-        <Text style={[styles.intro, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{s.intro}</Text>
-      </View>
-    </View>
-  );
+  const header = <PageHeader title={t.directory.hub.resourcesTitle} intro={s.intro} />;
 
   // Pairs, so each row's two cards share a height; `row` mirrors itself in RTL.
   const rows: ResourceTopic[][] = [];
@@ -207,33 +177,6 @@ const styles = StyleSheet.create({
     padding: grid(2),
     paddingBottom: grid(5),
     gap: grid(2),
-  },
-  header: {
-    gap: grid(2),
-    alignItems: 'flex-start',
-  },
-  headerText: {
-    alignSelf: 'stretch',
-    gap: grid(1),
-  },
-  eyebrowLatin: {
-    fontSize: 12,
-    letterSpacing: 12 * 0.16,
-    textTransform: 'uppercase',
-  },
-  eyebrowArabic: {
-    fontSize: 13.5,
-  },
-  title: {
-    fontSize: 32,
-    lineHeight: 40,
-  },
-  titleArabic: {
-    lineHeight: 48,
-  },
-  intro: {
-    fontSize: 15,
-    lineHeight: 24,
   },
   count: {
     fontSize: 13,
