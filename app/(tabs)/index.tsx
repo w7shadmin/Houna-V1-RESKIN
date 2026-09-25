@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { AccessibilityInfo, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { AccessibilityInfo, Animated, Easing, Platform, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { useIsFocused } from '@react-navigation/native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Defs, Ellipse, RadialGradient, Stop } from 'react-native-svg';
@@ -271,38 +272,110 @@ export default function HomeScreen() {
 
 /* ──────────────── Decorative layers (canvas values) ──────────────── */
 
-/** The 28-dot ring around the mark: first half brand accent, second half Dusk, swelling toward the sides. */
+/** Animations run on the UI thread on native (web has no native driver). */
+const NATIVE = Platform.OS !== 'web';
+/** One lap of the dots' drift, and one breath of the glow (in + out). */
+const DRIFT_MS = 8000;
+const GLOW_BREATH_MS = 10000;
+
+/** A sine wave sampled across one loop (0 → 1), offset by `phase` laps — for piecewise interpolation. */
+const WAVE_STEPS = Array.from({ length: 17 }, (_, k) => k / 16);
+const wave = (phase: number) => WAVE_STEPS.map((t) => Math.sin(2 * Math.PI * (t + phase)));
+
+/** Runs only while Home is on screen and Reduce Motion is off; otherwise holds still. */
+function useCalmLoop(make: (v: Animated.Value) => Animated.CompositeAnimation) {
+  const v = useRef(new Animated.Value(0)).current;
+  const focused = useIsFocused();
+  const [reduceMotion, setReduceMotion] = useState(false);
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotion).catch(() => {});
+    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduceMotion);
+    return () => sub.remove();
+  }, []);
+  useEffect(() => {
+    if (!focused || reduceMotion) return;
+    const anim = make(v);
+    anim.start();
+    return () => anim.stop();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focused, reduceMotion, v]);
+  return v;
+}
+
+/**
+ * The 28-dot ring around the mark: first half brand accent, second half
+ * Dusk, swelling toward the sides. Each dot drifts gently up and down and
+ * fades out and back in, a little behind its neighbour, so a slow ripple
+ * travels round the ring; behind the mark, its glow breathes.
+ */
 function MarkHalo({ accent, dusk, glow }: { accent: string; dusk: string; glow: string }) {
   const N = 28;
   const R = 86;
-  const C = 95;
-  const dots = Array.from({ length: N }, (_, i) => {
-    const t = i / N;
-    const a = t * Math.PI * 2 - Math.PI / 2;
-    const s = 2.5 + 4 * Math.sin(t * Math.PI);
-    return {
-      cx: C + R * Math.cos(a),
-      cy: C + R * Math.sin(a),
-      r: s / 2,
-      o: 0.22 + 0.78 * Math.sin(t * Math.PI),
-      c: i < N / 2 ? accent : dusk,
-    };
-  });
+  const drift = useCalmLoop((v) => Animated.loop(Animated.timing(v, { toValue: 1, duration: DRIFT_MS, easing: Easing.linear, useNativeDriver: NATIVE })));
+  const breath = useCalmLoop((v) =>
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(v, { toValue: 1, duration: GLOW_BREATH_MS / 2, easing: Easing.inOut(Easing.sin), useNativeDriver: NATIVE }),
+        Animated.timing(v, { toValue: 0, duration: GLOW_BREATH_MS / 2, easing: Easing.inOut(Easing.sin), useNativeDriver: NATIVE }),
+      ]),
+    ),
+  );
+
+  const dots = useMemo(
+    () =>
+      Array.from({ length: N }, (_, i) => {
+        const t = i / N;
+        const a = t * Math.PI * 2 - Math.PI / 2;
+        const s = 2.5 + 4 * Math.sin(t * Math.PI);
+        const o = 0.22 + 0.78 * Math.sin(t * Math.PI);
+        const x = R * Math.cos(a);
+        const y = R * Math.sin(a);
+        return {
+          s,
+          c: i < N / 2 ? accent : dusk,
+          x,
+          // Drift: 3px either way, one lap behind the next dot round the ring.
+          translateY: drift.interpolate({ inputRange: WAVE_STEPS, outputRange: wave(-t).map((w) => y + 3 * w) }),
+          // Fade: down to a fifth of its light and back, twice round the ring per lap.
+          opacity: drift.interpolate({ inputRange: WAVE_STEPS, outputRange: wave(-2 * t + 0.25).map((w) => o * (0.6 + 0.4 * w)) }),
+        };
+      }),
+    [accent, dusk, drift],
+  );
+
+  const glowScale = breath.interpolate({ inputRange: [0, 1], outputRange: [0.86, 1.14] });
+  const glowOpacity = breath.interpolate({ inputRange: [0, 1], outputRange: [0.65, 1] });
 
   return (
     <View style={styles.halo} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-      <Svg width={190} height={190} style={StyleSheet.absoluteFill}>
-        <Defs>
-          <RadialGradient id="markGlow" cx="50%" cy="50%" r="50%">
-            <Stop offset="0" stopColor={glow} stopOpacity={0.45} />
-            <Stop offset="1" stopColor={glow} stopOpacity={0} />
-          </RadialGradient>
-        </Defs>
-        {dots.map((d, i) => (
-          <Circle key={i} cx={d.cx} cy={d.cy} r={d.r} fill={d.c} opacity={d.o} />
-        ))}
-        <Circle cx={95} cy={95} r={55} fill="url(#markGlow)" />
-      </Svg>
+      {dots.map((d, i) => (
+        <Animated.View
+          key={i}
+          style={[
+            styles.haloDot,
+            {
+              width: d.s,
+              height: d.s,
+              borderRadius: d.s / 2,
+              backgroundColor: d.c,
+              opacity: d.opacity,
+              // Offsets from the centre rather than left/top, so it draws the same in either direction.
+              transform: [{ translateX: d.x }, { translateY: d.translateY }],
+            },
+          ]}
+        />
+      ))}
+      <Animated.View style={[styles.markGlow, { opacity: glowOpacity, transform: [{ scale: glowScale }] }]}>
+        <Svg width={110} height={110}>
+          <Defs>
+            <RadialGradient id="markGlow" cx="50%" cy="50%" r="50%">
+              <Stop offset="0" stopColor={glow} stopOpacity={0.5} />
+              <Stop offset="1" stopColor={glow} stopOpacity={0} />
+            </RadialGradient>
+          </Defs>
+          <Circle cx={55} cy={55} r={55} fill="url(#markGlow)" />
+        </Svg>
+      </Animated.View>
       <HounaMark size={70} />
     </View>
   );
@@ -325,8 +398,12 @@ function TopGlow({ color }: { color: string }) {
   );
 }
 
-/** Night sky: the canvas's seven stars on a 390×380 tile, repeated down the screen. */
-const STAR_TILE: { x: number; y: number; r: number; o: number }[] = [
+/**
+ * Night sky on a 390×380 tile, repeated down the screen: the canvas's seven
+ * stars, plus a scatter of fainter, smaller ones (fixed seed, so the sky is
+ * the same every visit) for depth.
+ */
+const CANVAS_STARS: { x: number; y: number; r: number; o: number }[] = [
   { x: 24, y: 40, r: 1.3, o: 0.55 },
   { x: 150, y: 96, r: 1.3, o: 0.35 },
   { x: 300, y: 30, r: 1.5, o: 0.5 },
@@ -335,6 +412,19 @@ const STAR_TILE: { x: number; y: number; r: number; o: number }[] = [
   { x: 220, y: 300, r: 1.3, o: 0.25 },
   { x: 120, y: 350, r: 1.1, o: 0.4 },
 ];
+
+const FAINT_STARS = (() => {
+  let seed = 7;
+  const rand = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
+  return Array.from({ length: 16 }, () => ({
+    x: Math.round(rand() * 390),
+    y: Math.round(rand() * 380),
+    r: +(0.6 + rand() * 0.6).toFixed(2),
+    o: +(0.12 + rand() * 0.28).toFixed(2),
+  }));
+})();
+
+const STAR_TILE = [...CANVAS_STARS, ...FAINT_STARS];
 
 function Stars() {
   const { colors } = useTheme();
@@ -398,6 +488,14 @@ const styles = StyleSheet.create({
     height: 190,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  haloDot: {
+    position: 'absolute',
+  },
+  markGlow: {
+    position: 'absolute',
+    width: 110,
+    height: 110,
   },
   notAloneRow: {
     flexDirection: 'row',
