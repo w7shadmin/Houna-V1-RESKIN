@@ -138,7 +138,7 @@ export interface ColorTokens {
   tones: { glow: AccentTone; dawn: AccentTone; dusk: AccentTone };
 
   /** "Need to talk now?" crisis pill. */
-  crisis: { bg: string; border: string; icon: string };
+  crisis: { bg: string; border: string; borderSoft: string; icon: string };
 
   tabBarBackground: string;
   tabBarBorder: string;
@@ -167,6 +167,10 @@ export interface ColorTokens {
   scrim: string;
   /** Grabber, inactive slider ticks and track. */
   faint: string;
+
+  /** Stage behind a topic animation (search topic card), and its sky glow. */
+  topicStage: string;
+  topicGlow: string;
 }
 
 const N = nightPalette;
@@ -220,7 +224,7 @@ export const nightColors: ColorTokens = {
     dusk: { fg: N.dusk, bg: TONE_BG.dusk, border: TONE_BORDER.dusk },
   },
 
-  crisis: { bg: alpha(N.dawn, 0.08), border: alpha(N.dawn, 0.4), icon: N.dawn },
+  crisis: { bg: alpha(N.dawn, 0.08), border: alpha(N.dawn, 0.4), borderSoft: alpha(N.dawn, 0.35), icon: N.dawn },
 
   tabBarBackground: N.tabBar,
   tabBarBorder: alpha(N.moonlight, 0.08),
@@ -239,6 +243,9 @@ export const nightColors: ColorTokens = {
   sheet: N.nightfall,
   scrim: '#070B1C',
   faint: alpha(N.moonlight, 0.25),
+
+  topicStage: '#10173A',
+  topicGlow: '#86A9F0',
 };
 
 export const dayColors: ColorTokens = {
@@ -280,7 +287,7 @@ export const dayColors: ColorTokens = {
     dusk: { fg: D.duskDeep, bg: TONE_BG.dusk, border: TONE_BORDER.dusk },
   },
 
-  crisis: { bg: alpha(N.dawn, 0.08), border: alpha(N.dawn, 0.4), icon: D.dawnDeep },
+  crisis: { bg: alpha(N.dawn, 0.08), border: alpha(N.dawn, 0.4), borderSoft: alpha(N.dawn, 0.35), icon: D.dawnDeep },
 
   tabBarBackground: D.paper,
   tabBarBorder: alpha(D.ink, 0.08),
@@ -301,6 +308,9 @@ export const dayColors: ColorTokens = {
   sheet: '#FBF8F2',
   scrim: '#CBC7BD',
   faint: alpha(D.ink, 0.25),
+
+  topicStage: D.paleFill,
+  topicGlow: '#86A9F0',
 };
 
 export const themeColors: Record<ColorScheme, ColorTokens> = {

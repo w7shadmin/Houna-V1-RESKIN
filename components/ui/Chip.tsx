@@ -7,6 +7,8 @@ import { radius, typography } from '@/constants/theme';
 interface ChipProps {
   label: string;
   selected?: boolean;
+  /** `sm` — the 36px filter chips on the search screen. */
+  size?: 'md' | 'sm';
   onPress: () => void;
   style?: StyleProp<ViewStyle>;
 }
@@ -16,7 +18,7 @@ interface ChipProps {
  * are tracked DM Mono caps; Arabic uses IBM Plex Sans Arabic untracked
  * (Arabic has no case and tracking breaks its joins).
  */
-export default function Chip({ label, selected = false, onPress, style }: ChipProps) {
+export default function Chip({ label, selected = false, size = 'md', onPress, style }: ChipProps) {
   const { fonts } = useLanguage();
   const { colors } = useTheme();
 
@@ -27,6 +29,7 @@ export default function Chip({ label, selected = false, onPress, style }: ChipPr
       aria-selected={selected}
       style={({ pressed }) => [
         styles.base,
+        size === 'sm' && styles.baseSm,
         selected
           ? { backgroundColor: colors.action, borderColor: colors.action }
           : { backgroundColor: pressed ? colors.cardPressed : colors.control, borderColor: colors.borderControl },
@@ -41,8 +44,12 @@ export default function Chip({ label, selected = false, onPress, style }: ChipPr
             fontFamily: selected ? fonts.label : fonts.labelRegular,
           },
           fonts.labelTracked
-            ? { letterSpacing: typography.chip.letterSpacing, textTransform: 'uppercase' }
-            : styles.labelArabic,
+            ? size === 'sm'
+              ? styles.labelLatinSm
+              : { letterSpacing: typography.chip.letterSpacing, textTransform: 'uppercase' }
+            : size === 'sm'
+              ? styles.labelArabicSm
+              : styles.labelArabic,
         ]}
       >
         {label}
@@ -65,5 +72,17 @@ const styles = StyleSheet.create({
   },
   labelArabic: {
     fontSize: 14,
+  },
+  baseSm: {
+    height: 36,
+    paddingHorizontal: 14,
+  },
+  labelLatinSm: {
+    fontSize: 11.5,
+    letterSpacing: 11.5 * 0.1,
+    textTransform: 'uppercase',
+  },
+  labelArabicSm: {
+    fontSize: 13,
   },
 });
