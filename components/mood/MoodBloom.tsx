@@ -1,7 +1,8 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, Easing, StyleSheet, View } from 'react-native';
 import Svg, { Circle, Defs, Path, RadialGradient, Stop } from 'react-native-svg';
-import type { MoodTag } from '@/lib/journal';
+import { MOOD_STYLE } from '@/constants/moods';
+import { MOOD_ORDER, type Mood } from '@/lib/journal';
 
 export interface BloomShape {
   /** Leaf rotation in degrees about the leaf base; negative opens the bloom. */
@@ -20,25 +21,28 @@ export interface BloomStyle extends BloomShape {
   ringOpacity: number;
 }
 
-/**
- * The eight mood states from the canvas's "Houna bloom — mood states"
- * sheet (identical in Night and Day), heavy → light — the same order as
- * `MOOD_VALUES` in lib/journal.ts. Angry and joyful extend the original six
- * at each end: angry folds tightest, joyful opens widest.
- */
-export const MOOD_BLOOMS: Record<MoodTag, BloomStyle> = {
-  angry: { color: '#E36F5E', hi: '#FFE1DA', glow: 'rgba(227,111,94,0.42)', fold: 38, headY: 76, ringOpacity: 0.4 },
-  frustrated: { color: '#EA90A8', hi: '#FFE3EB', glow: 'rgba(234,144,168,0.42)', fold: 30, headY: 74, ringOpacity: 0.45 },
-  anxious: { color: '#F0B27A', hi: '#FFEEDC', glow: 'rgba(240,178,122,0.42)', fold: 20, headY: 71, ringOpacity: 0.5 },
-  sad: { color: '#82A4EE', hi: '#E2EBFF', glow: 'rgba(130,164,238,0.42)', fold: 12, headY: 78, ringOpacity: 0.5 },
-  tired: { color: '#AE9FF2', hi: '#EEEAFF', glow: 'rgba(174,159,242,0.42)', fold: 4, headY: 72, ringOpacity: 0.6 },
-  neutral: { color: '#D2CBB9', hi: '#FFFFFF', glow: 'rgba(210,203,185,0.34)', fold: -6, headY: 66, ringOpacity: 0.7 },
-  calm: { color: '#62D2C9', hi: '#E4FBF7', glow: 'rgba(98,210,201,0.48)', fold: -22, headY: 62, ringOpacity: 0.9 },
-  joyful: { color: '#F2C76B', hi: '#FFF3D6', glow: 'rgba(242,199,107,0.46)', fold: -32, headY: 58, ringOpacity: 1 },
+/** How far each mood's bloom opens: leaves fold shut when heavy, open wide when light. */
+const SHAPES: Record<Mood, BloomShape & { ringOpacity: number }> = {
+  angry: { fold: 38, headY: 76, ringOpacity: 0.4 },
+  anxious: { fold: 24, headY: 72, ringOpacity: 0.48 },
+  sad: { fold: 12, headY: 78, ringOpacity: 0.55 },
+  neutral: { fold: -6, headY: 66, ringOpacity: 0.7 },
+  calm: { fold: -18, headY: 63, ringOpacity: 0.85 },
+  hopeful: { fold: -26, headY: 60, ringOpacity: 0.95 },
+  joyful: { fold: -34, headY: 57, ringOpacity: 1 },
 };
 
+/**
+ * The seven mood states, heavy → light (`MOOD_ORDER`): the canvas's
+ * "Houna bloom — mood states" sheet, identical in Night and Day, with
+ * colours from constants/moods.ts.
+ */
+export const MOOD_BLOOMS = Object.fromEntries(
+  MOOD_ORDER.map((m) => [m, { ...SHAPES[m], color: MOOD_STYLE[m].color, hi: MOOD_STYLE[m].hi, glow: MOOD_STYLE[m].glow }]),
+) as Record<Mood, BloomStyle>;
+
 /** Heavy → light, the slider's order. */
-export const BLOOM_ORDER: MoodTag[] = ['angry', 'frustrated', 'anxious', 'sad', 'tired', 'neutral', 'calm', 'joyful'];
+export const BLOOM_ORDER: Mood[] = MOOD_ORDER;
 
 /** The Home top-bar glyph from the canvas: a gently opened bloom. */
 export const HOME_BLOOM: BloomShape = { fold: -14, headY: 64 };
@@ -115,7 +119,7 @@ function mixStyle(a: BloomStyle, b: BloomStyle, t: number): BloomStyle {
 }
 
 interface BreathingBloomProps {
-  mood: MoodTag;
+  mood: Mood;
   /** Halo box; the bloom itself is 80% of it (canvas: 250 halo, 200 bloom). */
   size: number;
 }

@@ -8,12 +8,12 @@ const THUMB = 24;
 const TRACK = 4;
 
 interface MoodSliderProps {
-  /** Index into the six moods, heavy (0) → light (5). */
+  /** Index into the moods, heavy (0) → light (steps − 1). */
   value: number;
   steps: number;
   onChange: (index: number) => void;
   accessibilityLabel: string;
-  /** Read-out for the current step, e.g. "Calm / Happy". */
+  /** Read-out for the current step, e.g. "Hopeful". */
   valueText: string;
   heavierLabel: string;
   lighterLabel: string;

@@ -10,54 +10,64 @@
  */
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
-import { palette } from '@/constants/theme';
+import { MOOD_STYLE } from '@/constants/moods';
 import { generateId, getLocalDb } from './localDb';
 
-export type MoodTag = 'joyful' | 'calm' | 'neutral' | 'sad' | 'anxious' | 'frustrated' | 'angry' | 'tired';
+/** The seven moods on the check-in slider, heavy → light (see constants/moods.ts). */
+export type Mood = 'angry' | 'anxious' | 'sad' | 'neutral' | 'calm' | 'hopeful' | 'joyful';
+/** Moods older entries can carry but the slider no longer offers. */
+export type LegacyMood = 'frustrated' | 'tired';
+/** Anything a stored entry can hold. */
+export type MoodTag = Mood | LegacyMood;
 
-export const MOOD_TAGS: MoodTag[] = ['joyful', 'calm', 'neutral', 'tired', 'sad', 'anxious', 'frustrated', 'angry'];
+/** Heavy → light: the slider's order. */
+export const MOOD_ORDER: Mood[] = ['angry', 'anxious', 'sad', 'neutral', 'calm', 'hopeful', 'joyful'];
+
+/** Light → heavy: pickers and legends. */
+export const MOOD_TAGS: Mood[] = [...MOOD_ORDER].reverse();
+
+/**
+ * A retired mood's place on today's scale — frustrated sits with angry and
+ * tired with sad (the Mood Meter puts fatigue in the same low-energy,
+ * unpleasant quadrant as sadness).
+ */
+export function currentMood(tag: MoodTag): Mood {
+  if (tag === 'frustrated') return 'angry';
+  if (tag === 'tired') return 'sad';
+  return tag;
+}
 
 export const MOOD_EMOJI: Record<MoodTag, string> = {
-  joyful: '😄',
-  calm: '😊',
-  neutral: '😐',
-  sad: '😔',
-  anxious: '😰',
-  frustrated: '😣',
   angry: '😡',
+  anxious: '😰',
+  sad: '😔',
+  neutral: '😐',
+  calm: '😌',
+  hopeful: '🙂',
+  joyful: '😄',
+  frustrated: '😣',
   tired: '😴',
 };
 
-/**
- * Brand-compliant mood colors. The old MVP's MOOD_COLORS (#59FFFF, #808080,
- * #FF9980, #F2E94E, #1A7452, #FF59A6) aren't in houna-colour-palette.md —
- * re-derived here from the real palette instead. Yellow/raspberry/lightCyan
- * only ever appear as small dots or legend swatches, never large surfaces.
- */
-export const MOOD_COLORS: Record<MoodTag, string> = {
-  joyful: palette.peach,
-  calm: palette.turquoise,
-  neutral: palette.lightCyan,
-  tired: palette.grey50,
-  sad: palette.turquoiseDark,
-  anxious: palette.yellow,
-  frustrated: palette.raspberry,
-  angry: '#E36F5E',
-};
+/** Journal colours come from the same table as the slider and recap. */
+export const MOOD_COLORS = Object.fromEntries(
+  Object.entries(MOOD_STYLE).map(([tag, style]) => [tag, style.color]),
+) as Record<MoodTag, string>;
 
-/** Higher = lighter mood, 1–8 (heavy → light). */
+/** Higher = lighter, 1–7 (heavy → light); retired moods sit between their neighbours. */
 export const MOOD_VALUES: Record<MoodTag, number> = {
-  joyful: 8,
-  calm: 7,
-  neutral: 6,
-  tired: 5,
-  sad: 4,
-  anxious: 3,
-  frustrated: 2,
   angry: 1,
+  anxious: 2,
+  sad: 3,
+  neutral: 4,
+  calm: 5,
+  hopeful: 6,
+  joyful: 7,
+  frustrated: 1.5,
+  tired: 3.5,
 };
 
-export const MOOD_VALUE_MAX = 8;
+export const MOOD_VALUE_MAX = 7;
 
 export interface JournalEntry {
   id: string;

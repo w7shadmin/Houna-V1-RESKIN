@@ -18,8 +18,11 @@ Facts this brief relies on (verified in code before writing it):
   doesn't use the shared `PhaseBreathingSession` shell.
 - The journal (`lib/journal.ts`, expo-sqlite, on-device, Guests and Aliases
   alike) stores `id, date, created_at, updated_at, text, mood`. Moods are
-  eight tags; `MOOD_VALUES` orders them heavy→light: angry 1, frustrated 2,
-  anxious 3, sad 4, tired 5, neutral 6, calm 7, joyful 8.
+  seven on the check-in, heavy→light (`MOOD_VALUES`): angry 1, anxious 2,
+  sad 3, neutral 4, calm 5, hopeful 6, joyful 7 — Apple Health's 7-point
+  pleasantness shape, coloured by the Yale Mood Meter quadrants
+  (constants/moods.ts). Retired `frustrated` (1.5) and `tired` (3.5) stay
+  readable in older entries.
 - `mood_pings` (`lib/moodPings.ts`) stores `mood_tag, ping_date` with no
   user id — the pattern to copy for anonymous counting.
 - `lib/countries.ts` has 197 countries with lat/lon; `profiles.country`
@@ -78,8 +81,8 @@ Canvas: "Mood check-in — Houna bloom" and "Houna bloom — mood states".
 - The figure is the Houna mark: ring, two leaves, head. Heavier moods fold
   and droop the leaves and cool the colour; lighter moods open them like a
   bloom. It breathes on a slow ~6s scale/glow loop.
-- A slider snaps across the **eight moods in `MOOD_VALUES` order** (angry
-  and joyful were added after the first device test).
+- A slider snaps across the **seven moods in `MOOD_ORDER`**: 3 unpleasant,
+  neutral, 3 pleasant (reworked after device testing; hopeful is new).
   No data-model change: the journal, mood history and "you're not alone"
   count keep working as-is. Save calls the existing `logMoodForToday`.
 - Build one `MoodBloom` component (react-native-svg + Reanimated) used by
@@ -91,13 +94,12 @@ Canvas: "Mood check-in — Houna bloom" and "Houna bloom — mood states".
   | Mood | Colour | Leaf fold | Head y |
   |---|---|---|---|
   | angry | #E36F5E | 38 | 76 |
-  | frustrated | #EA90A8 | 30 | 74 |
-  | anxious | #F0B27A | 20 | 71 |
+  | anxious | #F0B27A | 24 | 72 |
   | sad | #82A4EE | 12 | 78 |
-  | tired | #AE9FF2 | 4 | 72 |
   | neutral | #D2CBB9 | -6 | 66 |
-  | calm | #62D2C9 | -22 | 62 |
-  | joyful | #F2C76B | -32 | 58 |
+  | calm | #62D2C9 | -18 | 63 |
+  | hopeful | #9BD67E | -26 | 60 |
+  | joyful | #F2C76B | -34 | 57 |
 
 - Copy must stay accurate: "Saved privately in your journal on this
   phone" is fine; never claim it "never leaves the device" (OS backups).

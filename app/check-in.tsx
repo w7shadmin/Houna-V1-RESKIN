@@ -12,7 +12,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { layout } from '@/constants/theme';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
-import { getTodayEntry, logMoodForToday, localDateString, type MoodTag } from '@/lib/journal';
+import { currentMood, getTodayEntry, logMoodForToday, localDateString, type MoodTag } from '@/lib/journal';
 import { pingMoodAndGetCount } from '@/lib/moodPings';
 import { supabase } from '@/lib/supabase';
 import { BLOOM_ORDER, BreathingBloom } from '@/components/mood/MoodBloom';
@@ -28,9 +28,9 @@ const DEFAULT_INDEX = BLOOM_ORDER.indexOf('neutral');
 
 /**
  * Houna bloom mood check-in (FEATURES_BRIEF §2), opened from Home's
- * top-left button. The slider snaps across the six existing moods and Save
- * calls the existing `logMoodForToday`, so the journal and mood history
- * keep working unchanged. No streaks, counts of your own, or pressure — the
+ * top-left button. The slider snaps across the seven moods (`MOOD_ORDER`,
+ * heavy → light) and Save calls `logMoodForToday`; older entries with a
+ * retired mood keep it, and open here at its place on today's scale. No streaks, counts of your own, or pressure — the
  * only number shown is how many others felt the same today.
  */
 export default function CheckInScreen() {
@@ -57,7 +57,8 @@ export default function CheckInScreen() {
       .then((entry) => {
         if (!entry) return;
         setSavedMood(entry.mood);
-        setIndex(BLOOM_ORDER.indexOf(entry.mood));
+        // An older entry may hold a retired mood; start from its place on today's scale.
+        setIndex(BLOOM_ORDER.indexOf(currentMood(entry.mood)));
       })
       .catch(() => {});
   }, []);
