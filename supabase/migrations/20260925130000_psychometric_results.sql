@@ -1,5 +1,5 @@
--- Self-reflection results saved to a profile (FEATURES_BRIEF §5). NOT YET
--- APPLIED to the remote project — review, then apply deliberately.
+-- Self-reflection results saved to a profile (FEATURES_BRIEF §5).
+-- Applied to the remote project 2026-09-25.
 --
 -- Opt-in copy of an on-device result. Sensitive, health-adjacent data: the
 -- owner can insert, read and delete their own rows; nobody else can read

@@ -1,5 +1,5 @@
--- Home community card (FEATURES_BRIEF §1). NOT YET APPLIED to the remote
--- project — review, then apply deliberately.
+-- Home community card (FEATURES_BRIEF §1).
+-- Applied to the remote project 2026-09-25.
 --
 -- activity_pings: one anonymous row per breathing/meditation session start,
 -- for Guests and Aliases alike, so the counter isn't Alias-only. Same shape

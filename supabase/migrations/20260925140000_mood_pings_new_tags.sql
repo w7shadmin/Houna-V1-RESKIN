@@ -1,3 +1,4 @@
+-- Applied to the remote project 2026-09-25.
 -- The check-in's moods changed after device testing: seven moods on one
 -- pleasantness scale (angry, anxious, sad, neutral, calm, hopeful, joyful).
 -- 'angry', 'hopeful' and 'joyful' are new to mood_pings; 'frustrated' and
