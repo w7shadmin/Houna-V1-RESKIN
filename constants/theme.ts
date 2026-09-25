@@ -153,6 +153,9 @@ export interface ColorTokens {
 
   /** "Need to talk now?" crisis pill. */
   crisis: { bg: string; border: string; borderSoft: string; icon: string };
+  /** Destructive confirmations (delete, discard): fill and its text. */
+  danger: string;
+  onDanger: string;
 
   tabBarBackground: string;
   tabBarBorder: string;
@@ -243,6 +246,8 @@ export const nightColors: ColorTokens = {
   },
 
   crisis: { bg: alpha(N.dawn, 0.08), border: alpha(N.dawn, 0.4), borderSoft: alpha(N.dawn, 0.35), icon: N.dawn },
+  danger: '#E8806F',
+  onDanger: N.midnight,
 
   tabBarBackground: N.tabBar,
   tabBarBorder: alpha(N.moonlight, 0.08),
@@ -308,6 +313,8 @@ export const dayColors: ColorTokens = {
   },
 
   crisis: { bg: alpha(N.dawn, 0.08), border: alpha(N.dawn, 0.4), borderSoft: alpha(N.dawn, 0.35), icon: D.dawnDeep },
+  danger: '#C2503F',
+  onDanger: '#FFFFFF',
 
   tabBarBackground: D.paper,
   tabBarBorder: alpha(D.ink, 0.08),

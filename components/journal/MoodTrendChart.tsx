@@ -26,7 +26,7 @@ const PAD_BOTTOM = 28;
 const INNER_W = CHART_W - PAD_X * 2;
 const INNER_H = CHART_H - PAD_TOP - PAD_BOTTOM;
 
-/** Ported from the old MVP's MoodHistoryScreen chart — same layout math, smoothing and axis logic, redrawn with react-native-svg. */
+/** Mood over 7 or 30 days: a quiet trend line with each day's dot in its mood's colour (constants/moods.ts). Layout math from the old MVP's chart. */
 export default function MoodTrendChart({
   moodEntries,
   range,
@@ -99,7 +99,7 @@ export default function MoodTrendChart({
         })}
 
         {!!smoothPath && (
-          <Path d={smoothPath} fill="none" stroke={colors.primary} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" opacity={0.7} />
+          <Path d={smoothPath} fill="none" stroke={colors.textTertiary} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" opacity={0.6} />
         )}
 
         {points.map((p, i) => {
@@ -113,7 +113,7 @@ export default function MoodTrendChart({
                 cy={p.y}
                 r={selected ? 7 : 5}
                 fill={MOOD_COLORS[p.mood]}
-                stroke="#ffffff"
+                stroke={colors.background}
                 strokeWidth={1.5}
                 onPress={() => onSelectDate(p.dateStr)}
               />

@@ -17,10 +17,10 @@ import type { MoodTag } from '@/lib/journal';
 export const journalStrings = {
   en: {
     list: {
-      badge: 'Personal Journal',
-      title: 'Your Journal',
+      badge: 'Private journal',
+      title: 'Your journal',
       subtitle: 'A private space for your thoughts. Only you can see what you write here.',
-      newEntry: 'New Entry',
+      newEntry: 'New entry',
       emptyTitle: 'Your journal is empty',
       emptyBody: "Write your first entry whenever you're ready. There's no pressure — this is your space.",
       tabEntries: 'Entries',
@@ -30,12 +30,12 @@ export const journalStrings = {
       exportError: 'Could not export — please try again',
     },
     entry: {
-      newEntry: 'New Entry',
-      editEntry: 'Edit Entry',
-      yourEntry: 'Your Entry',
-      save: 'Save Entry',
-      edit: 'Edit Entry',
-      share: 'Share Entry',
+      newEntry: 'New entry',
+      editEntry: 'Edit entry',
+      yourEntry: 'Your entry',
+      save: 'Save entry',
+      edit: 'Edit',
+      share: 'Share',
       skipPrompt: 'Skip prompt',
       writeFreely: 'Write freely instead',
       howFeeling: 'How are you feeling?',
@@ -60,11 +60,11 @@ export const journalStrings = {
       ],
     },
     insights: {
-      badge: 'Mood Insights',
-      title: 'Your Mood Trend',
+      badge: 'Mood insights',
+      title: 'Your mood trend',
       subtitle: 'See how your mood has shifted over time.',
-      sevenDays: '7 Days',
-      thirtyDays: '30 Days',
+      sevenDays: '7 days',
+      thirtyDays: '30 days',
       placeholder: (remaining: number) =>
         `Log ${remaining} more ${remaining === 1 ? 'mood' : 'moods'} to see your trend — ${remaining} to go!`,
       tapHint: 'Tap any point to see that day’s mood and journal entry.',

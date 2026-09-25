@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, Text, Pressable, Modal, StyleSheet } from 'react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { palette, spacing, radius, typography } from '@/constants/theme';
+import { grid } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
-import { mix } from '@/lib/color';
+import Button from '@/components/ui/Button';
 
 interface ConfirmDialogProps {
   visible: boolean;
@@ -16,6 +16,7 @@ interface ConfirmDialogProps {
   onConfirm: () => void;
 }
 
+/** A small confirm sheet in the app's style; `destructive` fills the confirm in the theme's danger colour. */
 export default function ConfirmDialog({
   visible,
   title,
@@ -27,42 +28,36 @@ export default function ConfirmDialog({
   onConfirm,
 }: ConfirmDialogProps) {
   const { colors } = useTheme();
-  const { fonts } = useLanguage();
+  const { fonts, isRTL } = useLanguage();
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel}>
-      <Pressable style={styles.backdrop} onPress={onCancel}>
-        <Pressable style={[styles.card, { backgroundColor: colors.card }]} onPress={(e) => e.stopPropagation()}>
-          <Text style={[styles.title, { color: colors.text, fontFamily: fonts.bold }]}>{title}</Text>
+      <Pressable style={[styles.backdrop, { backgroundColor: colors.scrim }]} onPress={onCancel} accessibilityLabel={cancelLabel}>
+        <Pressable
+          style={[styles.card, { backgroundColor: colors.sheet, borderColor: colors.border }]}
+          onPress={(e) => e.stopPropagation()}
+          accessibilityRole="alert"
+        >
+          <Text style={[styles.title, isRTL && styles.titleArabic, { color: colors.text, fontFamily: fonts.display }]}>{title}</Text>
           <Text style={[styles.body, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{body}</Text>
           <View style={styles.actions}>
-            <Pressable
-              onPress={onCancel}
-              style={({ pressed }) => [
-                styles.btn,
-                { borderColor: colors.border, backgroundColor: colors.card },
-                pressed && { backgroundColor: colors.cardPressed },
-              ]}
-            >
-              <Text style={[styles.btnText, { color: colors.textSecondary, fontFamily: fonts.semiBold }]}>
-                {cancelLabel}
-              </Text>
-            </Pressable>
-            <Pressable
-              onPress={onConfirm}
-              style={({ pressed }) => [
-                styles.btn,
-                styles.btnFilled,
-                { backgroundColor: destructive ? palette.raspberry : colors.primary },
-                pressed && {
-                  backgroundColor: mix(destructive ? palette.raspberry : colors.primary, palette.black, 0.15),
-                },
-              ]}
-            >
-              <Text style={[styles.btnText, { color: colors.onPrimary, fontFamily: fonts.semiBold }]}>
-                {confirmLabel}
-              </Text>
-            </Pressable>
+            {/* Equal slots, so the two buttons split the row evenly. */}
+            <View style={styles.slot}>
+              <Button variant="secondary" label={cancelLabel} onPress={onCancel} block />
+            </View>
+            <View style={styles.slot}>
+              {destructive ? (
+                <Pressable
+                  onPress={onConfirm}
+                  accessibilityRole="button"
+                  style={({ pressed }) => [styles.danger, { backgroundColor: colors.danger }, pressed && styles.pressed]}
+                >
+                  <Text style={[styles.dangerText, { color: colors.onDanger, fontFamily: fonts.semiBold }]}>{confirmLabel}</Text>
+                </Pressable>
+              ) : (
+                <Button label={confirmLabel} onPress={onConfirm} block />
+              )}
+            </View>
           </View>
         </Pressable>
       </Pressable>
@@ -73,47 +68,51 @@ export default function ConfirmDialog({
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: spacing.xl,
+    paddingHorizontal: grid(3),
   },
   card: {
     width: '100%',
-    maxWidth: 320,
-    borderRadius: radius.xl,
-    padding: spacing.lg,
-    alignItems: 'center',
+    maxWidth: 360,
+    gap: grid(1.5),
+    borderRadius: 24,
+    borderWidth: 1,
+    padding: grid(3),
   },
   title: {
-    fontSize: typography.fontSize.lg,
+    fontSize: 24,
+    lineHeight: 30,
     textAlign: 'center',
   },
+  titleArabic: {
+    lineHeight: 40,
+  },
   body: {
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.body,
+    fontSize: 15,
+    lineHeight: 22,
     textAlign: 'center',
-    marginTop: spacing.sm,
   },
   actions: {
     flexDirection: 'row',
-    gap: spacing.sm + 4,
-    marginTop: spacing.lg,
-    width: '100%',
+    gap: grid(1.5),
+    marginTop: grid(1),
   },
-  btn: {
+  slot: {
     flex: 1,
-    height: 42,
-    borderWidth: 1,
-    borderRadius: radius.full,
+    minWidth: 0,
+  },
+  danger: {
+    height: 52,
+    borderRadius: 999,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: grid(2),
   },
-  btnFilled: {
-    borderColor: 'transparent',
+  dangerText: {
+    fontSize: 16,
   },
-  btnText: {
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.sm,
+  pressed: {
+    opacity: 0.85,
   },
 });

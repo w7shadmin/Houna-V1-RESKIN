@@ -3,26 +3,31 @@ import { View, Text, Pressable, ScrollView, ActivityIndicator, Alert, StyleSheet
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Plus, BookOpen, TrendingUp, Calendar, Download, ChevronLeft } from 'lucide-react-native';
+import { Download } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { spacing, radius, typography, shadows } from '@/constants/theme';
+import { grid, layout, radius } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
+import { MOOD_STYLE } from '@/constants/moods';
 import { arabicNumber } from '@/lib/arabicNumerals';
-import {
-  loadEntries,
-  exportAndShareJournal,
-  formatEntryDateShort,
-  MOOD_TAGS,
-  MOOD_EMOJI,
-  MOOD_COLORS,
-  type JournalEntry,
-} from '@/lib/journal';
+import { loadEntries, exportAndShareJournal, formatEntryDateShort, MOOD_TAGS, type JournalEntry } from '@/lib/journal';
 import EntryCard from '@/components/journal/EntryCard';
 import MoodTrendChart from '@/components/journal/MoodTrendChart';
+import MoodGlyph from '@/components/mood/MoodGlyph';
+import MoodBloom, { HOME_BLOOM } from '@/components/mood/MoodBloom';
+import Button from '@/components/ui/Button';
+import Chip from '@/components/ui/Chip';
+import IconButton from '@/components/ui/IconButton';
+import { DirectionalIcon } from '@/components/ui/CanvasIcon';
+import { GroupLabel } from '@/components/directory/ProfileKit';
 
 type JournalTab = 'entries' | 'insights';
 type RangeKey = 7 | 30;
 
+/**
+ * The private journal (Tanafas): entries grouped by month, and Insights —
+ * the mood trend with each day in its mood's colour. On-device only; the
+ * export button shares a copy (a lost phone shouldn't mean a lost journal).
+ */
 export default function JournalHomeScreen() {
   const { colors } = useTheme();
   const router = useRouter();
@@ -30,6 +35,7 @@ export default function JournalHomeScreen() {
   const { t, isRTL, fonts } = useLanguage();
   const list = t.journal.list;
   const insights = t.journal.insights;
+  const names = t.journal.dateNames;
 
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,34 +48,42 @@ export default function JournalHomeScreen() {
     useCallback(() => {
       let cancelled = false;
       loadEntries()
-        .then((data) => {
-          if (!cancelled) setEntries(data);
-        })
-        .finally(() => {
-          if (!cancelled) setLoading(false);
-        });
+        .then((data) => !cancelled && setEntries(data))
+        .finally(() => !cancelled && setLoading(false));
       return () => {
         cancelled = true;
       };
     }, []),
   );
 
-  const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
+  const num = useCallback((n: number) => (isRTL ? arabicNumber(n) : String(n)), [isRTL]);
   const moodEntries = useMemo(() => entries.filter((e) => e.mood), [entries]);
   const hasEnoughData = moodEntries.length >= 3;
 
   const dayLabelFor = useCallback(
-    (d: Date) => {
-      const short = formatEntryDateShort(formatDateKey(d), t.journal.dateNames, num);
-      return short.split(',')[0];
-    },
-    [t.journal.dateNames, isRTL],
+    (d: Date) => formatEntryDateShort(formatDateKey(d), names, num).split(',')[0],
+    [names, num],
   );
+
+  // Newest first, grouped under "September 2026"-style labels.
+  const months = useMemo(() => {
+    const groups: { key: string; label: string; items: JournalEntry[] }[] = [];
+    for (const entry of entries) {
+      const key = entry.date.slice(0, 7);
+      let group = groups[groups.length - 1];
+      if (!group || group.key !== key) {
+        const [y, m] = key.split('-').map(Number);
+        group = { key, label: `${names.monthsLong[m - 1]} ${num(y)}`, items: [] };
+        groups.push(group);
+      }
+      group.items.push(entry);
+    }
+    return groups;
+  }, [entries, names, num]);
 
   const selectedDay = useMemo(() => {
     if (!selectedDateStr) return null;
-    const entry = moodEntries.find((e) => e.date === selectedDateStr) ?? null;
-    return { dateStr: selectedDateStr, entry };
+    return { dateStr: selectedDateStr, entry: moodEntries.find((e) => e.date === selectedDateStr) ?? null };
   }, [selectedDateStr, moodEntries]);
 
   const handleExport = async () => {
@@ -83,178 +97,102 @@ export default function JournalHomeScreen() {
     }
   };
 
+  const openEntry = (id: string) => router.push({ pathname: '/tanafas/journal/entry/[id]', params: { id } });
+  const labelLatin = fonts.labelTracked;
+
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
-      <View style={styles.headerRow}>
-        <Pressable
-          onPress={() => router.back()}
-          hitSlop={12}
-          style={({ pressed }) => [
-            styles.iconBtn,
-            { backgroundColor: colors.card, borderColor: colors.border },
-            pressed && { backgroundColor: colors.cardPressed },
-          ]}
-        >
-          <View style={isRTL ? styles.flip : undefined}>
-<ArrowLeft size={18} color={colors.text} />
-</View>
-        </Pressable>
-        <View style={{ flex: 1 }} />
-        <Pressable
-          onPress={handleExport}
-          disabled={exporting || entries.length === 0}
-          hitSlop={12}
-          style={({ pressed }) => [
-            styles.iconBtn,
-            { backgroundColor: colors.card, borderColor: colors.border },
-            entries.length === 0 && styles.iconBtnDisabled,
-            pressed && { backgroundColor: colors.cardPressed },
-          ]}
-          accessibilityLabel={list.exportAction}
-        >
-          {exporting ? <ActivityIndicator size="small" color={colors.primary} /> : <Download size={18} color={colors.text} />}
-        </Pressable>
-      </View>
-
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <View style={[styles.badge, { backgroundColor: colors.primaryLightest }]}>
-          {tab === 'entries' ? (
-            <BookOpen size={13} color={colors.primary} />
-          ) : (
-            <TrendingUp size={13} color={colors.primary} />
-          )}
-          <Text style={[styles.badgeText, { color: colors.primary, fontFamily: fonts.semiBold }]}>
+        <View style={styles.topBar}>
+          <IconButton
+            variant="control"
+            accessibilityLabel={t.directory.common.goBack}
+            onPress={() => router.back()}
+            renderIcon={(c) => <DirectionalIcon isRTL={isRTL} name="back" size={20} strokeWidth={1.8} color={c} />}
+          />
+          <IconButton
+            variant="control"
+            accessibilityLabel={list.exportAction}
+            onPress={handleExport}
+            disabled={exporting || entries.length === 0}
+            renderIcon={(c) => (exporting ? <ActivityIndicator size="small" color={c} /> : <Download size={20} color={c} strokeWidth={1.7} />)}
+          />
+        </View>
+
+        <View style={styles.header}>
+          <Text
+            style={[
+              labelLatin ? styles.eyebrowLatin : styles.eyebrowArabic,
+              { color: colors.primary, fontFamily: labelLatin ? fonts.labelRegular : fonts.label },
+            ]}
+          >
             {tab === 'entries' ? list.badge : insights.badge}
           </Text>
+          <Text accessibilityRole="header" style={[styles.title, isRTL && styles.titleArabic, { color: colors.text, fontFamily: fonts.display }]}>
+            {tab === 'entries' ? list.title : insights.title}
+          </Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
+            {tab === 'entries' ? list.subtitle : insights.subtitle}
+          </Text>
         </View>
-        <Text style={[styles.title, { color: colors.text, fontFamily: fonts.bold }]}>
-          {tab === 'entries' ? list.title : insights.title}
-        </Text>
-        <Text style={[styles.subtitle, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-          {tab === 'entries' ? list.subtitle : insights.subtitle}
-        </Text>
 
-        <View style={[styles.tabRow, { borderColor: colors.border, backgroundColor: colors.card }]}>
-          <Pressable
-            onPress={() => setTab('entries')}
-            style={({ pressed }) => [
-              styles.tabBtn,
-              tab === 'entries' && { backgroundColor: colors.primary },
-              pressed && (tab === 'entries' ? { opacity: 0.85 } : { backgroundColor: colors.cardPressed }),
-            ]}
-          >
-            <BookOpen size={15} color={tab === 'entries' ? colors.onPrimary : colors.textSecondary} />
-            <Text
-              style={[
-                styles.tabText,
-                { color: tab === 'entries' ? colors.onPrimary : colors.textSecondary, fontFamily: fonts.semiBold },
-              ]}
-            >
-              {list.tabEntries}
-            </Text>
-          </Pressable>
-          <Pressable
-            onPress={() => setTab('insights')}
-            style={({ pressed }) => [
-              styles.tabBtn,
-              tab === 'insights' && { backgroundColor: colors.primary },
-              pressed && (tab === 'insights' ? { opacity: 0.85 } : { backgroundColor: colors.cardPressed }),
-            ]}
-          >
-            <TrendingUp size={15} color={tab === 'insights' ? colors.onPrimary : colors.textSecondary} />
-            <Text
-              style={[
-                styles.tabText,
-                { color: tab === 'insights' ? colors.onPrimary : colors.textSecondary, fontFamily: fonts.semiBold },
-              ]}
-            >
-              {list.tabInsights}
-            </Text>
-          </Pressable>
+        <View style={styles.chips} accessibilityRole="tablist">
+          <Chip size="sm" label={list.tabEntries} selected={tab === 'entries'} onPress={() => setTab('entries')} />
+          <Chip size="sm" label={list.tabInsights} selected={tab === 'insights'} onPress={() => setTab('insights')} />
         </View>
 
         {tab === 'entries' ? (
           <>
-            <Pressable
-              onPress={() => router.push({ pathname: '/tanafas/journal/entry/[id]', params: { id: 'new' } })}
-              style={({ pressed }) => [
-                styles.newBtn,
-                { backgroundColor: colors.primary },
-                pressed && { opacity: 0.85 },
-              ]}
-            >
-              <Plus size={20} color={colors.onPrimary} />
-              <Text style={[styles.newBtnText, { color: colors.onPrimary, fontFamily: fonts.bold }]}>
-                {list.newEntry}
-              </Text>
-            </Pressable>
+            <Button label={list.newEntry} onPress={() => openEntry('new')} block />
 
             {loading ? (
               <ActivityIndicator style={styles.loading} color={colors.primary} />
             ) : entries.length === 0 ? (
-              <View style={styles.empty}>
-                <View style={[styles.emptyIcon, { backgroundColor: colors.primaryLightest }]}>
-                  <BookOpen size={36} color={colors.primary} strokeWidth={1.5} />
-                </View>
-                <Text style={[styles.emptyTitle, { color: colors.text, fontFamily: fonts.bold }]}>
+              <View style={[styles.card, styles.empty, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                <MoodBloom size={grid(9)} color={colors.primary} shape={HOME_BLOOM} ringOpacity={0.5} />
+                <Text style={[styles.emptyTitle, isRTL && styles.emptyTitleArabic, { color: colors.text, fontFamily: fonts.display }]}>
                   {list.emptyTitle}
                 </Text>
-                <Text style={[styles.emptyBody, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-                  {list.emptyBody}
-                </Text>
+                <Text style={[styles.emptyBody, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{list.emptyBody}</Text>
               </View>
             ) : (
-              <View style={styles.entries}>
-                {entries.map((entry) => (
-                  <EntryCard
-                    key={entry.id}
-                    entry={entry}
-                    onPress={() => router.push({ pathname: '/tanafas/journal/entry/[id]', params: { id: entry.id } })}
-                  />
-                ))}
-              </View>
+              months.map((month) => (
+                <View key={month.key} style={styles.group}>
+                  <GroupLabel>{month.label}</GroupLabel>
+                  {month.items.map((entry) => (
+                    <EntryCard key={entry.id} entry={entry} onPress={() => openEntry(entry.id)} />
+                  ))}
+                </View>
+              ))
             )}
           </>
         ) : (
           <>
-            <View style={[styles.rangeRow, { borderColor: colors.border, backgroundColor: colors.card }]}>
+            <View style={styles.chips}>
               {([7, 30] as RangeKey[]).map((r) => (
-                <Pressable
+                <Chip
                   key={r}
+                  size="sm"
+                  label={r === 7 ? insights.sevenDays : insights.thirtyDays}
+                  selected={range === r}
                   onPress={() => {
                     setRange(r);
                     setSelectedDateStr(null);
                   }}
-                  style={({ pressed }) => [
-                    styles.rangeBtn,
-                    range === r && { backgroundColor: colors.primary },
-                    pressed && (range === r ? { opacity: 0.85 } : { backgroundColor: colors.cardPressed }),
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.rangeText,
-                      { color: range === r ? colors.onPrimary : colors.textSecondary, fontFamily: fonts.semiBold },
-                    ]}
-                  >
-                    {r === 7 ? insights.sevenDays : insights.thirtyDays}
-                  </Text>
-                </Pressable>
+                />
               ))}
             </View>
 
             {!hasEnoughData ? (
-              <View style={[styles.placeholderCard, { borderColor: colors.border, backgroundColor: colors.card }]}>
-                <View style={[styles.emptyIcon, { backgroundColor: colors.primaryLightest }]}>
-                  <Calendar size={32} color={colors.primary} strokeWidth={1.5} />
-                </View>
-                <Text style={[styles.placeholderText, { color: colors.textSecondary, fontFamily: fonts.medium }]}>
+              <View style={[styles.card, styles.empty, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                <MoodGlyph mood="neutral" size={grid(7)} />
+                <Text style={[styles.emptyBody, { color: colors.textSecondary, fontFamily: fonts.medium }]}>
                   {insights.placeholder(Math.max(0, 3 - moodEntries.length))}
                 </Text>
               </View>
             ) : (
               <>
-                <View style={[styles.chartCard, { borderColor: colors.border, backgroundColor: colors.card }]}>
+                <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
                   <MoodTrendChart
                     moodEntries={moodEntries}
                     range={range}
@@ -267,67 +205,45 @@ export default function JournalHomeScreen() {
                 <View style={styles.legend}>
                   {MOOD_TAGS.map((tag) => (
                     <View key={tag} style={styles.legendItem}>
-                      <View style={[styles.legendDot, { backgroundColor: MOOD_COLORS[tag] }]} />
+                      <MoodGlyph mood={tag} size={grid(2)} />
                       <Text style={[styles.legendText, { color: colors.textSecondary, fontFamily: fonts.medium }]}>
-                        {MOOD_EMOJI[tag]} {t.journal.moodLabelsFull[tag]}
+                        {t.journal.moodLabelsFull[tag]}
                       </Text>
                     </View>
                   ))}
                 </View>
 
-                <Text style={[styles.tapHint, { color: colors.textTertiary, fontFamily: fonts.regular }]}>
-                  {insights.tapHint}
-                </Text>
+                <Text style={[styles.hint, { color: colors.textTertiary, fontFamily: fonts.regular }]}>{insights.tapHint}</Text>
 
                 {selectedDay && (
-                  <View style={[styles.dayCard, { borderColor: colors.border, backgroundColor: colors.card }]}>
-                    <View style={styles.dayCardHeader}>
-                      <Text style={[styles.dayCardDate, { color: colors.text, fontFamily: fonts.bold }]}>
-                        {formatEntryDateShort(selectedDay.dateStr, t.journal.dateNames, num)}
-                      </Text>
-                      {selectedDay.entry ? (
-                        <View style={styles.dayCardMood}>
-                          <Text style={styles.dayCardMoodEmoji}>{MOOD_EMOJI[selectedDay.entry.mood]}</Text>
-                          <Text
-                            style={[
-                              styles.dayCardMoodLabel,
-                              { color: MOOD_COLORS[selectedDay.entry.mood], fontFamily: fonts.semiBold },
-                            ]}
-                          >
+                  <View style={[styles.card, styles.day, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                    <Text style={[styles.dayDate, { color: colors.textTertiary, fontFamily: fonts.medium }]}>
+                      {formatEntryDateShort(selectedDay.dateStr, names, num)}
+                    </Text>
+                    {selectedDay.entry ? (
+                      <>
+                        <View style={styles.dayMood}>
+                          <MoodGlyph mood={selectedDay.entry.mood} size={grid(3)} />
+                          <Text style={[styles.dayMoodLabel, { color: MOOD_STYLE[selectedDay.entry.mood].color, fontFamily: fonts.semiBold }]}>
                             {t.journal.moodLabelsFull[selectedDay.entry.mood]}
                           </Text>
                         </View>
-                      ) : (
-                        <Text style={[styles.dayCardNoEntry, { color: colors.textTertiary, fontFamily: fonts.regular }]}>
-                          {insights.noEntry}
-                        </Text>
-                      )}
-                    </View>
-                    {selectedDay.entry && (
-                      <>
-                        <Text
-                          numberOfLines={3}
-                          style={[styles.dayCardText, { color: colors.textSecondary, fontFamily: fonts.regular }]}
-                        >
-                          {selectedDay.entry.text.trim() || insights.noEntry}
-                        </Text>
-                        <Pressable
-                          onPress={() =>
-                            router.push({
-                              pathname: '/tanafas/journal/entry/[id]',
-                              params: { id: selectedDay.entry!.id },
-                            })
-                          }
-                          style={({ pressed }) => [styles.viewEntryBtn, pressed && { opacity: 0.6 }]}
-                        >
-                          <Text style={[styles.viewEntryText, { color: colors.primary, fontFamily: fonts.semiBold }]}>
-                            {insights.viewEntry}
+                        {!!selectedDay.entry.text.trim() && (
+                          <Text numberOfLines={3} style={[styles.dayText, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
+                            {selectedDay.entry.text.trim()}
                           </Text>
-                          <View style={!isRTL ? styles.flip : undefined}>
-                            <ChevronLeft size={14} color={colors.primary} />
-                          </View>
+                        )}
+                        <Pressable
+                          onPress={() => openEntry(selectedDay.entry!.id)}
+                          accessibilityRole="link"
+                          style={({ pressed }) => [styles.viewEntry, pressed && styles.pressed]}
+                        >
+                          <Text style={[styles.viewEntryText, { color: colors.primary, fontFamily: fonts.medium }]}>{insights.viewEntry}</Text>
+                          <DirectionalIcon isRTL={isRTL} name="chevron" size={14} strokeWidth={2} color={colors.primary} />
                         </Pressable>
                       </>
+                    ) : (
+                      <Text style={[styles.dayText, { color: colors.textTertiary, fontFamily: fonts.regular }]}>{insights.noEntry}</Text>
                     )}
                   </View>
                 )}
@@ -351,221 +267,121 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
   },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-  },
-  iconBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconBtnDisabled: {
-    opacity: 0.5,
-  },
-  flip: {
-    transform: [{ scaleX: -1 }],
-  },
   scroll: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.xxl,
+    width: '100%',
+    maxWidth: layout.maxContentWidth,
+    alignSelf: 'center',
+    padding: grid(2),
+    paddingBottom: grid(5),
+    gap: grid(2),
   },
-  badge: {
+  topBar: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 24,
-    gap: spacing.xs + 2,
-    alignSelf: 'flex-start',
-    borderRadius: radius.full,
-    paddingHorizontal: spacing.sm + 2,
-    marginBottom: spacing.xs,
+    justifyContent: 'space-between',
   },
-  badgeText: {
-    fontSize: typography.fontSize.xs,
-    lineHeight: typography.lineHeight.xs,
+  header: {
+    gap: grid(1),
+  },
+  eyebrowLatin: {
+    fontSize: 12,
+    letterSpacing: 12 * 0.16,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+  },
+  eyebrowArabic: {
+    fontSize: 13.5,
   },
   title: {
-    fontSize: typography.fontSize.xl,
+    fontSize: 32,
+    lineHeight: 40,
+  },
+  titleArabic: {
+    lineHeight: 48,
   },
   subtitle: {
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.body,
-    marginTop: spacing.xs,
-    marginBottom: spacing.md,
+    fontSize: 15,
+    lineHeight: 24,
   },
-  tabRow: {
+  chips: {
     flexDirection: 'row',
-    borderWidth: 1,
-    borderRadius: radius.full,
-    padding: 4,
-    marginBottom: spacing.md,
-  },
-  tabBtn: {
-    flex: 1,
-    height: 34,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.xs + 2,
-    borderRadius: radius.full,
-  },
-  tabText: {
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.sm,
-  },
-  newBtn: {
-    height: 50,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    borderRadius: radius.lg,
-    marginBottom: spacing.md,
-  },
-  newBtnText: {
-    fontSize: typography.fontSize.body,
-    lineHeight: typography.lineHeight.body,
+    gap: grid(1),
   },
   loading: {
-    marginTop: spacing.xxl,
+    marginTop: grid(4),
   },
-  entries: {
-    gap: spacing.sm,
+  card: {
+    borderRadius: radius.cardLg,
+    borderWidth: 1,
+    padding: grid(2),
   },
   empty: {
     alignItems: 'center',
-    paddingTop: spacing.xxl,
-    paddingHorizontal: spacing.lg,
-  },
-  emptyIcon: {
-    width: 72,
-    height: 72,
-    borderRadius: radius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.md,
+    gap: grid(1.5),
+    paddingVertical: grid(4),
+    paddingHorizontal: grid(3),
   },
   emptyTitle: {
-    fontSize: typography.fontSize.md,
+    fontSize: 22,
+    lineHeight: 28,
+    textAlign: 'center',
+  },
+  emptyTitleArabic: {
+    lineHeight: 36,
   },
   emptyBody: {
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.body,
+    fontSize: 15,
+    lineHeight: 24,
     textAlign: 'center',
-    marginTop: spacing.xs,
-    maxWidth: 280,
+    maxWidth: 300,
   },
-  rangeRow: {
-    flexDirection: 'row',
-    alignSelf: 'flex-start',
-    borderWidth: 1,
-    borderRadius: radius.full,
-    padding: 4,
-    marginBottom: spacing.md,
-  },
-  rangeBtn: {
-    height: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: radius.full,
-    paddingHorizontal: spacing.md,
-  },
-  rangeText: {
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.sm,
-  },
-  placeholderCard: {
-    alignItems: 'center',
-    borderWidth: 1,
-    borderRadius: radius.xl,
-    paddingVertical: spacing.xxl,
-    paddingHorizontal: spacing.lg,
-  },
-  placeholderText: {
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.body,
-    textAlign: 'center',
-    maxWidth: 260,
-  },
-  chartCard: {
-    borderWidth: 1,
-    borderRadius: radius.xl,
-    padding: spacing.md,
-    ...shadows.card,
+  group: {
+    gap: grid(1.5),
+    marginTop: grid(1),
   },
   legend: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing.sm,
-    marginTop: spacing.md,
+    gap: grid(1.5),
   },
   legendItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xs,
-  },
-  legendDot: {
-    width: 8,
-    height: 8,
-    borderRadius: radius.full,
+    gap: grid(0.5),
   },
   legendText: {
-    fontSize: typography.fontSize.xs,
+    fontSize: 13,
   },
-  tapHint: {
-    fontSize: typography.fontSize.xs,
+  hint: {
+    fontSize: 13,
+    lineHeight: 20,
     textAlign: 'center',
-    marginTop: spacing.md,
   },
-  dayCard: {
-    borderWidth: 1,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    marginTop: spacing.md,
+  day: {
+    gap: grid(1),
   },
-  dayCardHeader: {
+  dayDate: {
+    fontSize: 13,
+  },
+  dayMood: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: grid(1),
   },
-  dayCardDate: {
-    fontSize: typography.fontSize.sm,
+  dayMoodLabel: {
+    fontSize: 16,
   },
-  dayCardMood: {
+  dayText: {
+    fontSize: 15,
+    lineHeight: 24,
+  },
+  viewEntry: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xs,
-  },
-  dayCardMoodEmoji: {
-    fontSize: typography.fontSize.md,
-  },
-  dayCardMoodLabel: {
-    fontSize: typography.fontSize.sm,
-  },
-  dayCardNoEntry: {
-    fontSize: typography.fontSize.xs,
-  },
-  dayCardText: {
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.body,
-    marginTop: spacing.sm,
-  },
-  viewEntryBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    marginTop: spacing.sm + 2,
+    gap: grid(0.5),
   },
   viewEntryText: {
-    fontSize: typography.fontSize.sm,
+    fontSize: 14,
+  },
+  pressed: {
+    opacity: 0.6,
   },
 });
