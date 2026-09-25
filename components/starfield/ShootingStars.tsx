@@ -15,9 +15,10 @@ interface Streak {
 }
 
 /**
- * Now and then a shooting star: one at a time, every 3–9s at random, from
- * somewhere in the upper two-thirds of the sky, slanting 15–35° down to the
- * left or right, crossing ~220px in under a second with a fading tail.
+ * Now and then a shooting star: one at a time, every 3–9s at random. It
+ * enters from just off one side of the sky (somewhere in its upper half),
+ * slants 15–35° down, and streaks right across and out the other side in
+ * ~1.3–1.9s, with a fading tail.
  * Off while `active` is false (opening, closing, Reduce Motion).
  */
 export default function ShootingStars({ width, height, active }: { width: number; height: number; active: boolean }) {
@@ -34,18 +35,21 @@ export default function ShootingStars({ width, height, active }: { width: number
         if (!alive) return;
         const rightward = Math.random() < 0.5;
         const slant = 15 + Math.random() * 20;
+        const length = 80 + Math.random() * 60;
+        // From just off one side, all the way across and out past the other (or the bottom).
+        const travel = (width + length * 2) / Math.cos((slant * Math.PI) / 180);
         const next: Streak = {
           key: ++count.current,
-          x: width * (0.1 + Math.random() * 0.8),
-          y: height * (0.05 + Math.random() * 0.6),
+          x: rightward ? -length : width + length,
+          y: height * (0.03 + Math.random() * 0.45),
           angle: rightward ? slant : 180 - slant,
-          length: 80 + Math.random() * 60,
-          travel: 180 + Math.random() * 80,
-          duration: 750 + Math.random() * 350,
+          length,
+          travel,
+          duration: 1300 + Math.random() * 600,
         };
         setStreak(next);
         progress.setValue(0);
-        Animated.timing(progress, { toValue: 1, duration: next.duration, easing: Easing.out(Easing.quad), useNativeDriver: NATIVE }).start(() => {
+        Animated.timing(progress, { toValue: 1, duration: next.duration, easing: Easing.linear, useNativeDriver: NATIVE }).start(() => {
           if (alive) setStreak(null);
           if (alive) schedule();
         });
@@ -71,7 +75,7 @@ export default function ShootingStars({ width, height, active }: { width: number
             width: streak.length,
             left: streak.x - streak.length / 2,
             top: streak.y,
-            opacity: progress.interpolate({ inputRange: [0, 0.15, 0.7, 1], outputRange: [0, 1, 0.8, 0] }),
+            opacity: progress.interpolate({ inputRange: [0, 0.12, 0.75, 1], outputRange: [0, 1, 0.9, 0.2] }),
             // Along its own heading: rotate first, then travel.
             transform: [{ rotate: `${streak.angle}deg` }, { translateX: progress.interpolate({ inputRange: [0, 1], outputRange: [0, streak.travel] }) }],
           },

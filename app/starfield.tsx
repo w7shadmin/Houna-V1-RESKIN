@@ -15,8 +15,6 @@ import MarkHalo, { HALO_BOX } from '@/components/starfield/MarkHalo';
 import StarSky from '@/components/starfield/StarSky';
 import ShootingStars from '@/components/starfield/ShootingStars';
 
-/** How much bigger the moon is than Home's mark. */
-const MOON_SCALE = 1.45;
 /** The moonglow in the sky round the moon. */
 const GLOW = 420;
 
@@ -194,7 +192,6 @@ export default function StarfieldScreen() {
                 transform: [
                   { translateX: glide.interpolate({ inputRange: [0, 1], outputRange: [from.x - HALO_BOX / 2, to.x - HALO_BOX / 2] }) },
                   { translateY: glide.interpolate({ inputRange: [0, 1], outputRange: [from.y - HALO_BOX / 2, to.y - HALO_BOX / 2] }) },
-                  { scale: glide.interpolate({ inputRange: [0, 1], outputRange: [1, MOON_SCALE] }) },
                 ],
               },
             ]}
