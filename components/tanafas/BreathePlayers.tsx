@@ -416,12 +416,11 @@ function GroundingPlayer({ exercise, breath, nav }: PlayerProps) {
           shape="ring"
           tone={tone}
           breath={breath}
-          glass={running}
           progress={running ? (step + 1) / steps.length : status === 'complete' ? 1 : undefined}
         >
           {running && (
             <FadeIn key={step}>
-              <Text style={[styles.count, isRTL && styles.countArabic, { color: colors.text, fontFamily: fonts.semiBold }]}>{num(current.count)}</Text>
+              <Text style={[styles.count, isRTL && styles.countArabic, { color: nightPalette.midnight, fontFamily: fonts.semiBold }]}>{num(current.count)}</Text>
             </FadeIn>
           )}
         </BreathStage>

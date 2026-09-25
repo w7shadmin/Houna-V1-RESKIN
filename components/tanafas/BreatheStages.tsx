@@ -32,9 +32,7 @@ interface BreathStageProps {
   showTracer?: boolean;
   /** Light the dots up to this fraction, clockwise from the top (grounding steps). */
   progress?: number;
-  /** A see-through orb, for a number drawn over it. */
-  glass?: boolean;
-  /** Centred over the orb (a count). */
+  /** Centred over the orb (a count, in ink). */
   children?: React.ReactNode;
 }
 
@@ -43,7 +41,7 @@ interface BreathStageProps {
  * square) of dots graded in size and light, a hairline middle outline, and a
  * lit orb that inflates and deflates with `breath`.
  */
-export function BreathStage({ shape, tone, breath, trace, showTracer, progress, glass, children }: BreathStageProps) {
+export function BreathStage({ shape, tone, breath, trace, showTracer, progress, children }: BreathStageProps) {
   const { colors } = useTheme();
   const fg = colors.tones[tone].fg;
   // The canvas ring pairs Houna glow with dusk; the other tones keep to their own colour.
@@ -62,17 +60,11 @@ export function BreathStage({ shape, tone, breath, trace, showTracer, progress, 
   );
 
   const scale = breath.interpolate({ inputRange: [0, 1], outputRange: [REST, 1] });
-  const stops: [string, number][] = glass
-    ? [
-        [alpha(fg, 0.42), 0],
-        [alpha(fg, 0.2), 0.6],
-        [alpha(fg, 0.1), 1],
-      ]
-    : [
-        ['#FFFFFF', 0],
-        [flatten(alpha(fg, 0.3), '#FFFFFF'), 0.4],
-        [fg, 1],
-      ];
+  const stops: [string, number][] = [
+    ['#FFFFFF', 0],
+    [flatten(alpha(fg, 0.3), '#FFFFFF'), 0.4],
+    [fg, 1],
+  ];
 
   return (
     <View style={styles.stage} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
@@ -101,10 +93,10 @@ export function BreathStage({ shape, tone, breath, trace, showTracer, progress, 
           size={ORB}
           // Box breathing breathes a rounded square, echoing its square of dots.
           radius={shape === 'square' ? ORB * 0.22 : undefined}
-          fx={glass ? 0.5 : 0.34}
-          fy={glass ? 0.45 : 0.3}
+          fx={0.34}
+          fy={0.3}
           stops={stops}
-          glow={`0 0 ${glass ? 60 : 90}px ${alpha(fg, glass ? 0.3 : 0.5)}`}
+          glow={`0 0 90px ${alpha(fg, 0.5)}`}
         />
       </Animated.View>
       {shape === 'square' && trace && showTracer && <Tracer trace={trace} color={fg} />}
