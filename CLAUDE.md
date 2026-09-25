@@ -178,9 +178,12 @@ else lit.
 
 ### The breathing session shell
 
-`components/breathing/PhaseBreathingSession.tsx` is a reusable component;
-each exercise (`app/tanafas/breathing/*.tsx`) passes in a phase-timing
-config. Never hardcode one exercise's timings into the shell itself.
+Breathing exercises run in place on the Tanafas hub, not on screens of
+their own: `components/tanafas/BreathePlayers.tsx` has one player per kind
+(timed phases, five-senses grounding, muscle relaxation), and the timed
+player's `useBreathCycle` is the reusable phase state machine. Every
+exercise's timings live in `constants/breathPatterns.ts`. Never hardcode one
+exercise's timings into a player.
 
 ## Current skin — "Nightlight" / "Daylight"
 
@@ -242,10 +245,14 @@ eyebrow, display title), `Field`, `FormMessage`, `OrDivider`, `SwitchLink`,
 `SettingsGroup`/`SettingsRow` and `ThemedSwitch`. Use these for any new
 account or settings screen.
 
-**Exercise sessions** share `components/breathing/SessionScaffold.tsx` (the
-canvas "Breathing session" artboard: tone glows, close + title/technique,
-`SessionLabel`, `SessionCompletion`). Each exercise picks a canvas tone:
-4-7-8 glow, box dusk, five senses dawn, muscle relaxation glow.
+**Tanafas player**: the Breathe and Meditate carousels share
+`components/tanafas/PlayerFrame.tsx` (stage, title row, tag, description,
+tiles, round button). Pressing play on a breathing exercise keeps the
+layout and fades each slot over to the session (round, phase, time left).
+The stage (`BreatheStages.tsx`) is a ring of dots (a square for box
+breathing) around an orb that inflates and deflates, and the screen glow
+breathes with it. Tones: 4-7-8 glow, box dusk, five senses dawn, muscle
+relaxation glow.
 
 **Directory pages** are all in the canvas language now: list pages use
 `components/directory/PageHeader.tsx`; the professional / organization /

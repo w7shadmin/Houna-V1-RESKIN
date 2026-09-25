@@ -5,7 +5,7 @@ import { nightPalette } from '@/constants/theme';
 
 /** Internal stack for everything opened from the raised Tanafas button — the
  * whole group is presented as one modal (see app/_layout.tsx), and this
- * navigator handles hub → exercise within it. */
+ * navigator handles hub → journal, meditation, tests and Voices within it. */
 export default function TanafasLayout() {
   const { colors } = useTheme();
   return (
@@ -17,10 +17,6 @@ export default function TanafasLayout() {
       }}
     >
       <Stack.Screen name="index" />
-      <Stack.Screen name="breathing/anxiety-relief" />
-      <Stack.Screen name="breathing/steady-mind" />
-      <Stack.Screen name="breathing/panic-relief" />
-      <Stack.Screen name="breathing/tension-release" />
       <Stack.Screen name="meditation/index" />
       <Stack.Screen
         name="meditation/[scene]"

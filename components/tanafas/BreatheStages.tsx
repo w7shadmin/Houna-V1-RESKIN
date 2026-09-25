@@ -1,0 +1,155 @@
+import React, { useMemo } from 'react';
+import { Animated, Platform, StyleSheet, View } from 'react-native';
+import Svg, { Circle, Rect } from 'react-native-svg';
+import { useTheme } from '@/contexts/ThemeContext';
+import { alpha, flatten } from '@/constants/theme';
+import Orb from '@/components/ui/Orb';
+import type { IconTileTone } from '@/components/ui/IconTile';
+
+/** Animations on the stage and the screen glow stay on the UI thread on native. */
+export const NATIVE_DRIVER = Platform.OS !== 'web';
+
+const SIZE = 250;
+const C = SIZE / 2;
+/** Radius of the ring of dots; half-side of the square of dots. */
+const R = 110;
+const DOTS = 28;
+/** The orb is drawn at full size and scaled down: at rest it's the canvas's 74px pearl. */
+const ORB = 176;
+const REST = 74 / ORB;
+/** The hairline "middle" outline. */
+const MIDDLE = 137;
+
+export type StageShape = 'ring' | 'square';
+
+interface BreathStageProps {
+  shape: StageShape;
+  tone: IconTileTone;
+  /** 0 at rest → 1 filling the ring. Shared with the hub's screen glow. */
+  breath: Animated.Value;
+  /** Box breathing: 0 → 4 around the square, one side per phase. */
+  trace?: Animated.Value;
+  showTracer?: boolean;
+  /** Light the dots up to this fraction, clockwise from the top (grounding steps). */
+  progress?: number;
+  /** A see-through orb, for a number drawn over it. */
+  glass?: boolean;
+  /** Centred over the orb (a count). */
+  children?: React.ReactNode;
+}
+
+/**
+ * The Breathe stage from the canvas: a ring (or, for box breathing, a
+ * square) of dots graded in size and light, a hairline middle outline, and a
+ * lit orb that inflates and deflates with `breath`.
+ */
+export function BreathStage({ shape, tone, breath, trace, showTracer, progress, glass, children }: BreathStageProps) {
+  const { colors } = useTheme();
+  const fg = colors.tones[tone].fg;
+  // The canvas ring pairs Houna glow with dusk; the other tones keep to their own colour.
+  const partner = tone === 'glow' ? colors.tones.dusk.fg : fg;
+
+  const dots = useMemo(
+    () =>
+      Array.from({ length: DOTS }, (_, k) => {
+        const tt = k / DOTS;
+        const lit = progress !== undefined && (k + 0.5) / DOTS <= progress;
+        const s = lit ? 7 : 3 + 4 * Math.sin(tt * Math.PI);
+        const o = lit ? 1 : (0.2 + 0.8 * Math.sin(tt * Math.PI)) * (progress !== undefined ? 0.4 : 1);
+        return { ...position(shape, tt), r: s / 2, o, c: lit || k < DOTS / 2 ? fg : partner };
+      }),
+    [shape, progress, fg, partner],
+  );
+
+  const scale = breath.interpolate({ inputRange: [0, 1], outputRange: [REST, 1] });
+  const stops: [string, number][] = glass
+    ? [
+        [alpha(fg, 0.42), 0],
+        [alpha(fg, 0.2), 0.6],
+        [alpha(fg, 0.1), 1],
+      ]
+    : [
+        ['#FFFFFF', 0],
+        [flatten(alpha(fg, 0.3), '#FFFFFF'), 0.4],
+        [fg, 1],
+      ];
+
+  return (
+    <View style={styles.stage} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+      <Svg width={SIZE} height={SIZE} style={StyleSheet.absoluteFill}>
+        {dots.map((d, k) => (
+          <Circle key={k} cx={d.cx} cy={d.cy} r={d.r} fill={d.c} opacity={d.o} />
+        ))}
+        {shape === 'ring' ? (
+          <Circle cx={C - 0.5} cy={C - 0.5} r={MIDDLE / 2} fill="none" stroke={colors.text} strokeOpacity={0.14} strokeWidth={1} />
+        ) : (
+          <Rect
+            x={C - MIDDLE / 2}
+            y={C - MIDDLE / 2}
+            width={MIDDLE}
+            height={MIDDLE}
+            rx={28}
+            fill="none"
+            stroke={colors.text}
+            strokeOpacity={0.14}
+            strokeWidth={1}
+          />
+        )}
+      </Svg>
+      <Animated.View style={{ transform: [{ scale }] }}>
+        <Orb size={ORB} fx={glass ? 0.5 : 0.34} fy={glass ? 0.45 : 0.3} stops={stops} glow={`0 0 ${glass ? 60 : 90}px ${alpha(fg, glass ? 0.3 : 0.5)}`} />
+      </Animated.View>
+      {shape === 'square' && trace && showTracer && <Tracer trace={trace} color={fg} />}
+      {!!children && <View style={styles.centre}>{children}</View>}
+    </View>
+  );
+}
+
+/** A bright bead travelling the square of dots — one side per box-breathing phase. */
+function Tracer({ trace, color }: { trace: Animated.Value; color: string }) {
+  // Offsets from the centre, not start/left, so it draws the same in either direction.
+  const translateX = trace.interpolate({ inputRange: [0, 1, 2, 3, 4], outputRange: [-R, R, R, -R, -R] });
+  const translateY = trace.interpolate({ inputRange: [0, 1, 2, 3, 4], outputRange: [-R, -R, R, R, -R] });
+  return (
+    <View style={styles.centre} pointerEvents="none">
+      <Animated.View
+        style={[
+          styles.tracer,
+          { backgroundColor: color, boxShadow: `0 0 14px ${alpha(color, 0.9)}`, transform: [{ translateX }, { translateY }] },
+        ]}
+      />
+    </View>
+  );
+}
+
+/** Clockwise from the top: the ring from 12 o'clock, the square from its top-left corner. */
+function position(shape: StageShape, tt: number) {
+  if (shape === 'ring') {
+    const a = tt * Math.PI * 2 - Math.PI / 2;
+    return { cx: C + R * Math.cos(a), cy: C + R * Math.sin(a) };
+  }
+  const side = Math.floor(tt * 4);
+  const f = tt * 4 - side;
+  const along = -R + 2 * R * f;
+  const [x, y] = side === 0 ? [along, -R] : side === 1 ? [R, along] : side === 2 ? [-along, R] : [-R, -along];
+  return { cx: C + x, cy: C + y };
+}
+
+const styles = StyleSheet.create({
+  stage: {
+    width: SIZE,
+    height: SIZE,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  centre: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tracer: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+  },
+});

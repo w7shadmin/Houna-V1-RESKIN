@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useRouter, type Href } from 'expo-router';
+import React, { useRef, useState } from 'react';
+import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { alpha, layout, nightPalette } from '@/constants/theme';
+import { BREATHE_ORDER, BREATHE_TONE } from '@/constants/breathPatterns';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { MEDITATION_SCENES, SCENE_ORBS, type SceneId } from '@/components/meditation/scenes';
 import { TESTS } from '@/constants/psychometrics';
@@ -15,18 +16,10 @@ import Card from '@/components/ui/Card';
 import ScreenGlow from '@/components/ui/ScreenGlow';
 import Orb from '@/components/ui/Orb';
 import CanvasIcon, { DirectionalIcon } from '@/components/ui/CanvasIcon';
+import BreathePlayer, { toneGlow } from '@/components/tanafas/BreathePlayers';
+import PlayerFrame, { Body, Heading, InfoTiles, MainButton, SideSpacer, Tag, Tile } from '@/components/tanafas/PlayerFrame';
 
 type Tab = 'breathe' | 'meditate' | 'discover';
-
-interface CarouselItem {
-  key: string;
-  title: string;
-  tag: string;
-  desc: string;
-  tiles: [{ label: string; value: string }, { label: string; value: string }];
-  safety: boolean;
-  href: Href;
-}
 
 /** Discover's test tiles cycle through the canvas's three tones. */
 const TEST_TONES: IconTileTone[] = ['dusk', 'glow', 'dawn'];
@@ -34,74 +27,44 @@ const TEST_TONES: IconTileTone[] = ['dusk', 'glow', 'dawn'];
 /**
  * Tanafas hub (canvas "Tanafas — Breathe · Meditate · Discover"), opened
  * from the raised tab-bar button as a modal. Breathe and Meditate are
- * one-at-a-time carousels with a big Begin button; Discover lists the
- * self-reflection tests. The journal is one tap away in the header.
+ * one-at-a-time carousels with a big round button: breathing exercises run
+ * right here (components/tanafas/BreathePlayers.tsx), a meditation opens its
+ * full-screen scene. Discover lists the self-reflection tests. The journal is
+ * one tap away in the header.
  */
 export default function TanafasHubScreen() {
   const { colors } = useTheme();
   const router = useRouter();
-  const { t, fonts, isRTL } = useLanguage();
+  const { t, fonts } = useLanguage();
   const h = t.discover.hub;
-  const ex = t.tanafas.exercises;
   const scenesText = t.tanafas.meditation.scenes;
 
   const [tab, setTab] = useState<Tab>('breathe');
   const [breatheIndex, setBreatheIndex] = useState(0);
   const [sceneIndex, setSceneIndex] = useState(0);
+  // How full the breathing orb is (0 rest → 1); the screen glow breathes with it.
+  const breath = useRef(new Animated.Value(0)).current;
 
-  const clean = (s: string) => s.replace(/[()]/g, '').trim();
-
-  const breathe: CarouselItem[] = [
-    { key: 'anxiety-relief', e: ex.anxietyRelief, pattern: h.patterns.anxietyRelief, safety: false },
-    { key: 'steady-mind', e: ex.steadyMind, pattern: h.patterns.steadyMind, safety: false },
-    { key: 'panic-relief', e: ex.panicRelief, pattern: h.patterns.panicRelief, safety: false },
-    { key: 'tension-release', e: ex.tensionRelease, pattern: h.patterns.tensionRelease, safety: false },
-  ].map(({ key, e, pattern, safety }) => ({
-    key,
-    title: e.title,
-    tag: clean(e.subtitle),
-    desc: e.description,
-    tiles: [
-      { label: h.pattern, value: pattern },
-      { label: h.duration, value: e.duration },
-    ],
-    safety,
-    href: `/tanafas/breathing/${key}` as Href,
-  }));
-
-  const scenes: CarouselItem[] = MEDITATION_SCENES.map((scene) => ({
-    key: scene.id,
-    title: scenesText[scene.id].name,
-    tag: h.ambientScene,
-    desc: scenesText[scene.id].description,
-    tiles: [
-      { label: h.duration, value: h.noLimit },
-      { label: h.video, value: scene.video ? h.on : h.off },
-    ],
-    safety: false,
-    href: { pathname: '/tanafas/meditation/[scene]', params: { scene: scene.id } },
-  }));
-
-  const isBreathe = tab === 'breathe';
-  const list = isBreathe ? breathe : scenes;
-  const index = isBreathe ? breatheIndex : sceneIndex;
-  const setIndex = isBreathe ? setBreatheIndex : setSceneIndex;
-  const item = list[index];
-  const go = (d: number) => setIndex((index + d + list.length) % list.length);
-
-  const sceneOrb = SCENE_ORBS[(MEDITATION_SCENES[sceneIndex]?.id ?? 'fire') as SceneId];
+  const exercise = BREATHE_ORDER[breatheIndex];
+  const scene = MEDITATION_SCENES[sceneIndex];
+  const sceneOrb = SCENE_ORBS[scene.id as SceneId];
   const glow =
-    tab === 'discover'
-      ? alpha(nightPalette.dusk, 0.22)
-      : tab === 'breathe'
-        ? alpha(nightPalette.hounaGlow, 0.3)
-        : sceneOrb.glow;
+    tab === 'discover' ? alpha(nightPalette.dusk, 0.22) : tab === 'breathe' ? toneGlow(BREATHE_TONE[exercise], 0.36) : sceneOrb.glow;
+  const glowOpacity = breath.interpolate({ inputRange: [0, 1], outputRange: [0.65, 1] });
 
+  const cycle = (n: number, count: number, d: number) => (n + d + count) % count;
+  const switchTab = (next: Tab) => {
+    breath.stopAnimation();
+    breath.setValue(0);
+    setTab(next);
+  };
   const close = () => (router.canGoBack() ? router.back() : router.replace('/(tabs)'));
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
-      <ScreenGlow color={glow} rx={70} ry={38} cy={30} />
+      <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { opacity: tab === 'breathe' ? glowOpacity : 1 }]}>
+        <ScreenGlow color={glow} rx={70} ry={38} cy={30} />
+      </Animated.View>
 
       <View style={styles.inner}>
         {/* Header: close · tabs · journal */}
@@ -120,7 +83,7 @@ export default function TanafasHubScreen() {
                   key={key}
                   accessibilityRole="tab"
                   aria-selected={selected}
-                  onPress={() => setTab(key)}
+                  onPress={() => switchTab(key)}
                   style={[styles.tab, { borderBottomColor: selected ? colors.primary : 'transparent' }]}
                 >
                   <Text
@@ -145,147 +108,53 @@ export default function TanafasHubScreen() {
 
         {tab === 'discover' ? (
           <DiscoverPanel />
+        ) : tab === 'breathe' ? (
+          <BreathePlayer
+            key={exercise}
+            exercise={exercise}
+            breath={breath}
+            nav={{
+              count: BREATHE_ORDER.length,
+              index: breatheIndex,
+              onPrev: () => setBreatheIndex((i) => cycle(i, BREATHE_ORDER.length, -1)),
+              onNext: () => setBreatheIndex((i) => cycle(i, BREATHE_ORDER.length, 1)),
+            }}
+          />
         ) : (
-          <View style={styles.player}>
-            <View style={styles.stageArea}>
-              {isBreathe ? <BreatheStage /> : <MeditateStage sceneId={MEDITATION_SCENES[sceneIndex].id} />}
-
-              <View style={styles.titleRow}>
-                <Pressable accessibilityRole="button" accessibilityLabel={h.previous} onPress={() => go(-1)} style={styles.arrow}>
-                  <DirectionalIcon isRTL={isRTL} name="chevronStart" size={20} strokeWidth={1.8} color={colors.textSecondary} />
-                </Pressable>
-                <View style={styles.titleBlock} accessibilityLiveRegion="polite">
-                  <Text style={[styles.itemTitle, isRTL && styles.itemTitleArabic, { color: colors.text, fontFamily: fonts.display }]}>
-                    {item.title}
-                  </Text>
-                  <Tag label={item.tag} safety={item.safety} />
-                </View>
-                <Pressable accessibilityRole="button" accessibilityLabel={h.next} onPress={() => go(1)} style={styles.arrow}>
-                  <DirectionalIcon isRTL={isRTL} name="chevron" size={20} strokeWidth={1.8} color={colors.textSecondary} />
-                </Pressable>
-              </View>
-
-              <Text style={[styles.desc, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{item.desc}</Text>
-
-              <View style={styles.pager} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-                {list.map((it, k) => (
-                  <View
-                    key={it.key}
-                    style={[
-                      styles.pagerDot,
-                      k === index
-                        ? { width: 22, backgroundColor: colors.text }
-                        : { backgroundColor: colors.textTertiary, opacity: 0.45 },
-                    ]}
-                  />
-                ))}
-              </View>
-            </View>
-
-            <View style={styles.bottom}>
-              {item.safety && (
-                <View style={[styles.safety, { backgroundColor: colors.crisis.bg, borderColor: colors.crisis.borderSoft }]}>
-                  <CanvasIcon name="shield" size={18} strokeWidth={1.7} color={colors.tones.dawn.fg} />
-                  <Text style={[styles.safetyText, { color: colors.text, fontFamily: fonts.regular }]}>{h.safetyNote}</Text>
-                </View>
-              )}
-              <View style={styles.tiles}>
-                {item.tiles.map((tile) => (
-                  <View key={tile.label} style={[styles.tile, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
-                    <Text
-                      style={[
-                        fonts.labelTracked ? styles.tileLabelLatin : styles.tileLabelArabic,
-                        { color: colors.textTertiary, fontFamily: fonts.labelTracked ? fonts.labelRegular : fonts.label },
-                      ]}
-                    >
-                      {tile.label}
-                    </Text>
-                    <Text style={[styles.tileValue, { color: colors.text, fontFamily: fonts.medium }]}>{tile.value}</Text>
-                  </View>
-                ))}
-              </View>
-              <View style={styles.beginRow}>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={`${h.begin} — ${item.title}`}
-                  onPress={() => router.push(item.href)}
-                  style={({ pressed }) => [
-                    styles.begin,
-                    { backgroundColor: colors.action, boxShadow: `0 0 36px ${glow}` },
-                    pressed && styles.pressed,
-                  ]}
-                >
-                  <CanvasIcon name="play" size={28} color={colors.onAction} />
-                </Pressable>
-              </View>
-            </View>
-          </View>
+          <PlayerFrame
+            mode={scene.id}
+            nav={{
+              count: MEDITATION_SCENES.length,
+              index: sceneIndex,
+              onPrev: () => setSceneIndex((i) => cycle(i, MEDITATION_SCENES.length, -1)),
+              onNext: () => setSceneIndex((i) => cycle(i, MEDITATION_SCENES.length, 1)),
+            }}
+            stage={<MeditateStage sceneId={scene.id} />}
+            heading={<Heading>{scenesText[scene.id].name}</Heading>}
+            label={<Tag label={h.ambientScene} tone="glow" />}
+            body={<Body>{scenesText[scene.id].description}</Body>}
+            info={
+              <InfoTiles>
+                <Tile label={h.duration}>{h.noLimit}</Tile>
+                <Tile label={h.video}>{scene.video ? h.on : h.off}</Tile>
+              </InfoTiles>
+            }
+            controls={
+              <>
+                <SideSpacer />
+                <MainButton
+                  label={`${h.begin} — ${scenesText[scene.id].name}`}
+                  glow={glow}
+                  onPress={() => router.push({ pathname: '/tanafas/meditation/[scene]', params: { scene: scene.id } })}
+                  renderIcon={(c) => <CanvasIcon name="play" size={28} color={c} />}
+                />
+                <SideSpacer />
+              </>
+            }
+          />
         )}
       </View>
     </SafeAreaView>
-  );
-}
-
-function Tag({ label, safety }: { label: string; safety: boolean }) {
-  const { colors } = useTheme();
-  const { fonts } = useLanguage();
-  const latin = fonts.labelTracked;
-  return (
-    <View
-      style={[
-        styles.tag,
-        safety
-          ? { backgroundColor: alpha(nightPalette.dawn, 0.14), borderColor: alpha(nightPalette.dawn, 0.4) }
-          : { backgroundColor: alpha(nightPalette.hounaGlow, 0.12), borderColor: alpha(nightPalette.hounaGlow, 0.32) },
-      ]}
-    >
-      <Text
-        style={[
-          latin ? styles.tagLatin : styles.tagArabic,
-          {
-            color: safety ? colors.tones.dawn.fg : colors.primary,
-            fontFamily: latin ? fonts.labelRegular : fonts.label,
-          },
-        ]}
-      >
-        {label}
-      </Text>
-    </View>
-  );
-}
-
-/** Breathe: the 28-dot ring, a hairline circle, and a glowing pearl. */
-function BreatheStage() {
-  const { colors } = useTheme();
-  const N = 28;
-  const R = 110;
-  const C = 125;
-  const dots = Array.from({ length: N }, (_, k) => {
-    const tt = k / N;
-    const a = tt * Math.PI * 2 - Math.PI / 2;
-    const s = 3 + 4 * Math.sin(tt * Math.PI);
-    return { cx: C + R * Math.cos(a), cy: C + R * Math.sin(a), r: s / 2, o: 0.2 + 0.8 * Math.sin(tt * Math.PI), c: k < N / 2 ? colors.primary : colors.tones.dusk.fg };
-  });
-  return (
-    <View style={styles.stage} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-      <Svg width={250} height={250} style={StyleSheet.absoluteFill}>
-        {dots.map((d, k) => (
-          <Circle key={k} cx={d.cx} cy={d.cy} r={d.r} fill={d.c} opacity={d.o} />
-        ))}
-        <Circle cx={124} cy={124} r={68.5} fill="none" stroke={colors.text} strokeOpacity={0.14} strokeWidth={1} />
-      </Svg>
-      <Orb
-        size={74}
-        fx={0.34}
-        fy={0.3}
-        stops={[
-          ['#FFFFFF', 0],
-          ['#CFF6F2', 0.4],
-          [colors.primary, 1],
-        ]}
-        glow={`0 0 40px ${alpha(nightPalette.hounaGlow, 0.55)}`}
-      />
-    </View>
   );
 }
 
@@ -420,129 +289,11 @@ const styles = StyleSheet.create({
   tabText: {
     fontSize: 15,
   },
-  player: {
-    flex: 1,
-  },
-  stageArea: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 22,
-  },
   stage: {
     width: 250,
     height: 250,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  titleRow: {
-    alignSelf: 'stretch',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 8,
-  },
-  arrow: {
-    width: 44,
-    height: 44,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  titleBlock: {
-    flex: 1,
-    alignItems: 'center',
-    gap: 10,
-  },
-  itemTitle: {
-    fontSize: 27,
-    lineHeight: 27 * 1.12,
-    textAlign: 'center',
-  },
-  itemTitleArabic: {
-    lineHeight: 40,
-  },
-  tag: {
-    paddingVertical: 5,
-    paddingHorizontal: 12,
-    borderRadius: 999,
-    borderWidth: 1,
-  },
-  tagLatin: {
-    fontSize: 11,
-    letterSpacing: 11 * 0.12,
-    textTransform: 'uppercase',
-  },
-  tagArabic: {
-    fontSize: 12.5,
-  },
-  desc: {
-    maxWidth: 310,
-    minHeight: 44,
-    fontSize: 14.5,
-    lineHeight: 14.5 * 1.5,
-    textAlign: 'center',
-  },
-  pager: {
-    flexDirection: 'row',
-    gap: 6,
-  },
-  pagerDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-  },
-  bottom: {
-    gap: 16,
-  },
-  safety: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    borderRadius: 16,
-    borderWidth: 1,
-  },
-  safetyText: {
-    flex: 1,
-    fontSize: 13.5,
-    lineHeight: 13.5 * 1.4,
-  },
-  tiles: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  tile: {
-    flex: 1,
-    gap: 4,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 18,
-    borderWidth: 1,
-  },
-  tileLabelLatin: {
-    fontSize: 10.5,
-    letterSpacing: 10.5 * 0.14,
-    textTransform: 'uppercase',
-  },
-  tileLabelArabic: {
-    fontSize: 12,
-  },
-  tileValue: {
-    fontSize: 16,
-  },
-  beginRow: {
-    alignItems: 'center',
-  },
-  begin: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  pressed: {
-    opacity: 0.85,
   },
   discover: {
     paddingTop: 22,

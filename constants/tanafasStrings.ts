@@ -52,6 +52,15 @@ export const tanafasStrings = {
       remainingSuffix: 's remaining',
       timeLeft: '{t} left',
       sec: 's',
+      paused: 'Paused',
+      end: 'End session',
+      done: 'Done',
+      roundsDone: {
+        one: 'You completed {n} round',
+        two: 'You completed {n} rounds',
+        few: 'You completed {n} rounds',
+        many: 'You completed {n} rounds',
+      },
     },
     exercises: {
       anxietyRelief: {
@@ -165,6 +174,15 @@ export const tanafasStrings = {
       remainingSuffix: ' ثانية متبقية',
       timeLeft: 'متبقٍّ {t}',
       sec: ' ثواني',
+      paused: 'متوقف مؤقتًا',
+      end: 'إنهاء الجلسة',
+      done: 'تم',
+      roundsDone: {
+        one: 'أكملت جولة واحدة',
+        two: 'أكملت جولتين',
+        few: 'أكملت {n} جولات',
+        many: 'أكملت {n} جولة',
+      },
     },
     exercises: {
       anxietyRelief: {

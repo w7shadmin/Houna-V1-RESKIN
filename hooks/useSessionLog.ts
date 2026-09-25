@@ -3,8 +3,8 @@ import { logSession, type SessionKind } from '@/lib/sessionLog';
 import { pingActivity } from '@/lib/usageTracking';
 
 /**
- * Session bookkeeping for exercises that don't use the shared
- * `PhaseBreathingSession` shell. `start()` marks the beginning (and sends
+ * Session bookkeeping for exercises without a timed phase cycle (grounding,
+ * muscle relaxation). `start()` marks the beginning (and sends
  * the anonymous community ping); `end()` writes the on-device log exactly
  * once, whichever way the session ends — completion, restart or leaving
  * the screen (unmount ends it too). Never writes streak data.
