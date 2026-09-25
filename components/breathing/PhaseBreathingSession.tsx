@@ -1,14 +1,17 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { View, Text, StyleSheet } from 'react-native';
 import { Play, Pause, RotateCcw } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { spacing, radius, typography, shadows } from '@/constants/theme';
+import { grid } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
 import { arabicNumber } from '@/lib/arabicNumerals';
 import { pingActivity, recordTanafasSession } from '@/lib/usageTracking';
 import { logSession } from '@/lib/sessionLog';
-import ExerciseHeader from './ExerciseHeader';
+import Button from '@/components/ui/Button';
+import Chip from '@/components/ui/Chip';
+import IconButton from '@/components/ui/IconButton';
+import type { IconTileTone } from '@/components/ui/IconTile';
+import SessionScaffold, { SessionCompletion, SessionLabel, useSessionAccent } from './SessionScaffold';
 import type { BreathingPhase, PhaseVisualProps } from './types';
 
 interface PhaseBreathingSessionProps {
@@ -16,7 +19,8 @@ interface PhaseBreathingSessionProps {
   exerciseId: string;
   title: string;
   subtitle: string;
-  accentColor: string;
+  /** The exercise's canvas tone: its accent, glows and progress colour. */
+  tone: IconTileTone;
   phases: BreathingPhase[];
   sessionOptions: readonly number[];
   defaultSessionMinutes: number;
@@ -31,8 +35,8 @@ const TICK_MS = 100;
  * Reusable session shell for breathing exercises that cycle through a fixed
  * set of timed phases (inhale/hold/exhale/…) for a chosen session length.
  * Owns the whole state machine — session length, running/paused/complete,
- * round + progress tracking — and the shared chrome (header, selector,
- * progress bar, completion message, controls). Exercises plug in only
+ * round + progress tracking — and the canvas's session layout (SessionScaffold:
+ * length chips, round label, phase row, progress, completion, play/pause). Exercises plug in only
  * their phase config and a visual (renderVisual); never hardcode one
  * exercise's timings in here.
  *
@@ -43,7 +47,7 @@ export default function PhaseBreathingSession({
   exerciseId,
   title,
   subtitle,
-  accentColor,
+  tone,
   phases,
   sessionOptions,
   defaultSessionMinutes,
@@ -166,325 +170,142 @@ export default function PhaseBreathingSession({
   const sessionProgress = Math.min(totalElapsed / totalSeconds, 1);
   const secondsRemaining = Math.max(Math.ceil(totalSeconds - totalElapsed), 0);
   const isActive = isRunning && !isPaused;
+  const accent = useSessionAccent(tone);
 
   const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
-  const insets = useSafeAreaInsets();
+  const clock = `${num(Math.floor(secondsRemaining / 60))}:${num(secondsRemaining % 60).padStart(2, num(0))}`;
+  const labelLatin = fonts.labelTracked;
+
+  const footer = isComplete ? (
+    <Button label={s.startAgain} onPress={handleStart} />
+  ) : (
+    <>
+      {isRunning ? (
+        <IconButton
+          variant="control"
+          size={56}
+          accessibilityLabel={s.startAgain}
+          onPress={handleStopReset}
+          renderIcon={(c) => <RotateCcw size={22} color={c} strokeWidth={1.7} />}
+        />
+      ) : (
+        <View style={styles.sideSlot} />
+      )}
+      <IconButton
+        variant="primary"
+        size={80}
+        accessibilityLabel={isActive ? s.pause : isPaused ? s.resume : s.begin}
+        onPress={isActive ? handlePause : isPaused ? handleResume : handleStart}
+        renderIcon={(c) => (isActive ? <Pause size={26} color={c} fill={c} /> : <Play size={28} color={c} fill={c} />)}
+      />
+      <View style={styles.sideSlot} />
+    </>
+  );
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ExerciseHeader
-        title={title}
-        subtitle={subtitle}
-        exitLabel={s.exit}
-        onExit={handleExit}
-        accentColor={accentColor}
-      />
+    <SessionScaffold title={title} technique={subtitle} tone={tone} exitLabel={s.exit} onExit={handleExit} footer={footer}>
+      {isComplete ? (
+        <SessionCompletion
+          tone={tone}
+          title={s.wellDone}
+          subtitle={`${s.completedPrefix} ${num(round - 1)} ${round - 1 === 1 ? s.roundSingular : s.roundPlural}`}
+          body={completionBody}
+        />
+      ) : (
+        <>
+          {isRunning ? (
+            <SessionLabel color={accent}>{`${s.round} ${num(round)} ${s.ofTotal} ${num(totalRounds)}`}</SessionLabel>
+          ) : (
+            <View style={styles.lengths}>
+              <SessionLabel color={colors.textTertiary}>{s.chooseSession}</SessionLabel>
+              <View style={styles.chips}>
+                {sessionOptions.map((mins) => (
+                  <Chip
+                    key={mins}
+                    size="sm"
+                    label={`${num(mins)} ${mins === 1 ? s.min : s.minPlural}`}
+                    selected={mins === sessionMinutes}
+                    onPress={() => setSessionMinutes(mins)}
+                  />
+                ))}
+              </View>
+            </View>
+          )}
 
-      {!isRunning && !isComplete && (
-        <View style={styles.selectorWrap}>
-          <Text
-            style={[styles.selectorLabel, { color: colors.textTertiary, fontFamily: fonts.semiBold }]}
-          >
-            {s.chooseSession}
-          </Text>
-          <View style={styles.selectorRow}>
-            {sessionOptions.map((mins) => {
-              const active = mins === sessionMinutes;
-              const unit = mins === 1 ? s.min : s.minPlural;
-              return (
-                <Pressable
-                  key={mins}
-                  onPress={() => setSessionMinutes(mins)}
-                  style={({ pressed }) => [
-                    styles.selectorPill,
-                    {
-                      backgroundColor: active ? accentColor : colors.card,
-                      borderColor: active ? accentColor : colors.border,
-                    },
-                    pressed && { backgroundColor: colors.cardPressed },
-                  ]}
-                >
+          {renderVisual({ phase: currentPhase, phaseIndex, progressInPhase, isRunning, isPaused, isComplete })}
+
+          {isRunning && (
+            <View style={styles.progress}>
+              <View style={styles.phaseRow}>
+                {phases.map((ph, i) => (
                   <Text
+                    key={ph.key}
                     style={[
-                      styles.selectorPillText,
-                      {
-                        color: active ? colors.onPrimary : colors.textSecondary,
-                        fontFamily: fonts.semiBold,
-                      },
+                      labelLatin ? styles.phaseNameLatin : styles.phaseNameArabic,
+                      { color: i === phaseIndex ? colors.text : colors.textTertiary, fontFamily: labelLatin ? fonts.labelRegular : fonts.label },
                     ]}
                   >
-                    {num(mins)} {unit}
+                    {ph.label}
                   </Text>
-                </Pressable>
-              );
-            })}
-          </View>
-        </View>
-      )}
-
-      <View style={styles.main}>
-        {isRunning && (
-          <View style={styles.roundRow}>
-            <Text style={[styles.roundLabel, { color: colors.textTertiary, fontFamily: fonts.regular }]}>
-              {s.round}
-            </Text>
-            <Text style={[styles.roundValue, { color: accentColor, fontFamily: fonts.bold }]}>
-              {num(round)}
-            </Text>
-            <Text style={[styles.roundLabel, { color: colors.textTertiary, fontFamily: fonts.regular }]}>
-              {s.ofTotal} {num(totalRounds)}
-            </Text>
-          </View>
-        )}
-
-        {renderVisual({ phase: currentPhase, phaseIndex, progressInPhase, isRunning, isPaused, isComplete })}
-
-        {isRunning && (
-          <View style={styles.progressWrap}>
-            <View style={[styles.progressTrack, { backgroundColor: colors.border }]}>
+                ))}
+              </View>
               <View
-                style={[
-                  styles.progressFill,
-                  { width: `${sessionProgress * 100}%`, backgroundColor: accentColor },
-                ]}
-              />
+                style={[styles.track, { backgroundColor: colors.borderControl }]}
+                role="progressbar"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={Math.round(sessionProgress * 100)}
+              >
+                <View style={[styles.fill, { width: `${sessionProgress * 100}%`, backgroundColor: accent }]} />
+              </View>
+              <SessionLabel color={colors.textTertiary}>{isPaused ? s.pause : s.timeLeft.replace('{t}', clock)}</SessionLabel>
             </View>
-            <Text style={[styles.progressLabel, { color: colors.textTertiary, fontFamily: fonts.regular }]}>
-              {num(secondsRemaining)}
-              {s.remainingSuffix}
-            </Text>
-          </View>
-        )}
-
-        {isComplete && (
-          <View style={styles.completionWrap}>
-            <Text style={[styles.completionTitle, { color: colors.text, fontFamily: fonts.bold }]}>
-              {s.wellDone}
-            </Text>
-            <Text style={[styles.completionRounds, { color: accentColor, fontFamily: fonts.semiBold }]}>
-              {s.completedPrefix} {num(round - 1)} {round - 1 === 1 ? s.roundSingular : s.roundPlural}
-            </Text>
-            <Text style={[styles.completionBody, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-              {completionBody}
-            </Text>
-          </View>
-        )}
-      </View>
-
-      <View style={[styles.controls, { paddingBottom: spacing.xxl + insets.bottom }]}>
-        {!isRunning && !isComplete && (
-          <Pressable
-            onPress={handleStart}
-            style={({ pressed }) => [
-              styles.primaryBtn,
-              { backgroundColor: accentColor, ...shadows.cardLg },
-              pressed && styles.pressed,
-            ]}
-          >
-            <Play size={20} color={colors.onPrimary} fill={colors.onPrimary} />
-            <Text style={[styles.primaryBtnText, { color: colors.onPrimary, fontFamily: fonts.bold }]}>
-              {s.begin}
-            </Text>
-          </Pressable>
-        )}
-
-        {isActive && (
-          <Pressable
-            onPress={handlePause}
-            style={({ pressed }) => [
-              styles.secondaryBtn,
-              { borderColor: accentColor, backgroundColor: colors.card },
-              pressed && styles.pressed,
-            ]}
-          >
-            <Pause size={20} color={accentColor} fill={accentColor} />
-            <Text style={[styles.secondaryBtnText, { color: accentColor, fontFamily: fonts.bold }]}>
-              {s.pause}
-            </Text>
-          </Pressable>
-        )}
-
-        {isPaused && (
-          <Pressable
-            onPress={handleResume}
-            style={({ pressed }) => [
-              styles.primaryBtn,
-              { backgroundColor: accentColor, ...shadows.cardLg },
-              pressed && styles.pressed,
-            ]}
-          >
-            <Play size={20} color={colors.onPrimary} fill={colors.onPrimary} />
-            <Text style={[styles.primaryBtnText, { color: colors.onPrimary, fontFamily: fonts.bold }]}>
-              {s.resume}
-            </Text>
-          </Pressable>
-        )}
-
-        {isRunning && (
-          <Pressable
-            onPress={handleStopReset}
-            accessibilityLabel={s.startAgain}
-            style={({ pressed }) => [
-              styles.iconBtn,
-              { backgroundColor: colors.card, borderColor: colors.border },
-              pressed && styles.pressed,
-            ]}
-          >
-            <RotateCcw size={20} color={colors.textTertiary} />
-          </Pressable>
-        )}
-
-        {isComplete && (
-          <Pressable
-            onPress={handleStart}
-            style={({ pressed }) => [
-              styles.primaryBtn,
-              { backgroundColor: accentColor, ...shadows.cardLg },
-              pressed && styles.pressed,
-            ]}
-          >
-            <RotateCcw size={20} color={colors.onPrimary} />
-            <Text style={[styles.primaryBtnText, { color: colors.onPrimary, fontFamily: fonts.bold }]}>
-              {s.startAgain}
-            </Text>
-          </Pressable>
-        )}
-      </View>
-    </View>
+          )}
+        </>
+      )}
+    </SessionScaffold>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  sideSlot: {
+    width: 56,
   },
-  selectorWrap: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.xs,
-  },
-  selectorLabel: {
-    textAlign: 'center',
-    fontSize: typography.fontSize.xs,
-    marginBottom: spacing.sm,
-  },
-  selectorRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: spacing.sm,
-  },
-  selectorPill: {
-    height: 34,
-    paddingHorizontal: spacing.lg,
-    borderRadius: radius.full,
-    borderWidth: 1,
+  lengths: {
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: grid(1.5),
   },
-  selectorPillText: {
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.sm,
-  },
-  main: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.lg,
-  },
-  roundRow: {
+  chips: {
     flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: spacing.xs,
-    marginBottom: spacing.md,
+    gap: grid(1),
   },
-  roundLabel: {
-    fontSize: typography.fontSize.xs,
+  progress: {
+    width: 280,
+    alignItems: 'center',
+    gap: grid(1.5),
   },
-  roundValue: {
-    fontSize: typography.fontSize.md,
+  phaseRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: grid(1.5),
   },
-  progressWrap: {
+  phaseNameLatin: {
+    fontSize: 11.5,
+    letterSpacing: 11.5 * 0.12,
+    textTransform: 'uppercase',
+  },
+  phaseNameArabic: {
+    fontSize: 13,
+  },
+  track: {
     width: '100%',
-    maxWidth: 320,
-    marginTop: spacing.xl,
-  },
-  progressTrack: {
-    height: 8,
-    borderRadius: radius.full,
+    height: 4,
+    borderRadius: 2,
     overflow: 'hidden',
   },
-  progressFill: {
+  fill: {
     height: '100%',
-    borderRadius: radius.full,
-  },
-  progressLabel: {
-    textAlign: 'center',
-    fontSize: typography.fontSize.xs,
-    marginTop: spacing.sm,
-  },
-  completionWrap: {
-    marginTop: spacing.xl,
-    alignItems: 'center',
-  },
-  completionTitle: {
-    fontSize: typography.fontSize.xxl,
-  },
-  completionRounds: {
-    fontSize: typography.fontSize.body,
-    marginTop: spacing.xs,
-  },
-  completionBody: {
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.body,
-    textAlign: 'center',
-    marginTop: spacing.md,
-    maxWidth: 320,
-  },
-  controls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xxl,
-    paddingTop: spacing.sm,
-  },
-  primaryBtn: {
-    height: 54,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    paddingHorizontal: spacing.xl,
-    borderRadius: radius.full,
-  },
-  primaryBtnText: {
-    fontSize: typography.fontSize.body,
-    lineHeight: typography.lineHeight.body,
-  },
-  secondaryBtn: {
-    height: 54,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    borderRadius: radius.full,
-    borderWidth: 1,
-  },
-  secondaryBtnText: {
-    fontSize: typography.fontSize.body,
-    lineHeight: typography.lineHeight.body,
-  },
-  iconBtn: {
-    width: 48,
-    height: 48,
-    borderRadius: radius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-  },
-  pressed: {
-    opacity: 0.85,
+    borderRadius: 2,
   },
 });

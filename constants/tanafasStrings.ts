@@ -32,11 +32,6 @@ export const tanafasStrings = {
       comingSoonBody: (name: string) => `${name} is being crafted with care and will be available in a future update.`,
       gotIt: 'Got it',
     },
-    breathingList: {
-      title: 'Breathing & Grounding',
-      subtitle: 'Choose a guided exercise below to help you find your calm.',
-      soon: 'Soon',
-    },
     // Vocabulary shared by the phase-cycling exercises (4-7-8, Box breathing).
     session: {
       chooseSession: 'Choose your session length',
@@ -52,9 +47,10 @@ export const tanafasStrings = {
       begin: 'Begin',
       pause: 'Pause',
       resume: 'Resume',
-      startAgain: 'Start Again',
+      startAgain: 'Start again',
       exit: 'Exit',
       remainingSuffix: 's remaining',
+      timeLeft: '{t} left',
       sec: 's',
     },
     exercises: {
@@ -87,7 +83,7 @@ export const tanafasStrings = {
         stepCounter: (step: number, total: number, sense: string) => `Step ${step} of ${total} · ${sense}`,
         next: 'Next',
         finish: 'Finish',
-        startAgain: 'Start Again',
+        startAgain: 'Start again',
         exit: 'Exit',
         completionTitle: 'Well done',
         completionSubtitle: "You've completed the grounding exercise",
@@ -116,7 +112,7 @@ export const tanafasStrings = {
         wellDone: 'Well done',
         releasedTension: "You've released the tension",
         completionBody: "You've moved through your whole body, tensing and then letting go of each muscle group. Notice the deep, heavy stillness that remains. Let this softness stay with you as you carry on with your day.",
-        startAgain: 'Start Again',
+        startAgain: 'Start again',
         next: 'Next',
         finish: 'Finish',
         groups: [
@@ -150,11 +146,6 @@ export const tanafasStrings = {
       comingSoonBody: (name: string) => `يتم إعداد ${name} بعناية وستكون متاحة في تحديث قادم.`,
       gotIt: 'حسناً',
     },
-    breathingList: {
-      title: 'تمارين التنفس والتأريض',
-      subtitle: 'اختر تمريناً موجهاً أدناه لمساعدتك على الشعور بالهدوء.',
-      soon: 'قريباً',
-    },
     session: {
       chooseSession: 'اختر مدة الجلسة',
       min: 'دقيقة',
@@ -172,6 +163,7 @@ export const tanafasStrings = {
       startAgain: 'ابدأ من جديد',
       exit: 'رجوع',
       remainingSuffix: ' ثانية متبقية',
+      timeLeft: 'متبقٍّ {t}',
       sec: ' ثواني',
     },
     exercises: {

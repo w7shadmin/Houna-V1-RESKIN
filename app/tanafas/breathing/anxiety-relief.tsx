@@ -1,8 +1,8 @@
 import React from 'react';
 import { useRouter } from 'expo-router';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { palette } from '@/constants/theme';
 import PhaseBreathingSession from '@/components/breathing/PhaseBreathingSession';
+import { useSessionAccent } from '@/components/breathing/SessionScaffold';
 import PulsingCircleVisual from '@/components/breathing/PulsingCircleVisual';
 import type { BreathingPhase } from '@/components/breathing/types';
 
@@ -13,7 +13,7 @@ export default function AnxietyReliefBreathingScreen() {
   const { t } = useLanguage();
   const ex = t.tanafas.exercises.anxietyRelief;
   const s = t.tanafas.session;
-  const accent = palette.turquoise;
+  const accent = useSessionAccent('glow');
 
   const phases: BreathingPhase[] = [
     { key: 'inhale', label: ex.inhale, duration: 4 },
@@ -26,7 +26,7 @@ export default function AnxietyReliefBreathingScreen() {
       exerciseId="anxiety-relief"
       title={ex.title}
       subtitle={ex.subtitle}
-      accentColor={accent}
+      tone="glow"
       phases={phases}
       sessionOptions={SESSION_OPTIONS}
       defaultSessionMinutes={3}

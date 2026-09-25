@@ -1,9 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Wind, CheckCircle2 } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { typography } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
+import { alpha } from '@/constants/theme';
 import { arabicNumber } from '@/lib/arabicNumerals';
 import type { PhaseVisualProps } from './types';
 
@@ -13,108 +12,105 @@ interface Props extends PhaseVisualProps {
   secSuffix: string;
 }
 
-const SIZE = 220;
+const BOX = 280;
+const ORB = 200;
 
-/** Circle that expands on inhale, holds, contracts on exhale — for the 4-7-8 exercise. */
-export default function PulsingCircleVisual({
-  phase,
-  progressInPhase,
-  isRunning,
-  isComplete,
-  accentColor,
-  readyLabel,
-  secSuffix,
-}: Props) {
+/**
+ * 4-7-8 breathing: a glowing orb that swells on the inhale, rests full on
+ * the hold and settles on the exhale, inside the canvas's dotted and solid
+ * rings, with the phase word in the display face at its centre.
+ */
+export default function PulsingCircleVisual({ phase, progressInPhase, isRunning, isComplete, accentColor, readyLabel, secSuffix }: Props) {
   const { colors } = useTheme();
   const { isRTL, fonts } = useLanguage();
 
-  let scale = 1;
-  let opacity = 1;
-  if (phase.key === 'inhale') {
-    scale = 0.5 + progressInPhase * 0.5;
-    opacity = 0.4 + progressInPhase * 0.6;
-  } else if (phase.key === 'hold') {
-    scale = 1;
-    opacity = 1;
-  } else if (phase.key === 'exhale') {
-    scale = 1 - progressInPhase * 0.5;
-    opacity = 1 - progressInPhase * 0.6;
+  let scale = 0.62;
+  if (isRunning && !isComplete) {
+    if (phase.key === 'inhale') scale = 0.62 + progressInPhase * 0.38;
+    else if (phase.key === 'hold') scale = 1;
+    else if (phase.key === 'exhale') scale = 1 - progressInPhase * 0.38;
   }
-
   const secondsLeft = Math.max(Math.ceil(phase.duration * (1 - progressInPhase)), 0);
   const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
 
   return (
-    <View style={styles.wrap}>
-      <View style={[styles.guideRing, { borderColor: accentColor + '40' }]} />
+    <View style={styles.box} accessibilityElementsHidden={!isRunning} importantForAccessibility={isRunning ? 'auto' : 'no-hide-descendants'}>
+      <View style={[styles.dotted, { borderColor: alpha(accentColor, 0.4) }]} />
+      <View style={[styles.inner, { borderColor: colors.borderControl }]} />
       <View
         style={[
-          styles.circle,
+          styles.orb,
           {
-            backgroundColor: isComplete ? accentColor + '22' : accentColor,
-            transform: [{ scale: isComplete ? 0.85 : scale }],
-            opacity: isComplete ? 1 : opacity,
+            backgroundColor: alpha(accentColor, 0.22),
+            borderColor: alpha(accentColor, 0.5),
+            boxShadow: `0 0 42px ${alpha(accentColor, 0.45)}`,
+            transform: [{ scale }],
           },
         ]}
       />
-      <View style={styles.content}>
-        {isComplete ? (
-          <CheckCircle2 size={52} color={accentColor} strokeWidth={1.5} />
-        ) : isRunning ? (
+      <View style={styles.centre} accessibilityLiveRegion="polite">
+        {isRunning ? (
           <>
-            <Text style={[styles.phaseLabel, { fontFamily: fonts.bold }]}>{phase.label}</Text>
-            <Text style={[styles.phaseTime, { fontFamily: fonts.semiBold }]}>
+            <Text style={[styles.phase, isRTL && styles.phaseArabic, { color: colors.text, fontFamily: fonts.display }]}>{phase.label}</Text>
+            <Text style={[styles.secs, { color: colors.textSecondary, fontFamily: fonts.labelRegular }]}>
               {num(secondsLeft)}
               {secSuffix}
             </Text>
           </>
-        ) : (
-          <>
-            <Wind size={32} color={accentColor} strokeWidth={1.5} />
-            <Text style={[styles.readyLabel, { color: colors.textTertiary, fontFamily: fonts.regular }]}>{readyLabel}</Text>
-          </>
-        )}
+        ) : !isComplete ? (
+          <Text style={[styles.ready, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{readyLabel}</Text>
+        ) : null}
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: {
-    width: SIZE + 40,
-    height: SIZE + 40,
+  box: {
+    width: BOX,
+    height: BOX,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  guideRing: {
+  dotted: {
     position: 'absolute',
-    width: SIZE + 40,
-    height: SIZE + 40,
-    borderRadius: (SIZE + 40) / 2,
+    width: 240,
+    height: 240,
+    borderRadius: 120,
     borderWidth: 2,
-    borderStyle: 'dashed',
+    borderStyle: 'dotted',
   },
-  circle: {
+  inner: {
     position: 'absolute',
-    width: SIZE,
-    height: SIZE,
-    borderRadius: SIZE / 2,
+    width: 192,
+    height: 192,
+    borderRadius: 96,
+    borderWidth: 1,
   },
-  content: {
+  orb: {
+    position: 'absolute',
+    width: ORB,
+    height: ORB,
+    borderRadius: ORB / 2,
+    borderWidth: 1,
+  },
+  centre: {
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: 4,
   },
-  phaseLabel: {
-    fontSize: typography.fontSize.xl,
-    color: '#ffffff',
+  phase: {
+    fontSize: 46,
+    lineHeight: 52,
   },
-  phaseTime: {
-    fontSize: typography.fontSize.body,
-    color: 'rgba(255,255,255,0.85)',
-    marginTop: 2,
+  phaseArabic: {
+    lineHeight: 72,
   },
-  readyLabel: {
-    fontSize: typography.fontSize.sm,
-    marginTop: 8,
+  secs: {
+    fontSize: 15,
+  },
+  ready: {
+    fontSize: 15,
+    textAlign: 'center',
+    maxWidth: 160,
   },
 });

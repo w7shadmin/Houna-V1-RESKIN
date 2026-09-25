@@ -114,7 +114,7 @@ export default function JournalEntryScreen() {
     setIsEditing(false);
 
     // Streak/leaderboard activity signal (Segment 5) — Alias-only, silent;
-    // same 'mood' kind HomeMoodCard's quick check-in uses, since either one
+    // same 'mood' kind as the mood check-in, since either one
     // marks the day as active for streak purposes.
     recordTanafasSession('mood', new Date()).catch(() => {});
   };

@@ -1,39 +1,31 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, ArrowRight, Pause, Play, RotateCcw, CheckCircle2 } from 'lucide-react-native';
+import { Check, Pause, Play } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { palette, spacing, radius, typography, shadows } from '@/constants/theme';
+import { alpha, grid } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
 import { arabicNumber } from '@/lib/arabicNumerals';
 import { useSessionLog } from '@/hooks/useSessionLog';
-import ExerciseHeader from '@/components/breathing/ExerciseHeader';
+import SessionScaffold, { SessionCompletion, SessionLabel, useSessionAccent } from '@/components/breathing/SessionScaffold';
+import Button from '@/components/ui/Button';
+import IconButton from '@/components/ui/IconButton';
+import { DirectionalIcon } from '@/components/ui/CanvasIcon';
 
-const RELEASE_COLOR = palette.peach; // #F9A980
-const TENSE_COLOR = '#C97654'; // peach, darkened — deep vs. soft, not a new hue
+const TONE = 'glow' as const;
 const TENSE_MS = 5000;
 const RELEASE_MS = 7000;
 
-function hexToRgb(hex: string) {
-  const clean = hex.replace('#', '');
-  const num = parseInt(clean, 16);
-  return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
-}
-
-function blend(from: string, to: string, t: number): string {
-  const f = hexToRgb(from);
-  const g = hexToRgb(to);
-  const r = Math.round(f.r + (g.r - f.r) * t);
-  const gr = Math.round(f.g + (g.g - f.g) * t);
-  const b = Math.round(f.b + (g.b - f.b) * t);
-  return `rgb(${r}, ${gr}, ${b})`;
-}
-
+/**
+ * Progressive muscle relaxation: each group tensed, then released, on a
+ * timer, with the orb drawing in as you tense and opening as you let go.
+ */
 export default function TensionReleaseScreen() {
   const { colors } = useTheme();
   const router = useRouter();
   const { t, isRTL, fonts } = useLanguage();
   const ex = t.tanafas.exercises.tensionRelease;
+  const accent = useSessionAccent(TONE);
   const groups = ex.groups;
 
   const [groupIndex, setGroupIndex] = useState(0);
@@ -140,342 +132,173 @@ export default function TensionReleaseScreen() {
   const currentGroup = groups[groupIndex];
   const progress = Math.min(elapsed / phaseDuration, 1);
   const isLastGroup = groupIndex === groups.length - 1;
+  const isFinalStep = isLastGroup && phase === 'release';
   const secondsLeft = Math.max(Math.ceil((phaseDuration - elapsed) / 1000), 0);
   const isTense = phase === 'tense';
   const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
 
-  const minScale = 0.55;
-  const scale = isTense ? 1 - progress * (1 - minScale) : minScale + progress * (1 - minScale);
-  const fillColor = isTense ? blend(RELEASE_COLOR, TENSE_COLOR, progress) : blend(TENSE_COLOR, RELEASE_COLOR, progress);
+  // Tensing draws the orb in and deepens it; releasing lets it open and soften.
+  const scale = isTense ? 1 - progress * 0.4 : 0.6 + progress * 0.4;
+  const fill = isTense ? 0.18 + progress * 0.4 : 0.58 - progress * 0.4;
+
+  const footer = isComplete ? (
+    <Button label={ex.startAgain} onPress={handleStartAgain} />
+  ) : (
+    <>
+      <IconButton
+        variant="control"
+        size={56}
+        accessibilityLabel={t.directory.common.goBack}
+        onPress={handleBack}
+        disabled={groupIndex === 0 && isTense}
+        renderIcon={(c) => <DirectionalIcon isRTL={isRTL} name="back" size={22} strokeWidth={1.8} color={c} />}
+      />
+      <IconButton
+        variant="primary"
+        size={80}
+        accessibilityLabel={isPaused ? t.tanafas.session.resume : t.tanafas.session.pause}
+        onPress={() => setIsPaused((v) => !v)}
+        renderIcon={(c) => (isPaused ? <Play size={28} color={c} fill={c} /> : <Pause size={26} color={c} fill={c} />)}
+      />
+      <IconButton
+        variant="control"
+        size={56}
+        accessibilityLabel={isFinalStep ? ex.finish : ex.next}
+        onPress={handleNext}
+        renderIcon={(c) =>
+          isFinalStep ? <Check size={22} color={c} strokeWidth={1.8} /> : <DirectionalIcon isRTL={isRTL} name="arrow" size={22} strokeWidth={1.8} color={c} />
+        }
+      />
+    </>
+  );
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <ExerciseHeader
-        title={ex.title}
-        exitLabel={ex.exit}
-        onExit={handleExit}
-        accentColor={RELEASE_COLOR}
-      />
-
-      {!isComplete && (
-        <View style={styles.dots}>
-          {groups.map((_, i) => (
-            <Pressable key={i} onPress={() => goToGroup(i)} hitSlop={8}>
-              <View
-                style={[
-                  styles.dot,
-                  {
-                    width: i === groupIndex ? 22 : 6,
-                    backgroundColor:
-                      i === groupIndex ? RELEASE_COLOR : i < groupIndex ? RELEASE_COLOR + '66' : colors.border,
-                  },
-                ]}
-              />
-            </Pressable>
-          ))}
-        </View>
-      )}
-
-      <View style={styles.main}>
-        {isComplete ? (
-          <View style={styles.completionWrap}>
-            <View style={[styles.completionBadge, { backgroundColor: RELEASE_COLOR + '22' }]}>
-              <CheckCircle2 size={52} color={TENSE_COLOR} strokeWidth={1.5} />
-            </View>
-            <Text style={[styles.completionTitle, { color: colors.text, fontFamily: fonts.bold }]}>
-              {ex.wellDone}
-            </Text>
-            <Text style={[styles.completionSubtitle, { color: TENSE_COLOR, fontFamily: fonts.semiBold }]}>
-              {ex.releasedTension}
-            </Text>
-            <Text style={[styles.completionBody, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-              {ex.completionBody}
-            </Text>
-          </View>
-        ) : (
-          <View style={styles.groupWrap}>
-            <Text style={[styles.groupName, { color: colors.text, fontFamily: fonts.bold }]}>
+    <SessionScaffold title={ex.title} tone={TONE} exitLabel={ex.exit} onExit={handleExit} footer={footer}>
+      {isComplete ? (
+        <SessionCompletion tone={TONE} title={ex.wellDone} subtitle={ex.releasedTension} body={ex.completionBody} />
+      ) : (
+        <>
+          <View style={styles.groupHead}>
+            <SessionLabel color={accent}>{isTense ? ex.tense : ex.release}</SessionLabel>
+            <Text style={[styles.groupName, isRTL && styles.groupNameArabic, { color: colors.text, fontFamily: fonts.display }]}>
               {currentGroup.name}
             </Text>
-            <Text style={[styles.phaseLabel, { color: isTense ? TENSE_COLOR : RELEASE_COLOR, fontFamily: fonts.bold }]}>
-              {isTense ? ex.tense : ex.release}
-            </Text>
-
-            <View style={styles.circleWrap}>
-              <View style={[styles.circleGuide, { borderColor: RELEASE_COLOR + '40' }]} />
-              <View
-                style={[
-                  styles.circle,
-                  {
-                    backgroundColor: fillColor,
-                    transform: [{ scale }],
-                  },
-                ]}
-              />
-              <View style={styles.circleContent}>
-                <Text style={[styles.countdown, { fontFamily: fonts.bold }]}>{num(secondsLeft)}</Text>
-                <Text style={[styles.countdownLabel, { fontFamily: fonts.semiBold }]}>
-                  {isTense ? ex.holdTight : ex.letGo}
-                </Text>
-              </View>
-            </View>
-
-            <Text style={[styles.guidance, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-              {isTense ? currentGroup.tensePrompt : currentGroup.releasePrompt}
-            </Text>
-
-            {isRunning && !isPaused && (
-              <View style={[styles.progressTrack, { backgroundColor: colors.border }]}>
-                <View
-                  style={[
-                    styles.progressFill,
-                    { width: `${progress * 100}%`, backgroundColor: isTense ? TENSE_COLOR : RELEASE_COLOR },
-                  ]}
-                />
-              </View>
-            )}
-
-            <Text style={[styles.groupCounter, { color: colors.textTertiary, fontFamily: fonts.regular }]}>
-              {ex.groupOf} {num(groupIndex + 1)} {ex.ofTotal} {num(groups.length)}
-            </Text>
-
-            {isPaused && (
-              <Text style={[styles.pausedLabel, { color: RELEASE_COLOR, fontFamily: fonts.semiBold }]}>
-                {ex.paused}
-              </Text>
-            )}
           </View>
-        )}
-      </View>
 
-      <View style={styles.controls}>
-        {isComplete ? (
-          <Pressable
-            onPress={handleStartAgain}
-            style={({ pressed }) => [
-              styles.primaryBtn,
-              { backgroundColor: RELEASE_COLOR, ...shadows.cardLg },
-              pressed && styles.pressed,
-            ]}
-          >
-            <RotateCcw size={20} color={colors.onPrimary} />
-            <Text style={[styles.primaryBtnText, { color: colors.onPrimary, fontFamily: fonts.bold }]}>
-              {ex.startAgain}
-            </Text>
-          </Pressable>
-        ) : (
-          <>
-            <Pressable
-              onPress={handleBack}
-              disabled={groupIndex === 0 && phase === 'tense'}
-              style={({ pressed }) => [
-                styles.iconBtn,
+          <View style={styles.box} accessibilityLiveRegion="polite">
+            <View style={[styles.dotted, { borderColor: alpha(accent, 0.4) }]} />
+            <View style={[styles.inner, { borderColor: colors.borderControl }]} />
+            <View
+              style={[
+                styles.orb,
                 {
-                  backgroundColor: colors.card,
-                  borderColor: colors.border,
-                  opacity: groupIndex === 0 && phase === 'tense' ? 0.5 : 1,
+                  backgroundColor: alpha(accent, fill),
+                  borderColor: alpha(accent, 0.5),
+                  boxShadow: `0 0 42px ${alpha(accent, 0.45)}`,
+                  transform: [{ scale }],
                 },
-                pressed && styles.pressed,
               ]}
-            >
-              <View style={isRTL ? styles.flip : undefined}>
-<ArrowLeft size={20} color={colors.textSecondary} />
-</View>
-            </Pressable>
-
-            <Pressable
-              onPress={() => setIsPaused((p) => !p)}
-              style={({ pressed }) => [
-                styles.iconBtn,
-                { backgroundColor: colors.card, borderColor: RELEASE_COLOR },
-                pressed && styles.pressed,
-              ]}
-            >
-              {isPaused ? (
-                <Play size={20} color={RELEASE_COLOR} fill={RELEASE_COLOR} />
-              ) : (
-                <Pause size={20} color={RELEASE_COLOR} fill={RELEASE_COLOR} />
-              )}
-            </Pressable>
-
-            <Pressable
-              onPress={handleNext}
-              style={({ pressed }) => [
-                styles.primaryBtn,
-                { backgroundColor: RELEASE_COLOR, ...shadows.cardLg },
-                pressed && styles.pressed,
-              ]}
-            >
-              <Text style={[styles.primaryBtnText, { color: colors.onPrimary, fontFamily: fonts.bold }]}>
-                {isLastGroup && phase === 'release' ? ex.finish : ex.next}
+            />
+            <View style={styles.centre}>
+              <Text style={[styles.countdown, isRTL && styles.countdownArabic, { color: colors.text, fontFamily: fonts.display }]}>
+                {num(secondsLeft)}
               </Text>
-              {!(isLastGroup && phase === 'release') && (
-                <View style={isRTL ? styles.flip : undefined}>
-<ArrowRight size={20} color={colors.onPrimary} />
-</View>
-              )}
-            </Pressable>
-          </>
-        )}
-      </View>
-    </View>
+              <Text style={[styles.cue, { color: colors.textSecondary, fontFamily: fonts.medium }]}>{isTense ? ex.holdTight : ex.letGo}</Text>
+            </View>
+          </View>
+
+          <Text style={[styles.guidance, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
+            {isTense ? currentGroup.tensePrompt : currentGroup.releasePrompt}
+          </Text>
+
+          <View style={styles.progress}>
+            <View style={[styles.track, { backgroundColor: colors.borderControl }]}>
+              <View style={[styles.fill, { width: `${progress * 100}%`, backgroundColor: accent }]} />
+            </View>
+            <SessionLabel color={colors.textTertiary}>
+              {isPaused ? ex.paused : `${ex.groupOf} ${num(groupIndex + 1)} ${ex.ofTotal} ${num(groups.length)}`}
+            </SessionLabel>
+          </View>
+        </>
+      )}
+    </SessionScaffold>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  dots: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+  groupHead: {
     alignItems: 'center',
-    gap: 6,
-    paddingTop: spacing.sm,
-  },
-  dot: {
-    height: 6,
-    borderRadius: 3,
-  },
-  main: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: spacing.lg,
-  },
-  groupWrap: {
-    alignItems: 'center',
-    width: '100%',
-    maxWidth: 340,
+    gap: grid(1),
   },
   groupName: {
-    fontSize: typography.fontSize.lg,
+    fontSize: 30,
+    lineHeight: 36,
+    textAlign: 'center',
   },
-  phaseLabel: {
-    fontSize: typography.fontSize.body,
-    marginTop: 2,
+  groupNameArabic: {
+    lineHeight: 48,
   },
-  circleWrap: {
-    width: 200,
-    height: 200,
+  box: {
+    width: 240,
+    height: 240,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: spacing.lg,
   },
-  circleGuide: {
+  dotted: {
     position: 'absolute',
-    width: 200,
-    height: 200,
-    borderRadius: 100,
+    width: 220,
+    height: 220,
+    borderRadius: 110,
     borderWidth: 2,
-    borderStyle: 'dashed',
+    borderStyle: 'dotted',
   },
-  circle: {
+  inner: {
     position: 'absolute',
-    width: 150,
-    height: 150,
-    borderRadius: 75,
+    width: 176,
+    height: 176,
+    borderRadius: 88,
+    borderWidth: 1,
   },
-  circleContent: {
+  orb: {
+    position: 'absolute',
+    width: 184,
+    height: 184,
+    borderRadius: 92,
+    borderWidth: 1,
+  },
+  centre: {
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: 4,
   },
   countdown: {
-    fontSize: 40,
-    lineHeight: 44,
-    color: '#ffffff',
+    fontSize: 46,
+    lineHeight: 52,
   },
-  countdownLabel: {
-    fontSize: typography.fontSize.xs,
-    color: 'rgba(255,255,255,0.85)',
-    marginTop: 2,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
+  countdownArabic: {
+    lineHeight: 72,
+  },
+  cue: {
+    fontSize: 14,
   },
   guidance: {
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.body,
+    fontSize: 15,
+    lineHeight: 24,
     textAlign: 'center',
-    marginTop: spacing.lg,
+    maxWidth: 320,
   },
-  progressTrack: {
-    width: 160,
+  progress: {
+    width: 240,
+    alignItems: 'center',
+    gap: grid(1.5),
+  },
+  track: {
+    width: '100%',
     height: 4,
     borderRadius: 2,
     overflow: 'hidden',
-    marginTop: spacing.md,
   },
-  progressFill: {
+  fill: {
     height: '100%',
     borderRadius: 2,
-  },
-  groupCounter: {
-    fontSize: typography.fontSize.xs,
-    marginTop: spacing.sm,
-  },
-  pausedLabel: {
-    fontSize: typography.fontSize.sm,
-    marginTop: spacing.sm,
-  },
-  completionWrap: {
-    alignItems: 'center',
-    maxWidth: 320,
-  },
-  completionBadge: {
-    width: 120,
-    height: 120,
-    borderRadius: radius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  completionTitle: {
-    fontSize: typography.fontSize.xxl,
-    marginTop: spacing.xl,
-  },
-  completionSubtitle: {
-    fontSize: typography.fontSize.body,
-    marginTop: spacing.xs,
-  },
-  completionBody: {
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.body,
-    textAlign: 'center',
-    marginTop: spacing.md,
-  },
-  controls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xxl,
-    paddingTop: spacing.sm,
-  },
-  primaryBtn: {
-    height: 54,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    paddingHorizontal: spacing.xl,
-    borderRadius: radius.full,
-  },
-  primaryBtnText: {
-    fontSize: typography.fontSize.body,
-    lineHeight: typography.lineHeight.body,
-  },
-  iconBtn: {
-    width: 48,
-    height: 48,
-    borderRadius: radius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-  },
-  flip: {
-    transform: [{ scaleX: -1 }],
-  },
-  pressed: {
-    opacity: 0.85,
   },
 });

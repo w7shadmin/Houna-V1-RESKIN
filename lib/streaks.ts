@@ -4,7 +4,7 @@ import { localDateString } from './journal';
 /**
  * Streaks/leaderboard (Segment 5 of the accounts roadmap) — reads the same
  * `tanafas_sessions` table Segment 2's usage tracking writes to, now also
- * fed by mood/journal activity (`kind: 'mood'`, see HomeMoodCard.tsx and
+ * fed by mood/journal activity (`kind: 'mood'`, see the check-in and
  * the journal entry screen).
  *
  * Streak math runs client-side against the caller's own rows (already

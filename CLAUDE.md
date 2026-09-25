@@ -231,11 +231,16 @@ audio can only be verified in an Android dev-client build.
 needs `npx expo prebuild --clean` + reinstalling the dev client to apply,
 like `userInterfaceStyle: "automatic"`.
 
-**Legacy, still to migrate**: the old `palette` export and `OLD_MVP_ICON_HEX`
-/ `FlatIconTile` / `GradientTile` / `IconTile3D` remain on screens the
-canvas doesn't design (topic grid, breathing list, stats, exercise accents,
-entry, some detail screens). Move them onto `IconTile` and tokens when
-touched, then delete the legacy exports.
+**Legacy, still to migrate**: the old `palette` export and older styling
+(`shadows.card`, `primaryLightest`) remain on the account screens (profile,
+sign-up, stats, notifications), About, More's leftovers, Voices and
+`ComingSoon`. Move them onto the primitives and tokens when touched, then
+delete `palette`.
+
+**Exercise sessions** share `components/breathing/SessionScaffold.tsx` (the
+canvas "Breathing session" artboard: tone glows, close + title/technique,
+`SessionLabel`, `SessionCompletion`). Each exercise picks a canvas tone:
+4-7-8 glow, box dusk, five senses dawn, muscle relaxation glow.
 
 **Directory pages** are all in the canvas language now: list pages use
 `components/directory/PageHeader.tsx`; the professional / organization /

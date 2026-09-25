@@ -17,8 +17,7 @@ interface IconTileProps {
 /**
  * The one icon-tile pattern for Nightlight/Daylight: a 12% tint of the
  * tone with a slightly stronger border, icon in the tone colour (deepened
- * on Day for contrast). Replaces both `FlatIconTile` and the glossy
- * `GradientTile`/`IconTile3D` as screens move over.
+ * on Day for contrast).
  */
 export default function IconTile({ renderIcon, tone = 'glow', size = 52, style }: IconTileProps) {
   const { colors } = useTheme();

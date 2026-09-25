@@ -1,9 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Square, CheckCircle2 } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { typography } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
+import { alpha } from '@/constants/theme';
 import { arabicNumber } from '@/lib/arabicNumerals';
 import type { PhaseVisualProps } from './types';
 
@@ -14,156 +13,115 @@ interface Props extends PhaseVisualProps {
   phaseCount: number;
 }
 
-const SQUARE = 200;
-/** Keeps the tracing dot's path inside the dashed border instead of sitting directly on it. */
-const TRACK_INSET = 16;
-const TRACK_SIZE = SQUARE - TRACK_INSET * 2;
+const BOX = 280;
+const OUTER = 240;
+const ORB = 20;
+/** The orb travels just inside the dotted square, one edge per phase. */
+const TRACK_MIN = (BOX - OUTER) / 2 + 14;
+const TRACK = OUTER - 28;
 
-/** Square with a dot tracing the perimeter (one edge per phase) — for box/4x4 breathing. */
-export default function TracingSquareVisual({
-  phase,
-  phaseIndex,
-  progressInPhase,
-  isRunning,
-  isComplete,
-  accentColor,
-  readyLabel,
-  secSuffix,
-  phaseCount,
-}: Props) {
+/**
+ * Box (4×4) breathing, as drawn on the canvas: a dotted rounded square and
+ * an inner square, with a glowing orb tracing one edge per phase and the
+ * phase word in the display face at the centre. The orb moves by transform
+ * from the box's centre, so its path is the same in both text directions.
+ */
+export default function TracingSquareVisual({ phase, phaseIndex, progressInPhase, isRunning, isComplete, accentColor, readyLabel, secSuffix }: Props) {
   const { colors } = useTheme();
   const { isRTL, fonts } = useLanguage();
 
-  let dotX = SQUARE / 2;
-  let dotY = SQUARE / 2;
-  if (!isComplete) {
-    const p = progressInPhase;
-    switch (phaseIndex % 4) {
-      case 0: dotX = TRACK_INSET + p * TRACK_SIZE; dotY = TRACK_INSET; break;
-      case 1: dotX = SQUARE - TRACK_INSET; dotY = TRACK_INSET + p * TRACK_SIZE; break;
-      case 2: dotX = TRACK_INSET + (1 - p) * TRACK_SIZE; dotY = SQUARE - TRACK_INSET; break;
-      case 3: dotX = TRACK_INSET; dotY = TRACK_INSET + (1 - p) * TRACK_SIZE; break;
-    }
+  const p = isRunning ? progressInPhase : 0;
+  let x = TRACK_MIN;
+  let y = TRACK_MIN;
+  switch (isRunning ? phaseIndex % 4 : 0) {
+    case 0: x = TRACK_MIN + p * TRACK; y = TRACK_MIN; break;
+    case 1: x = TRACK_MIN + TRACK; y = TRACK_MIN + p * TRACK; break;
+    case 2: x = TRACK_MIN + (1 - p) * TRACK; y = TRACK_MIN + TRACK; break;
+    case 3: x = TRACK_MIN; y = TRACK_MIN + (1 - p) * TRACK; break;
   }
-
   const secondsLeft = Math.max(Math.ceil(phase.duration * (1 - progressInPhase)), 0);
   const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
 
   return (
-    <View style={styles.wrap}>
-      <View style={[styles.square, { borderColor: accentColor + '40' }]} />
-
-      {isComplete && (
-        <View style={[styles.square, styles.completeFill, { backgroundColor: accentColor + '18' }]} />
-      )}
-
+    <View style={styles.box}>
+      <View style={[styles.outer, { borderColor: alpha(accentColor, 0.4) }]} />
+      <View style={[styles.inner, { borderColor: colors.borderControl }]} />
       {!isComplete && (
         <View
           style={[
-            styles.dot,
+            styles.orb,
             {
+              // Absolute with no insets centres the orb in the box; offset from there.
+              transform: [{ translateX: x - BOX / 2 }, { translateY: y - BOX / 2 }],
               backgroundColor: accentColor,
-              left: dotX,
-              top: dotY,
-              opacity: isRunning ? 1 : 0.4,
+              boxShadow: `0 0 18px ${alpha(accentColor, 0.9)}, 0 0 42px ${alpha(accentColor, 0.45)}`,
+              opacity: isRunning ? 1 : 0.45,
             },
           ]}
         />
       )}
-
-      <View style={styles.content}>
-        {isComplete ? (
-          <CheckCircle2 size={48} color={accentColor} strokeWidth={1.5} />
-        ) : isRunning ? (
+      <View style={styles.centre} accessibilityLiveRegion="polite">
+        {isRunning ? (
           <>
-            <Text style={[styles.phaseLabel, { color: colors.text, fontFamily: fonts.bold }]}>
-              {phase.label}
-            </Text>
-            <Text style={[styles.phaseTime, { color: accentColor, fontFamily: fonts.semiBold }]}>
+            <Text style={[styles.phase, isRTL && styles.phaseArabic, { color: colors.text, fontFamily: fonts.display }]}>{phase.label}</Text>
+            <Text style={[styles.secs, { color: colors.textSecondary, fontFamily: fonts.labelRegular }]}>
               {num(secondsLeft)}
               {secSuffix}
             </Text>
           </>
-        ) : (
-          <>
-            <Square size={30} color={accentColor} strokeWidth={1.5} />
-            <Text style={[styles.readyLabel, { color: colors.textTertiary, fontFamily: fonts.regular }]}>
-              {readyLabel}
-            </Text>
-          </>
-        )}
+        ) : !isComplete ? (
+          <Text style={[styles.ready, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{readyLabel}</Text>
+        ) : null}
       </View>
-
-      {isRunning && (
-        <View style={styles.pips}>
-          {Array.from({ length: phaseCount }).map((_, i) => (
-            <View
-              key={i}
-              style={[
-                styles.pip,
-                {
-                  width: i === phaseIndex ? 26 : 14,
-                  backgroundColor:
-                    i === phaseIndex ? accentColor : i < phaseIndex ? accentColor + '55' : colors.border,
-                },
-              ]}
-            />
-          ))}
-        </View>
-      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: {
-    width: SQUARE,
-    height: SQUARE,
+  box: {
+    width: BOX,
+    height: BOX,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  square: {
+  outer: {
     position: 'absolute',
-    width: SQUARE,
-    height: SQUARE,
-    borderRadius: 8,
+    width: OUTER,
+    height: OUTER,
+    borderRadius: 42,
     borderWidth: 2,
-    borderStyle: 'dashed',
+    borderStyle: 'dotted',
   },
-  completeFill: {
-    borderWidth: 0,
-  },
-  dot: {
+  inner: {
     position: 'absolute',
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    marginLeft: -8,
-    marginTop: -8,
+    width: 192,
+    height: 192,
+    borderRadius: 26,
+    borderWidth: 1,
   },
-  content: {
+  orb: {
+    position: 'absolute',
+    width: ORB,
+    height: ORB,
+    borderRadius: ORB / 2,
+  },
+  centre: {
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: 4,
   },
-  phaseLabel: {
-    fontSize: typography.fontSize.xl,
+  phase: {
+    fontSize: 46,
+    lineHeight: 52,
   },
-  phaseTime: {
-    fontSize: typography.fontSize.body,
-    marginTop: 2,
+  phaseArabic: {
+    lineHeight: 72,
   },
-  readyLabel: {
-    fontSize: typography.fontSize.sm,
-    marginTop: 8,
+  secs: {
+    fontSize: 15,
   },
-  pips: {
-    position: 'absolute',
-    bottom: -32,
-    flexDirection: 'row',
-    gap: 6,
-  },
-  pip: {
-    height: 6,
-    borderRadius: 3,
+  ready: {
+    fontSize: 15,
+    textAlign: 'center',
+    maxWidth: 160,
   },
 });
