@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, Image, Pressable, Modal, SectionList, Alert, ActivityIndicator, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
@@ -29,6 +29,15 @@ export default function ProfileScreen() {
       router.replace('/(tabs)/more');
     }
   }, [authLoading, session, profile, router]);
+
+  const sections = useMemo(() => {
+    const gccSet = new Set<string>(GCC_CODES);
+    const list = getCountryList(language);
+    return [
+      { title: s.gccGroup, data: list.filter((c) => gccSet.has(c.code)) },
+      { title: s.allCountries, data: list.filter((c) => !gccSet.has(c.code)) },
+    ];
+  }, [language, s.gccGroup, s.allCountries]);
 
   if (!session || !profile) return null;
 
@@ -80,11 +89,6 @@ export default function ProfileScreen() {
   };
 
   const countryName = profile.country ? getCountryName(profile.country, language) : null;
-  const gccSet = new Set<string>(GCC_CODES);
-  const sections = [
-    { title: s.gccGroup, data: getCountryList(language).filter((c) => gccSet.has(c.code)) },
-    { title: s.allCountries, data: getCountryList(language).filter((c) => !gccSet.has(c.code)) },
-  ];
 
   return (
     <DetailScreen title={s.title}>
@@ -137,23 +141,10 @@ export default function ProfileScreen() {
             >
               {countryName ?? s.selectCountry}
             </Text>
-            <ChevronRight size={16} color={colors.textTertiary} style={isRTL ? styles.flip : undefined} />
+            <View style={isRTL ? styles.flip : undefined}>
+<ChevronRight size={16} color={colors.textTertiary} />
+</View>
           </View>
-        </Pressable>
-
-        <Pressable
-          onPress={() => router.push('/account/community')}
-          style={({ pressed }) => [
-            styles.row,
-            styles.rowPressable,
-            { borderTopColor: colors.borderLight },
-            pressed && { backgroundColor: colors.cardPressed },
-          ]}
-        >
-          <Text style={[styles.rowLabelFixed, styles.rowLabelGrow, { color: colors.text, fontFamily: fonts.semiBold }]}>
-            {s.communityMap}
-          </Text>
-          <ChevronRight size={16} color={colors.textTertiary} style={isRTL ? styles.flip : undefined} />
         </Pressable>
 
         <Pressable
@@ -168,7 +159,9 @@ export default function ProfileScreen() {
           <Text style={[styles.rowLabelFixed, styles.rowLabelGrow, { color: colors.text, fontFamily: fonts.semiBold }]}>
             {s.streakStats}
           </Text>
-          <ChevronRight size={16} color={colors.textTertiary} style={isRTL ? styles.flip : undefined} />
+          <View style={isRTL ? styles.flip : undefined}>
+<ChevronRight size={16} color={colors.textTertiary} />
+</View>
         </Pressable>
       </View>
 

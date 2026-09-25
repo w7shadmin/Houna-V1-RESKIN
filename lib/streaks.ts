@@ -5,9 +5,7 @@ import { localDateString } from './journal';
  * Streaks/leaderboard (Segment 5 of the accounts roadmap) — reads the same
  * `tanafas_sessions` table Segment 2's usage tracking writes to, now also
  * fed by mood/journal activity (`kind: 'mood'`, see HomeMoodCard.tsx and
- * the journal entry screen). Wim Hof/Nervous System Reset never appears
- * here — it doesn't use the shared session shell that calls
- * `recordTanafasSession`, so it never writes a row in the first place.
+ * the journal entry screen).
  *
  * Streak math runs client-side against the caller's own rows (already
  * readable under `tanafas_sessions`' own-row RLS) rather than a server

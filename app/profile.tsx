@@ -35,7 +35,7 @@ export default function ProfileScreen() {
   const { colors } = useTheme();
   const router = useRouter();
   const { t, fonts, isRTL, language, setLanguage } = useLanguage();
-  const { profile, signOut } = useAuth();
+  const { profile, signOut, isGuest, needsUsername } = useAuth();
   const p = t.profile;
   const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
 
@@ -127,6 +127,21 @@ export default function ProfileScreen() {
               </Pressable>
             </View>
           </View>
+        ) : needsUsername ? (
+          // Signed in, alias not claimed yet — finish setup (was on More's account card).
+          <Pressable
+            accessibilityRole="link"
+            onPress={go('/account/username')}
+            style={({ pressed }) => [styles.guest, { backgroundColor: colors.card, borderColor: colors.border }, pressed && styles.pressed]}
+          >
+            <HounaMark size={64} />
+            <Text style={[styles.guestTitle, isRTL && styles.guestTitleArabic, { color: colors.text, fontFamily: fonts.display }]}>
+              {t.account.more.finishSetupTitle}
+            </Text>
+            <Text style={[styles.guestBody, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
+              {t.account.more.finishSetupBody}
+            </Text>
+          </Pressable>
         ) : (
           <View style={[styles.guest, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <HounaMark size={64} />
@@ -225,7 +240,6 @@ export default function ProfileScreen() {
           </SettingRow>
           <AppearanceRow />
           <LinkRow label={p.settings.notifications} onPress={go('/account/notifications')} />
-          <LinkRow label={p.settings.communityMap} onPress={go('/account/community')} />
           <LinkRow label={p.settings.exportJournal} onPress={onExport} last />
         </View>
         {exportFailed && (
@@ -234,7 +248,7 @@ export default function ProfileScreen() {
           </Text>
         )}
 
-        {profile && (
+        {!isGuest && (
           <Pressable accessibilityRole="button" onPress={() => signOut()} style={({ pressed }) => [styles.signOut, pressed && styles.pressed]}>
             <Text style={[styles.signOutText, { color: colors.textSecondary, fontFamily: fonts.medium }]}>{p.signOut}</Text>
           </Pressable>

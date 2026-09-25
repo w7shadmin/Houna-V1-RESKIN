@@ -136,7 +136,9 @@ export default function JournalEntryScreen() {
             pressed && { backgroundColor: colors.cardPressed },
           ]}
         >
-          <ArrowLeft size={18} color={colors.text} style={isRTL ? styles.flip : undefined} />
+          <View style={isRTL ? styles.flip : undefined}>
+<ArrowLeft size={18} color={colors.text} />
+</View>
         </Pressable>
         <View style={{ flex: 1 }} />
         {existing && isEditing && (

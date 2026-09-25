@@ -3,7 +3,8 @@
 import 'react-native-url-polyfill/auto';
 
 import { useEffect, useState } from 'react';
-import { I18nManager } from 'react-native';
+import { I18nManager, Platform } from 'react-native';
+import * as NavigationBar from 'expo-navigation-bar';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
@@ -35,6 +36,13 @@ I18nManager.allowRTL(true);
 
 function InnerLayout() {
   const { colors, isNight } = useTheme();
+
+  // Android system buttons follow the theme. With edge-to-edge and
+  // `androidNavigationBar.enforceContrast: false` (app.json) the bar itself is
+  // transparent, so our own tab bar / screen colour shows behind the buttons.
+  useEffect(() => {
+    if (Platform.OS === 'android') NavigationBar.setStyle(isNight ? 'dark' : 'light');
+  }, [isNight]);
   return (
     <>
       <Stack
@@ -45,7 +53,6 @@ function InnerLayout() {
         }}
       >
         <Stack.Screen name="index" />
-        <Stack.Screen name="entry" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
           name="tanafas"

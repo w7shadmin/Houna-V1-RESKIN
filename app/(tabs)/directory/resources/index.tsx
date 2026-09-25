@@ -59,7 +59,9 @@ export default function ResourceDirectoryScreen() {
                 pressed && { backgroundColor: colors.cardPressed },
               ]}
             >
-              <ArrowLeft size={18} color={colors.text} style={isRTL ? styles.flip : undefined} />
+              <View style={isRTL ? styles.flip : undefined}>
+<ArrowLeft size={18} color={colors.text} />
+</View>
             </Pressable>
           </View>
           <LoadingState label={s.loading} />
@@ -76,7 +78,9 @@ export default function ResourceDirectoryScreen() {
                 pressed && { backgroundColor: colors.cardPressed },
               ]}
             >
-              <ArrowLeft size={18} color={colors.text} style={isRTL ? styles.flip : undefined} />
+              <View style={isRTL ? styles.flip : undefined}>
+<ArrowLeft size={18} color={colors.text} />
+</View>
             </Pressable>
           </View>
           <ErrorState message={error} retryLabel={common.tryAgain} onRetry={load} />
@@ -105,7 +109,9 @@ export default function ResourceDirectoryScreen() {
                     pressed && { backgroundColor: 'rgba(255,255,255,0.7)' },
                   ]}
                 >
-                  <ArrowLeft size={18} color={colors.text} style={isRTL ? styles.flip : undefined} />
+                  <View style={isRTL ? styles.flip : undefined}>
+<ArrowLeft size={18} color={colors.text} />
+</View>
                 </Pressable>
               </View>
 
@@ -138,7 +144,9 @@ export default function ResourceDirectoryScreen() {
                       <Text style={[styles.learnMoreText, { color: colors.primary, fontFamily: fonts.semiBold }]}>
                         {s.learnMore}
                       </Text>
-                      <ChevronRight size={13} color={colors.primary} strokeWidth={2} style={isRTL ? styles.flip : undefined} />
+                      <View style={isRTL ? styles.flip : undefined}>
+<ChevronRight size={13} color={colors.primary} strokeWidth={2} />
+</View>
                     </View>
                   </Pressable>
                 ))}

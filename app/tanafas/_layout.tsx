@@ -21,7 +21,6 @@ export default function TanafasLayout() {
       <Stack.Screen name="breathing/anxiety-relief" />
       <Stack.Screen name="breathing/steady-mind" />
       <Stack.Screen name="breathing/panic-relief" />
-      <Stack.Screen name="breathing/nervous-system-reset" />
       <Stack.Screen name="breathing/tension-release" />
       <Stack.Screen name="meditation/index" />
       <Stack.Screen

@@ -196,7 +196,9 @@ export default function EventsListScreen() {
                     <Text style={[styles.readMoreText, { color: colors.primary, fontFamily: fonts.semiBold }]}>
                       {s.readMore}
                     </Text>
-                    <ChevronRight size={14} color={colors.primary} style={isRTL ? styles.flip : undefined} />
+                    <View style={isRTL ? styles.flip : undefined}>
+<ChevronRight size={14} color={colors.primary} />
+</View>
                   </View>
                 </View>
               </Pressable>

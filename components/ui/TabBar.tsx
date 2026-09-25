@@ -10,6 +10,8 @@ import CanvasIcon, { type CanvasIconName } from './CanvasIcon';
 /** Height of the bar above the bottom inset — canvas nav is 100 with 24 of bottom padding. */
 export const TAB_BAR_CONTENT_HEIGHT = 76;
 const MIN_BOTTOM_PADDING = 24;
+/** Space between the labels and the system navigation area when there is one. */
+const SYSTEM_BAR_GAP = 12;
 
 const ROUTE_ICONS: Record<string, CanvasIconName> = {
   index: 'home',
@@ -94,7 +96,9 @@ export default function TabBar({ state, descriptors, navigation, insets }: Botto
     </Pressable>
   );
 
-  const bottom = Math.max(insets.bottom, MIN_BOTTOM_PADDING);
+  // With Android's system buttons (or a home indicator) under the bar, keep
+  // clear space above them; with none, use the canvas's 24.
+  const bottom = insets.bottom > 0 ? insets.bottom + SYSTEM_BAR_GAP : MIN_BOTTOM_PADDING;
 
   return (
     <View

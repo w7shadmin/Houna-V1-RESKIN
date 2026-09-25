@@ -37,8 +37,7 @@ const TICK_MS = 100;
  * exercise's timings in here.
  *
  * Doesn't fit exercises whose interaction isn't phase-cycling (grounding's
- * step-through, Wim Hof's count-up hold + safety gate, PMR's per-group
- * tense/release) — those are bespoke screens.
+ * step-through, PMR's per-group tense/release) — those are bespoke screens.
  */
 export default function PhaseBreathingSession({
   exerciseId,

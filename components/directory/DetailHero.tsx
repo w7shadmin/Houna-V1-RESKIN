@@ -36,7 +36,9 @@ export default function DetailHero({ imageUrl, imageResizeMode = 'cover', height
           { backgroundColor: pressed ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.9)' },
         ]}
       >
-        <ArrowLeft size={20} color={colors.text} style={isRTL ? styles.flip : undefined} />
+        <View style={isRTL ? styles.flip : undefined}>
+<ArrowLeft size={20} color={colors.text} />
+</View>
       </Pressable>
     </View>
   );

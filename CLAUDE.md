@@ -50,15 +50,13 @@ Changing the app icon or any native splash asset (`app.json`'s `icon`,
 `npx expo prebuild --clean` followed by reinstalling the Android dev client
 — a plain JS reload won't pick up native asset changes.
 
-**Known follow-up, not resolved**: `assets/images/icon.png`'s mark was
-recentered and `android.adaptiveIcon` was added (`foregroundImage` set to
-the same full `icon.png`), but the on-device launcher icon still doesn't
-look right. Unconfirmed but worth checking first: Android's adaptive-icon
-mask only shows the center ~66% of the foreground layer as a safe zone —
-using the full icon (background circle + mark, no extra padding) as
-`foregroundImage` is a common way to get it cropped unevenly by the
-launcher. A dedicated foreground-only asset with proper safe-zone padding
-would likely fix it.
+**Adaptive icon**: `android.adaptiveIcon.foregroundImage` is
+`assets/images/adaptive-icon.png` — the white mark alone on a transparent
+canvas at ~46% of its width, over `backgroundColor`. Android's launcher
+mask only shows the center ~66% of the foreground layer, so never point it
+at the full-bleed `icon.png` (that crops the ring to the edge). Regenerate
+the foreground from `icon.png` if the mark changes, keeping it inside the
+~61% safe-zone circle.
 
 ### Supabase conventions
 
@@ -124,13 +122,12 @@ whichever skin is using it.
 This is a mental health app; some users are in distress. These hold
 regardless of visual skin:
 
-- **Wim Hof / Nervous System Reset**
-  (`app/tanafas/breathing/nervous-system-reset.tsx`) must show a
-  full-screen safety warning before every session, acknowledged
-  explicitly, never persisted across sessions. The breath-retention timer
-  counts **up**, never auto-advances at a target, never pressures
-  continuation, and has no streaks or personal bests. The user ends the
-  hold themselves.
+- **Breath retention (Wim Hof / "Nervous System Reset") was removed** after
+  device testing. If any breath-hold exercise is ever reintroduced, it must
+  show a full-screen safety warning before every session, acknowledged
+  explicitly, never persisted across sessions; its retention timer counts
+  **up**, never auto-advances at a target, never pressures continuation,
+  and has no streaks or personal bests. The user ends the hold themselves.
 - Crisis resources must never be buried behind a generic label or deep
   navigation.
 - No streaks or guilt mechanics on mood logging (`lib/streaks.ts` tracks

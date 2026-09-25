@@ -55,9 +55,12 @@
       ],
       "package": "com.anonymous.houna",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon.png",
+        "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#3BAAA7"
       }
+    },
+    "androidNavigationBar": {
+      "enforceContrast": false
     }
   }
 }

@@ -95,7 +95,9 @@ export default function JournalHomeScreen() {
             pressed && { backgroundColor: colors.cardPressed },
           ]}
         >
-          <ArrowLeft size={18} color={colors.text} style={isRTL ? styles.flip : undefined} />
+          <View style={isRTL ? styles.flip : undefined}>
+<ArrowLeft size={18} color={colors.text} />
+</View>
         </Pressable>
         <View style={{ flex: 1 }} />
         <Pressable
@@ -321,11 +323,9 @@ export default function JournalHomeScreen() {
                           <Text style={[styles.viewEntryText, { color: colors.primary, fontFamily: fonts.semiBold }]}>
                             {insights.viewEntry}
                           </Text>
-                          <ChevronLeft
-                            size={14}
-                            color={colors.primary}
-                            style={!isRTL ? styles.flip : undefined}
-                          />
+                          <View style={!isRTL ? styles.flip : undefined}>
+                            <ChevronLeft size={14} color={colors.primary} />
+                          </View>
                         </Pressable>
                       </>
                     )}

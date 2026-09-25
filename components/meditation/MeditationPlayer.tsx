@@ -192,6 +192,7 @@ export default function MeditationPlayer({
   }, []);
 
   const audioPlayer = useAudioPlayer(scene.audio);
+  const releaseLockScreenRef = useRef<() => void>(() => {});
   const fadingOutRef = useRef(false);
   const fadeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -254,6 +255,7 @@ export default function MeditationPlayer({
     elapsedBaseRef.current = 0;
     segmentStartMsRef.current = null;
     if (scene.audio) audioPlayer.volume = 1;
+    releaseLockScreenRef.current();
   }, [stop, stopFade, recordIfStarted, scene.audio, audioPlayer]);
 
   const tickAndCheckCompletion = useCallback(() => {
@@ -269,6 +271,7 @@ export default function MeditationPlayer({
       setIsRunning(false);
       setIsComplete(true);
       recordIfStarted(new Date());
+      releaseLockScreenRef.current();
     } else {
       setElapsed(rawElapsed);
     }
@@ -299,9 +302,30 @@ export default function MeditationPlayer({
 
   useEffect(() => {
     if (!scene.audio) return;
-    if (isActive) audioPlayer.play();
-    else audioPlayer.pause();
-  }, [isActive, scene.audio, audioPlayer]);
+    if (isActive) {
+      audioPlayer.play();
+      // Makes this the lock-screen media player, which runs expo-audio's
+      // media-playback foreground service. Without it Android freezes the
+      // backgrounded app after ~90s and the audio stops while locked, even
+      // with shouldPlayInBackground set.
+      try {
+        audioPlayer.setActiveForLockScreen(true, { title: t.tanafas.meditation.scenes[scene.id].name, artist: 'Houna' });
+      } catch {
+        // Non-fatal: playback still works in the foreground.
+      }
+    } else audioPlayer.pause();
+  }, [isActive, scene.audio, scene.id, audioPlayer, t]);
+
+  /** Drops the lock-screen player (and its foreground service) when a session ends. Only call while mounted. */
+  const releaseLockScreen = useCallback(() => {
+    if (!scene.audio) return;
+    try {
+      audioPlayer.clearLockScreenControls();
+    } catch {
+      // Already cleared.
+    }
+  }, [audioPlayer, scene.audio]);
+  releaseLockScreenRef.current = releaseLockScreen;
 
   // Auto-hide the header/timer/controls while actively playing, so the
   // ambient scene is unobstructed — matches ordinary video-player UX. Stays
@@ -435,7 +459,9 @@ export default function MeditationPlayer({
               pressed && { backgroundColor: alpha(FOCUS.moonlight, 0.15), borderRadius: radius.full },
             ]}
           >
-            <ArrowLeft size={22} color={FOCUS.moonlight} style={isRTL ? styles.flip : undefined} />
+            <View style={isRTL ? styles.flip : undefined}>
+<ArrowLeft size={22} color={FOCUS.moonlight} />
+</View>
           </Pressable>
           <View style={styles.headerTextWrap}>
             <Text style={[styles.headerTitle, { fontFamily: fonts.bold }]}>{sceneName}</Text>

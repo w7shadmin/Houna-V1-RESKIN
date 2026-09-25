@@ -172,7 +172,9 @@ export default function PanicReliefGroundingScreen() {
                 pressed && !isFirstStep && styles.pressed,
               ]}
             >
-              <ArrowLeft size={20} color={colors.textSecondary} style={isRTL ? styles.flip : undefined} />
+              <View style={isRTL ? styles.flip : undefined}>
+<ArrowLeft size={20} color={colors.textSecondary} />
+</View>
             </Pressable>
 
             <Pressable
@@ -187,7 +189,9 @@ export default function PanicReliefGroundingScreen() {
                 {isLastStep ? ex.finish : ex.next}
               </Text>
               {!isLastStep && (
-                <ArrowRight size={20} color={colors.onPrimary} style={isRTL ? styles.flip : undefined} />
+                <View style={isRTL ? styles.flip : undefined}>
+<ArrowRight size={20} color={colors.onPrimary} />
+</View>
               )}
             </Pressable>
           </>

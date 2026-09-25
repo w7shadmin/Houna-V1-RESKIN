@@ -80,7 +80,9 @@ export default function ResourceDetailScreen() {
             pressed && { backgroundColor: colors.cardPressed },
           ]}
         >
-          <ArrowLeft size={18} color={colors.text} style={isRTL ? styles.flip : undefined} />
+          <View style={isRTL ? styles.flip : undefined}>
+<ArrowLeft size={18} color={colors.text} />
+</View>
         </Pressable>
       </View>
 

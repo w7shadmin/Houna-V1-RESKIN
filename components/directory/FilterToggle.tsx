@@ -14,7 +14,7 @@ interface FilterToggleProps {
 
 export default function FilterToggle({ label, activeCount, expanded, onPress }: FilterToggleProps) {
   const { colors } = useTheme();
-  const { fonts, isRTL } = useLanguage();
+  const { fonts } = useLanguage();
 
   return (
     <Pressable
@@ -36,11 +36,10 @@ export default function FilterToggle({ label, activeCount, expanded, onPress }: 
           </View>
         )}
       </View>
-      <ChevronDown
-        size={18}
-        color={colors.textTertiary}
-        style={[expanded && styles.flipped, isRTL && undefined]}
-      />
+      {/* Rotate a wrapper, not the icon — lucide copies `style` onto each path. */}
+      <View style={expanded ? styles.flipped : undefined}>
+        <ChevronDown size={18} color={colors.textTertiary} />
+      </View>
     </Pressable>
   );
 }

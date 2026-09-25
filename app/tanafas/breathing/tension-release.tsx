@@ -278,7 +278,9 @@ export default function TensionReleaseScreen() {
                 pressed && styles.pressed,
               ]}
             >
-              <ArrowLeft size={20} color={colors.textSecondary} style={isRTL ? styles.flip : undefined} />
+              <View style={isRTL ? styles.flip : undefined}>
+<ArrowLeft size={20} color={colors.textSecondary} />
+</View>
             </Pressable>
 
             <Pressable
@@ -308,7 +310,9 @@ export default function TensionReleaseScreen() {
                 {isLastGroup && phase === 'release' ? ex.finish : ex.next}
               </Text>
               {!(isLastGroup && phase === 'release') && (
-                <ArrowRight size={20} color={colors.onPrimary} style={isRTL ? styles.flip : undefined} />
+                <View style={isRTL ? styles.flip : undefined}>
+<ArrowRight size={20} color={colors.onPrimary} />
+</View>
               )}
             </Pressable>
           </>

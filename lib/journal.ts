@@ -13,16 +13,18 @@ import * as Sharing from 'expo-sharing';
 import { palette } from '@/constants/theme';
 import { generateId, getLocalDb } from './localDb';
 
-export type MoodTag = 'calm' | 'neutral' | 'sad' | 'anxious' | 'frustrated' | 'tired';
+export type MoodTag = 'joyful' | 'calm' | 'neutral' | 'sad' | 'anxious' | 'frustrated' | 'angry' | 'tired';
 
-export const MOOD_TAGS: MoodTag[] = ['calm', 'neutral', 'tired', 'sad', 'anxious', 'frustrated'];
+export const MOOD_TAGS: MoodTag[] = ['joyful', 'calm', 'neutral', 'tired', 'sad', 'anxious', 'frustrated', 'angry'];
 
 export const MOOD_EMOJI: Record<MoodTag, string> = {
+  joyful: '😄',
   calm: '😊',
   neutral: '😐',
   sad: '😔',
   anxious: '😰',
-  frustrated: '😡',
+  frustrated: '😣',
+  angry: '😡',
   tired: '😴',
 };
 
@@ -33,23 +35,29 @@ export const MOOD_EMOJI: Record<MoodTag, string> = {
  * only ever appear as small dots or legend swatches, never large surfaces.
  */
 export const MOOD_COLORS: Record<MoodTag, string> = {
+  joyful: palette.peach,
   calm: palette.turquoise,
   neutral: palette.lightCyan,
   tired: palette.grey50,
   sad: palette.turquoiseDark,
   anxious: palette.yellow,
   frustrated: palette.raspberry,
+  angry: '#E36F5E',
 };
 
-/** Higher = better mood, 1–6. Kept as-is from the old MVP — already brand-agnostic. */
+/** Higher = lighter mood, 1–8 (heavy → light). */
 export const MOOD_VALUES: Record<MoodTag, number> = {
-  calm: 6,
-  neutral: 5,
-  tired: 4,
-  anxious: 2,
-  sad: 3,
-  frustrated: 1,
+  joyful: 8,
+  calm: 7,
+  neutral: 6,
+  tired: 5,
+  sad: 4,
+  anxious: 3,
+  frustrated: 2,
+  angry: 1,
 };
+
+export const MOOD_VALUE_MAX = 8;
 
 export interface JournalEntry {
   id: string;

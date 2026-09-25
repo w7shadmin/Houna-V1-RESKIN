@@ -55,7 +55,6 @@ export default function TanafasHubScreen() {
     { key: 'anxiety-relief', e: ex.anxietyRelief, pattern: h.patterns.anxietyRelief, safety: false },
     { key: 'steady-mind', e: ex.steadyMind, pattern: h.patterns.steadyMind, safety: false },
     { key: 'panic-relief', e: ex.panicRelief, pattern: h.patterns.panicRelief, safety: false },
-    { key: 'nervous-system-reset', e: ex.nervousSystemReset, pattern: h.patterns.nervousSystemReset, safety: true },
     { key: 'tension-release', e: ex.tensionRelease, pattern: h.patterns.tensionRelease, safety: false },
   ].map(({ key, e, pattern, safety }) => ({
     key,

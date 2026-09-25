@@ -47,8 +47,7 @@ export async function recordTanafasSession(
  * Anonymous "someone just started a session" ping for Home's community
  * counter (`activity_pings`, FEATURES_BRIEF §1). Sent for Guests and Aliases
  * alike, with no user id — only the Alias's opted-in country, if any.
- * Unlike `recordTanafasSession`, it never feeds streaks or the leaderboard,
- * which is why Nervous System Reset uses only this.
+ * Unlike `recordTanafasSession`, it never feeds streaks or the leaderboard.
  *
  * Fire-and-forget; a no-op until the table exists.
  */

@@ -117,7 +117,9 @@ export default function ProfessionalsListScreen() {
             pressed && { backgroundColor: colors.cardPressed },
           ]}
         >
-          <ArrowLeft size={18} color={colors.text} style={isRTL ? styles.flip : undefined} />
+          <View style={isRTL ? styles.flip : undefined}>
+<ArrowLeft size={18} color={colors.text} />
+</View>
         </Pressable>
         <Text style={[styles.title, { color: colors.text, fontFamily: fonts.bold }]}>{s.title}</Text>
       </View>

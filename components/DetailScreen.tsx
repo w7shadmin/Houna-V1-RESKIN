@@ -34,12 +34,12 @@ export default function DetailScreen({ title, children }: DetailScreenProps) {
             pressed && { opacity: 0.7 },
           ]}
         >
-          <ArrowLeft
+          <View style={isRTL ? styles.flip : undefined}>
+<ArrowLeft
             size={20}
             color={colors.text}
-            strokeWidth={2}
-            style={isRTL ? styles.flip : undefined}
-          />
+            strokeWidth={2} />
+</View>
         </Pressable>
         <Text
           style={[

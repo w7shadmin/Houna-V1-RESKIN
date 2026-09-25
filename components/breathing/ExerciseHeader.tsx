@@ -41,12 +41,12 @@ export default function ExerciseHeader({
           pressed && { opacity: 0.7 },
         ]}
       >
-        <ArrowLeft
+        <View style={isRTL ? styles.flip : undefined}>
+<ArrowLeft
           size={20}
           color={colors.textSecondary}
-          strokeWidth={2}
-          style={isRTL ? styles.flip : undefined}
-        />
+          strokeWidth={2} />
+</View>
       </Pressable>
 
       <View style={styles.titleWrap}>

@@ -21,21 +21,24 @@ export interface BloomStyle extends BloomShape {
 }
 
 /**
- * The six mood states, verbatim from the canvas's "Houna bloom — mood
- * states" sheet (identical in Night and Day), heavy → light — the same
- * order as `MOOD_VALUES` in lib/journal.ts.
+ * The eight mood states from the canvas's "Houna bloom — mood states"
+ * sheet (identical in Night and Day), heavy → light — the same order as
+ * `MOOD_VALUES` in lib/journal.ts. Angry and joyful extend the original six
+ * at each end: angry folds tightest, joyful opens widest.
  */
 export const MOOD_BLOOMS: Record<MoodTag, BloomStyle> = {
+  angry: { color: '#E36F5E', hi: '#FFE1DA', glow: 'rgba(227,111,94,0.42)', fold: 38, headY: 76, ringOpacity: 0.4 },
   frustrated: { color: '#EA90A8', hi: '#FFE3EB', glow: 'rgba(234,144,168,0.42)', fold: 30, headY: 74, ringOpacity: 0.45 },
   anxious: { color: '#F0B27A', hi: '#FFEEDC', glow: 'rgba(240,178,122,0.42)', fold: 20, headY: 71, ringOpacity: 0.5 },
   sad: { color: '#82A4EE', hi: '#E2EBFF', glow: 'rgba(130,164,238,0.42)', fold: 12, headY: 78, ringOpacity: 0.5 },
   tired: { color: '#AE9FF2', hi: '#EEEAFF', glow: 'rgba(174,159,242,0.42)', fold: 4, headY: 72, ringOpacity: 0.6 },
   neutral: { color: '#D2CBB9', hi: '#FFFFFF', glow: 'rgba(210,203,185,0.34)', fold: -6, headY: 66, ringOpacity: 0.7 },
   calm: { color: '#62D2C9', hi: '#E4FBF7', glow: 'rgba(98,210,201,0.48)', fold: -22, headY: 62, ringOpacity: 0.9 },
+  joyful: { color: '#F2C76B', hi: '#FFF3D6', glow: 'rgba(242,199,107,0.46)', fold: -32, headY: 58, ringOpacity: 1 },
 };
 
 /** Heavy → light, the slider's order. */
-export const BLOOM_ORDER: MoodTag[] = ['frustrated', 'anxious', 'sad', 'tired', 'neutral', 'calm'];
+export const BLOOM_ORDER: MoodTag[] = ['angry', 'frustrated', 'anxious', 'sad', 'tired', 'neutral', 'calm', 'joyful'];
 
 /** The Home top-bar glyph from the canvas: a gently opened bloom. */
 export const HOME_BLOOM: BloomShape = { fold: -14, headY: 64 };

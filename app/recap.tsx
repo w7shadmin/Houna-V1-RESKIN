@@ -47,14 +47,16 @@ const SLIDE_STYLE: Record<
   share: { night: N.nightfall, day: '#FBF8F2', glows: [{ c: GLOW.dusk, a: 0.34, rx: 90, ry: 60, cx: 50, cy: 40 }] },
 };
 
-/** Emotional-landscape orbs: colours per mood, and the canvas's six slots (largest first). */
+/** Emotional-landscape orbs: colours per mood, and one slot per mood (largest first). */
 const MOOD_ORBS: Record<MoodTag, { c: string; hi: string; lo: string; glow: string }> = {
+  joyful: { c: '#F2C76B', hi: '#FFF3D6', lo: '#B08526', glow: 'rgba(242,199,107,0.38)' },
   calm: { c: '#62D2C9', hi: '#E4FBF7', lo: '#1F7A74', glow: 'rgba(98,210,201,0.4)' },
   neutral: { c: '#D2CBB9', hi: '#FFFFFF', lo: '#8A8474', glow: 'rgba(210,203,185,0.3)' },
   tired: { c: '#AE9FF2', hi: '#EEEAFF', lo: '#6A5CC4', glow: 'rgba(174,159,242,0.35)' },
   sad: { c: '#82A4EE', hi: '#E2EBFF', lo: '#3D5DB0', glow: 'rgba(130,164,238,0.35)' },
   anxious: { c: '#F0B27A', hi: '#FFEEDC', lo: '#B9713A', glow: 'rgba(240,178,122,0.35)' },
   frustrated: { c: '#EA90A8', hi: '#FFE3EB', lo: '#B24B6B', glow: 'rgba(234,144,168,0.35)' },
+  angry: { c: '#E36F5E', hi: '#FFE1DA', lo: '#A23A2C', glow: 'rgba(227,111,94,0.35)' },
 };
 const ORB_SLOTS = [
   { x: 150, y: 70, s: 96 },
@@ -63,13 +65,14 @@ const ORB_SLOTS = [
   { x: 210, y: 180, s: 50 },
   { x: 140, y: 190, s: 42 },
   { x: 240, y: 30, s: 34 },
+  { x: 20, y: 215, s: 30 },
+  { x: 255, y: 110, s: 26 },
 ];
 
 const EXERCISE_KEYS = {
   'anxiety-relief': 'anxietyRelief',
   'steady-mind': 'steadyMind',
   'panic-relief': 'panicRelief',
-  'nervous-system-reset': 'nervousSystemReset',
   'tension-release': 'tensionRelease',
 } as const;
 

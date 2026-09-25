@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { View, StyleSheet } from 'react-native';
 import Svg, { Path, Circle, Line, Text as SvgText } from 'react-native-svg';
 import { useTheme } from '@/contexts/ThemeContext';
-import { MOOD_COLORS, MOOD_VALUES, localDateString, type JournalEntry, type MoodTag } from '@/lib/journal';
+import { MOOD_COLORS, MOOD_VALUES, MOOD_VALUE_MAX, localDateString, type JournalEntry, type MoodTag } from '@/lib/journal';
 
 export interface DayPoint {
   dateStr: string;
@@ -55,7 +55,7 @@ export default function MoodTrendChart({
     return daysWithMood.map((d, i) => {
       const x = PAD_X + (daysWithMood.length > 1 ? (i / (daysWithMood.length - 1)) * INNER_W : INNER_W / 2);
       const moodVal = MOOD_VALUES[d.entry!.mood];
-      const y = PAD_TOP + (1 - (moodVal - 1) / 5) * INNER_H;
+      const y = PAD_TOP + (1 - (moodVal - 1) / (MOOD_VALUE_MAX - 1)) * INNER_H;
       return { x, y, dateStr: d.dateStr, label: d.dayLabel, mood: d.entry!.mood as MoodTag };
     });
   }, [daysWithMood]);
@@ -83,8 +83,8 @@ export default function MoodTrendChart({
   return (
     <View style={styles.wrap}>
       <Svg viewBox={`0 0 ${CHART_W} ${CHART_H}`} width="100%" height={CHART_H}>
-        {[6, 1].map((val) => {
-          const y = PAD_TOP + (1 - (val - 1) / 5) * INNER_H;
+        {[MOOD_VALUE_MAX, 1].map((val) => {
+          const y = PAD_TOP + (1 - (val - 1) / (MOOD_VALUE_MAX - 1)) * INNER_H;
           return (
             <Line
               key={val}
