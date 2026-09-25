@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -16,6 +16,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { spacing, radius, typography } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
 import { arabicNumber } from '@/lib/arabicNumerals';
+import KeyboardSafeView from '@/components/ui/KeyboardSafeView';
+import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
 import {
   getEntry,
   saveEntry,
@@ -44,6 +46,12 @@ export default function JournalEntryScreen() {
   const [loading, setLoading] = useState(!isNew);
   const [existing, setExisting] = useState<JournalEntry | null>(null);
   const [text, setText] = useState('');
+  // Where the text field sits in the scroll content, so typing stays above the keyboard:
+  // the whole field when it fits, otherwise its bottom (where the cursor usually is).
+  const field = useRef({ y: 0, h: 0 });
+  const keyboard = useKeyboardScroll((visible) =>
+    Math.max(field.current.y - 16, field.current.y + field.current.h + 16 - visible),
+  );
   const [mood, setMood] = useState<MoodTag | null>(null);
   const [isEditing, setIsEditing] = useState(isNew);
   const [promptVisible, setPromptVisible] = useState(isNew);
@@ -157,129 +165,144 @@ export default function JournalEntryScreen() {
         )}
       </View>
 
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        {displayEntry ? (
-          <>
-            <View style={[styles.badge, { backgroundColor: colors.primaryLightest }]}>
-              <Text style={styles.badgeEmoji}>{MOOD_EMOJI[displayEntry.mood]}</Text>
-              <Text style={[styles.badgeText, { color: colors.primary, fontFamily: fonts.semiBold }]}>
-                {formatEntryDateShort(displayEntry.date, t.journal.dateNames, num)}
+      <KeyboardSafeView>
+        <ScrollView
+          ref={keyboard.scrollRef}
+          {...keyboard.scrollProps}
+          contentContainerStyle={styles.scroll}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {displayEntry ? (
+            <>
+              <View style={[styles.badge, { backgroundColor: colors.primaryLightest }]}>
+                <Text style={styles.badgeEmoji}>{MOOD_EMOJI[displayEntry.mood]}</Text>
+                <Text style={[styles.badgeText, { color: colors.primary, fontFamily: fonts.semiBold }]}>
+                  {formatEntryDateShort(displayEntry.date, t.journal.dateNames, num)}
+                </Text>
+              </View>
+              <Text style={[styles.heading, { color: colors.text, fontFamily: fonts.bold }]}>
+                {isEditing ? e.editEntry : e.yourEntry}
               </Text>
-            </View>
-            <Text style={[styles.heading, { color: colors.text, fontFamily: fonts.bold }]}>
-              {isEditing ? e.editEntry : e.yourEntry}
-            </Text>
-          </>
-        ) : (
-          <>
-            <View style={[styles.badge, { backgroundColor: colors.primaryLightest }]}>
-              <Text style={[styles.badgeText, { color: colors.primary, fontFamily: fonts.semiBold }]}>
-                {e.newEntry}
+            </>
+          ) : (
+            <>
+              <View style={[styles.badge, { backgroundColor: colors.primaryLightest }]}>
+                <Text style={[styles.badgeText, { color: colors.primary, fontFamily: fonts.semiBold }]}>
+                  {e.newEntry}
+                </Text>
+              </View>
+              <Text style={[styles.heading, { color: colors.text, fontFamily: fonts.bold }]}>
+                {formatEntryDateLong(new Date(), t.journal.dateNames, num)}
               </Text>
-            </View>
-            <Text style={[styles.heading, { color: colors.text, fontFamily: fonts.bold }]}>
-              {formatEntryDateLong(new Date(), t.journal.dateNames, num)}
-            </Text>
-          </>
-        )}
+            </>
+          )}
 
-        {isEditing && promptVisible && (
-          <View style={[styles.promptCard, { backgroundColor: colors.primaryLightest, borderColor: colors.border }]}>
-            <View style={styles.promptRow}>
-              <Text style={[styles.promptText, { color: colors.primary, fontFamily: fonts.medium }]}>{prompt}</Text>
+          {isEditing && promptVisible && (
+            <View style={[styles.promptCard, { backgroundColor: colors.primaryLightest, borderColor: colors.border }]}>
+              <View style={styles.promptRow}>
+                <Text style={[styles.promptText, { color: colors.primary, fontFamily: fonts.medium }]}>{prompt}</Text>
+                <Pressable
+                  onPress={() => setPromptVisible(false)}
+                  style={({ pressed }) => [
+                    styles.skipBtn,
+                    { backgroundColor: colors.card },
+                    pressed && { backgroundColor: colors.cardPressed },
+                  ]}
+                >
+                  <X size={12} color={colors.textSecondary} />
+                  <Text style={[styles.skipText, { color: colors.textSecondary, fontFamily: fonts.semiBold }]}>
+                    {e.skipPrompt}
+                  </Text>
+                </Pressable>
+              </View>
               <Pressable
                 onPress={() => setPromptVisible(false)}
-                style={({ pressed }) => [
-                  styles.skipBtn,
-                  { backgroundColor: colors.card },
-                  pressed && { backgroundColor: colors.cardPressed },
-                ]}
+                style={({ pressed }) => pressed && { opacity: 0.6 }}
               >
-                <X size={12} color={colors.textSecondary} />
-                <Text style={[styles.skipText, { color: colors.textSecondary, fontFamily: fonts.semiBold }]}>
-                  {e.skipPrompt}
+                <Text style={[styles.writeFreely, { color: colors.primary, fontFamily: fonts.medium }]}>
+                  {e.writeFreely}
                 </Text>
               </Pressable>
             </View>
-            <Pressable
-              onPress={() => setPromptVisible(false)}
-              style={({ pressed }) => pressed && { opacity: 0.6 }}
-            >
-              <Text style={[styles.writeFreely, { color: colors.primary, fontFamily: fonts.medium }]}>
-                {e.writeFreely}
-              </Text>
-            </Pressable>
-          </View>
-        )}
+          )}
 
-        <TextInput
-          value={text}
-          onChangeText={setText}
-          editable={isEditing}
-          multiline
-          textAlign={isRTL ? 'right' : 'left'}
-          placeholder={isEditing ? e.placeholder : ''}
-          placeholderTextColor={colors.placeholder}
-          style={[
-            styles.textArea,
-            { borderColor: colors.border, backgroundColor: colors.card, color: colors.text, fontFamily: fonts.regular },
-          ]}
-        />
-
-        <View style={styles.moodSection}>
-          <Text style={[styles.moodLabel, { color: colors.text, fontFamily: fonts.semiBold }]}>{e.howFeeling}</Text>
-          <MoodPicker value={mood} onChange={isEditing ? setMood : () => {}} disabled={!isEditing} />
-        </View>
-
-        {isEditing ? (
-          <Pressable
-            onPress={handleSave}
-            disabled={!canSave}
-            style={({ pressed }) => [
-              styles.primaryBtn,
-              { backgroundColor: canSave ? colors.primary : colors.border },
-              pressed && { opacity: 0.85 },
+          <TextInput
+            value={text}
+            onChangeText={setText}
+            {...keyboard.inputProps}
+            onLayout={(ev) => {
+              const { y, height } = ev.nativeEvent.layout;
+              const grew = height > field.current.h;
+              field.current = { y, h: height };
+              if (grew) keyboard.reveal();
+            }}
+            editable={isEditing}
+            multiline
+            textAlign={isRTL ? 'right' : 'left'}
+            placeholder={isEditing ? e.placeholder : ''}
+            placeholderTextColor={colors.placeholder}
+            style={[
+              styles.textArea,
+              { borderColor: colors.border, backgroundColor: colors.card, color: colors.text, fontFamily: fonts.regular },
             ]}
-          >
-            <Check size={20} color={canSave ? colors.onPrimary : colors.textTertiary} />
-            <Text
-              style={[
-                styles.primaryBtnText,
-                { color: canSave ? colors.onPrimary : colors.textTertiary, fontFamily: fonts.bold },
-              ]}
-            >
-              {e.save}
-            </Text>
-          </Pressable>
-        ) : (
-          <View style={styles.actions}>
+          />
+
+          <View style={styles.moodSection}>
+            <Text style={[styles.moodLabel, { color: colors.text, fontFamily: fonts.semiBold }]}>{e.howFeeling}</Text>
+            <MoodPicker value={mood} onChange={isEditing ? setMood : () => {}} disabled={!isEditing} />
+          </View>
+
+          {isEditing ? (
             <Pressable
-              onPress={() => setIsEditing(true)}
-              style={({ pressed }) => [
-                styles.secondaryBtn,
-                { borderColor: colors.border, backgroundColor: colors.card },
-                pressed && { backgroundColor: colors.cardPressed },
-              ]}
-            >
-              <Pencil size={18} color={colors.text} />
-              <Text style={[styles.secondaryBtnText, { color: colors.text, fontFamily: fonts.bold }]}>{e.edit}</Text>
-            </Pressable>
-            <Pressable
-              onPress={handleShare}
+              onPress={handleSave}
+              disabled={!canSave}
               style={({ pressed }) => [
                 styles.primaryBtn,
-                { backgroundColor: colors.primary },
+                { backgroundColor: canSave ? colors.primary : colors.border },
                 pressed && { opacity: 0.85 },
               ]}
             >
-              <Share2 size={18} color={colors.onPrimary} />
-              <Text style={[styles.primaryBtnText, { color: colors.onPrimary, fontFamily: fonts.bold }]}>
-                {e.share}
+              <Check size={20} color={canSave ? colors.onPrimary : colors.textTertiary} />
+              <Text
+                style={[
+                  styles.primaryBtnText,
+                  { color: canSave ? colors.onPrimary : colors.textTertiary, fontFamily: fonts.bold },
+                ]}
+              >
+                {e.save}
               </Text>
             </Pressable>
-          </View>
-        )}
-      </ScrollView>
+          ) : (
+            <View style={styles.actions}>
+              <Pressable
+                onPress={() => setIsEditing(true)}
+                style={({ pressed }) => [
+                  styles.secondaryBtn,
+                  { borderColor: colors.border, backgroundColor: colors.card },
+                  pressed && { backgroundColor: colors.cardPressed },
+                ]}
+              >
+                <Pencil size={18} color={colors.text} />
+                <Text style={[styles.secondaryBtnText, { color: colors.text, fontFamily: fonts.bold }]}>{e.edit}</Text>
+              </Pressable>
+              <Pressable
+                onPress={handleShare}
+                style={({ pressed }) => [
+                  styles.primaryBtn,
+                  { backgroundColor: colors.primary },
+                  pressed && { opacity: 0.85 },
+                ]}
+              >
+                <Share2 size={18} color={colors.onPrimary} />
+                <Text style={[styles.primaryBtnText, { color: colors.onPrimary, fontFamily: fonts.bold }]}>
+                  {e.share}
+                </Text>
+              </Pressable>
+            </View>
+          )}
+        </ScrollView>
+      </KeyboardSafeView>
 
       <ConfirmDialog
         visible={showDiscardConfirm}

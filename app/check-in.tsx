@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import {
-  KeyboardAvoidingView,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -22,6 +20,8 @@ import MoodSlider from '@/components/mood/MoodSlider';
 import Button from '@/components/ui/Button';
 import IconButton from '@/components/ui/IconButton';
 import CanvasIcon from '@/components/ui/CanvasIcon';
+import KeyboardSafeView from '@/components/ui/KeyboardSafeView';
+import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
 
 /** Neutral — the starting point when today has no mood yet (never presume "calm"). */
 const DEFAULT_INDEX = BLOOM_ORDER.indexOf('neutral');
@@ -106,12 +106,16 @@ export default function CheckInScreen() {
       : null;
 
   const labelLatin = fonts.labelTracked;
+  // The note sits near the end of the sheet: scroll to the end so it and Save clear the keyboard.
+  const keyboard = useKeyboardScroll('end');
 
   return (
     <View style={[styles.scrim, { backgroundColor: colors.scrim, paddingTop: Math.max(insets.top + 8, 28) }]}>
-      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardSafeView>
         <View style={[styles.sheet, { backgroundColor: colors.sheet, borderColor: colors.borderLight }]}>
           <ScrollView
+            ref={keyboard.scrollRef}
+            {...keyboard.scrollProps}
             contentContainerStyle={[styles.content, { paddingBottom: 36 + insets.bottom }]}
             keyboardShouldPersistTaps="handled"
           >
@@ -179,6 +183,7 @@ export default function CheckInScreen() {
                 placeholder={s.notePlaceholder}
                 placeholderTextColor={colors.placeholder}
                 accessibilityLabelledBy="checkInNoteLabel"
+                {...keyboard.inputProps}
                 textAlign={isRTL ? 'right' : 'left'}
                 multiline
                 numberOfLines={2}
@@ -204,15 +209,12 @@ export default function CheckInScreen() {
             </View>
           </ScrollView>
         </View>
-      </KeyboardAvoidingView>
+      </KeyboardSafeView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  flex: {
-    flex: 1,
-  },
   scrim: {
     flex: 1,
   },

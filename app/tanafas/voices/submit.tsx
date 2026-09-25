@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TextInput, Pressable, Switch, ScrollView, ActivityIndicator, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
+import { View, Text, Image, TextInput, Pressable, Switch, ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
+import KeyboardSafeView from '@/components/ui/KeyboardSafeView';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { ImagePlus, X, CheckCircle2 } from 'lucide-react-native';
@@ -82,7 +83,7 @@ export default function VoicesSubmitScreen() {
 
   return (
     <DetailScreen title={s.submitTitle}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+      <KeyboardSafeView>
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
           <Text style={[styles.subtitle, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{s.submitSubtitle}</Text>
 
@@ -164,7 +165,7 @@ export default function VoicesSubmitScreen() {
             )}
           </Pressable>
         </ScrollView>
-      </KeyboardAvoidingView>
+      </KeyboardSafeView>
     </DetailScreen>
   );
 }

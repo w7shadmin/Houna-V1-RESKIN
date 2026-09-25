@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, Pressable, ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
+import KeyboardSafeView from '@/components/ui/KeyboardSafeView';
 import { useRouter } from 'expo-router';
 import DetailScreen from '@/components/DetailScreen';
 import AuthField from '@/components/account/AuthField';
@@ -46,7 +47,7 @@ export default function SignInScreen() {
 
   return (
     <DetailScreen title={s.title}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+      <KeyboardSafeView>
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
           <Text style={[styles.subtitle, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
             {s.subtitle}
@@ -112,7 +113,7 @@ export default function SignInScreen() {
             </Pressable>
           </View>
         </ScrollView>
-      </KeyboardAvoidingView>
+      </KeyboardSafeView>
     </DetailScreen>
   );
 }
