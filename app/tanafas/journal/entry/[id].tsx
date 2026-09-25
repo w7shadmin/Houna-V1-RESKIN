@@ -31,7 +31,6 @@ import {
   type JournalEntry,
   type MoodTag,
 } from '@/lib/journal';
-import { recordTanafasSession } from '@/lib/usageTracking';
 import MoodPicker from '@/components/journal/MoodPicker';
 import ConfirmDialog from '@/components/journal/ConfirmDialog';
 import MoodGlyph from '@/components/mood/MoodGlyph';
@@ -112,11 +111,7 @@ export default function JournalEntryScreen() {
     }
     setSaved(true);
     setIsEditing(false);
-
-    // Streak/leaderboard activity signal (Segment 5) — Alias-only, silent;
-    // same 'mood' kind as the mood check-in, since either one
-    // marks the day as active for streak purposes.
-    recordTanafasSession('mood', new Date()).catch(() => {});
+    // Deliberately no streak/leaderboard signal: mood logging never feeds a streak.
   };
 
   const handleDelete = async () => {

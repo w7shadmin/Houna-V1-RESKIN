@@ -18,7 +18,6 @@ export default function AccountLayout() {
       <Stack.Screen name="sign-up" />
       <Stack.Screen name="username" />
       <Stack.Screen name="profile" />
-      <Stack.Screen name="community" />
       <Stack.Screen name="notifications" />
       <Stack.Screen name="stats" />
     </Stack>

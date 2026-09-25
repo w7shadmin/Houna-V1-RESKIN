@@ -1,18 +1,16 @@
 import { supabase } from './supabase';
 
-export type TanafasSessionKind = 'breathing' | 'meditation' | 'mood';
+/** Exercise sessions only — mood/journal activity is never recorded here (it would feed streaks). */
+export type TanafasSessionKind = 'breathing' | 'meditation';
 
 /**
- * Records a Tanafas session (breathing, meditation, or — for Segment 5's
- * streaks — a mood/journal check-in) for the community map and the
+ * Records a Tanafas exercise session (breathing or meditation) for the
  * streak/leaderboard. Alias users only — Guests keep the "nothing stored
  * beyond the device" promise exactly as stated, so this silently no-ops
  * when there's no signed-in session. Records on any session end, not just a
  * natural completion (finishing all cycles or reaching the target
- * duration) — someone stopping early is still usage. A 'mood' entry is
- * instantaneous by nature (no real duration to time), so 0 is a valid
- * duration here — only genuinely negative values (a caller bug) are
- * rejected.
+ * duration) — someone stopping early is still usage. Only genuinely
+ * negative durations (a caller bug) are rejected.
  *
  * Fire-and-forget by design: a failed write must never interrupt the
  * breathing/meditation UI, so errors are swallowed here rather than left

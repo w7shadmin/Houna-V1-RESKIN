@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Switch, Pressable, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import DetailScreen from '@/components/DetailScreen';
+import { AccountScreen, FormMessage, SettingsGroup, SettingsRow, ThemedSwitch } from '@/components/account/AccountKit';
+import Button from '@/components/ui/Button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { spacing, radius, typography, shadows } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
+import { grid, radius } from '@/constants/theme';
 import {
   isDailyReminderEnabled,
   setDailyReminderEnabled,
@@ -59,118 +60,54 @@ export default function NotificationSettingsScreen() {
   };
 
   return (
-    <DetailScreen title={s.title}>
-      <Text style={[styles.subtitle, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{s.subtitle}</Text>
-
-      <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border, ...shadows.card }]}>
-        <View style={styles.row}>
-          <View style={styles.rowText}>
-            <Text style={[styles.rowTitle, { color: colors.text, fontFamily: fonts.semiBold }]}>{s.reminderTitle}</Text>
-            <Text style={[styles.rowBody, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{s.reminderBody}</Text>
-          </View>
-          <Switch
-            value={reminderOn}
-            onValueChange={handleReminderToggle}
-            trackColor={{ false: colors.border, true: colors.primary }}
-            thumbColor={colors.card}
-          />
-        </View>
-      </View>
-
-      {!!permissionBlocked && (
-        <Text style={[styles.permissionNote, { color: colors.accent, fontFamily: fonts.regular }]}>{s.permissionDenied}</Text>
-      )}
+    <AccountScreen title={s.title} subtitle={s.subtitle}>
+      <SettingsGroup label={s.onDevice}>
+        <SettingsRow
+          title={s.reminderTitle}
+          body={s.reminderBody}
+          trailing={<ThemedSwitch label={s.reminderTitle} value={reminderOn} onValueChange={handleReminderToggle} />}
+        />
+      </SettingsGroup>
+      {!!permissionBlocked && <FormMessage message={s.permissionDenied} />}
 
       {isGuest ? (
-        <Pressable
-          onPress={() => router.push('/account/sign-in')}
-          style={({ pressed }) => [styles.guestNote, { backgroundColor: colors.primaryLightest }, pressed && { opacity: 0.85 }]}
-        >
-          <Text style={[styles.guestNoteText, { color: colors.primary, fontFamily: fonts.regular }]}>{s.guestNote}</Text>
-        </Pressable>
-      ) : (
-        <>
-          <Text style={[styles.sectionLabel, { color: colors.textTertiary, fontFamily: fonts.semiBold }]}>{s.remoteHeading}</Text>
-          <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border, ...shadows.card }]}>
-            <View style={styles.row}>
-              <View style={styles.rowText}>
-                <Text style={[styles.rowTitle, { color: colors.text, fontFamily: fonts.semiBold }]}>{s.storyHighlightsTitle}</Text>
-                <Text style={[styles.rowBody, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{s.storyHighlightsBody}</Text>
-              </View>
-              <Switch
-                value={storyHighlights}
-                onValueChange={(v) => handleRemoteToggle('story', v)}
-                trackColor={{ false: colors.border, true: colors.primary }}
-                thumbColor={colors.card}
-              />
-            </View>
-            <View style={[styles.row, styles.rowDivider, { borderTopColor: colors.borderLight }]}>
-              <View style={styles.rowText}>
-                <Text style={[styles.rowTitle, { color: colors.text, fontFamily: fonts.semiBold }]}>{s.communityStatsTitle}</Text>
-                <Text style={[styles.rowBody, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{s.communityStatsBody}</Text>
-              </View>
-              <Switch
-                value={communityStats}
-                onValueChange={(v) => handleRemoteToggle('stats', v)}
-                trackColor={{ false: colors.border, true: colors.primary }}
-                thumbColor={colors.card}
-              />
-            </View>
+        <View style={[styles.guest, { backgroundColor: colors.tones.glow.bg, borderColor: colors.tones.glow.border }]}>
+          <Text style={[styles.guestText, { color: colors.text, fontFamily: fonts.regular }]}>{s.guestNote}</Text>
+          <View style={styles.guestAction}>
+            <Button variant="secondary" label={s.signIn} onPress={() => router.push('/account/sign-in')} />
           </View>
-        </>
+        </View>
+      ) : (
+        <SettingsGroup label={s.remoteHeading}>
+          <SettingsRow
+            title={s.storyHighlightsTitle}
+            body={s.storyHighlightsBody}
+            trailing={<ThemedSwitch label={s.storyHighlightsTitle} value={storyHighlights} onValueChange={(v) => handleRemoteToggle('story', v)} />}
+          />
+          <SettingsRow
+            title={s.communityStatsTitle}
+            body={s.communityStatsBody}
+            trailing={<ThemedSwitch label={s.communityStatsTitle} value={communityStats} onValueChange={(v) => handleRemoteToggle('stats', v)} />}
+          />
+        </SettingsGroup>
       )}
-    </DetailScreen>
+    </AccountScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  subtitle: {
-    fontSize: typography.fontSize.body,
-    marginTop: spacing.sm,
-    marginBottom: spacing.lg,
-  },
-  card: {
-    borderRadius: radius.lg,
+  guest: {
     borderWidth: 1,
-    overflow: 'hidden',
-    marginBottom: spacing.lg,
+    borderRadius: radius.card,
+    padding: grid(2),
+    gap: grid(1.5),
+    marginTop: grid(1),
   },
-  row: {
+  guestText: {
+    fontSize: 15,
+    lineHeight: 22,
+  },
+  guestAction: {
     flexDirection: 'row',
-    alignItems: 'center',
-    padding: spacing.md,
-    gap: spacing.md,
-  },
-  rowDivider: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-  },
-  rowText: {
-    flex: 1,
-  },
-  rowTitle: {
-    fontSize: typography.fontSize.body,
-  },
-  rowBody: {
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.sm,
-    marginTop: 2,
-  },
-  permissionNote: {
-    fontSize: typography.fontSize.sm,
-    marginTop: -spacing.sm,
-    marginBottom: spacing.lg,
-  },
-  sectionLabel: {
-    fontSize: typography.fontSize.xs,
-    letterSpacing: 0.8,
-    marginBottom: spacing.sm,
-  },
-  guestNote: {
-    borderRadius: radius.md,
-    padding: spacing.md,
-  },
-  guestNoteText: {
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.sm,
   },
 });

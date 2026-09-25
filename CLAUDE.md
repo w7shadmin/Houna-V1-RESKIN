@@ -232,10 +232,15 @@ needs `npx expo prebuild --clean` + reinstalling the dev client to apply,
 like `userInterfaceStyle: "automatic"`.
 
 **Legacy, still to migrate**: the old `palette` export and older styling
-(`shadows.card`, `primaryLightest`) remain on the account screens (profile,
-sign-up, stats, notifications), About, More's leftovers, Voices and
-`ComingSoon`. Move them onto the primitives and tokens when touched, then
+(`shadows.card`, `primaryLightest`) remain on About, More's leftovers, Voices
+and `ComingSoon`. Move them onto the primitives and tokens when touched, then
 delete `palette`.
+
+**Account screens** (`app/account/*`) are built from
+`components/account/AccountKit.tsx`: `AccountScreen` (back button, tracked
+eyebrow, display title), `Field`, `FormMessage`, `OrDivider`, `SwitchLink`,
+`SettingsGroup`/`SettingsRow` and `ThemedSwitch`. Use these for any new
+account or settings screen.
 
 **Exercise sessions** share `components/breathing/SessionScaffold.tsx` (the
 canvas "Breathing session" artboard: tone glows, close + title/technique,

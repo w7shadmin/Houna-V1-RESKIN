@@ -3,9 +3,9 @@ import { localDateString } from './journal';
 
 /**
  * Streaks/leaderboard (Segment 5 of the accounts roadmap) — reads the same
- * `tanafas_sessions` table Segment 2's usage tracking writes to, now also
- * fed by mood/journal activity (`kind: 'mood'`, see the check-in and
- * the journal entry screen).
+ * `tanafas_sessions` table Segment 2's usage tracking writes to — breathing
+ * and meditation sessions only. Mood and journal activity never count toward
+ * a streak (no streaks or guilt mechanics on mood logging).
  *
  * Streak math runs client-side against the caller's own rows (already
  * readable under `tanafas_sessions`' own-row RLS) rather than a server
@@ -59,7 +59,9 @@ export function computeStreak(activeDays: Set<string>): StreakInfo {
 }
 
 export async function getMyStreak(): Promise<StreakInfo> {
-  const { data } = await supabase.from('tanafas_sessions').select('started_at');
+  // Exercise sessions only — mood logging never feeds a streak (CLAUDE.md safety
+  // requirement). Older rows with kind 'mood' are still in the table, so filter.
+  const { data } = await supabase.from('tanafas_sessions').select('started_at').neq('kind', 'mood');
   const activeDays = new Set((data ?? []).map((row) => localDateString(new Date(row.started_at))));
   return computeStreak(activeDays);
 }
