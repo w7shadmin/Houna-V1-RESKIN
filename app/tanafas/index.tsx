@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { alpha, layout, nightPalette } from '@/constants/theme';
-import { BREATHE_ORDER, BREATHE_TONE } from '@/constants/breathPatterns';
+import { BREATHE_ORDER, BREATHE_TONE, DEFAULT_MEDITATION_MINUTES, MEDITATION_MINUTES } from '@/constants/breathPatterns';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { MEDITATION_SCENES, SCENE_ORBS, type SceneId } from '@/components/meditation/scenes';
 import { TESTS } from '@/constants/psychometrics';
@@ -15,7 +15,7 @@ import Card from '@/components/ui/Card';
 import ScreenGlow from '@/components/ui/ScreenGlow';
 import CanvasIcon, { DirectionalIcon } from '@/components/ui/CanvasIcon';
 import BreathePlayer, { toneGlow } from '@/components/tanafas/BreathePlayers';
-import PlayerFrame, { Body, Heading, InfoTiles, MainButton, SideSpacer, Tag, Tile } from '@/components/tanafas/PlayerFrame';
+import PlayerFrame, { Body, Heading, InfoTiles, LengthTile, MainButton, SideSpacer, Tag, Tile } from '@/components/tanafas/PlayerFrame';
 import SceneStage from '@/components/tanafas/SceneStage';
 
 type Tab = 'breathe' | 'meditate' | 'discover';
@@ -34,13 +34,15 @@ const TEST_TONES: IconTileTone[] = ['dusk', 'glow', 'dawn'];
 export default function TanafasHubScreen() {
   const { colors } = useTheme();
   const router = useRouter();
-  const { t, fonts } = useLanguage();
+  const { t, fonts, isRTL } = useLanguage();
   const h = t.discover.hub;
   const scenesText = t.tanafas.meditation.scenes;
 
   const [tab, setTab] = useState<Tab>('breathe');
   const [breatheIndex, setBreatheIndex] = useState(0);
   const [sceneIndex, setSceneIndex] = useState(0);
+  // Meditation length, chosen here so the player can open straight into the session.
+  const [meditateMinutes, setMeditateMinutes] = useState<number | null>(DEFAULT_MEDITATION_MINUTES);
   // How full the breathing orb is (0 rest → 1); the screen glow breathes with it.
   const breath = useRef(new Animated.Value(0)).current;
 
@@ -134,7 +136,17 @@ export default function TanafasHubScreen() {
             body={<Body>{scenesText[scene.id].description}</Body>}
             info={
               <InfoTiles>
-                <Tile label={h.duration}>{h.noLimit}</Tile>
+                <LengthTile
+                  label={h.duration}
+                  options={MEDITATION_MINUTES}
+                  value={meditateMinutes}
+                  onChange={setMeditateMinutes}
+                  unit={t.tanafas.session.minPlural}
+                  optionLabel={(m) =>
+                    m === null ? h.noLimit : `${isRTL ? arabicNumber(m) : m} ${arabicPlural(m, t.tanafas.meditation.player.min)}`
+                  }
+                  accent={sceneOrb.c}
+                />
                 <Tile label={h.video}>{scene.video ? h.on : h.off}</Tile>
               </InfoTiles>
             }
@@ -144,7 +156,7 @@ export default function TanafasHubScreen() {
                 <MainButton
                   label={`${h.begin} — ${scenesText[scene.id].name}`}
                   glow={glow}
-                  onPress={() => router.push({ pathname: '/tanafas/meditation/[scene]', params: { scene: scene.id } })}
+                  onPress={() => router.push({ pathname: '/tanafas/meditation/[scene]', params: { scene: scene.id, minutes: meditateMinutes === null ? 'none' : String(meditateMinutes) } })}
                   renderIcon={(c) => <CanvasIcon name="play" size={28} color={c} />}
                 />
                 <SideSpacer />

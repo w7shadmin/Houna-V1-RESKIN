@@ -48,3 +48,7 @@ export const DEFAULT_SESSION_MINUTES = 3;
 /** Progressive muscle relaxation: each group is tensed, then released. */
 export const TENSE_MS = 5000;
 export const RELEASE_MS = 7000;
+
+/** Meditation lengths offered on the hub; null is "no limit". */
+export const MEDITATION_MINUTES: readonly (number | null)[] = [5, 10, 20, null];
+export const DEFAULT_MEDITATION_MINUTES = 10;

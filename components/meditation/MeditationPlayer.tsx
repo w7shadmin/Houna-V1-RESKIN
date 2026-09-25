@@ -12,19 +12,17 @@ import {
   Headphones,
   Maximize2,
   Minimize2,
-  Infinity as InfinityIcon,
   CheckCircle2,
-  Minus,
-  Plus,
 } from 'lucide-react-native';
 import { setAudioModeAsync, useAudioPlayer } from 'expo-audio';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import * as NavigationBar from 'expo-navigation-bar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { spacing, radius, typography, alpha, nightPalette } from '@/constants/theme';
-import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
+import { arabicNumber } from '@/lib/arabicNumerals';
 import { pingActivity, recordTanafasSession } from '@/lib/usageTracking';
 import { logSession } from '@/lib/sessionLog';
+import { sessionEndAlert } from '@/lib/sessionEndAlert';
 import AmbientVisual from './AmbientVisual';
 import type { MeditationScene } from './scenes';
 
@@ -35,15 +33,10 @@ import type { MeditationScene } from './scenes';
  */
 const FOCUS = { midnight: nightPalette.midnight, moonlight: nightPalette.moonlight };
 
-const SESSION_OPTIONS = [5, 10, 20] as const;
 /** How long the player's UI stays visible without interaction before fading out, while actively playing. */
 const CONTROLS_IDLE_MS = 3000;
 const CONTROLS_FADE_IN_MS = 200;
 const CONTROLS_FADE_OUT_MS = 400;
-const CUSTOM_MIN_MINUTES = 1;
-const CUSTOM_MAX_MINUTES = 180;
-const DEFAULT_CUSTOM_MINUTES = 25;
-const CUSTOM_STEP_MINUTES = 5;
 const TICK_MS = 1000;
 /** Ambient audio fades out over the last few seconds instead of cutting abruptly at completion. */
 const FADE_OUT_SECONDS = 5;
@@ -53,22 +46,22 @@ const AUDIO_ONLY_STORAGE_KEY = 'houna-meditation-audio-only';
 interface MeditationPlayerProps {
   scene: MeditationScene;
   sceneName: string;
-  sceneDescription: string;
+  /** Session length, chosen on the Tanafas hub; null = no limit. */
+  minutes: number | null;
   placeholderNotice: string;
   onExit: () => void;
 }
 
 /**
  * Ambient meditation player — hardcoded dark/white regardless of theme, per
- * CLAUDE.md's explicit exception for the meditation player. Open-ended
- * ambience rather than phase-cycling, so this doesn't reuse
- * PhaseBreathingSession; the session-length/pause/resume/complete shape is
- * still deliberately consistent with it.
+ * CLAUDE.md's explicit exception for the meditation player. The length is
+ * chosen on the Tanafas hub, so the player starts straight away and keeps
+ * its chrome to the time, pause and restart (all fading out while playing).
  */
 export default function MeditationPlayer({
   scene,
   sceneName,
-  sceneDescription,
+  minutes,
   placeholderNotice,
   onExit,
 }: MeditationPlayerProps) {
@@ -108,9 +101,8 @@ export default function MeditationPlayer({
     return () => sub.remove();
   }, []);
 
-  const [sessionMinutes, setSessionMinutes] = useState<number>(10);
-  const [isCustomMode, setIsCustomMode] = useState(false);
-  const [isInfiniteSession, setIsInfiniteSession] = useState(false);
+  const isInfiniteSession = minutes === null;
+  const sessionMinutes = minutes ?? 0;
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [elapsed, setElapsed] = useState(0);
@@ -142,30 +134,6 @@ export default function MeditationPlayer({
       AsyncStorage.setItem(AUDIO_ONLY_STORAGE_KEY, String(!next)).catch(() => {});
       return next;
     });
-  };
-
-  const selectPreset = (mins: number) => {
-    setIsCustomMode(false);
-    setIsInfiniteSession(false);
-    setSessionMinutes(mins);
-  };
-
-  const selectCustom = () => {
-    setIsCustomMode(true);
-    setIsInfiniteSession(false);
-    setSessionMinutes((prev) => ((SESSION_OPTIONS as readonly number[]).includes(prev) ? DEFAULT_CUSTOM_MINUTES : prev));
-  };
-
-  const selectInfinite = () => {
-    setIsCustomMode(true);
-    setIsInfiniteSession(true);
-  };
-
-  const clampCustomMinutes = (total: number) => Math.min(CUSTOM_MAX_MINUTES, Math.max(CUSTOM_MIN_MINUTES, total));
-
-  const stepCustom = (delta: number) => {
-    setIsInfiniteSession(false);
-    setSessionMinutes((prev) => clampCustomMinutes(prev + delta));
   };
 
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -270,6 +238,7 @@ export default function MeditationPlayer({
       stop();
       setIsRunning(false);
       setIsComplete(true);
+      sessionEndAlert();
       recordIfStarted(new Date());
       releaseLockScreenRef.current();
     } else {
@@ -410,7 +379,25 @@ export default function MeditationPlayer({
     segmentStartMsRef.current = Date.now();
     setIsPaused(false);
   };
-  const handleReset = () => reset();
+  // Starts from the whole length again without leaving the session (or its lock-screen player).
+  const handleRestart = () => {
+    stopFade();
+    fadingOutRef.current = false;
+    if (scene.audio) audioPlayer.volume = 1;
+    elapsedBaseRef.current = 0;
+    segmentStartMsRef.current = Date.now();
+    setElapsed(0);
+    setIsPaused(false);
+  };
+
+  // The length was chosen before opening, so the session begins straight away.
+  const startedRef = useRef(false);
+  useEffect(() => {
+    if (startedRef.current) return;
+    startedRef.current = true;
+    handleStart();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const handleExit = () => {
     stop();
     recordIfStarted(new Date());
@@ -465,9 +452,6 @@ export default function MeditationPlayer({
           </Pressable>
           <View style={styles.headerTextWrap}>
             <Text style={[styles.headerTitle, { fontFamily: fonts.bold }]}>{sceneName}</Text>
-            {!isRunning && !isComplete && (
-              <Text style={[styles.headerSubtitle, { fontFamily: fonts.regular }]}>{sceneDescription}</Text>
-            )}
           </View>
           <Pressable
             onPress={() => setIsFullscreen((v) => !v)}
@@ -500,117 +484,7 @@ export default function MeditationPlayer({
                 {isInfiniteSession ? p.elapsed : p.remaining}
               </Text>
             </View>
-          ) : (
-            <View style={styles.selectorWrap}>
-              <Text style={[styles.selectorLabel, { fontFamily: fonts.semiBold }]}>{p.chooseSession}</Text>
-              <View style={styles.selectorRow}>
-                {SESSION_OPTIONS.map((mins) => {
-                  const active = !isCustomMode && mins === sessionMinutes;
-                  return (
-                    <Pressable
-                      key={mins}
-                      onPress={() => selectPreset(mins)}
-                      style={({ pressed }) => [
-                        styles.pill,
-                        active && styles.pillActive,
-                        pressed && (active ? { opacity: 0.85 } : { backgroundColor: alpha(FOCUS.moonlight, 0.15) }),
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.pillText,
-                          { fontFamily: fonts.semiBold },
-                          active && styles.pillTextActive,
-                        ]}
-                      >
-                        {num(mins)} {arabicPlural(mins, p.min)}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-                <Pressable
-                  onPress={selectCustom}
-                  style={({ pressed }) => [
-                    styles.pill,
-                    isCustomMode && styles.pillActive,
-                    pressed && (isCustomMode ? { opacity: 0.85 } : { backgroundColor: alpha(FOCUS.moonlight, 0.15) }),
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.pillText,
-                      { fontFamily: fonts.semiBold },
-                      isCustomMode && styles.pillTextActive,
-                    ]}
-                  >
-                    {p.custom}
-                  </Text>
-                </Pressable>
-              </View>
-
-              {isCustomMode && (
-                <View style={styles.customWrap}>
-                  <View style={styles.stepperRow}>
-                    <Pressable
-                      onPress={() => stepCustom(-CUSTOM_STEP_MINUTES)}
-                      disabled={isInfiniteSession}
-                      hitSlop={8}
-                      style={({ pressed }) => [
-                        styles.stepperBtn,
-                        isInfiniteSession && styles.stepperBtnDisabled,
-                        pressed && !isInfiniteSession && { backgroundColor: alpha(FOCUS.moonlight, 0.28) },
-                      ]}
-                    >
-                      <Minus size={20} color={isInfiniteSession ? alpha(FOCUS.moonlight, 0.35) : FOCUS.moonlight} strokeWidth={2.4} />
-                    </Pressable>
-
-                    <Text
-                      style={[
-                        styles.customValue,
-                        { fontFamily: fonts.bold },
-                        isInfiniteSession && styles.customValueDisabled,
-                      ]}
-                    >
-                      {num(sessionMinutes)} {arabicPlural(sessionMinutes, p.min)}
-                    </Text>
-
-                    <Pressable
-                      onPress={() => stepCustom(CUSTOM_STEP_MINUTES)}
-                      disabled={isInfiniteSession}
-                      hitSlop={8}
-                      style={({ pressed }) => [
-                        styles.stepperBtn,
-                        isInfiniteSession && styles.stepperBtnDisabled,
-                        pressed && !isInfiniteSession && { backgroundColor: alpha(FOCUS.moonlight, 0.28) },
-                      ]}
-                    >
-                      <Plus size={20} color={isInfiniteSession ? alpha(FOCUS.moonlight, 0.35) : FOCUS.moonlight} strokeWidth={2.4} />
-                    </Pressable>
-                  </View>
-
-                  <Pressable
-                    onPress={selectInfinite}
-                    style={({ pressed }) => [
-                      styles.infinityPill,
-                      isInfiniteSession && styles.infinityPillActive,
-                      pressed && !isInfiniteSession && { backgroundColor: alpha(FOCUS.moonlight, 0.15) },
-                    ]}
-                  >
-                    <InfinityIcon size={16} color={isInfiniteSession ? FOCUS.midnight : FOCUS.moonlight} strokeWidth={2} />
-                    <Text
-                      style={[
-                        styles.infinityPillText,
-                        { fontFamily: fonts.semiBold },
-                        isInfiniteSession && styles.infinityPillTextActive,
-                      ]}
-                    >
-                      {p.noLimit}
-                    </Text>
-                  </Pressable>
-                </View>
-              )}
-            </View>
-          )}
+          ) : null}
         </View>
 
         {!hasRealMedia && (
@@ -629,16 +503,6 @@ export default function MeditationPlayer({
               ) : (
                 <Headphones size={18} color={FOCUS.moonlight} />
               )}
-            </Pressable>
-          )}
-
-          {!isRunning && !isComplete && (
-            <Pressable
-              onPress={handleStart}
-              style={({ pressed }) => [styles.primaryBtn, pressed && { backgroundColor: alpha(FOCUS.moonlight, 0.32) }]}
-            >
-              <Play size={22} color={FOCUS.moonlight} fill={FOCUS.moonlight} />
-              <Text style={[styles.primaryBtnText, { fontFamily: fonts.bold }]}>{p.begin}</Text>
             </Pressable>
           )}
 
@@ -674,7 +538,7 @@ export default function MeditationPlayer({
 
           {isRunning && (
             <Pressable
-              onPress={handleReset}
+              onPress={handleRestart}
               style={({ pressed }) => [styles.smallIconBtn, pressed && { backgroundColor: alpha(FOCUS.moonlight, 0.24) }]}
               accessibilityLabel={p.startAgain}
             >
@@ -732,106 +596,11 @@ const styles = StyleSheet.create({
     color: FOCUS.moonlight,
     fontSize: typography.fontSize.md,
   },
-  headerSubtitle: {
-    color: alpha(FOCUS.moonlight, 0.75),
-    fontSize: typography.fontSize.xs,
-    marginTop: 4,
-  },
   main: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: spacing.lg,
-  },
-  selectorWrap: {
-    alignItems: 'center',
-  },
-  selectorLabel: {
-    color: alpha(FOCUS.moonlight, 0.85),
-    fontSize: typography.fontSize.sm,
-    marginBottom: spacing.md,
-  },
-  selectorRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: spacing.sm,
-  },
-  customWrap: {
-    alignItems: 'center',
-    gap: spacing.md,
-    marginTop: spacing.lg,
-  },
-  stepperRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.lg,
-  },
-  stepperBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: radius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: alpha(FOCUS.moonlight, 0.14),
-    borderWidth: 1,
-    borderColor: alpha(FOCUS.moonlight, 0.4),
-  },
-  stepperBtnDisabled: {
-    opacity: 0.4,
-  },
-  customValue: {
-    color: FOCUS.moonlight,
-    fontSize: typography.fontSize.xxl,
-    minWidth: 130,
-    textAlign: 'center',
-  },
-  customValueDisabled: {
-    color: alpha(FOCUS.moonlight, 0.5),
-  },
-  infinityPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    height: 34,
-    paddingHorizontal: spacing.lg,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: alpha(FOCUS.moonlight, 0.4),
-  },
-  infinityPillActive: {
-    backgroundColor: FOCUS.moonlight,
-    borderColor: FOCUS.moonlight,
-  },
-  infinityPillText: {
-    color: FOCUS.moonlight,
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.sm,
-  },
-  infinityPillTextActive: {
-    color: FOCUS.midnight,
-  },
-  pill: {
-    height: 34,
-    paddingHorizontal: spacing.lg,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: alpha(FOCUS.moonlight, 0.4),
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  pillActive: {
-    backgroundColor: FOCUS.moonlight,
-    borderColor: FOCUS.moonlight,
-  },
-  pillText: {
-    color: FOCUS.moonlight,
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.sm,
-  },
-  pillTextActive: {
-    color: FOCUS.midnight,
   },
   timeWrap: {
     alignItems: 'center',

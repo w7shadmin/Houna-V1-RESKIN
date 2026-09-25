@@ -3,6 +3,7 @@ import { Animated, Pressable, ScrollView, StyleSheet, Text, View, type StyleProp
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { alpha } from '@/constants/theme';
+import { arabicNumber } from '@/lib/arabicNumerals';
 import IconButton from '@/components/ui/IconButton';
 import type { IconTileTone } from '@/components/ui/IconTile';
 import { DirectionalIcon } from '@/components/ui/CanvasIcon';
@@ -184,6 +185,58 @@ export function Tile({ label, children }: { label: string; children: React.React
   );
 }
 
+/**
+ * A Duration tile you can set: the lengths in a row, the chosen one
+ * underlined in the exercise's colour, then the unit. `null` is "no limit" (∞).
+ */
+export function LengthTile<T extends number | null>({
+  label,
+  options,
+  value,
+  onChange,
+  unit,
+  optionLabel,
+  accent,
+}: {
+  label: string;
+  options: readonly T[];
+  value: T;
+  onChange: (v: T) => void;
+  unit: string;
+  /** Spoken label for an option, e.g. "10 min" / "No limit". */
+  optionLabel: (v: T) => string;
+  accent: string;
+}) {
+  const { colors } = useTheme();
+  const { fonts, isRTL } = useLanguage();
+  const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
+  return (
+    <Tile label={label}>
+      <View style={styles.lengths}>
+        {options.map((m) => {
+          const selected = m === value;
+          return (
+            <Pressable
+              key={String(m)}
+              onPress={() => onChange(m)}
+              hitSlop={8}
+              accessibilityRole="button"
+              aria-selected={selected}
+              accessibilityLabel={optionLabel(m)}
+              style={[styles.length, { borderBottomColor: selected ? accent : 'transparent' }]}
+            >
+              <Text style={[styles.lengthText, { color: selected ? colors.text : colors.textTertiary, fontFamily: selected ? fonts.semiBold : fonts.medium }]}>
+                {m === null ? '∞' : num(m)}
+              </Text>
+            </Pressable>
+          );
+        })}
+        <Text style={[styles.lengthText, { color: colors.textTertiary, fontFamily: fonts.regular }]}>{unit}</Text>
+      </View>
+    </Tile>
+  );
+}
+
 /** A thin progress track with a label beneath (time left, step, group). */
 export function ProgressInfo({ progress, label, color }: { progress: number; label: string; color: string }) {
   const { colors } = useTheme();
@@ -343,6 +396,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   tileValue: {
+    fontSize: 16,
+  },
+  lengths: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  length: {
+    borderBottomWidth: 2,
+  },
+  lengthText: {
     fontSize: 16,
   },
   progress: {

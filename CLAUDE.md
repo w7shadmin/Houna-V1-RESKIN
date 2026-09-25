@@ -183,7 +183,10 @@ their own: `components/tanafas/BreathePlayers.tsx` has one player per kind
 (timed phases, five-senses grounding, muscle relaxation), and the timed
 player's `useBreathCycle` is the reusable phase state machine. Every
 exercise's timings live in `constants/breathPatterns.ts`. Never hardcode one
-exercise's timings into a player.
+exercise's timings into a player. Meditation lengths are chosen on the hub
+too (`MEDITATION_MINUTES`, passed as the `minutes` route param), so the
+full-screen player starts straight away. Every breathing and meditation
+session ends with `lib/sessionEndAlert.ts`'s gentle buzz.
 
 ## Current skin — "Nightlight" / "Daylight"
 

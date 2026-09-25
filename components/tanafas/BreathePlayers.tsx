@@ -18,6 +18,7 @@ import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { logSession } from '@/lib/sessionLog';
 import { pingActivity, recordTanafasSession } from '@/lib/usageTracking';
 import { useSessionLog } from '@/hooks/useSessionLog';
+import { sessionEndAlert } from '@/lib/sessionEndAlert';
 import CanvasIcon, { DirectionalIcon } from '@/components/ui/CanvasIcon';
 import type { IconTileTone } from '@/components/ui/IconTile';
 import { BreathStage, NATIVE_DRIVER } from './BreatheStages';
@@ -26,6 +27,7 @@ import PlayerFrame, {
   FadeIn,
   Heading,
   InfoTiles,
+  LengthTile,
   MainButton,
   ProgressInfo,
   SideButton,
@@ -178,6 +180,7 @@ function useBreathCycle(exercise: BreatheKey, phases: readonly BreathPhase[], mi
   useEffect(() => {
     if (status === 'running' && clock.total >= totalSeconds) {
       setStatus('complete');
+      sessionEndAlert();
       record();
     }
   }, [status, clock.total, totalSeconds, record]);
@@ -251,29 +254,15 @@ function PhasePlayer({ exercise, breath, nav }: PlayerProps) {
   const roundsDone = Math.max(clock.round - 1, 1);
 
   const lengthTile = (
-    <Tile label={t.discover.hub.duration}>
-      <View style={styles.lengths}>
-        {SESSION_MINUTES.map((m) => {
-          const selected = m === minutes;
-          return (
-            <Pressable
-              key={m}
-              onPress={() => setMinutes(m)}
-              hitSlop={8}
-              accessibilityRole="button"
-              aria-selected={selected}
-              accessibilityLabel={`${num(m)} ${m === 1 ? s.min : s.minPlural}`}
-              style={[styles.length, { borderBottomColor: selected ? accent : 'transparent' }]}
-            >
-              <Text style={[styles.lengthText, { color: selected ? colors.text : colors.textTertiary, fontFamily: selected ? fonts.semiBold : fonts.medium }]}>
-                {num(m)}
-              </Text>
-            </Pressable>
-          );
-        })}
-        <Text style={[styles.lengthText, { color: colors.textTertiary, fontFamily: fonts.regular }]}>{s.minPlural}</Text>
-      </View>
-    </Tile>
+    <LengthTile
+      label={t.discover.hub.duration}
+      options={SESSION_MINUTES}
+      value={minutes as (typeof SESSION_MINUTES)[number]}
+      onChange={setMinutes}
+      unit={s.minPlural}
+      optionLabel={(m) => `${num(m)} ${m === 1 ? s.min : s.minPlural}`}
+      accent={accent}
+    />
   );
 
   return (
@@ -393,6 +382,7 @@ function GroundingPlayer({ exercise, breath, nav }: PlayerProps) {
     if (step < steps.length - 1) setStep(step + 1);
     else {
       setStatus('complete');
+      sessionEndAlert();
       log.end();
     }
   };
@@ -543,6 +533,7 @@ function TensionPlayer({ exercise, breath, nav }: PlayerProps) {
     else if (group < groups.length - 1) goTo(group + 1, 'tense');
     else {
       setStatus('complete');
+      sessionEndAlert();
       logEnd();
     }
   }, [phase, group, groups.length, goTo, logEnd]);
@@ -700,17 +691,6 @@ function TensionPlayer({ exercise, breath, nav }: PlayerProps) {
 }
 
 const styles = StyleSheet.create({
-  lengths: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  length: {
-    borderBottomWidth: 2,
-  },
-  lengthText: {
-    fontSize: 16,
-  },
   phaseRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
