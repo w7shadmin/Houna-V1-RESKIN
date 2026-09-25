@@ -72,6 +72,20 @@ export function alpha(hex: string, a: number): string {
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
 }
 
+/**
+ * A translucent colour (`rgba(...)` from `alpha`, or #hex) pre-blended onto an
+ * opaque #hex ground — same look over that ground, but nothing behind shows
+ * through (e.g. Home's Night stars under its glassy cards).
+ */
+export function flatten(color: string, over: string): string {
+  if (color.startsWith('#')) return color;
+  const [r, g, b, a = 1] = color.slice(color.indexOf('(') + 1, -1).split(',').map(Number);
+  const n = parseInt(over.slice(1), 16);
+  const mix = (fg: number, bg: number) => Math.round(fg * a + bg * (1 - a));
+  const out = (mix(r, (n >> 16) & 255) << 16) | (mix(g, (n >> 8) & 255) << 8) | mix(b, n & 255);
+  return '#' + out.toString(16).padStart(6, '0');
+}
+
 /* ──────────────────── Semantic Color Tokens ──────────────────── */
 
 export type ColorScheme = 'night' | 'day';

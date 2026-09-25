@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Defs, Ellipse, RadialGradient, Stop } from 'react-native-svg';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { layout, typography } from '@/constants/theme';
+import { flatten, layout, typography } from '@/constants/theme';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { getTodayEntry } from '@/lib/journal';
 import { ACTIVITY_PERIODS, fetchCommunityActivity, type CommunityActivity } from '@/lib/communityActivity';
@@ -93,6 +93,10 @@ export default function HomeScreen() {
   };
 
   const accent = colors.primary;
+  // Night surfaces are glassy (translucent); over the stars they'd let stars
+  // show through. Pre-blend them onto the background so the sky stays behind.
+  const solid = (c: string) => (isNight ? flatten(c, colors.background) : c);
+  const topButton = { backgroundColor: solid(colors.control) };
   const labelLatin = fonts.labelTracked;
 
   return (
@@ -107,6 +111,7 @@ export default function HomeScreen() {
           <View>
             <IconButton
               variant="subtle"
+              style={topButton}
               accessibilityLabel={moodPending ? h.topBar.moodCheckInPending : h.topBar.moodCheckIn}
               onPress={() => router.push('/check-in')}
               renderIcon={() => <MoodBloom size={26} color={accent} shape={HOME_BLOOM} />}
@@ -126,6 +131,7 @@ export default function HomeScreen() {
           </View>
           <IconButton
             variant="subtle"
+            style={topButton}
             accessibilityLabel={h.topBar.profile}
             onPress={() => router.push('/profile')}
             renderIcon={(c) => <CanvasIcon name="profile" size={20} strokeWidth={1.7} color={c} />}
@@ -158,7 +164,7 @@ export default function HomeScreen() {
         </View>
 
         {/* Community card */}
-        <Card variant="feature" style={styles.community}>
+        <Card variant="feature" style={[styles.community, { backgroundColor: solid(colors.card) }]}>
           <View style={styles.communityHead}>
             <Text
               style={[
@@ -249,7 +255,7 @@ export default function HomeScreen() {
           onPress={() => router.push('/crisis')}
           style={({ pressed }) => [
             styles.crisis,
-            { backgroundColor: colors.crisis.bg, borderColor: colors.crisis.border },
+            { backgroundColor: solid(colors.crisis.bg), borderColor: colors.crisis.border },
             pressed && styles.pressed,
           ]}
         >
