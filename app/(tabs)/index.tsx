@@ -276,7 +276,7 @@ export default function HomeScreen() {
 const NATIVE = Platform.OS !== 'web';
 /** One lap of the dots' drift, and one breath of the glow (in + out). */
 const DRIFT_MS = 8000;
-const GLOW_BREATH_MS = 10000;
+const GLOW_BREATH_MS = 5000;
 
 /** A sine wave sampled across one loop (0 → 1), offset by `phase` laps — for piecewise interpolation. */
 const WAVE_STEPS = Array.from({ length: 17 }, (_, k) => k / 16);
@@ -294,6 +294,9 @@ function useCalmLoop(make: (v: Animated.Value) => Animated.CompositeAnimation) {
   }, []);
   useEffect(() => {
     if (!focused || reduceMotion) return;
+    // Always from the top of a cycle: a loop replays from the value it started at, so
+    // resuming mid-cycle (after Home was covered) would jump back there every lap.
+    v.setValue(0);
     const anim = make(v);
     anim.start();
     return () => anim.stop();
