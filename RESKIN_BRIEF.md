@@ -9,6 +9,13 @@ travel with the request itself.
 Read this file, then read `CLAUDE.md` (full architecture, screen inventory,
 and a step-by-step "How to reskin" checklist) before touching any code.
 
+The chosen direction ("Nightlight" / "Daylight") and the new structural
+features — one-screen Home, mood bloom check-in, unified search, Tanafas
+Discover tests, Profile, Recap — are designed on the canvas at
+https://claude.ai/artifact/EMxmwt7o1Uq6kx32BdAUA7. What each feature needs
+from the data and backend is in `FEATURES_BRIEF.md`; read it before
+building any of them.
+
 ## The one non-negotiable
 
 Houna's brand identity — the name, the logo mark, the mission/voice — stays
