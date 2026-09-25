@@ -240,7 +240,7 @@ export const nightColors: ColorTokens = {
 
   logo: { primary: N.hounaGlow, secondary: N.moonlight },
 
-  mapDot: alpha(N.moonlight, 0.26),
+  mapDot: alpha(N.moonlight, 0.34),
 
   sheet: N.nightfall,
   scrim: '#070B1C',
@@ -305,7 +305,7 @@ export const dayColors: ColorTokens = {
   // The official logo artwork's own teal and grey, unchanged on Day.
   logo: { primary: D.hounaTeal, secondary: '#525052' },
 
-  mapDot: alpha(D.ink, 0.26),
+  mapDot: alpha(D.ink, 0.3),
 
   // Check-in artboard (Day): a warmer-than-Paper sheet over a stone scrim.
   sheet: '#FBF8F2',

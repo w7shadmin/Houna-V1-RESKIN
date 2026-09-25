@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import Svg, { Line, Circle, G } from 'react-native-svg';
-import { COUNTRIES, getCountry } from '@/lib/countries';
+import Svg, { Line, Circle, G, Path } from 'react-native-svg';
+import { WORLD_DOTS_HEIGHT, WORLD_DOTS_PATH, WORLD_DOTS_WIDTH, snapToLand } from '@/constants/worldDots';
+import { getCountry } from '@/lib/countries';
 import { palette, spacing, radius, typography } from '@/constants/theme';
 import { arabicNumber } from '@/lib/arabicNumerals';
 
@@ -110,59 +111,52 @@ const styles = StyleSheet.create({
 
 /* ──────────────── Community dot map (Nightlight Home) ──────────────── */
 
-/** Canvas map frame: 318×118, i.e. the 360° equirectangular strip scaled to 318 wide with 22px trimmed off the top. */
-const DOT_MAP_ASPECT = 318 / 118;
-const DOT_MAP_TOP_TRIM = 22 / 318;
-
 interface CommunityDotMapProps {
   /** Countries to light up. */
   lit: readonly string[];
   /** Colour (and glow) of lit countries. */
   accent: string;
-  /** Colour of every other country. */
+  /** Colour of the land dots. */
   dotColor: string;
 }
 
 /**
- * Home's community card map, drawn exactly as on the canvas: every country
- * in `lib/countries.ts` as a faint 2.4px dot at its capital (plain
- * equirectangular projection, same as `WorldMap`), with active countries
- * lit as 5px accent dots with a soft glow. No labels, no touch targets —
- * it's ambience, the numbers beside it carry the meaning.
+ * Home's community card map: a halftone dot world map (constants/worldDots.ts)
+ * with active countries lit as accent dots with a soft glow, each snapped
+ * onto the nearest land dot so it always sits on the drawn coastline. One
+ * path for all land dots; scales with its width through the viewBox. No
+ * labels or touch targets — it's ambience, the numbers beside it carry the
+ * meaning.
  */
 export function CommunityDotMap({ lit, accent, dotColor }: CommunityDotMapProps) {
-  const [width, setWidth] = useState(0);
-  const litSet = useMemo(() => new Set(lit), [lit]);
-  const scale = width / 360;
-  const height = width / DOT_MAP_ASPECT;
-  const trim = width * DOT_MAP_TOP_TRIM;
+  const markers = useMemo(
+    () =>
+      lit
+        .map((code) => {
+          const c = getCountry(code);
+          return c ? { code, ...snapToLand(c.lat, c.lon) } : null;
+        })
+        .filter((m): m is NonNullable<typeof m> => m !== null),
+    [lit],
+  );
 
   return (
     <View
-      style={{ width: '100%', aspectRatio: DOT_MAP_ASPECT, overflow: 'hidden' }}
-      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
+      style={{ width: '100%', aspectRatio: WORLD_DOTS_WIDTH / WORLD_DOTS_HEIGHT }}
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"
     >
-      {width > 0 && (
-        <Svg width={width} height={height}>
-          {COUNTRIES.filter((c) => !litSet.has(c.code)).map((c) => (
-            <Circle key={c.code} cx={(c.lon + 180) * scale} cy={(90 - c.lat) * scale - trim} r={1.2} fill={dotColor} />
-          ))}
-          {COUNTRIES.filter((c) => litSet.has(c.code)).map((c) => {
-            const cx = (c.lon + 180) * scale;
-            const cy = (90 - c.lat) * scale - trim;
-            return (
-              <G key={c.code}>
-                {/* CSS `0 0 8px accent` approximated as two soft halo rings. */}
-                <Circle cx={cx} cy={cy} r={6.5} fill={accent} opacity={0.12} />
-                <Circle cx={cx} cy={cy} r={4.5} fill={accent} opacity={0.25} />
-                <Circle cx={cx} cy={cy} r={2.5} fill={accent} />
-              </G>
-            );
-          })}
-        </Svg>
-      )}
+      <Svg width="100%" height="100%" viewBox={`0 0 ${WORLD_DOTS_WIDTH} ${WORLD_DOTS_HEIGHT}`}>
+        <Path d={WORLD_DOTS_PATH} fill={dotColor} />
+        {markers.map((m) => (
+          <G key={m.code}>
+            {/* CSS `0 0 8px accent` approximated as two soft halo rings. */}
+            <Circle cx={m.x} cy={m.y} r={3.6} fill={accent} opacity={0.12} />
+            <Circle cx={m.x} cy={m.y} r={2.4} fill={accent} opacity={0.25} />
+            <Circle cx={m.x} cy={m.y} r={1.3} fill={accent} />
+          </G>
+        ))}
+      </Svg>
     </View>
   );
 }
