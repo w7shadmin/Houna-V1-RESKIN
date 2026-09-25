@@ -259,7 +259,10 @@ stars (`components/starfield/`). The only word is "Tanafas"; tapping the
 moon or Back reverses it. Home's mark and the moon are the same
 `components/starfield/MarkHalo.tsx` (dot ring, edge halo, 5s breath);
 ambient loops use `hooks/useCalmLoop.ts` (focus- and Reduce-Motion-aware).
-A visit of a minute or more counts as a breathing session (`starfield`).
+Every visit counts as a breathing session (`starfield`, titled Tanafas in
+Recap): the foreground time from arrival until the moon is tapped, with the
+app-wide 10s minimum (`MIN_SESSION_SECONDS`), into Recap, streaks and the
+leaderboard.
 
 **Tanafas player**: the Breathe and Meditate carousels share
 `components/tanafas/PlayerFrame.tsx` (stage, title row, tag, description,

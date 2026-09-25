@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, BackHandler, Easing, Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
+import { AppState, Animated, BackHandler, Easing, Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import Svg, { Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
@@ -9,7 +9,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useStarfield } from '@/contexts/StarfieldContext';
 import { grid, nightColors, nightPalette } from '@/constants/theme';
 import { NATIVE, useReduceMotion } from '@/hooks/useCalmLoop';
-import { logSession } from '@/lib/sessionLog';
+import { MIN_SESSION_SECONDS, logSession } from '@/lib/sessionLog';
 import { pingActivity, recordTanafasSession } from '@/lib/usageTracking';
 import MarkHalo, { HALO_BOX } from '@/components/starfield/MarkHalo';
 import StarSky from '@/components/starfield/StarSky';
@@ -19,8 +19,6 @@ import ShootingStars from '@/components/starfield/ShootingStars';
 const MOON_SCALE = 1.45;
 /** The moonglow in the sky round the moon. */
 const GLOW = 420;
-/** A visit counts as a breathing session (Recap, streaks) once it lasts this long. */
-const COUNTS_AFTER_MS = 60000;
 
 interface Frame {
   /** This screen's own top-left on the window: Home's measurement is converted by it. */
@@ -98,9 +96,44 @@ export default function StarfieldScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [frame !== null]);
 
+  // Every visit counts as a breathing session, like the Breathe exercises: the time spent
+  // breathing (in the foreground, from arrival until the moon is tapped) goes to Recap's
+  // minutes, the streak and the leaderboard. Anything under the app-wide minimum is an
+  // accidental open; the community ping waits for that minimum too.
+  const breathing = useRef({ ms: 0, since: Date.now() as number | null, counted: false });
+  const countVisit = useCallback(() => {
+    const b = breathing.current;
+    if (b.counted) return;
+    b.counted = true;
+    const ms = b.ms + (b.since !== null ? Date.now() - b.since : 0);
+    if (ms < MIN_SESSION_SECONDS * 1000) return;
+    const endedAt = new Date();
+    const startedAt = new Date(endedAt.getTime() - ms);
+    logSession('breathing', 'starfield', startedAt, endedAt).catch(() => {});
+    recordTanafasSession('breathing', startedAt, endedAt).catch(() => {});
+  }, []);
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (state) => {
+      const b = breathing.current;
+      if (state === 'active') {
+        if (b.since === null) b.since = Date.now();
+      } else if (b.since !== null) {
+        b.ms += Date.now() - b.since;
+        b.since = null;
+      }
+    });
+    const ping = setTimeout(() => pingActivity('breathing').catch(() => {}), MIN_SESSION_SECONDS * 1000);
+    return () => {
+      sub.remove();
+      clearTimeout(ping);
+      countVisit();
+    };
+  }, [countVisit]);
+
   const close = useCallback(() => {
     if (closing.current) return;
     closing.current = true;
+    countVisit();
     setSettled(false);
     word.stopAnimation();
     Animated.sequence([
@@ -117,7 +150,7 @@ export default function StarfieldScreen() {
       setHaloHidden(false);
       requestAnimationFrame(() => requestAnimationFrame(() => router.back()));
     });
-  }, [word, glide, sky, router, setHaloHidden]);
+  }, [word, glide, sky, router, setHaloHidden, countVisit]);
 
   // Android back: the same way out as tapping the moon.
   useEffect(() => {
@@ -139,20 +172,6 @@ export default function StarfieldScreen() {
       setHaloHidden(false);
     };
   }, [setHaloHidden]);
-
-  // A visit of a minute or more counts as a breathing session: the community ping at the
-  // minute mark, then the on-device log (Recap) and streak record on leaving.
-  useEffect(() => {
-    const startedAt = new Date();
-    const ping = setTimeout(() => pingActivity('breathing').catch(() => {}), COUNTS_AFTER_MS);
-    return () => {
-      clearTimeout(ping);
-      const endedAt = new Date();
-      if (endedAt.getTime() - startedAt.getTime() < COUNTS_AFTER_MS) return;
-      logSession('breathing', 'starfield', startedAt, endedAt).catch(() => {});
-      recordTanafasSession('breathing', startedAt, endedAt).catch(() => {});
-    };
-  }, []);
 
   return (
     <View ref={rootRef} collapsable={false} onLayout={onLayout} style={StyleSheet.absoluteFill}>
