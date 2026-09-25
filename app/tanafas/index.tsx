@@ -2,7 +2,6 @@ import React, { useRef, useState } from 'react';
 import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Circle } from 'react-native-svg';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { alpha, layout, nightPalette } from '@/constants/theme';
@@ -14,10 +13,10 @@ import IconButton from '@/components/ui/IconButton';
 import IconTile, { type IconTileTone } from '@/components/ui/IconTile';
 import Card from '@/components/ui/Card';
 import ScreenGlow from '@/components/ui/ScreenGlow';
-import Orb from '@/components/ui/Orb';
 import CanvasIcon, { DirectionalIcon } from '@/components/ui/CanvasIcon';
 import BreathePlayer, { toneGlow } from '@/components/tanafas/BreathePlayers';
 import PlayerFrame, { Body, Heading, InfoTiles, MainButton, SideSpacer, Tag, Tile } from '@/components/tanafas/PlayerFrame';
+import SceneStage from '@/components/tanafas/SceneStage';
 
 type Tab = 'breathe' | 'meditate' | 'discover';
 
@@ -129,7 +128,7 @@ export default function TanafasHubScreen() {
               onPrev: () => setSceneIndex((i) => cycle(i, MEDITATION_SCENES.length, -1)),
               onNext: () => setSceneIndex((i) => cycle(i, MEDITATION_SCENES.length, 1)),
             }}
-            stage={<MeditateStage sceneId={scene.id} />}
+            stage={<SceneStage scene={scene} />}
             heading={<Heading>{scenesText[scene.id].name}</Heading>}
             label={<Tag label={h.ambientScene} tone="glow" />}
             body={<Body>{scenesText[scene.id].description}</Body>}
@@ -155,30 +154,6 @@ export default function TanafasHubScreen() {
         )}
       </View>
     </SafeAreaView>
-  );
-}
-
-/** Meditate: a hairline halo around the scene's coloured orb. */
-function MeditateStage({ sceneId }: { sceneId: SceneId }) {
-  const { colors } = useTheme();
-  const orb = SCENE_ORBS[sceneId];
-  return (
-    <View style={styles.stage} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-      <Svg width={250} height={250} style={StyleSheet.absoluteFill}>
-        <Circle cx={124} cy={124} r={119.5} fill="none" stroke={colors.text} strokeOpacity={0.16} strokeWidth={1} />
-      </Svg>
-      <Orb
-        size={176}
-        fx={0.38}
-        fy={0.32}
-        stops={[
-          [orb.hi, 0],
-          [orb.c, 0.48],
-          [orb.lo, 1],
-        ]}
-        glow={`0 0 70px ${orb.glow}`}
-      />
-    </View>
   );
 }
 

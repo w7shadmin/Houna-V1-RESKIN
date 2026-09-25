@@ -251,10 +251,13 @@ account or settings screen.
 `components/tanafas/PlayerFrame.tsx` (stage, title row, tag, description,
 tiles, round button). Pressing play on a breathing exercise keeps the
 layout and fades each slot over to the session (round, phase, time left).
-The stage (`BreatheStages.tsx`) is a ring of dots (a square for box
-breathing) around an orb that inflates and deflates, and the screen glow
-breathes with it. Tones: 4-7-8 glow, box dusk, five senses dawn, muscle
-relaxation glow.
+The stage (`BreatheStages.tsx`) is a ring of dots around an orb that
+inflates and deflates (box breathing: a square of dots around a rounded-
+square orb), and the screen glow breathes with it. Tones: 4-7-8 glow, box
+dusk, five senses dawn, muscle relaxation glow. Meditate's stage
+(`SceneStage.tsx`) plays the scene's footage muted inside its orb, cropped
+to `videoFocus` in `components/meditation/scenes.ts`; the plain orb shows
+for scenes without footage.
 
 **Directory pages** are all in the canvas language now: list pages use
 `components/directory/PageHeader.tsx`; the professional / organization /

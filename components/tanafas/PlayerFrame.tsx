@@ -58,13 +58,19 @@ export default function PlayerFrame({ stage, heading, label, body, nav, info, co
       accessibilityLabel={dir === 'prev' ? h.previous : h.next}
       onPress={dir === 'prev' ? nav?.onPrev : nav?.onNext}
       disabled={!nav}
+      hitSlop={4}
       // Out of sight during a session: out of the accessibility tree too.
       aria-hidden={!nav}
       accessibilityElementsHidden={!nav}
       importantForAccessibility={nav ? 'auto' : 'no-hide-descendants'}
-      style={[styles.arrow, !nav && styles.hidden]}
+      style={({ pressed }) => [
+        styles.arrow,
+        { backgroundColor: colors.control, borderColor: colors.borderControl },
+        pressed && styles.pressed,
+        !nav && styles.hidden,
+      ]}
     >
-      <DirectionalIcon isRTL={isRTL} name={dir === 'prev' ? 'chevronStart' : 'chevron'} size={20} strokeWidth={1.8} color={colors.textSecondary} />
+      <DirectionalIcon isRTL={isRTL} name={dir === 'prev' ? 'chevronStart' : 'chevron'} size={20} strokeWidth={2} color={colors.text} />
     </Pressable>
   );
 
@@ -241,8 +247,10 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   arrow: {
-    width: 44,
-    height: 44,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },

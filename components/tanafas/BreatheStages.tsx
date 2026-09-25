@@ -97,7 +97,15 @@ export function BreathStage({ shape, tone, breath, trace, showTracer, progress, 
         )}
       </Svg>
       <Animated.View style={{ transform: [{ scale }] }}>
-        <Orb size={ORB} fx={glass ? 0.5 : 0.34} fy={glass ? 0.45 : 0.3} stops={stops} glow={`0 0 ${glass ? 60 : 90}px ${alpha(fg, glass ? 0.3 : 0.5)}`} />
+        <Orb
+          size={ORB}
+          // Box breathing breathes a rounded square, echoing its square of dots.
+          radius={shape === 'square' ? ORB * 0.22 : undefined}
+          fx={glass ? 0.5 : 0.34}
+          fy={glass ? 0.45 : 0.3}
+          stops={stops}
+          glow={`0 0 ${glass ? 60 : 90}px ${alpha(fg, glass ? 0.3 : 0.5)}`}
+        />
       </Animated.View>
       {shape === 'square' && trace && showTracer && <Tracer trace={trace} color={fg} />}
       {!!children && <View style={styles.centre}>{children}</View>}

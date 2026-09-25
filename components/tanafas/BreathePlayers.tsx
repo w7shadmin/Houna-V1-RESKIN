@@ -421,7 +421,7 @@ function GroundingPlayer({ exercise, breath, nav }: PlayerProps) {
         >
           {running && (
             <FadeIn key={step}>
-              <Text style={[styles.count, isRTL && styles.countArabic, { color: colors.text, fontFamily: fonts.display }]}>{num(current.count)}</Text>
+              <Text style={[styles.count, isRTL && styles.countArabic, { color: colors.text, fontFamily: fonts.semiBold }]}>{num(current.count)}</Text>
             </FadeIn>
           )}
         </BreathStage>
@@ -607,7 +607,7 @@ function TensionPlayer({ exercise, breath, nav }: PlayerProps) {
         <BreathStage shape="ring" tone={tone} breath={breath} glass={inSession}>
           {inSession && (
             <View style={styles.countWrap}>
-              <Text style={[styles.count, isRTL && styles.countArabic, { color: colors.text, fontFamily: fonts.display }]}>{num(secondsLeft)}</Text>
+              <Text style={[styles.count, isRTL && styles.countArabic, { color: colors.text, fontFamily: fonts.semiBold }]}>{num(secondsLeft)}</Text>
               <FadeIn key={phase}>
                 <Text style={[styles.cue, { color: colors.textSecondary, fontFamily: fonts.medium }]}>{isTense ? ex.holdTight : ex.letGo}</Text>
               </FadeIn>
@@ -734,13 +734,14 @@ const styles = StyleSheet.create({
   countWrap: {
     alignItems: 'center',
   },
+  // The body face, not the display one: steadier numerals, sized like the cue beneath.
   count: {
-    fontSize: 56,
-    lineHeight: 64,
+    fontSize: 40,
+    lineHeight: 48,
     textAlign: 'center',
   },
   countArabic: {
-    lineHeight: 88,
+    lineHeight: 56,
   },
   cue: {
     fontSize: 14,

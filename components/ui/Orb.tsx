@@ -1,6 +1,6 @@
 import React, { useId } from 'react';
 import { View } from 'react-native';
-import Svg, { Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
+import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 
 interface OrbProps {
   size: number;
@@ -11,6 +11,8 @@ interface OrbProps {
   fy: number;
   /** CSS box-shadow for the halo, e.g. `0 0 40px rgba(...)`. */
   glow?: string;
+  /** Corner radius; leave out for a sphere. A smaller one makes a lit rounded square. */
+  radius?: number;
 }
 
 /**
@@ -18,11 +20,11 @@ interface OrbProps {
  * (Tanafas stages, mood orbs in Recap). The gradient radius is CSS's
  * default `farthest-corner` from the highlight.
  */
-export default function Orb({ size, stops, fx, fy, glow }: OrbProps) {
+export default function Orb({ size, stops, fx, fy, glow, radius = size / 2 }: OrbProps) {
   const id = `orb${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
   const r = Math.hypot(Math.max(fx, 1 - fx), Math.max(fy, 1 - fy));
   return (
-    <View style={{ width: size, height: size, borderRadius: size / 2, boxShadow: glow }}>
+    <View style={{ width: size, height: size, borderRadius: radius, boxShadow: glow }}>
       <Svg width={size} height={size}>
         <Defs>
           <RadialGradient id={id} cx={`${fx * 100}%`} cy={`${fy * 100}%`} fx={`${fx * 100}%`} fy={`${fy * 100}%`} r={`${r * 100}%`}>
@@ -31,7 +33,7 @@ export default function Orb({ size, stops, fx, fy, glow }: OrbProps) {
             ))}
           </RadialGradient>
         </Defs>
-        <Circle cx={size / 2} cy={size / 2} r={size / 2} fill={`url(#${id})`} />
+        <Rect x={0} y={0} width={size} height={size} rx={radius} ry={radius} fill={`url(#${id})`} />
       </Svg>
     </View>
   );
