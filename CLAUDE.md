@@ -222,7 +222,7 @@ band in Night), so `plugins/withNavigationBarContrastOff.js` turns it off
 in `MainActivity` — `app.json`'s `enforceContrast` alone isn't enough.
 
 **Primitives** (`components/ui/`): `Button`, `IconButton`, `Chip`, `Card`,
-`IconTile` (the one tile pattern: glow / dawn / dusk tones), `Label`,
+`IconTile` (the one tile pattern: glow / dawn / dusk / bloom tones), `Label`,
 `TabBar`, `CanvasIcon` (canvas stroke icons; use `DirectionalIcon` for ones
 that mirror in RTL), `Orb`, `ScreenGlow`. Build new UI from these.
 
@@ -257,7 +257,7 @@ layout and fades each slot over to the session (round, phase, time left).
 The stage (`BreatheStages.tsx`) is a ring of dots around an orb that
 inflates and deflates (box breathing: a square of dots around a rounded-
 square orb), and the screen glow breathes with it. Tones: 4-7-8 glow, box
-dusk, five senses dawn, muscle relaxation glow. Meditate's stage
+dusk, five senses dawn, muscle relaxation bloom (a fourth tone, the mood palette's rose, so neighbours in the carousel never share a colour). Meditate's stage
 (`SceneStage.tsx`) plays the scene's footage muted inside its orb, cropped
 to `videoFocus` in `components/meditation/scenes.ts`; the plain orb shows
 for scenes without footage.

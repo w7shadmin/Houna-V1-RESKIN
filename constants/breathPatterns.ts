@@ -15,7 +15,8 @@ export const BREATHE_TONE: Record<BreatheKey, IconTileTone> = {
   'anxiety-relief': 'glow',
   'steady-mind': 'dusk',
   'panic-relief': 'dawn',
-  'tension-release': 'glow',
+  // Its own colour: it sits between grounding (dawn) and, wrapping round, 4-7-8 (glow).
+  'tension-release': 'bloom',
 };
 
 export interface BreathPhase {

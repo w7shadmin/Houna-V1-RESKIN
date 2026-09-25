@@ -3,7 +3,7 @@ import { StyleProp, StyleSheet, View, ViewStyle } from 'react-native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { radius } from '@/constants/theme';
 
-export type IconTileTone = 'glow' | 'dawn' | 'dusk';
+export type IconTileTone = 'glow' | 'dawn' | 'dusk' | 'bloom';
 
 interface IconTileProps {
   /** Receives the tone's icon colour. */

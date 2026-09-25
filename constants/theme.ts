@@ -26,6 +26,8 @@ export const nightPalette = {
   hounaTeal: '#3BAAA7', // Brand teal — logo, deep fills
   dawn: '#F2B880', // Warmth & urgent support
   dusk: '#B3A7F5', // Secondary accent
+  /** A fourth tone, added after the sheets (the mood palette's rose): muscle relaxation. */
+  bloom: '#EA90A8',
   /** Tab bar ground (Home artboard nav). */
   tabBar: '#0F1534',
 } as const;
@@ -41,6 +43,8 @@ export const dayPalette = {
   hounaTeal: '#3BAAA7', // Brand teal — logo, glows
   dawnDeep: '#A8621F', // Warmth & urgent support
   duskDeep: '#6353C9', // Secondary accent
+  /** Deep rose for the bloom tone on light (added after the sheet). */
+  bloomDeep: '#B24B6B',
   /** Pale fill (Daylight sheet swatch-card ground). */
   paleFill: '#EEF3F1',
 } as const;
@@ -149,7 +153,7 @@ export interface ColorTokens {
   onAccent: string;
 
   /** Icon-tile tones from the canvas. */
-  tones: { glow: AccentTone; dawn: AccentTone; dusk: AccentTone };
+  tones: { glow: AccentTone; dawn: AccentTone; dusk: AccentTone; bloom: AccentTone };
 
   /** "Need to talk now?" crisis pill. */
   crisis: { bg: string; border: string; borderSoft: string; icon: string };
@@ -201,11 +205,13 @@ const TONE_BG = {
   glow: alpha(N.hounaGlow, 0.12),
   dawn: alpha(N.dawn, 0.12),
   dusk: alpha(N.dusk, 0.12),
+  bloom: alpha(N.bloom, 0.12),
 };
 const TONE_BORDER = {
   glow: alpha(N.hounaGlow, 0.28),
   dawn: alpha(N.dawn, 0.28),
   dusk: alpha(N.dusk, 0.3),
+  bloom: alpha(N.bloom, 0.3),
 };
 
 export const nightColors: ColorTokens = {
@@ -243,6 +249,7 @@ export const nightColors: ColorTokens = {
     glow: { fg: N.hounaGlow, bg: TONE_BG.glow, border: TONE_BORDER.glow },
     dawn: { fg: N.dawn, bg: TONE_BG.dawn, border: TONE_BORDER.dawn },
     dusk: { fg: N.dusk, bg: TONE_BG.dusk, border: TONE_BORDER.dusk },
+    bloom: { fg: N.bloom, bg: TONE_BG.bloom, border: TONE_BORDER.bloom },
   },
 
   crisis: { bg: alpha(N.dawn, 0.08), border: alpha(N.dawn, 0.4), borderSoft: alpha(N.dawn, 0.35), icon: N.dawn },
@@ -310,6 +317,7 @@ export const dayColors: ColorTokens = {
     glow: { fg: D.hounaDeepTeal, bg: TONE_BG.glow, border: TONE_BORDER.glow },
     dawn: { fg: D.dawnDeep, bg: TONE_BG.dawn, border: TONE_BORDER.dawn },
     dusk: { fg: D.duskDeep, bg: TONE_BG.dusk, border: TONE_BORDER.dusk },
+    bloom: { fg: D.bloomDeep, bg: TONE_BG.bloom, border: TONE_BORDER.bloom },
   },
 
   crisis: { bg: alpha(N.dawn, 0.08), border: alpha(N.dawn, 0.4), borderSoft: alpha(N.dawn, 0.35), icon: D.dawnDeep },

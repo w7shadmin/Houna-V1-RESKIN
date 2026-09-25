@@ -74,7 +74,8 @@ const EXERCISE_TEXT = {
 
 /** Glow for the round button and the screen, from the Nightlight swatch of the tone. */
 export function toneGlow(tone: IconTileTone, a = 0.3): string {
-  return alpha(tone === 'dusk' ? nightPalette.dusk : tone === 'dawn' ? nightPalette.dawn : nightPalette.hounaGlow, a);
+  const swatch = { glow: nightPalette.hounaGlow, dawn: nightPalette.dawn, dusk: nightPalette.dusk, bloom: nightPalette.bloom }[tone];
+  return alpha(swatch, a);
 }
 
 function useNum() {
