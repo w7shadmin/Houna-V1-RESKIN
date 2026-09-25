@@ -193,7 +193,9 @@ export function BreathingBloom({ mood, size }: BreathingBloomProps) {
         <Svg width={size} height={size}>
           <Defs>
             <RadialGradient id={haloId} cx="50%" cy="50%" r="50%">
-              <Stop offset="0" {...stopProps(style.glow)} />
+              {/* Full strength at the centre (the mood's colour, not its translucent glow value): the
+                  halo as it has always looked on the phone, fading out to the edge. */}
+              <Stop offset="0" stopColor={stopProps(style.glow).stopColor} stopOpacity={1} />
               <Stop offset="1" {...stopProps(style.glow, 0)} />
             </RadialGradient>
           </Defs>
