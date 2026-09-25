@@ -146,7 +146,7 @@ export default function HomeScreen() {
             accent={accent}
             dusk={colors.tones.dusk.fg}
             glow={isNight ? colors.glow : dayPalette.hounaTeal}
-            glowStrength={isNight ? 0.5 : 0.6}
+            glowStrength={isNight ? 0.45 : 0.6}
           />
           <View style={styles.notAloneRow}>
             <View style={[styles.notAloneDot, { backgroundColor: accent }]} />
@@ -280,9 +280,10 @@ export default function HomeScreen() {
 
 /** Animations run on the UI thread on native (web has no native driver). */
 const NATIVE = Platform.OS !== 'web';
-/** One lap of the dots' drift, and one breath of the glow (in + out). */
+/** One lap of the dots' drift, one breath of the ring (open + close), one slow turn of the ring. */
 const DRIFT_MS = 8000;
-const GLOW_BREATH_MS = 5000;
+const BREATH_MS = 5000;
+const TURN_MS = 120000;
 
 /** A sine wave sampled across one loop (0 → 1), offset by `phase` laps — for piecewise interpolation. */
 const WAVE_STEPS = Array.from({ length: 17 }, (_, k) => k / 16);
@@ -315,17 +316,19 @@ function useCalmLoop(make: (v: Animated.Value) => Animated.CompositeAnimation) {
  * The 28-dot ring around the mark: first half brand accent, second half
  * Dusk, swelling toward the sides. Each dot drifts gently up and down and
  * fades out and back in, a little behind its neighbour, so a slow ripple
- * travels round the ring; behind the mark, its glow breathes.
+ * travels round the ring. The whole ring also turns slowly and breathes,
+ * opening out and drawing back in. The mark and its glow stay still.
  */
 function MarkHalo({ accent, dusk, glow, glowStrength }: { accent: string; dusk: string; glow: string; glowStrength: number }) {
   const N = 28;
   const R = 86;
   const drift = useCalmLoop((v) => Animated.loop(Animated.timing(v, { toValue: 1, duration: DRIFT_MS, easing: Easing.linear, useNativeDriver: NATIVE })));
+  const turn = useCalmLoop((v) => Animated.loop(Animated.timing(v, { toValue: 1, duration: TURN_MS, easing: Easing.linear, useNativeDriver: NATIVE })));
   const breath = useCalmLoop((v) =>
     Animated.loop(
       Animated.sequence([
-        Animated.timing(v, { toValue: 1, duration: GLOW_BREATH_MS / 2, easing: Easing.inOut(Easing.sin), useNativeDriver: NATIVE }),
-        Animated.timing(v, { toValue: 0, duration: GLOW_BREATH_MS / 2, easing: Easing.inOut(Easing.sin), useNativeDriver: NATIVE }),
+        Animated.timing(v, { toValue: 1, duration: BREATH_MS / 2, easing: Easing.inOut(Easing.sin), useNativeDriver: NATIVE }),
+        Animated.timing(v, { toValue: 0, duration: BREATH_MS / 2, easing: Easing.inOut(Easing.sin), useNativeDriver: NATIVE }),
       ]),
     ),
   );
@@ -353,13 +356,12 @@ function MarkHalo({ accent, dusk, glow, glowStrength }: { accent: string; dusk: 
   );
 
   const ringScale = breath.interpolate({ inputRange: [0, 1], outputRange: [1, 1.07] });
-  const glowScale = breath.interpolate({ inputRange: [0, 1], outputRange: [0.86, 1.14] });
-  const glowOpacity = breath.interpolate({ inputRange: [0, 1], outputRange: [0.65, 1] });
+  const ringTurn = turn.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
 
   return (
     <View style={styles.halo} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-      {/* The ring opens out as the glow swells and draws back as it settles. */}
-      <Animated.View style={[styles.haloRing, { transform: [{ scale: ringScale }] }]}>
+      {/* The ring turns slowly (a lap every two minutes) and breathes, opening out and drawing back. */}
+      <Animated.View style={[styles.haloRing, { transform: [{ rotate: ringTurn }, { scale: ringScale }] }]}>
         {dots.map((d, i) => (
           <Animated.View
             key={i}
@@ -378,7 +380,7 @@ function MarkHalo({ accent, dusk, glow, glowStrength }: { accent: string; dusk: 
           />
         ))}
       </Animated.View>
-      <Animated.View style={[styles.markGlow, { opacity: glowOpacity, transform: [{ scale: glowScale }] }]}>
+      <View style={styles.markGlow}>
         <Svg width={110} height={110}>
           <Defs>
             <RadialGradient id="markGlow" cx="50%" cy="50%" r="50%">
@@ -388,7 +390,7 @@ function MarkHalo({ accent, dusk, glow, glowStrength }: { accent: string; dusk: 
           </Defs>
           <Circle cx={55} cy={55} r={55} fill="url(#markGlow)" />
         </Svg>
-      </Animated.View>
+      </View>
       <HounaMark size={70} />
     </View>
   );
