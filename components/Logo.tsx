@@ -39,7 +39,7 @@ export default function Logo({ size = 'medium', width: explicitWidth, variant = 
   const xml = useMemo(() => {
     if (variant === 'white') return LOGO_WHITE_XML;
     if (variant === 'green') return LOGO_GREEN_XML;
-    return tintedLogoXml(colors.logo.primary, colors.logo.secondary, colors.background);
+    return tintedLogoXml(colors.logo.primary, colors.logo.secondary);
   }, [variant, colors]);
 
   return <SvgXml xml={xml} width={width} height={height} />;

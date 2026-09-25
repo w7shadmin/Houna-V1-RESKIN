@@ -1,6 +1,7 @@
 import React from 'react';
 import Svg, { G, Path } from 'react-native-svg';
 import { useTheme } from '@/contexts/ThemeContext';
+import { FIGURE_WITH_HEAD_HOLE_D } from '@/constants/logoSvg';
 
 interface HounaMarkProps {
   size: number;
@@ -9,7 +10,8 @@ interface HounaMarkProps {
 /**
  * The Houna pin on its own — ring, heart, and knocked-out head — cropped
  * from the official logo. Paths and transforms are the logo's own (same as
- * the canvas "Houna mark" asset); only the fills follow the theme.
+ * the canvas "Houna mark" asset); only the fills follow the theme. The head
+ * is a real hole, so glows behind the mark show through it.
  */
 export default function HounaMark({ size }: HounaMarkProps) {
   const { colors } = useTheme();
@@ -26,17 +28,8 @@ export default function HounaMark({ size }: HounaMarkProps) {
           />
         </G>
         <G transform="translate(31.801 13.392)">
-          <Path
-            d="M48.6,24.924c0,3.4,6.124,5.679,6.124,8.685,0-3.006,6.124-5.289,6.124-8.685a6.124,6.124,0,0,0-12.248,0"
-            transform="translate(-48.6 -18.8)"
-            fill={fill}
-          />
+          <Path d={FIGURE_WITH_HEAD_HOLE_D} transform="translate(-48.6 -18.8)" fill={fill} fillRule="evenodd" />
         </G>
-        <Path
-          d="M60.245,26.672A2.672,2.672,0,1,1,57.572,24a2.71,2.71,0,0,1,2.672,2.672"
-          transform="translate(-19.592 -7.713)"
-          fill={colors.background}
-        />
       </G>
     </Svg>
   );
