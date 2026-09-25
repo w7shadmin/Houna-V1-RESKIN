@@ -61,8 +61,8 @@ export default function JournalHomeScreen() {
   const hasEnoughData = moodEntries.length >= 3;
 
   const dayLabelFor = useCallback(
-    (d: Date) => formatEntryDateShort(formatDateKey(d), names, num).split(',')[0],
-    [names, num],
+    (d: Date) => names.weekdaysShort[d.getDay()],
+    [names],
   );
 
   // Newest first, grouped under "September 2026"-style labels.
@@ -254,13 +254,6 @@ export default function JournalHomeScreen() {
       </ScrollView>
     </SafeAreaView>
   );
-}
-
-function formatDateKey(d: Date): string {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
 }
 
 const styles = StyleSheet.create({

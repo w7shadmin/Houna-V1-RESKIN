@@ -198,10 +198,18 @@ export async function logMoodForToday(mood: MoodTag, note = ''): Promise<Journal
 }
 
 interface DateNames {
-  weekdaysShort: string[];
-  weekdaysLong: string[];
-  monthsShort: string[];
-  monthsLong: string[];
+  weekdaysShort: readonly string[];
+  weekdaysLong: readonly string[];
+  monthsShort: readonly string[];
+  monthsLong: readonly string[];
+  /** ', ' in English, the Arabic comma '، ' in Arabic. */
+  comma: string;
+  /** Arabic reads the day before the month ('٢٥ سبتمبر'); English the reverse. */
+  dayFirst: boolean;
+}
+
+function dayMonth(day: string, month: string, names: DateNames): string {
+  return names.dayFirst ? `${day} ${month}` : `${month} ${day}`;
 }
 
 function parseLocalDate(dateStr: string): Date {
@@ -211,12 +219,12 @@ function parseLocalDate(dateStr: string): Date {
 /** e.g. "Mon, Sep 21" — locale names come from the string catalogue, never hardcoded here. */
 export function formatEntryDateShort(dateStr: string, names: DateNames, num: (n: number) => string): string {
   const d = parseLocalDate(dateStr);
-  return `${names.weekdaysShort[d.getDay()]}, ${names.monthsShort[d.getMonth()]} ${num(d.getDate())}`;
+  return `${names.weekdaysShort[d.getDay()]}${names.comma}${dayMonth(num(d.getDate()), names.monthsShort[d.getMonth()], names)}`;
 }
 
 /** e.g. "Sunday, September 21" — used for the new-entry heading. */
 export function formatEntryDateLong(d: Date, names: DateNames, num: (n: number) => string): string {
-  return `${names.weekdaysLong[d.getDay()]}, ${names.monthsLong[d.getMonth()]} ${num(d.getDate())}`;
+  return `${names.weekdaysLong[d.getDay()]}${names.comma}${dayMonth(num(d.getDate()), names.monthsLong[d.getMonth()], names)}`;
 }
 
 export async function exportEntriesAsJson(): Promise<string> {
