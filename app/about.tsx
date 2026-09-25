@@ -1,14 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, Image, Pressable, ScrollView, ActivityIndicator, Linking, StyleSheet } from 'react-native';
+import { View, Text, Image, Pressable, ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
 import { Award, HeartHandshake, Users, RotateCw, ChevronRight } from 'lucide-react-native';
 import DetailScreen from '@/components/DetailScreen';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { spacing, radius, typography, shadows } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
 import { fetchAbout, resolveImageUrl, type AboutData, type TeamMember } from '@/lib/hounaApi';
-
-/** Freepik's license requires crediting the Home community map's source art (constants/worldDots.ts). */
-const FREEPIK_URL = 'https://www.freepik.com';
 
 // Members who've left since this content was scraped — filtered client-side
 // rather than waiting on the source site to update, matching the old MVP.
@@ -170,17 +167,6 @@ export default function AboutScreen() {
             </Pressable>
           </View>
         )}
-
-        <View style={styles.credits}>
-          <Text style={[styles.creditsTitle, { color: colors.textTertiary, fontFamily: fonts.semiBold }]}>{s.credits}</Text>
-          <Pressable
-            accessibilityRole="link"
-            onPress={() => Linking.openURL(FREEPIK_URL).catch(() => {})}
-            style={({ pressed }) => pressed && { opacity: 0.6 }}
-          >
-            <Text style={[styles.creditsText, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{s.mapCredit}</Text>
-          </Pressable>
-        </View>
       </ScrollView>
     );
   }
@@ -195,18 +181,6 @@ export default function AboutScreen() {
 const styles = StyleSheet.create({
   scroll: {
     paddingBottom: spacing.xxl,
-  },
-  credits: {
-    marginTop: spacing.xl,
-    gap: spacing.xs,
-    alignItems: 'center',
-  },
-  creditsTitle: {
-    fontSize: typography.fontSize.xs,
-  },
-  creditsText: {
-    fontSize: typography.fontSize.sm,
-    textDecorationLine: 'underline',
   },
   centerState: {
     flex: 1,

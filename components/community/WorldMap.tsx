@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Svg, { Line, Circle, G, Path } from 'react-native-svg';
 import { WORLD_DOTS_HEIGHT, WORLD_DOTS_PATH, WORLD_DOTS_WIDTH, snapToLand } from '@/constants/worldDots';
-import { WORLD_LAND_HEIGHT, WORLD_LAND_PATH, WORLD_LAND_WIDTH, WORLD_LAND_Y_SHIFT } from '@/constants/worldLand';
+import { WORLD_LAND_HEIGHT, WORLD_LAND_PATH, WORLD_LAND_WIDTH } from '@/constants/worldLand';
 import { getCountry } from '@/lib/countries';
 import { palette, spacing, radius, typography } from '@/constants/theme';
 import { arabicNumber } from '@/lib/arabicNumerals';
@@ -135,18 +135,16 @@ export function CommunityDotMap({ lit, accent, dotColor, variant = 'dots' }: Com
   const solid = variant === 'solid';
   const width = solid ? WORLD_LAND_WIDTH : WORLD_DOTS_WIDTH;
   const height = solid ? WORLD_LAND_HEIGHT : WORLD_DOTS_HEIGHT;
-  const shiftY = solid ? WORLD_LAND_Y_SHIFT : 0;
   const markers = useMemo(
     () =>
       lit
         .map((code) => {
           const c = getCountry(code);
           if (!c) return null;
-          const p = snapToLand(c.lat, c.lon);
-          return { code, x: p.x, y: p.y + shiftY };
+          return { code, ...snapToLand(c.lat, c.lon) };
         })
         .filter((m): m is NonNullable<typeof m> => m !== null),
-    [lit, shiftY],
+    [lit],
   );
 
   return (
