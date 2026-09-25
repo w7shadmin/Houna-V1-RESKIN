@@ -70,6 +70,8 @@ export const strings = {
       founder: 'Founder',
       advisor: 'Advisor',
       team: 'Team',
+      credits: 'Credits',
+      mapCredit: 'World map designed by Freepik',
     },
     // About / Get Involved / Contact ported from the old MVP's MoreScreen;
     // Account section (see `account.more` below) is new.
@@ -134,6 +136,8 @@ export const strings = {
       founder: 'المؤسسون',
       advisor: 'المستشارون',
       team: 'الفريق',
+      credits: 'شكر وتقدير',
+      mapCredit: 'خريطة العالم من تصميم Freepik',
     },
     more: {
       title: 'المزيد',
