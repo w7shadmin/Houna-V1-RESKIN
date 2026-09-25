@@ -1,23 +1,34 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, Image, FlatList, Pressable, Linking, StyleSheet } from 'react-native';
+import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, ChevronRight } from 'lucide-react-native';
+import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { palette, spacing, radius, typography, shadows } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
-import { fetchResourceDirectory, safeUrl, type ResourceDirectoryData, type ResourceArticle } from '@/lib/hounaApi';
+import { grid, layout, radius } from '@/constants/theme';
+import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
+import { fetchResourceDirectory, type ResourceDirectoryData, type ResourceTopic } from '@/lib/hounaApi';
 import { LoadingState, ErrorState } from '@/components/directory/AsyncState';
-import ListItemCard from '@/components/directory/ListItemCard';
+import { CrisisRow } from '@/components/directory/SearchResults';
 import LottieTopicIcon from '@/components/directory/LottieTopicIcon';
-import GradientTile from '@/components/GradientTile';
+import IconButton from '@/components/ui/IconButton';
+import { DirectionalIcon } from '@/components/ui/CanvasIcon';
 
+/**
+ * Mental health topics (the Directory's "Mental Health Directory" row), in
+ * the Nightlight/Daylight language rather than the website's layout: canvas
+ * header, then a two-column grid of topic cards whose animated icons sit on
+ * the same themed stage as topic search results (`topicStage`/`topicGlow`,
+ * Night and Day). Closes with the crisis line, like the Directory hub. The
+ * source page's banner photo, slogan and "Important Articles" are dropped.
+ */
 export default function ResourceDirectoryScreen() {
   const { colors } = useTheme();
   const router = useRouter();
   const { t, language, isRTL, fonts } = useLanguage();
   const s = t.directory.resources;
   const common = t.directory.common;
+  const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
 
   const [data, setData] = useState<ResourceDirectoryData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -27,8 +38,7 @@ export default function ResourceDirectoryScreen() {
     setLoading(true);
     setError(null);
     try {
-      const result = await fetchResourceDirectory(language);
-      setData(result);
+      setData(await fetchResourceDirectory(language));
     } catch (err) {
       setError(err instanceof Error ? err.message : s.error);
     } finally {
@@ -40,148 +50,142 @@ export default function ResourceDirectoryScreen() {
     load();
   }, [load]);
 
-  const handleArticle = (article: ResourceArticle) => {
-    const url = safeUrl(article.url);
-    if (url) Linking.openURL(url);
-  };
+  // Always a child of the Directory hub (CLAUDE.md, hub-first navigation).
+  const back = () => router.replace('/directory');
+  const open = (topic: ResourceTopic) =>
+    router.push({ pathname: '/directory/resources/[slug]', params: { slug: topic.slug } });
+
+  const labelLatin = fonts.labelTracked;
+  const header = (
+    <View style={styles.header}>
+      <IconButton
+        variant="control"
+        accessibilityLabel={common.goBack}
+        onPress={back}
+        renderIcon={(c) => <DirectionalIcon isRTL={isRTL} name="back" size={20} strokeWidth={1.8} color={c} />}
+      />
+      <View style={styles.headerText}>
+        <Text
+          style={[
+            labelLatin ? styles.eyebrowLatin : styles.eyebrowArabic,
+            { color: colors.primary, fontFamily: labelLatin ? fonts.labelRegular : fonts.label },
+          ]}
+        >
+          {t.directory.search.eyebrow}
+        </Text>
+        <Text
+          accessibilityRole="header"
+          style={[styles.title, isRTL && styles.titleArabic, { color: colors.text, fontFamily: fonts.display }]}
+        >
+          {t.directory.hub.resourcesTitle}
+        </Text>
+        <Text style={[styles.intro, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{s.intro}</Text>
+      </View>
+    </View>
+  );
+
+  // Pairs, so each row's two cards share a height; `row` mirrors itself in RTL.
+  const rows: ResourceTopic[][] = [];
+  data?.topics.forEach((topic, i) => (i % 2 ? rows[rows.length - 1].push(topic) : rows.push([topic])));
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
       {loading && !data ? (
-        <>
-          <View style={styles.headerRow}>
-            <Pressable
-              onPress={() => router.back()}
-              hitSlop={12}
-              style={({ pressed }) => [
-                styles.backBtn,
-                { backgroundColor: colors.card, borderColor: colors.border },
-                pressed && { backgroundColor: colors.cardPressed },
-              ]}
-            >
-              <View style={isRTL ? styles.flip : undefined}>
-<ArrowLeft size={18} color={colors.text} />
-</View>
-            </Pressable>
-          </View>
+        <View style={styles.stateWrap}>
+          {header}
           <LoadingState label={s.loading} />
-        </>
+        </View>
       ) : error && !data ? (
-        <>
-          <View style={styles.headerRow}>
-            <Pressable
-              onPress={() => router.back()}
-              hitSlop={12}
-              style={({ pressed }) => [
-                styles.backBtn,
-                { backgroundColor: colors.card, borderColor: colors.border },
-                pressed && { backgroundColor: colors.cardPressed },
-              ]}
-            >
-              <View style={isRTL ? styles.flip : undefined}>
-<ArrowLeft size={18} color={colors.text} />
-</View>
-            </Pressable>
-          </View>
+        <View style={styles.stateWrap}>
+          {header}
           <ErrorState message={error} retryLabel={common.tryAgain} onRetry={load} />
-        </>
+        </View>
       ) : data ? (
-        <FlatList
-          data={[]}
-          keyExtractor={() => 'x'}
-          renderItem={null}
-          ListHeaderComponent={
-            <View>
-              {/* Banner */}
-              <View style={styles.banner}>
-                {data.bannerImage ? (
-                  <Image source={{ uri: data.bannerImage }} style={styles.bannerImg} resizeMode="cover" />
-                ) : (
-                  <View style={[styles.bannerImg, { backgroundColor: colors.primaryLightest }]} />
-                )}
-                <View style={styles.bannerOverlay} />
-                <Pressable
-                  onPress={() => router.back()}
-                  hitSlop={12}
-                  style={({ pressed }) => [
-                    styles.bannerBackBtn,
-                    isRTL ? styles.bannerBackBtnEnd : styles.bannerBackBtnStart,
-                    pressed && { backgroundColor: 'rgba(255,255,255,0.7)' },
-                  ]}
-                >
-                  <View style={isRTL ? styles.flip : undefined}>
-<ArrowLeft size={18} color={colors.text} />
-</View>
-                </Pressable>
-              </View>
+        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+          {header}
 
-              <Text style={[styles.heading, { color: colors.primary, fontFamily: fonts.bold }]}>{data.heading}</Text>
+          <Text style={[styles.count, { color: colors.textTertiary, fontFamily: fonts.medium }]}>
+            {arabicPlural(data.topics.length, s.topicCount).replace('{n}', num(data.topics.length))}
+          </Text>
 
-              {/* Topic grid */}
-              <View style={styles.grid}>
-                {data.topics.map((topic, i) => (
-                  <Pressable
-                    key={`${topic.slug}-${i}`}
-                    onPress={() => router.push({ pathname: '/directory/resources/[slug]', params: { slug: topic.slug } })}
-                    style={({ pressed }) => [
-                      styles.topicCard,
-                      { backgroundColor: colors.card, borderColor: colors.border, ...shadows.card },
-                      pressed && { backgroundColor: colors.cardPressed },
-                    ]}
-                  >
-                    <GradientTile color={palette.turquoise} size={56} borderRadius={radius.md} style={styles.topicIconTile}>
-                      <LottieTopicIcon slug={topic.slug} size={40} />
-                    </GradientTile>
-                    <Text numberOfLines={2} style={[styles.topicTitle, { color: colors.text, fontFamily: fonts.bold }]}>
-                      {topic.title}
-                    </Text>
-                    {!!topic.description && (
-                      <Text numberOfLines={1} style={[styles.topicDesc, { color: colors.textTertiary, fontFamily: fonts.regular }]}>
-                        {topic.description}
-                      </Text>
-                    )}
-                    <View style={styles.learnMoreRow}>
-                      <Text style={[styles.learnMoreText, { color: colors.primary, fontFamily: fonts.semiBold }]}>
-                        {s.learnMore}
-                      </Text>
-                      <View style={isRTL ? styles.flip : undefined}>
-<ChevronRight size={13} color={colors.primary} strokeWidth={2} />
-</View>
-                    </View>
-                  </Pressable>
+          <View style={styles.grid}>
+            {rows.map((pair) => (
+              <View key={pair[0].slug} style={styles.row}>
+                {pair.map((topic) => (
+                  <TopicCard key={topic.slug} topic={topic} learnMore={s.learnMore} onPress={() => open(topic)} />
                 ))}
+                {pair.length === 1 && <View style={styles.cardSpacer} />}
               </View>
+            ))}
+          </View>
 
-              {/* Important Articles */}
-              {data.importantArticles.length > 0 && (
-                <View style={styles.articlesSection}>
-                  <Text style={[styles.articlesHeading, { color: colors.text, fontFamily: fonts.bold }]}>
-                    {s.importantArticles}
-                  </Text>
-                  <Text style={[styles.articlesBlurb, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-                    {s.articlesBlurb}
-                  </Text>
-                  <View style={styles.articlesList}>
-                    {data.importantArticles.map((article, i) => (
-                      <ListItemCard
-                        key={`${article.url}-${i}`}
-                        imageUrl={article.imageUrl}
-                        title={article.title}
-                        subtitle={article.sourceDomain}
-                        description={article.blurb}
-                        imageResizeMode="cover"
-                        onPress={() => handleArticle(article)}
-                      />
-                    ))}
-                  </View>
-                </View>
-              )}
-            </View>
-          }
-          contentContainerStyle={styles.listContent}
-        />
+          <CrisisRow label={t.directory.search.crisis} onPress={() => router.push('/crisis')} />
+        </ScrollView>
       ) : null}
     </SafeAreaView>
+  );
+}
+
+/**
+ * Some of the site's blurbs open with the title pasted in front of a
+ * sentence that itself starts with the title ("AI Dependence AI dependence
+ * refers to…"); drop that first copy. A real sentence that merely starts
+ * with the title ("Abuse comes in…") is left alone.
+ */
+function blurbFor(topic: ResourceTopic): string {
+  const desc = topic.description.trim();
+  const title = topic.title.trim().toLowerCase();
+  if (!desc.toLowerCase().startsWith(title)) return desc;
+  const rest = desc.slice(title.length).replace(/^[\s:.,–—-]+/, '');
+  return rest.toLowerCase().startsWith(title) ? rest : desc;
+}
+
+function TopicCard({ topic, learnMore, onPress }: { topic: ResourceTopic; learnMore: string; onPress: () => void }) {
+  const { colors } = useTheme();
+  const { fonts, isRTL } = useLanguage();
+  const blurb = blurbFor(topic);
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="link"
+      accessibilityLabel={topic.title}
+      style={({ pressed }) => [
+        styles.card,
+        { backgroundColor: colors.card, borderColor: colors.borderControl },
+        pressed && styles.pressed,
+      ]}
+    >
+      <View style={[styles.stage, { backgroundColor: colors.topicStage }]}>
+        {/* Same soft glow rising from the bottom as the search's topic card. */}
+        <Svg width="100%" height="100%" style={StyleSheet.absoluteFill} preserveAspectRatio="none" viewBox="0 0 100 100">
+          <Defs>
+            <RadialGradient id="topicGlow" gradientUnits="userSpaceOnUse" cx={50} cy={110} rx={60} ry={100} fx={50} fy={110}>
+              <Stop offset="0" stopColor={colors.topicGlow} stopOpacity={0.45} />
+              <Stop offset="0.7" stopColor={colors.topicGlow} stopOpacity={0} />
+            </RadialGradient>
+          </Defs>
+          <Rect x={0} y={0} width={100} height={100} fill="url(#topicGlow)" />
+        </Svg>
+        <LottieTopicIcon slug={topic.slug} size={grid(8)} />
+      </View>
+      <View style={styles.body}>
+        <Text
+          numberOfLines={2}
+          style={[styles.cardTitle, isRTL && styles.cardTitleArabic, { color: colors.text, fontFamily: fonts.display }]}
+        >
+          {topic.title}
+        </Text>
+        {!!blurb && (
+          <Text numberOfLines={2} style={[styles.cardDesc, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
+            {blurb}
+          </Text>
+        )}
+        <View style={styles.learnMoreRow}>
+          <Text style={[styles.learnMore, { color: colors.primary, fontFamily: fonts.medium }]}>{learnMore}</Text>
+          <DirectionalIcon isRTL={isRTL} name="chevron" size={14} strokeWidth={2} color={colors.primary} />
+        </View>
+      </View>
+    </Pressable>
   );
 }
 
@@ -189,108 +193,100 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
   },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-  },
-  backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  flip: {
-    transform: [{ scaleX: -1 }],
-  },
-  listContent: {
-    paddingBottom: spacing.xxl,
-  },
-  banner: {
-    height: 176,
+  stateWrap: {
+    flex: 1,
     width: '100%',
+    maxWidth: layout.maxContentWidth,
+    alignSelf: 'center',
+    padding: grid(2),
   },
-  bannerImg: {
+  scroll: {
     width: '100%',
-    height: '100%',
+    maxWidth: layout.maxContentWidth,
+    alignSelf: 'center',
+    padding: grid(2),
+    paddingBottom: grid(5),
+    gap: grid(2),
   },
-  bannerOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.15)',
+  header: {
+    gap: grid(2),
+    alignItems: 'flex-start',
   },
-  bannerBackBtn: {
-    position: 'absolute',
-    top: spacing.md,
-    width: 36,
-    height: 36,
-    borderRadius: radius.full,
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    alignItems: 'center',
-    justifyContent: 'center',
+  headerText: {
+    alignSelf: 'stretch',
+    gap: grid(1),
   },
-  bannerBackBtnStart: {
-    start: spacing.md,
-  },
-  bannerBackBtnEnd: {
-    end: spacing.md,
-  },
-  heading: {
-    fontSize: typography.fontSize.lg,
+  eyebrowLatin: {
+    fontSize: 12,
+    letterSpacing: 12 * 0.16,
     textTransform: 'uppercase',
-    textAlign: 'center',
-    marginTop: spacing.lg,
-    marginHorizontal: spacing.lg,
+  },
+  eyebrowArabic: {
+    fontSize: 13.5,
+  },
+  title: {
+    fontSize: 32,
+    lineHeight: 40,
+  },
+  titleArabic: {
+    lineHeight: 48,
+  },
+  intro: {
+    fontSize: 15,
+    lineHeight: 24,
+  },
+  count: {
+    fontSize: 13,
+    lineHeight: 16,
   },
   grid: {
+    gap: grid(2),
+  },
+  row: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm + 4,
-    paddingHorizontal: spacing.lg,
-    marginTop: spacing.lg,
+    gap: grid(2),
   },
-  topicCard: {
-    width: '47%',
-    borderRadius: radius.lg,
+  cardSpacer: {
+    flex: 1,
+  },
+  card: {
+    flex: 1,
+    borderRadius: radius.cardLg,
     borderWidth: 1,
-    padding: spacing.sm + 4,
+    overflow: 'hidden',
   },
-  topicIconTile: {
-    marginBottom: spacing.sm,
+  stage: {
+    height: grid(12),
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
   },
-  topicTitle: {
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.sm,
+  body: {
+    flex: 1,
+    padding: grid(2),
+    gap: grid(1),
   },
-  topicDesc: {
-    fontSize: typography.fontSize.xs,
-    marginTop: 2,
+  cardTitle: {
+    fontSize: 18,
+    lineHeight: 24,
+  },
+  cardTitleArabic: {
+    lineHeight: 32,
+  },
+  cardDesc: {
+    fontSize: 13,
+    lineHeight: 20,
   },
   learnMoreRow: {
+    marginTop: 'auto',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 2,
-    marginTop: spacing.xs,
+    gap: grid(0.5),
   },
-  learnMoreText: {
-    fontSize: typography.fontSize.xs,
+  learnMore: {
+    fontSize: 13,
   },
-  articlesSection: {
-    marginTop: spacing.xl,
-    paddingHorizontal: spacing.lg,
-  },
-  articlesHeading: {
-    fontSize: typography.fontSize.lg,
-  },
-  articlesBlurb: {
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.body,
-    marginTop: spacing.xs,
-    marginBottom: spacing.md,
-  },
-  articlesList: {
-    gap: spacing.sm,
+  pressed: {
+    opacity: 0.85,
   },
 });
