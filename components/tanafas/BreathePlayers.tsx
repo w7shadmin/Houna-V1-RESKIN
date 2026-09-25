@@ -604,14 +604,12 @@ function TensionPlayer({ exercise, breath, nav }: PlayerProps) {
       mode={inSession ? 'session' : status}
       nav={status === 'idle' ? nav : null}
       stage={
-        <BreathStage shape="ring" tone={tone} breath={breath} glass={inSession}>
+        // The same lit orb as the other exercises; the count sits on it in ink, as the play icon does on its light button.
+        <BreathStage shape="ring" tone={tone} breath={breath}>
           {inSession && (
-            <View style={styles.countWrap}>
-              <Text style={[styles.count, isRTL && styles.countArabic, { color: colors.text, fontFamily: fonts.semiBold }]}>{num(secondsLeft)}</Text>
-              <FadeIn key={phase}>
-                <Text style={[styles.cue, { color: colors.textSecondary, fontFamily: fonts.medium }]}>{isTense ? ex.holdTight : ex.letGo}</Text>
-              </FadeIn>
-            </View>
+            <Text style={[styles.count, isRTL && styles.countArabic, { color: nightPalette.midnight, fontFamily: fonts.semiBold }]}>
+              {num(secondsLeft)}
+            </Text>
           )}
         </BreathStage>
       }
@@ -731,10 +729,7 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
   },
-  countWrap: {
-    alignItems: 'center',
-  },
-  // The body face, not the display one: steadier numerals, sized like the cue beneath.
+  // The body face, not the display one: steadier numerals.
   count: {
     fontSize: 40,
     lineHeight: 48,
@@ -742,9 +737,5 @@ const styles = StyleSheet.create({
   },
   countArabic: {
     lineHeight: 56,
-  },
-  cue: {
-    fontSize: 14,
-    textAlign: 'center',
   },
 });
