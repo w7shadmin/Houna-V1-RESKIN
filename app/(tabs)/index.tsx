@@ -352,28 +352,32 @@ function MarkHalo({ accent, dusk, glow, glowStrength }: { accent: string; dusk: 
     [accent, dusk, drift],
   );
 
+  const ringScale = breath.interpolate({ inputRange: [0, 1], outputRange: [1, 1.07] });
   const glowScale = breath.interpolate({ inputRange: [0, 1], outputRange: [0.86, 1.14] });
   const glowOpacity = breath.interpolate({ inputRange: [0, 1], outputRange: [0.65, 1] });
 
   return (
     <View style={styles.halo} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-      {dots.map((d, i) => (
-        <Animated.View
-          key={i}
-          style={[
-            styles.haloDot,
-            {
-              width: d.s,
-              height: d.s,
-              borderRadius: d.s / 2,
-              backgroundColor: d.c,
-              opacity: d.opacity,
-              // Offsets from the centre rather than left/top, so it draws the same in either direction.
-              transform: [{ translateX: d.x }, { translateY: d.translateY }],
-            },
-          ]}
-        />
-      ))}
+      {/* The ring opens out as the glow swells and draws back as it settles. */}
+      <Animated.View style={[styles.haloRing, { transform: [{ scale: ringScale }] }]}>
+        {dots.map((d, i) => (
+          <Animated.View
+            key={i}
+            style={[
+              styles.haloDot,
+              {
+                width: d.s,
+                height: d.s,
+                borderRadius: d.s / 2,
+                backgroundColor: d.c,
+                opacity: d.opacity,
+                // Offsets from the centre rather than left/top, so it draws the same in either direction.
+                transform: [{ translateX: d.x }, { translateY: d.translateY }],
+              },
+            ]}
+          />
+        ))}
+      </Animated.View>
       <Animated.View style={[styles.markGlow, { opacity: glowOpacity, transform: [{ scale: glowScale }] }]}>
         <Svg width={110} height={110}>
           <Defs>
@@ -495,6 +499,11 @@ const styles = StyleSheet.create({
   halo: {
     width: 190,
     height: 190,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  haloRing: {
+    ...StyleSheet.absoluteFillObject,
     alignItems: 'center',
     justifyContent: 'center',
   },
