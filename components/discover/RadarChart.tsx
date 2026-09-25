@@ -1,4 +1,5 @@
 import React from 'react';
+import { View } from 'react-native';
 import Svg, { Circle, Line, Polygon, Text as SvgText } from 'react-native-svg';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -47,7 +48,8 @@ export default function RadarChart({ axes, color, width = 350, compact = false }
   const points = axes.map((a, k) => at(k, R * Math.max(0, Math.min(1, a.value))));
 
   return (
-    <Svg width={width} height={height} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+    <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+    <Svg width={width} height={height}>
       <Polygon points={ring(1)} fill={colors.text} fillOpacity={0.03} stroke={colors.text} strokeOpacity={0.18} strokeWidth={1} />
       <Polygon points={ring(2 / 3)} fill="none" stroke={colors.text} strokeOpacity={0.12} strokeWidth={1} />
       <Polygon points={ring(1 / 3)} fill="none" stroke={colors.text} strokeOpacity={0.1} strokeWidth={1} />
@@ -83,5 +85,6 @@ export default function RadarChart({ axes, color, width = 350, compact = false }
           );
         })}
     </Svg>
+    </View>
   );
 }

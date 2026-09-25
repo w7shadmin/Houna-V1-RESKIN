@@ -18,6 +18,7 @@ import { accountStrings } from './accountStrings';
 import { crisisStrings } from './crisisStrings';
 import { checkInStrings } from './checkInStrings';
 import { discoverStrings } from './discoverStrings';
+import { recapStrings } from './recapStrings';
 
 export type Language = 'en' | 'ar';
 
@@ -54,6 +55,7 @@ export const strings = {
     crisis: crisisStrings.en,
     checkIn: checkInStrings.en,
     discover: discoverStrings.en,
+    recap: recapStrings.en,
     directory: directoryStrings.en,
     events: eventsStrings.en,
     about: {
@@ -116,6 +118,7 @@ export const strings = {
     crisis: crisisStrings.ar,
     checkIn: checkInStrings.ar,
     discover: discoverStrings.ar,
+    recap: recapStrings.ar,
     directory: directoryStrings.ar,
     events: eventsStrings.ar,
     about: {

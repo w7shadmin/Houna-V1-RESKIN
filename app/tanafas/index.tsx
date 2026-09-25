@@ -1,8 +1,8 @@
-import React, { useId, useState } from 'react';
+import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useRouter, type Href } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
+import Svg, { Circle } from 'react-native-svg';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { alpha, layout, nightPalette } from '@/constants/theme';
@@ -13,6 +13,7 @@ import IconButton from '@/components/ui/IconButton';
 import IconTile, { type IconTileTone } from '@/components/ui/IconTile';
 import Card from '@/components/ui/Card';
 import ScreenGlow from '@/components/ui/ScreenGlow';
+import Orb from '@/components/ui/Orb';
 import CanvasIcon, { DirectionalIcon } from '@/components/ui/CanvasIcon';
 
 type Tab = 'breathe' | 'meditate' | 'discover';
@@ -250,27 +251,6 @@ function Tag({ label, safety }: { label: string; safety: boolean }) {
       >
         {label}
       </Text>
-    </View>
-  );
-}
-
-/** Radial-gradient sphere, CSS `circle at X% Y%` → SVG focal point at the same spot. */
-function Orb({ size, stops, fx, fy, glow }: { size: number; stops: [string, number][]; fx: number; fy: number; glow: string }) {
-  const id = `orb${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
-  // CSS default radius for `circle at …` is the farthest corner.
-  const r = Math.hypot(Math.max(fx, 1 - fx), Math.max(fy, 1 - fy));
-  return (
-    <View style={{ width: size, height: size, borderRadius: size / 2, boxShadow: glow }}>
-      <Svg width={size} height={size}>
-        <Defs>
-          <RadialGradient id={id} cx={`${fx * 100}%`} cy={`${fy * 100}%`} fx={`${fx * 100}%`} fy={`${fy * 100}%`} r={`${r * 100}%`}>
-            {stops.map(([c, o]) => (
-              <Stop key={o} offset={o} stopColor={c} />
-            ))}
-          </RadialGradient>
-        </Defs>
-        <Circle cx={size / 2} cy={size / 2} r={size / 2} fill={`url(#${id})`} />
-      </Svg>
     </View>
   );
 }

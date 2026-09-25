@@ -9,22 +9,24 @@ interface ScreenGlowProps {
   rx: number;
   ry: number;
   cy: number;
+  /** Horizontal centre, % of width (default 50). */
+  cx?: number;
   /** Where the glow has faded out, 0–1 (canvas uses 0.72). */
   fade?: number;
 }
 
 /**
  * Soft light behind the top of a screen — the canvas's
- * `radial-gradient(rx% ry% at 50% cy%, color, transparent fade)` as SVG,
+ * `radial-gradient(rx% ry% at cx% cy%, color, transparent fade)` as SVG,
  * stretched to the screen so the percentages mean the same thing.
  */
-export default function ScreenGlow({ color, rx, ry, cy, fade = 0.72 }: ScreenGlowProps) {
+export default function ScreenGlow({ color, rx, ry, cy, cx = 50, fade = 0.72 }: ScreenGlowProps) {
   const id = `glow${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       <Svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
         <Defs>
-          <RadialGradient id={id} gradientUnits="userSpaceOnUse" cx={50} cy={cy} rx={rx} ry={ry} fx={50} fy={cy}>
+          <RadialGradient id={id} gradientUnits="userSpaceOnUse" cx={cx} cy={cy} rx={rx} ry={ry} fx={cx} fy={cy}>
             <Stop offset="0" stopColor={color} />
             <Stop offset={fade} stopColor={color} stopOpacity={0} />
           </RadialGradient>

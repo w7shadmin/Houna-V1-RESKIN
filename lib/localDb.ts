@@ -29,6 +29,14 @@ export function getLocalDb(): Promise<SQLite.SQLiteDatabase> {
           taken_at INTEGER NOT NULL,
           saved_to_profile INTEGER NOT NULL DEFAULT 0
         );
+        CREATE TABLE IF NOT EXISTS sessions (
+          id TEXT PRIMARY KEY NOT NULL,
+          kind TEXT NOT NULL,
+          exercise TEXT NOT NULL,
+          started_at INTEGER NOT NULL,
+          duration_seconds INTEGER NOT NULL
+        );
+        CREATE INDEX IF NOT EXISTS sessions_started_at ON sessions (started_at);
       `);
       return db;
     });

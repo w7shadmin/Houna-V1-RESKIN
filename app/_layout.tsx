@@ -55,6 +55,10 @@ function InnerLayout() {
           name="check-in"
           options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }}
         />
+        <Stack.Screen
+          name="recap"
+          options={{ presentation: 'fullScreenModal', animation: 'fade' }}
+        />
         <Stack.Screen name="crisis" />
         <Stack.Screen name="about" />
         <Stack.Screen name="get-involved" />

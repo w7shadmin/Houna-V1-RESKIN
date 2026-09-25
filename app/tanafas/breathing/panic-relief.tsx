@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import {
@@ -17,6 +17,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { palette, spacing, radius, typography, shadows } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
 import { arabicNumber } from '@/lib/arabicNumerals';
+import { useSessionLog } from '@/hooks/useSessionLog';
 import ExerciseHeader from '@/components/breathing/ExerciseHeader';
 
 const ACCENT = palette.raspberry;
@@ -31,6 +32,15 @@ export default function PanicReliefGroundingScreen() {
 
   const [stepIndex, setStepIndex] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
+
+  // On-device session log for Recap: a session runs from opening (or
+  // starting again) until completion or leaving the screen.
+  const sessionLog = useSessionLog('breathing', 'panic-relief');
+  const { start: startLog, end: endLog } = sessionLog;
+  useEffect(() => {
+    if (isComplete) endLog();
+    else startLog();
+  }, [isComplete, startLog, endLog]);
 
   const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
 

@@ -7,10 +7,13 @@ import { spacing, radius, typography, shadows } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
 import { arabicNumber } from '@/lib/arabicNumerals';
 import { pingActivity, recordTanafasSession } from '@/lib/usageTracking';
+import { logSession } from '@/lib/sessionLog';
 import ExerciseHeader from './ExerciseHeader';
 import type { BreathingPhase, PhaseVisualProps } from './types';
 
 interface PhaseBreathingSessionProps {
+  /** Route id (e.g. 'steady-mind') — recorded in the on-device session log for Recap. */
+  exerciseId: string;
   title: string;
   subtitle: string;
   accentColor: string;
@@ -38,6 +41,7 @@ const TICK_MS = 100;
  * tense/release) — those are bespoke screens.
  */
 export default function PhaseBreathingSession({
+  exerciseId,
   title,
   subtitle,
   accentColor,
@@ -75,9 +79,10 @@ export default function PhaseBreathingSession({
   const recordIfStarted = useCallback((endedAt: Date) => {
     if (sessionStartRef.current) {
       recordTanafasSession('breathing', sessionStartRef.current, endedAt).catch(() => {});
+      logSession('breathing', exerciseId, sessionStartRef.current, endedAt).catch(() => {});
       sessionStartRef.current = null;
     }
-  }, []);
+  }, [exerciseId]);
 
   const stop = useCallback(() => {
     if (intervalRef.current) {

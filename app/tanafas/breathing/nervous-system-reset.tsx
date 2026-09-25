@@ -7,7 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { palette, spacing, radius, typography, shadows } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
 import { arabicNumber } from '@/lib/arabicNumerals';
-import { pingActivity } from '@/lib/usageTracking';
+import { useSessionLog } from '@/hooks/useSessionLog';
 import ExerciseHeader from '@/components/breathing/ExerciseHeader';
 
 const ACCENT = palette.lightCyan;
@@ -40,6 +40,11 @@ export default function NervousSystemResetScreen() {
   const [recoveryElapsed, setRecoveryElapsed] = useState(0);
   const [currentRound, setCurrentRound] = useState(1);
   const [isComplete, setIsComplete] = useState(false);
+  const sessionLog = useSessionLog('breathing', 'nervous-system-reset');
+  const { end: endLog } = sessionLog;
+  useEffect(() => {
+    if (isComplete) endLog();
+  }, [isComplete, endLog]);
 
   const timersRef = useRef<Array<ReturnType<typeof setInterval>>>([]);
   const clearTimers = useCallback(() => {
@@ -49,6 +54,7 @@ export default function NervousSystemResetScreen() {
 
   const reset = useCallback(() => {
     clearTimers();
+    endLog();
     setIsRunning(false);
     setIsPaused(false);
     setPhase('breathe');
@@ -57,7 +63,7 @@ export default function NervousSystemResetScreen() {
     setRecoveryElapsed(0);
     setCurrentRound(1);
     setIsComplete(false);
-  }, [clearTimers]);
+  }, [clearTimers, endLog]);
 
   const handleExit = () => {
     clearTimers();
@@ -118,9 +124,9 @@ export default function NervousSystemResetScreen() {
 
   const handleStart = () => {
     if (isComplete) reset();
-    // Community counter only — never recordTanafasSession, which feeds
-    // streaks and the leaderboard (CLAUDE.md: no streaks on this exercise).
-    pingActivity('breathing').catch(() => {});
+    // Community ping + on-device log only — never recordTanafasSession,
+    // which feeds streaks and the leaderboard (CLAUDE.md: no streaks here).
+    sessionLog.start();
     setIsRunning(true);
     setIsPaused(false);
     setPhase('breathe');

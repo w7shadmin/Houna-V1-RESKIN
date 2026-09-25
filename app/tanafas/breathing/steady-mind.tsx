@@ -26,6 +26,7 @@ export default function SteadyMindBreathingScreen() {
 
   return (
     <PhaseBreathingSession
+      exerciseId="steady-mind"
       title={ex.title}
       subtitle={ex.subtitle}
       accentColor={ACCENT}

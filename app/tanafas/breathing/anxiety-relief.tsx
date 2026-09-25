@@ -23,6 +23,7 @@ export default function AnxietyReliefBreathingScreen() {
 
   return (
     <PhaseBreathingSession
+      exerciseId="anxiety-relief"
       title={ex.title}
       subtitle={ex.subtitle}
       accentColor={accent}

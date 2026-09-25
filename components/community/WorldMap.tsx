@@ -139,7 +139,7 @@ export function CommunityDotMap({ lit, accent, dotColor }: CommunityDotMapProps)
 
   return (
     <View
-      style={{ width: '100%', aspectRatio: DOT_MAP_ASPECT, overflow: 'hidden', direction: 'ltr' }}
+      style={{ width: '100%', aspectRatio: DOT_MAP_ASPECT, overflow: 'hidden' }}
       onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
       accessibilityElementsHidden
       importantForAccessibility="no-hide-descendants"

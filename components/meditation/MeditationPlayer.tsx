@@ -24,6 +24,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { spacing, radius, typography } from '@/constants/theme';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { pingActivity, recordTanafasSession } from '@/lib/usageTracking';
+import { logSession } from '@/lib/sessionLog';
 import AmbientVisual from './AmbientVisual';
 import type { MeditationScene } from './scenes';
 
@@ -229,6 +230,7 @@ export default function MeditationPlayer({
   const recordIfStarted = useCallback((endedAt: Date) => {
     if (sessionStartRef.current) {
       recordTanafasSession('meditation', sessionStartRef.current, endedAt).catch(() => {});
+      logSession('meditation', scene.id, sessionStartRef.current, endedAt).catch(() => {});
       sessionStartRef.current = null;
     }
   }, []);

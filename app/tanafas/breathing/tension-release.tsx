@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { palette, spacing, radius, typography, shadows } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
 import { arabicNumber } from '@/lib/arabicNumerals';
+import { useSessionLog } from '@/hooks/useSessionLog';
 import ExerciseHeader from '@/components/breathing/ExerciseHeader';
 
 const RELEASE_COLOR = palette.peach; // #F9A980
@@ -41,6 +42,15 @@ export default function TensionReleaseScreen() {
   const [isRunning, setIsRunning] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
+
+  // On-device session log for Recap: a session runs from opening (or
+  // starting again) until completion or leaving the screen.
+  const sessionLog = useSessionLog('breathing', 'tension-release');
+  const { start: startLog, end: endLog } = sessionLog;
+  useEffect(() => {
+    if (isComplete) endLog();
+    else startLog();
+  }, [isComplete, startLog, endLog]);
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const clearTimer = useCallback(() => {
