@@ -14,6 +14,7 @@ import {
   HandHeart,
   Phone,
   Bell,
+  MessageCircle,
   ChevronRight,
   User,
   type LucideIcon,
@@ -27,7 +28,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 interface MenuItem {
   icon: LucideIcon;
   label: string;
-  href: '/about' | '/get-involved' | '/contact' | '/account/notifications';
+  href: '/about' | '/get-involved' | '/contact' | '/account/notifications' | '/tanafas/voices';
 }
 
 export default function MoreScreen() {
@@ -41,6 +42,8 @@ export default function MoreScreen() {
   // the Account section below is new.
   const menuItems: MenuItem[] = [
     { icon: Bell, label: t.account.notifications.title, href: '/account/notifications' },
+    // Voices lost its Tanafas hub card in the Nightlight redesign; it lives here now.
+    { icon: MessageCircle, label: t.tanafas.voices.hubTitle, href: '/tanafas/voices' },
     { icon: Info, label: t.more.about, href: '/about' },
     { icon: HandHeart, label: t.more.getInvolved, href: '/get-involved' },
     { icon: Phone, label: t.more.contact, href: '/contact' },

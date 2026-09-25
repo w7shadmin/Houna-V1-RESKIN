@@ -67,7 +67,7 @@ export const palette = {
 } as const;
 
 /** `rgba()` of a `#RRGGBB` hex at the given alpha. */
-function alpha(hex: string, a: number): string {
+export function alpha(hex: string, a: number): string {
   const n = parseInt(hex.slice(1), 16);
   return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`;
 }
@@ -167,6 +167,8 @@ export interface ColorTokens {
   scrim: string;
   /** Grabber, inactive slider ticks and track. */
   faint: string;
+  /** Unselected radio ring (self-reflection answers). */
+  ringIdle: string;
 
   /** Stage behind a topic animation (search topic card), and its sky glow. */
   topicStage: string;
@@ -243,6 +245,7 @@ export const nightColors: ColorTokens = {
   sheet: N.nightfall,
   scrim: '#070B1C',
   faint: alpha(N.moonlight, 0.25),
+  ringIdle: alpha(N.moonlight, 0.35),
 
   topicStage: '#10173A',
   topicGlow: '#86A9F0',
@@ -308,6 +311,7 @@ export const dayColors: ColorTokens = {
   sheet: '#FBF8F2',
   scrim: '#CBC7BD',
   faint: alpha(D.ink, 0.25),
+  ringIdle: alpha(D.ink, 0.35),
 
   topicStage: D.paleFill,
   topicGlow: '#86A9F0',

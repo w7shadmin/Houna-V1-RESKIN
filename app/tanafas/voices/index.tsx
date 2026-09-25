@@ -9,6 +9,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { spacing, radius, typography, shadows } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
 import { fetchApprovedPosts, fetchMyPosts, type VoicePost } from '@/lib/voices';
+import IconButton from '@/components/ui/IconButton';
+import { DirectionalIcon } from '@/components/ui/CanvasIcon';
 
 type Tab = 'feed' | 'mine';
 
@@ -56,6 +58,13 @@ export default function VoicesScreen() {
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
       <View style={styles.header}>
+        {/* Reachable from More now, not just the Tanafas hub — needs its own way back. */}
+        <IconButton
+          variant="subtle"
+          accessibilityLabel={t.common.back}
+          onPress={() => (router.canGoBack() ? router.back() : router.replace('/(tabs)/more'))}
+          renderIcon={(c) => <DirectionalIcon isRTL={isRTL} name="back" size={20} strokeWidth={1.8} color={c} />}
+        />
         <Text style={[styles.title, { color: colors.text, fontFamily: fonts.bold }]}>{s.feedTitle}</Text>
         <Pressable
           onPress={handleSubmitPress}
@@ -150,11 +159,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: spacing.sm + 4,
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.md,
     paddingBottom: spacing.sm,
   },
   title: {
+    flex: 1,
     fontSize: typography.fontSize.xxl,
   },
   submitBtn: {

@@ -1,0 +1,53 @@
+{
+  "id": "dev-sample",
+  "version": 1,
+  "devOnly": true,
+  "title": { "en": "Sample reflection (development only)", "ar": "تأمّل تجريبي (للتطوير فقط)" },
+  "description": {
+    "en": "Placeholder questionnaire for building and testing the Discover flow. Not a real or validated instrument — replace with a licensed test before release.",
+    "ar": "استبيان مؤقت لبناء واختبار قسم «اكتشف». ليس أداة حقيقية أو معتمدة — يُستبدل باختبار مرخّص قبل الإصدار."
+  },
+  "source": { "citation": "Development placeholder — no source", "licence": "N/A", "url": "" },
+  "prompt": { "en": "How much do you agree?", "ar": "إلى أي مدى توافق؟" },
+  "scale": {
+    "min": 1,
+    "max": 5,
+    "labels": {
+      "en": ["Strongly disagree", "Disagree", "Neither agree nor disagree", "Agree", "Strongly agree"],
+      "ar": ["لا أوافق بشدة", "لا أوافق", "محايد", "أوافق", "أوافق بشدة"]
+    }
+  },
+  "traits": [
+    {
+      "key": "a",
+      "label": { "en": "Placeholder A", "ar": "عيّنة أ" },
+      "description": { "en": "Placeholder description for trait A.", "ar": "وصف مؤقت للسمة أ." }
+    },
+    {
+      "key": "b",
+      "label": { "en": "Placeholder B", "ar": "عيّنة ب" },
+      "description": { "en": "Placeholder description for trait B.", "ar": "وصف مؤقت للسمة ب." }
+    },
+    {
+      "key": "c",
+      "label": { "en": "Placeholder C", "ar": "عيّنة ج" },
+      "description": { "en": "Placeholder description for trait C.", "ar": "وصف مؤقت للسمة ج." }
+    }
+  ],
+  "items": [
+    { "id": "q1", "trait": "a", "reverse": false, "text": { "en": "Placeholder statement 1 (sample).", "ar": "عبارة تجريبية ١." } },
+    { "id": "q2", "trait": "b", "reverse": false, "text": { "en": "Placeholder statement 2 (sample).", "ar": "عبارة تجريبية ٢." } },
+    { "id": "q3", "trait": "c", "reverse": false, "text": { "en": "Placeholder statement 3 (sample).", "ar": "عبارة تجريبية ٣." } },
+    { "id": "q4", "trait": "a", "reverse": true, "text": { "en": "Placeholder statement 4 (sample, reverse-scored).", "ar": "عبارة تجريبية ٤ (عكسية)." } },
+    { "id": "q5", "trait": "b", "reverse": true, "text": { "en": "Placeholder statement 5 (sample, reverse-scored).", "ar": "عبارة تجريبية ٥ (عكسية)." } },
+    { "id": "q6", "trait": "c", "reverse": false, "text": { "en": "Placeholder statement 6 (sample).", "ar": "عبارة تجريبية ٦." } }
+  ],
+  "scoring": {
+    "method": "mean",
+    "bands": [
+      { "max": 2.5, "label": { "en": "Lower", "ar": "أقل" } },
+      { "max": 3.5, "label": { "en": "Middle", "ar": "متوسط" } },
+      { "max": 5, "label": { "en": "Higher", "ar": "أعلى" } }
+    ]
+  }
+}

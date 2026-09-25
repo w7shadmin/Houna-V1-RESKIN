@@ -15,6 +15,17 @@ export interface MeditationScene {
   audio?: number;
 }
 
+/**
+ * The Tanafas hub's Meditate orb for each scene — highlight, body, shade and
+ * glow, verbatim from the canvas "Tanafas" artboard (same in Night and Day).
+ */
+export const SCENE_ORBS: Record<SceneId, { hi: string; c: string; lo: string; glow: string }> = {
+  fire: { hi: '#FFE9CF', c: '#F0A868', lo: '#9A4F22', glow: 'rgba(240,168,104,0.45)' },
+  rain: { hi: '#E4EDFF', c: '#7FA2EC', lo: '#33509E', glow: 'rgba(127,162,236,0.45)' },
+  forest: { hi: '#DDFAF5', c: '#63CFC7', lo: '#1F7A74', glow: 'rgba(99,207,199,0.45)' },
+  ocean: { hi: '#E6E8FF', c: '#8F9BF0', lo: '#39439E', glow: 'rgba(143,155,240,0.45)' },
+};
+
 // "Four scenes — fire, rain, nature" per build-notes.md; nature split into
 // forest + ocean to make four distinct scenes rather than one generic
 // "nature" (a judgment call — the doc doesn't specify the fourth).

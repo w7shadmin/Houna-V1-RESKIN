@@ -8,7 +8,7 @@ import Svg, { Circle, Path, Rect } from 'react-native-svg';
  * e.g. its house has a rounded roof — so the tab bar and core controls use
  * the canvas paths directly. Add a new glyph here by copying its <svg>
  * children from the canvas artboard. Directional glyphs (`back`,
- * `chevron`) are drawn for LTR — mirror them in RTL with a wrapping View
+ * `chevron`, `chevronStart`, `arrow`) are drawn for LTR — mirror them in RTL with a wrapping View
  * (see `DirectionalIcon`), never a transform on the Svg itself.
  */
 export type CanvasIconName =
@@ -23,7 +23,13 @@ export type CanvasIconName =
   | 'profile'
   | 'phone'
   | 'back'
-  | 'chevron';
+  | 'chevron'
+  | 'chevronStart'
+  | 'journal'
+  | 'info'
+  | 'shield'
+  | 'reflection'
+  | 'arrow';
 
 interface CanvasIconProps {
   name: CanvasIconName;
@@ -115,6 +121,45 @@ export default function CanvasIcon({ name, size = 24, color, strokeWidth = 1.6 }
       break;
     case 'chevron':
       body = <Path d="m9 6 6 6-6 6" {...stroke} />;
+      break;
+    case 'chevronStart':
+      body = <Path d="m15 6-6 6 6 6" {...stroke} />;
+      break;
+    case 'journal':
+      body = (
+        <>
+          <Path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z" {...stroke} />
+          <Path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3" {...stroke} />
+          <Path d="M9 7.5h6" {...stroke} />
+        </>
+      );
+      break;
+    case 'shield':
+      body = (
+        <>
+          <Path d="M12 3 5 6v5c0 4.5 3 8.3 7 10 4-1.7 7-5.5 7-10V6z" {...stroke} />
+          <Path d="M12 8v4.5M12 16h.01" {...stroke} />
+        </>
+      );
+      break;
+    case 'reflection':
+      body = (
+        <>
+          <Path d="M12 3 20 8v8l-8 5-8-5V8z" {...stroke} />
+          <Path d="M12 7.5 16.5 10v4.5L12 17l-4.5-2.5V10z" {...stroke} />
+        </>
+      );
+      break;
+    case 'arrow':
+      body = <Path d="M5 12h14m-6-6 6 6-6 6" {...stroke} />;
+      break;
+    case 'info':
+      body = (
+        <>
+          <Circle cx={12} cy={12} r={9} {...stroke} />
+          <Path d="M12 11v5M12 8h.01" {...stroke} />
+        </>
+      );
       break;
   }
 

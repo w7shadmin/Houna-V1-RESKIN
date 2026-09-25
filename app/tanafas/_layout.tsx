@@ -27,6 +27,8 @@ export default function TanafasLayout() {
         name="meditation/[scene]"
         options={{ animation: 'fade', contentStyle: { backgroundColor: '#000000' } }}
       />
+      <Stack.Screen name="discover/[testId]" />
+      <Stack.Screen name="discover/result/[resultId]" />
       <Stack.Screen name="journal/index" />
       <Stack.Screen name="journal/entry/[id]" />
       <Stack.Screen name="voices/index" />

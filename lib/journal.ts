@@ -8,10 +8,10 @@
  * only tracked `createdAt`. `id` is now a real UUID rather than the old
  * `${Date.now()}-${random}` string.
  */
-import * as SQLite from 'expo-sqlite';
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { palette } from '@/constants/theme';
+import { generateId, getLocalDb } from './localDb';
 
 export type MoodTag = 'calm' | 'neutral' | 'sad' | 'anxious' | 'frustrated' | 'tired';
 
@@ -80,36 +80,7 @@ function rowToEntry(row: JournalEntryRow): JournalEntry {
   };
 }
 
-let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null;
-
-function getDb(): Promise<SQLite.SQLiteDatabase> {
-  if (!dbPromise) {
-    dbPromise = SQLite.openDatabaseAsync('houna-journal.db').then(async (db) => {
-      await db.execAsync(`
-        CREATE TABLE IF NOT EXISTS journal_entries (
-          id TEXT PRIMARY KEY NOT NULL,
-          date TEXT NOT NULL,
-          created_at INTEGER NOT NULL,
-          updated_at INTEGER NOT NULL,
-          text TEXT NOT NULL,
-          mood TEXT NOT NULL
-        );
-      `);
-      return db;
-    });
-  }
-  return dbPromise;
-}
-
-function generateId(): string {
-  // Local, non-cryptographic UUID v4 — good enough for a client-only
-  // primary key that never leaves the device.
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0;
-    const v = c === 'x' ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
-}
+const getDb = getLocalDb;
 
 export function localDateString(d: Date): string {
   const y = d.getFullYear();

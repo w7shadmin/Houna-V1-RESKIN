@@ -9,8 +9,8 @@ interface IconTileProps {
   /** Receives the tone's icon colour. */
   renderIcon: (color: string, iconSize: number) => React.ReactNode;
   tone?: IconTileTone;
-  /** 52 (standalone) or 46 (inside a row card), per the canvas. */
-  size?: 52 | 46;
+  /** Canvas sizes: 52 (standalone), 48 (test cards), 46 (inside a row card). */
+  size?: 52 | 48 | 46;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -23,7 +23,7 @@ interface IconTileProps {
 export default function IconTile({ renderIcon, tone = 'glow', size = 52, style }: IconTileProps) {
   const { colors } = useTheme();
   const t = colors.tones[tone];
-  const iconSize = size === 52 ? 24 : 22;
+  const iconSize = size >= 52 ? 24 : 22;
 
   return (
     <View
@@ -32,7 +32,7 @@ export default function IconTile({ renderIcon, tone = 'glow', size = 52, style }
         {
           width: size,
           height: size,
-          borderRadius: size === 52 ? radius.tile : radius.tileSm,
+          borderRadius: size >= 52 ? radius.tile : radius.tileSm,
           backgroundColor: t.bg,
           borderColor: t.border,
         },
