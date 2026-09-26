@@ -5,6 +5,8 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { alpha, flatten, nightPalette } from '@/constants/theme';
 import Orb from '@/components/ui/Orb';
 import HounaMark from '@/components/HounaMark';
+import { useStarfield } from '@/contexts/StarfieldContext';
+import { WAVE_STEPS, wave } from '@/hooks/useCalmLoop';
 import type { IconTileTone } from '@/components/ui/IconTile';
 
 /** Animations on the stage and the screen glow stay on the UI thread on native. */
@@ -57,10 +59,13 @@ export function BreathStage({ shape, tone, breath, trace, showTracer, progress, 
         const lit = progress !== undefined && (k + 0.5) / DOTS <= progress;
         const s = lit ? 7 : 3 + 4 * Math.sin(tt * Math.PI);
         const o = lit ? 1 : (0.2 + 0.8 * Math.sin(tt * Math.PI)) * (progress !== undefined ? 0.4 : 1);
-        return { ...position(shape, tt), r: s / 2, o, c: lit || k < DOTS / 2 ? fg : partner };
+        return { ...position(shape, tt), tt, s, o, c: lit || k < DOTS / 2 ? fg : partner };
       }),
     [shape, progress, fg, partner],
   );
+  // The ring turns as Home's does, but not while grounding lights it from the top, and never
+  // the square, whose corners the box-breathing bead follows.
+  const turns = shape === 'ring' && progress === undefined;
 
   const scale = breath.interpolate({ inputRange: [0, 1], outputRange: [REST, 1] });
   // Glass rather than solid: the same lit sphere (highlight at the top left, the tone deepening
@@ -76,10 +81,8 @@ export function BreathStage({ shape, tone, breath, trace, showTracer, progress, 
 
   return (
     <View style={styles.stage} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+      <DriftingDots dots={dots} turns={turns} />
       <Svg width={SIZE} height={SIZE} style={StyleSheet.absoluteFill}>
-        {dots.map((d, k) => (
-          <Circle key={k} cx={d.cx} cy={d.cy} r={d.r} fill={d.c} opacity={d.o} />
-        ))}
         {shape === 'ring' ? (
           <Circle cx={C - 0.5} cy={C - 0.5} r={MIDDLE / 2} fill="none" stroke={colors.text} strokeOpacity={0.14} strokeWidth={1} />
         ) : (
@@ -120,6 +123,49 @@ export function BreathStage({ shape, tone, breath, trace, showTracer, progress, 
       {shape === 'square' && trace && showTracer && <Tracer trace={trace} color={fg} />}
       {!!children && <View style={styles.centre}>{children}</View>}
     </View>
+  );
+}
+
+/**
+ * The dots, moving as Home's ring does and on the same clock (StarfieldContext): each drifts
+ * gently up and down and fades a little and back, a step behind its neighbour, so a slow ripple
+ * travels round; a ring also turns, a lap every two minutes. It doesn't breathe with Home's 5s
+ * rhythm: the orb breathes at the exercise's own pace, and two rhythms would pull against it.
+ */
+function DriftingDots({ dots, turns }: { dots: { cx: number; cy: number; tt: number; s: number; o: number; c: string }[]; turns: boolean }) {
+  const { drift, turn } = useStarfield()!.clock;
+  const animated = useMemo(
+    () =>
+      dots.map((d) => ({
+        ...d,
+        // Drift: 3px either way, one lap behind the next dot round the ring.
+        translateY: drift.interpolate({ inputRange: WAVE_STEPS, outputRange: wave(-d.tt).map((w) => d.cy - C + 3 * w) }),
+        // Fade: down to three-fifths of its light and back, twice round the ring per lap.
+        opacity: drift.interpolate({ inputRange: WAVE_STEPS, outputRange: wave(-2 * d.tt + 0.25).map((w) => d.o * (0.6 + 0.4 * w)) }),
+      })),
+    [dots, drift],
+  );
+  const rotate = turn.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
+  return (
+    <Animated.View style={[styles.centre, turns && { transform: [{ rotate }] }]} pointerEvents="none">
+      {animated.map((d, k) => (
+        <Animated.View
+          key={k}
+          style={[
+            styles.dot,
+            {
+              width: d.s,
+              height: d.s,
+              borderRadius: d.s / 2,
+              backgroundColor: d.c,
+              opacity: d.opacity,
+              // Offsets from the centre, not left/top, so it draws the same in either direction.
+              transform: [{ translateX: d.cx - C }, { translateY: d.translateY }],
+            },
+          ]}
+        />
+      ))}
+    </Animated.View>
   );
 }
 
@@ -172,6 +218,9 @@ const styles = StyleSheet.create({
   markLight: {
     position: 'absolute',
     transform: [{ translateY: 1.25 }],
+  },
+  dot: {
+    position: 'absolute',
   },
   tracer: {
     width: 12,

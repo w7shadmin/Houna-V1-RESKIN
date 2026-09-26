@@ -279,6 +279,10 @@ The stage (`BreatheStages.tsx`) is a ring of dots around a translucent,
 glassy orb that inflates and deflates (box breathing: a square of dots
 around a rounded-square orb), with the Houna mark pressed into its middle
 (letterpress edges, scaling with it); the screen glow breathes with it.
+The dots move on Home's clock (`StarfieldContext`), rippling like its ring;
+a ring also turns (not while grounding lights it, never the square, whose
+corners the bead follows), and none take Home's 5s breath, which would
+fight the exercise's own pace.
 Nothing is drawn over the orb: grounding's count is in its prompt, muscle
 relaxation's countdown in its Tense / Release label. Tones: 4-7-8 glow, box
 dusk, five senses dawn, muscle relaxation bloom (a fourth tone, the mood palette's rose, so neighbours in the carousel never share a colour). Meditate's stage
