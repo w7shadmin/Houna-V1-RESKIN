@@ -192,7 +192,9 @@ session ends with `lib/sessionEndAlert.ts`'s gentle buzz.
 
 Designed on the canvas at https://claude.ai/artifact/EMxmwt7o1Uq6kx32BdAUA7
 (Night row = primary, Dusk row = the light theme once called Daylight,
-Sunrise row = Houna's original brand palette). Everything below is today's
+Sunrise row = Houna's original brand palette). The scripts that generate its
+boards, and a snapshot of its files, are in `design/canvas/` (see its README;
+re-read the live canvas before publishing). Everything below is today's
 visual choice, not a requirement; take values from the canvas, never by eye.
 
 **Themes** (`constants/theme.ts`): `nightColors` / `dayColors` (Dusk; still

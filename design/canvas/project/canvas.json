@@ -1,0 +1,575 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "AppIcon.dc.html": {
+      "h": 4128,
+      "title": "App icon — every option",
+      "w": 1280,
+      "x": 13022,
+      "y": 0
+    },
+    "AppIconGCC.dc.html": {
+      "h": 2633,
+      "title": "App icon — GCC editions",
+      "w": 1280,
+      "x": 14382,
+      "y": 0
+    },
+    "Breathe.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Breathing session — in place (box)",
+      "w": 390,
+      "x": 3710,
+      "y": 0
+    },
+    "BreatheDay.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Breathing session (Dusk)",
+      "w": 390,
+      "x": 3710,
+      "y": 2420
+    },
+    "BreatheMorning.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Breathing session (Sunrise)",
+      "w": 390,
+      "x": 3710,
+      "y": 4840
+    },
+    "CheckIn.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "title": "Mood check-in — Houna bloom",
+      "w": 390,
+      "x": 4180,
+      "y": 0
+    },
+    "CheckInDay.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "title": "Mood check-in (Dusk)",
+      "w": 390,
+      "x": 4180,
+      "y": 2420
+    },
+    "CheckInMorning.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "title": "Mood check-in (Sunrise)",
+      "w": 390,
+      "x": 4180,
+      "y": 4840
+    },
+    "Directory.dc.html": {
+      "h": 1120,
+      "is_interactive": true,
+      "title": "Professionals list",
+      "w": 390,
+      "x": 2300,
+      "y": 0
+    },
+    "DirectoryDay.dc.html": {
+      "h": 1120,
+      "is_interactive": true,
+      "title": "Professionals list (Dusk)",
+      "w": 390,
+      "x": 2300,
+      "y": 2420
+    },
+    "DirectoryMorning.dc.html": {
+      "h": 1120,
+      "is_interactive": true,
+      "title": "Professionals list (Sunrise)",
+      "w": 390,
+      "x": 2300,
+      "y": 4840
+    },
+    "HomeAr.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Home — Arabic (RTL)",
+      "w": 390,
+      "x": 1830,
+      "y": 0
+    },
+    "HomeArDay.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Home — Arabic (Dusk)",
+      "w": 390,
+      "x": 1830,
+      "y": 2420
+    },
+    "HomeArMorning.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Home — Arabic (Sunrise)",
+      "w": 390,
+      "x": 1830,
+      "y": 4840
+    },
+    "HomeDay.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Home — English (Dusk)",
+      "w": 390,
+      "x": 1360,
+      "y": 2420
+    },
+    "HomeMorning.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Home — English (Sunrise)",
+      "w": 390,
+      "x": 1360,
+      "y": 4840
+    },
+    "Icons.dc.html": {
+      "h": 3944,
+      "title": "Icon library",
+      "w": 1280,
+      "x": 8942,
+      "y": 0
+    },
+    "IconsDay.dc.html": {
+      "h": 3944,
+      "title": "Icon library (Dusk)",
+      "w": 1280,
+      "x": 10302,
+      "y": 0
+    },
+    "IconsMorning.dc.html": {
+      "h": 3944,
+      "title": "Icon library (Sunrise)",
+      "w": 1280,
+      "x": 11662,
+      "y": 0
+    },
+    "Main.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Home — English",
+      "w": 390,
+      "x": 1360,
+      "y": 0
+    },
+    "MoodStates.dc.html": {
+      "h": 560,
+      "title": "Houna bloom — mood states",
+      "w": 1280,
+      "x": 0,
+      "y": 1300
+    },
+    "MoodStatesDay.dc.html": {
+      "h": 560,
+      "title": "Houna bloom — mood states (Dusk)",
+      "w": 1280,
+      "x": 0,
+      "y": 3720
+    },
+    "MoodStatesMorning.dc.html": {
+      "h": 560,
+      "title": "Houna bloom — mood states (Sunrise)",
+      "w": 1280,
+      "x": 0,
+      "y": 6240
+    },
+    "Professional.dc.html": {
+      "h": 1080,
+      "is_interactive": true,
+      "title": "Professional profile",
+      "w": 390,
+      "x": 2770,
+      "y": 0
+    },
+    "ProfessionalDay.dc.html": {
+      "h": 1080,
+      "is_interactive": true,
+      "title": "Professional profile (Dusk)",
+      "w": 390,
+      "x": 2770,
+      "y": 2420
+    },
+    "ProfessionalMorning.dc.html": {
+      "h": 1080,
+      "is_interactive": true,
+      "title": "Professional profile (Sunrise)",
+      "w": 390,
+      "x": 2770,
+      "y": 4840
+    },
+    "Profile.dc.html": {
+      "h": 1320,
+      "is_interactive": true,
+      "title": "Profile",
+      "w": 390,
+      "x": 6060,
+      "y": 0
+    },
+    "ProfileDay.dc.html": {
+      "h": 1320,
+      "is_interactive": true,
+      "title": "Profile (Dusk)",
+      "w": 390,
+      "x": 6060,
+      "y": 2420
+    },
+    "ProfileMorning.dc.html": {
+      "h": 1320,
+      "is_interactive": true,
+      "title": "Profile (Sunrise)",
+      "w": 390,
+      "x": 6060,
+      "y": 4840
+    },
+    "Recap.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Recap (tap through)",
+      "w": 390,
+      "x": 6530,
+      "y": 0
+    },
+    "RecapDay.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Recap (Dusk)",
+      "w": 390,
+      "x": 6530,
+      "y": 2420
+    },
+    "RecapMorning.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Recap (Sunrise)",
+      "w": 390,
+      "x": 6530,
+      "y": 4840
+    },
+    "Search.dc.html": {
+      "h": 1380,
+      "is_interactive": true,
+      "title": "Directory search",
+      "w": 390,
+      "x": 4650,
+      "y": 0
+    },
+    "SearchDay.dc.html": {
+      "h": 1380,
+      "is_interactive": true,
+      "title": "Directory search (Dusk)",
+      "w": 390,
+      "x": 4650,
+      "y": 2420
+    },
+    "SearchMorning.dc.html": {
+      "h": 1380,
+      "is_interactive": true,
+      "title": "Directory search (Sunrise)",
+      "w": 390,
+      "x": 4650,
+      "y": 4840
+    },
+    "Starfield.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Houna starfield — tap the mark on Home",
+      "w": 390,
+      "x": 7000,
+      "y": 0
+    },
+    "Sunrise.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Houna sunrise — tap the mark on Home",
+      "w": 390,
+      "x": 7000,
+      "y": 4840
+    },
+    "SunriseStory.dc.html": {
+      "h": 1378,
+      "title": "Houna sunrise — storyboard & build plan",
+      "w": 1172,
+      "x": 7470,
+      "y": 4840
+    },
+    "System.dc.html": {
+      "h": 1240,
+      "title": "Nightlight — direction & system",
+      "w": 1321,
+      "x": 0,
+      "y": 0
+    },
+    "SystemDay.dc.html": {
+      "h": 1213,
+      "title": "Dusk — direction & system",
+      "w": 1296,
+      "x": 0,
+      "y": 2420
+    },
+    "SystemMorning.dc.html": {
+      "h": 1360,
+      "title": "Sunrise — direction & system",
+      "w": 1360,
+      "x": 0,
+      "y": 4840
+    },
+    "Tanafas.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Tanafas — Breathe · Meditate · Discover",
+      "w": 390,
+      "x": 3240,
+      "y": 0
+    },
+    "TanafasDay.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Tanafas (Dusk)",
+      "w": 390,
+      "x": 3240,
+      "y": 2420
+    },
+    "TanafasMorning.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Tanafas (Sunrise)",
+      "w": 390,
+      "x": 3240,
+      "y": 4840
+    },
+    "TestQuestion.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Self-reflection — question",
+      "w": 390,
+      "x": 5120,
+      "y": 0
+    },
+    "TestQuestionDay.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Self-reflection — question (Dusk)",
+      "w": 390,
+      "x": 5120,
+      "y": 2420
+    },
+    "TestQuestionMorning.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Self-reflection — question (Sunrise)",
+      "w": 390,
+      "x": 5120,
+      "y": 4840
+    },
+    "TestResult.dc.html": {
+      "h": 1240,
+      "is_interactive": true,
+      "title": "Self-reflection — results",
+      "w": 390,
+      "x": 5590,
+      "y": 0
+    },
+    "TestResultDay.dc.html": {
+      "h": 1240,
+      "is_interactive": true,
+      "title": "Self-reflection — results (Dusk)",
+      "w": 390,
+      "x": 5590,
+      "y": 2420
+    },
+    "TestResultMorning.dc.html": {
+      "h": 1240,
+      "is_interactive": true,
+      "title": "Self-reflection — results (Sunrise)",
+      "w": 390,
+      "x": 5590,
+      "y": 4840
+    },
+    "DuskScene.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Houna dusk — tap the mark on Home",
+      "w": 390,
+      "x": 7000,
+      "y": 2420
+    },
+    "DuskStory.dc.html": {
+      "h": 1603,
+      "title": "Houna dusk — storyboard & build plan",
+      "w": 1172,
+      "x": 7470,
+      "y": 2420
+    },
+    "PressedLogo.dc.html": {
+      "h": 1720,
+      "title": "Pressed logo — side by side",
+      "w": 1424,
+      "x": 0,
+      "y": 7200
+    },
+    "StarfieldPressedTeal.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Houna starfield — pressed logo, teal moon",
+      "w": 390,
+      "x": 1504,
+      "y": 7200
+    },
+    "StarfieldPressedSilver.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Houna starfield — pressed logo, silver moon",
+      "w": 390,
+      "x": 1974,
+      "y": 7200
+    },
+    "SunrisePressed.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Houna sunrise — pressed logo",
+      "w": 390,
+      "x": 2444,
+      "y": 7200
+    },
+    "DuskPressed.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Houna dusk — pressed logo",
+      "w": 390,
+      "x": 2914,
+      "y": 7200
+    },
+    "MoonConcepts.dc.html": {
+      "h": 1530,
+      "title": "Houna moon — concepts",
+      "w": 1332,
+      "x": 3464,
+      "y": 7200
+    },
+    "MoonPhases.dc.html": {
+      "h": 1380,
+      "title": "Houna moon — real phases",
+      "w": 1468,
+      "x": 4876,
+      "y": 7200
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-09-24T22:50:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "title": {
+      "kind": "title1",
+      "maxW": 7390,
+      "text": "Houna — Nightlight",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    },
+    "titleDay": {
+      "kind": "title1",
+      "maxW": 8000,
+      "text": "Houna — Dusk",
+      "w": 240,
+      "x": 0,
+      "y": 2120
+    },
+    "titleIcons": {
+      "kind": "title1",
+      "maxW": 6760,
+      "text": "Houna — Icons & app icon",
+      "w": 240,
+      "x": 8942,
+      "y": -300
+    },
+    "titleMorning": {
+      "kind": "title1",
+      "maxW": 8000,
+      "text": "Houna — Sunrise",
+      "w": 240,
+      "x": 0,
+      "y": 4540
+    },
+    "titlePressed": {
+      "kind": "title1",
+      "maxW": 6344,
+      "text": "Houna — Pressed logo (alternative)",
+      "w": 240,
+      "x": 0,
+      "y": 6900
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "System.dc.html",
+    "MoodStates.dc.html",
+    "HomeAr.dc.html",
+    "Directory.dc.html",
+    "Professional.dc.html",
+    "Tanafas.dc.html",
+    "Breathe.dc.html",
+    "CheckIn.dc.html",
+    "Search.dc.html",
+    "TestQuestion.dc.html",
+    "TestResult.dc.html",
+    "Profile.dc.html",
+    "Recap.dc.html",
+    "Starfield.dc.html",
+    "SystemDay.dc.html",
+    "MoodStatesDay.dc.html",
+    "HomeDay.dc.html",
+    "HomeArDay.dc.html",
+    "DirectoryDay.dc.html",
+    "ProfessionalDay.dc.html",
+    "TanafasDay.dc.html",
+    "BreatheDay.dc.html",
+    "CheckInDay.dc.html",
+    "SearchDay.dc.html",
+    "TestQuestionDay.dc.html",
+    "TestResultDay.dc.html",
+    "ProfileDay.dc.html",
+    "RecapDay.dc.html",
+    "DuskScene.dc.html",
+    "DuskStory.dc.html",
+    "SystemMorning.dc.html",
+    "MoodStatesMorning.dc.html",
+    "HomeMorning.dc.html",
+    "HomeArMorning.dc.html",
+    "DirectoryMorning.dc.html",
+    "ProfessionalMorning.dc.html",
+    "TanafasMorning.dc.html",
+    "BreatheMorning.dc.html",
+    "CheckInMorning.dc.html",
+    "SearchMorning.dc.html",
+    "TestQuestionMorning.dc.html",
+    "TestResultMorning.dc.html",
+    "ProfileMorning.dc.html",
+    "RecapMorning.dc.html",
+    "Sunrise.dc.html",
+    "SunriseStory.dc.html",
+    "Icons.dc.html",
+    "IconsDay.dc.html",
+    "IconsMorning.dc.html",
+    "AppIcon.dc.html",
+    "AppIconGCC.dc.html",
+    "PressedLogo.dc.html",
+    "StarfieldPressedTeal.dc.html",
+    "StarfieldPressedSilver.dc.html",
+    "SunrisePressed.dc.html",
+    "DuskPressed.dc.html",
+    "MoonConcepts.dc.html",
+    "MoonPhases.dc.html"
+  ],
+  "pages": [],
+  "title": "Houna Redesign"
+}
