@@ -246,15 +246,16 @@ audio can only be verified in an Android dev-client build.
 
 **Native splash**: `app.json` has Daybreak and Midnight (`dark`) grounds;
 needs `npx expo prebuild --clean` + reinstalling the dev client to apply,
-like `userInterfaceStyle: "automatic"`. Its image is the mark alone
-(`assets/images/splash-mark.png` teal, `splash-mark-dark.png` glow; never the
-full-bleed `icon.png`, which draws as a teal box), centred on a transparent
-square: Android scales the whole picture to ~107dp (a 160dp icon box × 2/3,
-whatever `imageWidth` says), so the ring fills 42% of it to match the intro's
-"o" on a 412dp-wide phone (iOS gets `imageWidth: 107` to match). The intro
-(`components/SplashIntro.tsx`) starts from that mark at the screen's centre,
-already showing on native, then eases the lockup over to centre. Regenerate
-both images from `adaptive-icon.png` if the mark or the intro's size changes.
+like `userInterfaceStyle: "automatic"`. This is Android's launch screen,
+shown the moment the icon is tapped, before the animated splash
+(`components/SplashIntro.tsx`, which is separate and unchanged by it). Its
+image is the mark alone (`assets/images/splash-mark.png` teal,
+`splash-mark-dark.png` glow; never the full-bleed `icon.png`, which draws as a
+teal box), centred on a transparent square: Android scales the whole picture
+to ~107dp (a 160dp icon box × 2/3, whatever `imageWidth` says), so the ring
+fills 42% of it, about the size of the animated splash's "o" (iOS gets
+`imageWidth: 107` to match). Regenerate both images from `adaptive-icon.png`
+if the mark changes.
 
 **Legacy, still to migrate**: the old `palette` export and older styling
 (`shadows.card`, `primaryLightest`) remain on About, More's leftovers, Voices
