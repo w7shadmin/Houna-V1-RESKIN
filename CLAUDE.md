@@ -264,7 +264,19 @@ draws its moon at the measured spot (`x`/`y` params), then glides it to the
 middle over a turning, twinkling sky with shooting stars
 (`components/starfield/`), the mark becoming the moon on the way: a small
 solid teal disc about the mark's size with the mark pressed in
-(`MoonDisc`), its halo joined to the disc's edge (`EdgeHalo`). The only word is "Tanafas"; tapping the
+(`MoonDisc`), its halo joined to the disc's edge (`EdgeHalo`). The moon is
+in tonight's real phase (`lib/moonPhase.ts`, from the date alone: offline, no
+permissions), lit on the right while waxing as seen from the Gulf, the dark part
+in earthshine with the mark just visible. The lit shape is two clipping windows
+over whole faces (a half-disc slid sideways, a round window squeezed across), so
+the pressed mark never distorts and the breath animates natively: the lit part
+swells a little on the in-breath, never past the quarter line, and the halo
+follows the light (full on full-moon nights). On full-moon nights only (the
+"full" eighth of the cycle, three or four nights a month) a wide, faint ring
+circles it too (the canvas "Moon halo" concept). Canvas: "Houna moon — real
+phases", option B. The moon fades as one layer (`needsOffscreenAlphaCompositing`):
+Android otherwise fades its stacked faces separately and it seems to sweep
+through phases. The only word is "Tanafas"; tapping the
 moon or Back reverses it. Home's mark is `components/starfield/MarkHalo.tsx`
 (dot ring, edge halo, 5s breath), and it crossfades into the moon mid-glide;
 ambient loops use `hooks/useCalmLoop.ts` (focus- and Reduce-Motion-aware).
