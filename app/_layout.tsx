@@ -73,6 +73,15 @@ function InnerLayout() {
           name="starfield"
           options={{ presentation: 'transparentModal', animation: 'none', gestureEnabled: false, contentStyle: { backgroundColor: 'transparent' } }}
         />
+        {/* Its Sunrise and Dusk counterparts, the same way. */}
+        <Stack.Screen
+          name="sunrise"
+          options={{ presentation: 'transparentModal', animation: 'none', gestureEnabled: false, contentStyle: { backgroundColor: 'transparent' } }}
+        />
+        <Stack.Screen
+          name="dusk"
+          options={{ presentation: 'transparentModal', animation: 'none', gestureEnabled: false, contentStyle: { backgroundColor: 'transparent' } }}
+        />
         <Stack.Screen name="profile" />
         <Stack.Screen name="crisis" />
         <Stack.Screen name="about" />

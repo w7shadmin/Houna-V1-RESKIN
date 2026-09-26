@@ -124,8 +124,8 @@ export default function RecapScreen() {
   const close = () => (router.canGoBack() ? router.back() : router.replace('/(tabs)'));
 
   const exerciseTitle = (id: string | null) =>
-    // The Houna starfield (breathing with the moon on Home) goes by the one word it shows.
-    id === 'starfield'
+    // The Houna starfield, sunrise and dusk (breathing with the moon or sun from Home) go by the one word they show.
+    id === 'starfield' || id === 'sunrise' || id === 'dusk'
       ? t.tabs.tanafas
       : id && id in EXERCISE_KEYS
         ? t.tanafas.exercises[EXERCISE_KEYS[id as keyof typeof EXERCISE_KEYS]].title

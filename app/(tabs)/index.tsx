@@ -30,7 +30,7 @@ const ROTATE_MS = 4500;
  * (CLAUDE.md: crisis resources are never buried).
  */
 export default function HomeScreen() {
-  const { colors, isNight } = useTheme();
+  const { colors, isNight, scheme } = useTheme();
   const { t, isRTL, fonts } = useLanguage();
   const router = useRouter();
   const h = t.home;
@@ -89,28 +89,30 @@ export default function HomeScreen() {
   const current = activity[period];
   const lit = useMemo(() => current?.countries.map((c) => c.country) ?? [], [current]);
 
-  // The Houna starfield (Night only): tapping the mark fades everything else
-  // away, then hands the mark over to the starfield, drawn at exactly this spot.
+  // The Houna starfield (Night), sunrise (Sunrise) and dusk (Dusk): tapping the mark fades
+  // everything else away, then hands the mark over to the scene, drawn at exactly this spot.
+  const scene = isNight ? ('/starfield' as const) : scheme === 'sunrise' ? ('/sunrise' as const) : ('/dusk' as const);
+  const sceneLabel = scene === '/starfield' ? h.starfield.open : scene === '/sunrise' ? h.sunrise.open : h.dusk.open;
   const starfield = useStarfield();
   const starfieldRef = useRef(starfield);
   starfieldRef.current = starfield;
   const haloRef = useRef<View>(null);
   const away = useRef(false);
 
-  const openStarfield = () => {
+  const openScene = () => {
     const sf = starfieldRef.current;
     if (!sf || away.current) return;
     away.current = true;
     sf.setChromeHidden(true);
     Animated.timing(sf.chrome, { toValue: 0, duration: 450, easing: Easing.out(Easing.quad), useNativeDriver: NATIVE }).start(() => {
       haloRef.current?.measureInWindow((x, y, w, hgt) => {
-        // The starfield draws its moon over this exact spot, then hides this mark (haloHidden).
-        router.push({ pathname: '/starfield', params: { x: String(x + w / 2), y: String(y + hgt / 2) } });
+        // The scene draws its moon or sun over this exact spot, then hides this mark (haloHidden).
+        router.push({ pathname: scene, params: { x: String(x + w / 2), y: String(y + hgt / 2) } });
       });
     });
   };
 
-  // Back from the starfield: its moon has returned to this spot and shown our mark again
+  // Back from the scene: its moon or sun has returned to this spot and shown our mark again
   // just before leaving, so bring the rest of Home (the ring and the tab bar too) back.
   useFocusEffect(
     useCallback(() => {
@@ -181,13 +183,8 @@ export default function HomeScreen() {
 
         {/* Mark, "You're not alone", rotating line */}
         <View style={styles.hero}>
-          {/* In Night the mark opens the Houna starfield; in Day it's decoration. */}
-          <Pressable
-            onPress={openStarfield}
-            disabled={!isNight}
-            accessibilityRole={isNight ? 'button' : undefined}
-            accessibilityLabel={isNight ? h.starfield.open : undefined}
-          >
+          {/* The mark opens this theme's scene: the starfield, the sunrise or the dusk. */}
+          <Pressable onPress={openScene} accessibilityRole="button" accessibilityLabel={sceneLabel}>
             <View ref={haloRef} collapsable={false} style={starfield?.haloHidden && styles.hidden}>
               {/* Day: the logo's deeper teal, a little stronger — the pale Night glow vanishes on Daybreak. */}
               <MarkHalo

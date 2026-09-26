@@ -2,9 +2,9 @@ import React, { useMemo } from 'react';
 import { Animated, Platform, StyleSheet, View } from 'react-native';
 import Svg, { Circle, Rect } from 'react-native-svg';
 import { useTheme } from '@/contexts/ThemeContext';
-import { alpha, flatten, nightPalette } from '@/constants/theme';
+import { alpha, flatten } from '@/constants/theme';
 import Orb from '@/components/ui/Orb';
-import HounaMark from '@/components/HounaMark';
+import PressedMark from '@/components/ui/PressedMark';
 import { useStarfield } from '@/contexts/StarfieldContext';
 import { WAVE_STEPS, wave } from '@/hooks/useCalmLoop';
 import type { IconTileTone } from '@/components/ui/IconTile';
@@ -75,9 +75,6 @@ export function BreathStage({ shape, tone, breath, trace, showTracer, progress, 
     [alpha(flatten(alpha(fg, 0.35), '#FFFFFF'), 0.52), 0.4],
     [alpha(fg, 0.43), 1],
   ];
-  // The mark pressed into it: a shade deeper than the surface, with the letterpress edges of a
-  // hollow lit from the top left (a dark sliver along its top, a lit one along its bottom).
-  const pressed = alpha(flatten(alpha(nightPalette.midnight, 0.25), fg), 0.7);
 
   return (
     <View style={styles.stage} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
@@ -110,15 +107,7 @@ export function BreathStage({ shape, tone, breath, trace, showTracer, progress, 
           glow={`0 0 90px ${alpha(fg, 0.38)}`}
         />
         {/* Inside the breathing scale, so the mark grows and shrinks as one with the shape. */}
-        <View style={styles.centre} pointerEvents="none">
-          <View style={styles.markEdge}>
-            <HounaMark size={MARK} color={alpha(nightPalette.midnight, 0.35)} />
-          </View>
-          <View style={styles.markLight}>
-            <HounaMark size={MARK} color={alpha('#FFFFFF', 0.55)} />
-          </View>
-          <HounaMark size={MARK} color={pressed} />
-        </View>
+        <PressedMark size={MARK} surface={fg} />
       </Animated.View>
       {shape === 'square' && trace && showTracer && <Tracer trace={trace} color={fg} />}
       {!!children && <View style={styles.centre}>{children}</View>}
@@ -210,14 +199,6 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  markEdge: {
-    position: 'absolute',
-    transform: [{ translateY: -1 }],
-  },
-  markLight: {
-    position: 'absolute',
-    transform: [{ translateY: 1.25 }],
   },
   dot: {
     position: 'absolute',

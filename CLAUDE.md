@@ -261,15 +261,37 @@ account or settings screen.
 and the tab bar (`contexts/StarfieldContext.tsx`, one shared `chrome`
 value) and hands the mark to `app/starfield.tsx`, a transparent modal that
 draws its moon at the measured spot (`x`/`y` params), then glides it to the
-middle as a silver full moon over a turning, twinkling sky with shooting
-stars (`components/starfield/`). The only word is "Tanafas"; tapping the
-moon or Back reverses it. Home's mark and the moon are the same
-`components/starfield/MarkHalo.tsx` (dot ring, edge halo, 5s breath);
+middle over a turning, twinkling sky with shooting stars
+(`components/starfield/`), the mark becoming the moon on the way: a small
+solid teal disc about the mark's size with the mark pressed in
+(`MoonDisc`), its halo joined to the disc's edge (`EdgeHalo`). The only word is "Tanafas"; tapping the
+moon or Back reverses it. Home's mark is `components/starfield/MarkHalo.tsx`
+(dot ring, edge halo, 5s breath), and it crossfades into the moon mid-glide;
 ambient loops use `hooks/useCalmLoop.ts` (focus- and Reduce-Motion-aware).
 Every visit counts as a breathing session (`starfield`, titled Tanafas in
 Recap): the foreground time from arrival until the moon is tapped, with the
 app-wide 10s minimum (`MIN_SESSION_SECONDS`), into Recap, streaks and the
 leaderboard.
+
+**Houna sunrise and Houna dusk** (Sunrise and Dusk; the starfield's
+counterparts, canvas "Houna sunrise" / "Houna dusk"): the same handoff from
+Home's mark, to `app/sunrise.tsx` / `app/dusk.tsx`, thin wrappers round one
+scene (`components/sunrise/SunScene.tsx`) that reads a `SunScene` from
+`theme.ts` (`sunriseScene` / `duskScene`). A first sky comes in as Home steps
+back (pre-dawn; golden hour), and the mark glides down as the moon does to
+where that sun settles (`settle`: the moon's 0.42; Dusk's lower 0.55, a
+setting sun), becoming a small sun (`SunDisc`: pale-gold with short turning
+rays; amber with none; the mark pressed into it) as the second sky takes over (morning; violet dusk,
+where `FirstStars` then come out, with the starfield's `ShootingStars`
+now and then). The disc and mark stay still; the edge
+halo, rays and wide sunglow breathe on the shared clock exactly as the
+moon's halo does. Counted as `sunrise` / `dusk` sessions, titled Tanafas in
+Recap. Every theme's mark now opens a scene. All three share
+`hooks/useBreathingScene.ts` (the measured handoff, visit counting,
+keep-awake / hidden bars / Back); keep one animation per value inside a
+parallel, or stopping one stops all. The web preview may only paint frames
+on demand, so JS-driven animations there can look stuck mid-way; that's the
+preview, not the scene.
 
 **Tanafas player**: the Breathe and Meditate carousels share
 `components/tanafas/PlayerFrame.tsx` (stage, title row, tag, description,
@@ -278,7 +300,8 @@ layout and fades each slot over to the session (round, phase, time left).
 The stage (`BreatheStages.tsx`) is a ring of dots around a translucent,
 glassy orb that inflates and deflates (box breathing: a square of dots
 around a rounded-square orb), with the Houna mark pressed into its middle
-(letterpress edges, scaling with it); the screen glow breathes with it.
+(one even shape a shade deeper than the orb, scaling with it: `components/ui/PressedMark.tsx`, the
+one pressed mark the orbs, the suns and the moon share); the screen glow breathes with it.
 The dots move on Home's clock (`StarfieldContext`), rippling like its ring;
 a ring also turns (not while grounding lights it, never the square, whose
 corners the bead follows), and none take Home's 5s breath, which would

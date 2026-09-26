@@ -80,6 +80,74 @@ export const sunrisePalette = {
   scrim: '#C9CDCB',
 } as const;
 
+/** A sky, top to bottom, for a LinearGradient. */
+export interface SkyWash {
+  colors: readonly [string, string, ...string[]];
+  locations: readonly [number, number, ...number[]];
+}
+
+/**
+ * A Home-mark sun scene (canvas "Houna sunrise" / "Houna dusk"): the sky that
+ * comes in as Home steps back (`skyA`), crossfading to the one the sun settles
+ * in (`skyB`), and the sun the mark becomes.
+ */
+export interface SunScene {
+  skyA: SkyWash;
+  skyB: SkyWash;
+  /** The disc, centre to edge (light falls from a touch above centre). */
+  disc: [string, number][];
+  /** The halo at the disc's edge, and the wide sunglow behind. */
+  halo: string;
+  glow: string;
+  /** Short turning rays, or none (an evening sun is a glow). */
+  rays: string | null;
+  /** The disc's surface, the mark is pressed into (a shade deeper, as the breathing orbs'). */
+  surface: string;
+  /** The one word, "Tanafas". */
+  word: string;
+  /** Where the sun settles, as a fraction of the screen's height (the moon's is 0.42). */
+  settle: number;
+  /** The first faint stars coming out once it has settled, or none. */
+  stars: string | null;
+  /** The starfield's far-off shooting stars, now and then, once it has settled. */
+  shootingStars: boolean;
+}
+
+/** Sunrise: pre-dawn warming to morning; a pale-gold sun with short turning rays. */
+export const sunriseScene: SunScene = {
+  skyA: { colors: ['#274A5E', '#4F7A86', '#C99A8A', '#F2B38F'], locations: [0, 0.42, 0.8, 1] },
+  skyB: { colors: ['#A9DDE0', '#DDF1EF', '#FCE7D8', '#FBC9A6'], locations: [0, 0.38, 0.74, 1] },
+  disc: [['#FFF9F1', 0], ['#FFE9D3', 0.52], ['#FBC8A3', 0.82], [sunrisePalette.peach, 1]],
+  halo: sunrisePalette.peach,
+  glow: sunrisePalette.peach,
+  rays: '#FFDEBE',
+  surface: '#FBC8A3',
+  word: sunrisePalette.grey80,
+  settle: 0.42,
+  stars: null,
+  shootingStars: false,
+};
+
+/**
+ * Dusk: golden hour deepening to violet; a low amber evening sun, no rays,
+ * settling lower than the moon and the sunrise, as a setting sun would, as the
+ * first faint stars come out, with the starfield's shooting stars now and then
+ * (a nod to Night next door).
+ */
+export const duskScene: SunScene = {
+  skyA: { colors: ['#FBE6C8', '#F7CFA0', '#F0B08A', '#E8978A'], locations: [0, 0.4, 0.78, 1] },
+  skyB: { colors: ['#2E2A5C', '#5A4E9A', '#A785B0', '#EFA07E'], locations: [0, 0.4, 0.76, 1] },
+  disc: [['#FFF3E4', 0], ['#FFD9B3', 0.5], ['#F5B08A', 0.8], ['#E4826A', 1]],
+  halo: '#EC8C6E',
+  glow: '#F2A078',
+  rays: null,
+  surface: '#F5B08A',
+  word: dayPalette.ink,
+  settle: 0.55,
+  stars: dayPalette.daybreak,
+  shootingStars: true,
+};
+
 /**
  * Pre-reskin brand palette. Still referenced directly by the splash intro,
  * the meditation player, a few breathing-exercise accents and the legacy

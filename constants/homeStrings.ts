@@ -14,6 +14,16 @@ export const homeStrings = {
       open: 'Breathe under the stars',
       close: 'Back to Home',
     },
+    // The Houna sunrise (Sunrise theme's counterpart): the same, with the mark becoming the sun.
+    sunrise: {
+      open: 'Breathe with the sunrise',
+      close: 'Back to Home',
+    },
+    // The Houna dusk (Dusk theme's counterpart): the mark becoming the evening sun.
+    dusk: {
+      open: 'Breathe with the dusk',
+      close: 'Back to Home',
+    },
     hero: {
       badge: "You're not alone",
       headline: 'SELF-CARE IS HOW YOU GAIN CONTROL OF YOUR LIFE',
@@ -134,6 +144,14 @@ export const homeStrings = {
   ar: {
     starfield: {
       open: 'تنفّس تحت النجوم',
+      close: 'العودة إلى الرئيسية',
+    },
+    sunrise: {
+      open: 'تنفّس مع الشروق',
+      close: 'العودة إلى الرئيسية',
+    },
+    dusk: {
+      open: 'تنفّس مع الغسق',
       close: 'العودة إلى الرئيسية',
     },
     hero: {

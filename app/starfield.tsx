@@ -1,36 +1,27 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { AppState, Animated, BackHandler, Easing, Platform, Pressable, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Animated, Easing, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import Svg, { Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
-import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
-import * as NavigationBar from 'expo-navigation-bar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useStarfield } from '@/contexts/StarfieldContext';
 import { grid, nightColors, nightPalette } from '@/constants/theme';
 import { NATIVE, useReduceMotion } from '@/hooks/useCalmLoop';
-import { MIN_SESSION_SECONDS, logSession } from '@/lib/sessionLog';
-import { pingActivity, recordTanafasSession } from '@/lib/usageTracking';
+import { useBreathingVisit, useImmersiveScene, useSceneFrame } from '@/hooks/useBreathingScene';
 import MarkHalo, { HALO_BOX } from '@/components/starfield/MarkHalo';
+import MoonDisc from '@/components/starfield/MoonDisc';
 import StarSky from '@/components/starfield/StarSky';
 import ShootingStars from '@/components/starfield/ShootingStars';
 
 /** The moonglow in the sky round the moon. */
 const GLOW = 420;
 
-interface Frame {
-  /** This screen's own top-left on the window: Home's measurement is converted by it. */
-  ox: number;
-  oy: number;
-  width: number;
-  height: number;
-}
-
 /**
  * The Houna starfield (Night only, opened by tapping Home's mark). Everything
  * else, the mark's dot ring included, has faded away on Home; here the mark is
- * taken over at exactly the spot it was drawn and becomes the moon: it glides
- * to the middle of a turning, twinkling night sky with the odd shooting star,
+ * taken over at exactly the spot it was drawn and becomes the moon (a small solid
+ * teal disc with the mark pressed in, see MoonDisc) as it glides to the middle
+ * of a turning, twinkling night sky with the odd shooting star,
  * and breathes on Home's easy 5s rhythm for the person to breathe along with.
  * The only word is "Tanafas". Tapping the moon (or Back) reverses it all.
  *
@@ -45,27 +36,15 @@ export default function StarfieldScreen() {
   const starfield = useStarfield()!;
   const { clock, setHaloHidden } = starfield;
   const reduceMotion = useReduceMotion();
-  const params = useLocalSearchParams<{ x?: string; y?: string }>();
-
-  const rootRef = useRef<View>(null);
-  const [frame, setFrame] = useState<Frame | null>(null);
+  const { rootRef, frame, onLayout, from, to } = useSceneFrame();
   const sky = useRef(new Animated.Value(0)).current;
   const glide = useRef(new Animated.Value(0)).current;
   const word = useRef(new Animated.Value(0)).current;
   const [settled, setSettled] = useState(false);
+  // The mark becomes the moon over the middle of the glide, and back, reversed, on the way home.
+  const moonForm = glide.interpolate({ inputRange: [0.3, 0.8], outputRange: [0, 1], extrapolate: 'clamp' });
+  const markFade = glide.interpolate({ inputRange: [0.3, 0.6], outputRange: [1, 0], extrapolate: 'clamp' });
   const closing = useRef(false);
-
-  // Where this screen sits on the window, so Home's mark (measured on the window) lands exactly.
-  const onLayout = (e: LayoutChangeEvent) => {
-    const { width, height } = e.nativeEvent.layout;
-    rootRef.current?.measureInWindow((ox, oy) => setFrame({ ox, oy, width, height }));
-  };
-
-  const from = frame && {
-    x: (Number(params.x) || frame.ox + frame.width / 2) - frame.ox,
-    y: (Number(params.y) || frame.oy + frame.height * 0.3) - frame.oy,
-  };
-  const to = frame && { x: frame.width / 2, y: frame.height * 0.42 };
 
   // Once the moon is drawn over Home's mark, hide Home's (the next frame, so there's no gap), then rise.
   useEffect(() => {
@@ -94,39 +73,8 @@ export default function StarfieldScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [frame !== null]);
 
-  // Every visit counts as a breathing session, like the Breathe exercises: the time spent
-  // breathing (in the foreground, from arrival until the moon is tapped) goes to Recap's
-  // minutes, the streak and the leaderboard. Anything under the app-wide minimum is an
-  // accidental open; the community ping waits for that minimum too.
-  const breathing = useRef({ ms: 0, since: Date.now() as number | null, counted: false });
-  const countVisit = useCallback(() => {
-    const b = breathing.current;
-    if (b.counted) return;
-    b.counted = true;
-    const ms = b.ms + (b.since !== null ? Date.now() - b.since : 0);
-    if (ms < MIN_SESSION_SECONDS * 1000) return;
-    const endedAt = new Date();
-    const startedAt = new Date(endedAt.getTime() - ms);
-    logSession('breathing', 'starfield', startedAt, endedAt).catch(() => {});
-    recordTanafasSession('breathing', startedAt, endedAt).catch(() => {});
-  }, []);
-  useEffect(() => {
-    const sub = AppState.addEventListener('change', (state) => {
-      const b = breathing.current;
-      if (state === 'active') {
-        if (b.since === null) b.since = Date.now();
-      } else if (b.since !== null) {
-        b.ms += Date.now() - b.since;
-        b.since = null;
-      }
-    });
-    const ping = setTimeout(() => pingActivity('breathing').catch(() => {}), MIN_SESSION_SECONDS * 1000);
-    return () => {
-      sub.remove();
-      clearTimeout(ping);
-      countVisit();
-    };
-  }, [countVisit]);
+  // Every visit counts as a breathing session (Recap, streaks, the leaderboard).
+  const countVisit = useBreathingVisit('starfield');
 
   const close = useCallback(() => {
     if (closing.current) return;
@@ -150,26 +98,8 @@ export default function StarfieldScreen() {
     });
   }, [word, glide, sky, router, setHaloHidden, countVisit]);
 
-  // Android back: the same way out as tapping the moon.
-  useEffect(() => {
-    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
-      close();
-      return true;
-    });
-    return () => sub.remove();
-  }, [close]);
-
-  // Immersive: screen stays on, system bars away. Leaving any other way still gives Home its mark back.
-  useEffect(() => {
-    const tag = 'houna-starfield';
-    activateKeepAwakeAsync(tag).catch(() => {});
-    NavigationBar.setVisibilityAsync('hidden').catch(() => {});
-    return () => {
-      deactivateKeepAwake(tag).catch(() => {});
-      NavigationBar.setVisibilityAsync('visible').catch(() => {});
-      setHaloHidden(false);
-    };
-  }, [setHaloHidden]);
+  // Screen on, system bars away, Android Back = tapping the moon.
+  useImmersiveScene('houna-starfield', close);
 
   return (
     <View ref={rootRef} collapsable={false} onLayout={onLayout} style={[StyleSheet.absoluteFill, styles.physical]}>
@@ -218,8 +148,13 @@ export default function StarfieldScreen() {
               </Svg>
             </Animated.View>
             <Pressable onPress={close} accessibilityRole="button" accessibilityLabel={t.home.starfield.close}>
-              {/* Exactly Home's Night mark (same colours, strength and clock), minus the ring. */}
-              <MarkHalo accent={nightColors.primary} dusk={nightColors.tones.dusk.fg} glow={nightColors.glow} glowStrength={0.4} showRing={false} />
+              {/* The mark becoming the moon partway through the glide (and back on the way home). */}
+              <MoonDisc form={moonForm} />
+              {/* Exactly Home's Night mark (same colours, strength and clock), minus the ring,
+                  giving way to the moon's own. */}
+              <Animated.View style={[StyleSheet.absoluteFill, { opacity: markFade }]} pointerEvents="none" needsOffscreenAlphaCompositing>
+                <MarkHalo accent={nightColors.primary} dusk={nightColors.tones.dusk.fg} glow={nightColors.glow} glowStrength={0.4} showRing={false} />
+              </Animated.View>
             </Pressable>
           </Animated.View>
 
