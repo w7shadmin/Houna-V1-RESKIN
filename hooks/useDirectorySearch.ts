@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   ALIAS_SOURCES,
   SOURCES,
-  professionalFacts,
+  professionalProfiles,
   professionalsInCountry,
   proxyCountryId,
   tanafasItems,
@@ -13,6 +13,7 @@ import {
   type SourceKey,
 } from '@/lib/directorySearch';
 import { getCountryName } from '@/lib/countries';
+import type { ProfessionalProfile } from '@/lib/searchHighlight';
 
 const SOURCE_KEYS = Object.keys(SOURCES) as SourceKey[];
 
@@ -50,7 +51,7 @@ export function useDirectorySearch(
   /** `${type}:${key}` → the item's name in the other language. */
   const [aliases, setAliases] = useState<Map<string, string>>(new Map());
   /** Professional slug → what their own page says (from the daily server index). */
-  const [facts, setFacts] = useState<Map<string, string[]>>(new Map());
+  const [profiles, setProfiles] = useState<Map<string, ProfessionalProfile>>(new Map());
 
   useEffect(() => {
     if (!enabled) return;
@@ -59,10 +60,10 @@ export function useDirectorySearch(
     setFailed([]);
     setNear(null);
     setAliases(new Map());
-    setFacts(new Map());
+    setProfiles(new Map());
 
     // Alongside the lists: one small file, never holding the search up.
-    professionalFacts(language).then((map) => alive && setFacts(map));
+    professionalProfiles(language).then((map) => alive && setProfiles(map));
 
     const loads = SOURCE_KEYS.map((key) =>
       SOURCES[key](language)
@@ -115,17 +116,17 @@ export function useDirectorySearch(
 
   const items = useMemo(() => {
     const loaded = SOURCE_KEYS.flatMap((k) => bySource[k] ?? []);
-    if (aliases.size === 0 && facts.size === 0) return [...localItems, ...loaded];
+    if (aliases.size === 0 && profiles.size === 0) return [...localItems, ...loaded];
     return [
       ...localItems,
       ...loaded.map((it) => {
         const alias = aliases.get(`${it.type}:${it.key}`);
-        const known = it.type === 'professional' ? facts.get(it.key) : undefined;
-        if (!known && !(alias && alias !== it.title)) return it;
-        return { ...it, ...(alias && alias !== it.title ? { aliases: [alias] } : {}), ...(known ? { facts: known } : {}) };
+        const profile = it.type === 'professional' ? profiles.get(it.key) : undefined;
+        if (!profile && !(alias && alias !== it.title)) return it;
+        return { ...it, ...(alias && alias !== it.title ? { aliases: [alias] } : {}), ...(profile ? { profile } : {}) };
       }),
     ];
-  }, [localItems, bySource, aliases, facts]);
+  }, [localItems, bySource, aliases, profiles]);
   const loading = enabled && Object.keys(bySource).length + failed.length < SOURCE_KEYS.length;
 
   return { items, near, loading, failed };

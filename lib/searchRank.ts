@@ -38,6 +38,22 @@ const ALL_WORDS = 3;
 /** Partial matches (at least half the words) are only added when fewer items than this match them all. */
 const FEW = 5;
 
+/** What a search found, and how. */
+export interface SearchResult<T> {
+  items: T[];
+  /**
+   * The indexed words that matched a query word directly (exactly, as its
+   * start or inside it) or through a corrected spelling: what the results
+   * light up. Normalised (`words()`); meaning-map matches aren't included.
+   */
+  lit: Set<string>;
+  /**
+   * The query as read, when some query word matched nothing as typed and
+   * only through a corrected spelling ("anxeity" → "anxiety"); otherwise null.
+   */
+  corrected: string | null;
+}
+
 interface IndexedField {
   weight: number;
   words: string[];
@@ -80,6 +96,8 @@ const phraseAt = (seq: string[], phrase: string[], at: number) => phrase.every((
 interface Alternatives {
   words: Set<string>;
   phrases: Set<string>;
+  /** A group was reached by the word as typed (or a phrase), not only through a typo. */
+  asTyped: boolean;
 }
 
 /**
@@ -87,17 +105,18 @@ interface Alternatives {
  * of a group's words (or, for longer words, by a typo), or by being part of
  * one of a group's phrases in the query ("low mood", "can't sleep").
  */
-function alternatives(all: string[], tokens: string[]): Alternatives[] {
-  const alts = tokens.map(() => ({ words: new Set<string>(), phrases: new Set<string>() }));
-  const bring = (i: number, c: Concept) => {
+function alternatives(all: string[], tokens: string[], exact = false): Alternatives[] {
+  const alts = tokens.map(() => ({ words: new Set<string>(), phrases: new Set<string>(), asTyped: false }));
+  const bring = (i: number, c: Concept, asTyped = true) => {
+    if (asTyped) alts[i].asTyped = true;
     c.words.forEach((w) => w !== tokens[i] && alts[i].words.add(w));
     c.phrases.forEach((p) => alts[i].phrases.add(p));
   };
   tokens.forEach((t, i) => {
     const forms = wordForms(t);
     for (const c of CONCEPTS) {
-      const hit = c.forms.some((f) => sharesForm(forms, f)) || (t.length >= 5 && c.words.some((w) => w.length >= 5 && editDistance(t, w, 1) <= 1));
-      if (hit) bring(i, c);
+      if (c.forms.some((f) => sharesForm(forms, f))) bring(i, c);
+      else if (!exact && t.length >= 5 && c.words.some((w) => w.length >= 5 && editDistance(t, w, 1) <= 1)) bring(i, c, false);
     }
   });
   for (const c of CONCEPTS) {
@@ -170,13 +189,26 @@ export class SearchIndex<T> {
 
   /** The items matching `query`, best first. */
   search(query: string): T[] {
+    return this.query(query).items;
+  }
+
+  /**
+   * The items matching `query`, best first, with what matched and any
+   * corrected spelling. `exact` turns spelling correction off (the
+   * "Search for … instead" a corrected search offers).
+   */
+  query(query: string, { exact = false }: { exact?: boolean } = {}): SearchResult<T> {
     const all = words(query);
-    if (all.length === 0) return [];
+    if (all.length === 0) return { items: [], lit: new Set(), corrected: null };
     const kept = all.filter((w) => !isStopword(w));
     const tokens = kept.length > 0 ? [...new Set(kept)] : [...new Set(all)];
-    const alts = alternatives(all, tokens);
+    const alts = alternatives(all, tokens, exact);
 
-    // Every indexed word, scored once per query word.
+    // Every indexed word, scored once per query word; noting, per query word, whether anything
+    // matched it as typed or through the meaning map, and its best corrected spelling.
+    const lit = new Set<string>();
+    const asTyped = tokens.map(() => false);
+    const respelt = tokens.map(() => ({ word: '', score: 0 }));
     const scores = tokens.map((t, i) => {
       const qForms = wordForms(t);
       // A complete word the meaning map knows ("sad") isn't also the start of a name (Sadiq).
@@ -185,10 +217,24 @@ export class SearchIndex<T> {
       const map = new Map<string, number>();
       for (const w of this.vocab) {
         const wf = this.forms.get(w)!;
-        let s = matchWord(qForms, w, wf, true, !known);
+        const typed = matchWord(qForms, w, wf, false, !known);
+        let s = typed;
+        if (typed > 0) {
+          lit.add(w);
+          asTyped[i] = true;
+        } else if (!exact) {
+          const typo = matchWord(qForms, w, wf, true, false);
+          if (typo > 0) {
+            s = typo;
+            lit.add(w);
+            if (typo > respelt[i].score) respelt[i] = { word: w, score: typo };
+          }
+        }
         if (s < EXACT) {
           for (const syn of synForms) {
-            s = Math.max(s, matchWord(syn.forms, w, wf, false, syn.prefix) * SYNONYM);
+            const viaMeaning = matchWord(syn.forms, w, wf, false, syn.prefix) * SYNONYM;
+            if (viaMeaning > 0 && alts[i].asTyped) asTyped[i] = true;
+            s = Math.max(s, viaMeaning);
             if (s >= SYNONYM) break;
           }
         }
@@ -242,6 +288,11 @@ export class SearchIndex<T> {
     });
     ranked.sort((a, b) => b.score - a.score || a.title.localeCompare(b.title));
     const complete = ranked.filter((r) => r.all);
-    return (complete.length >= FEW ? complete : ranked).map((r) => r.item);
+    const items = (complete.length >= FEW ? complete : ranked).map((r) => r.item);
+
+    // "Showing results for …": the query with each word that matched only through a corrected spelling replaced.
+    const fixes = new Map(tokens.map((t, i) => [t, !asTyped[i] && respelt[i].word ? respelt[i].word : t]));
+    const corrected = items.length > 0 && tokens.some((t) => fixes.get(t) !== t) ? all.map((w) => fixes.get(w) ?? w).join(' ') : null;
+    return { items, lit, corrected };
   }
 }

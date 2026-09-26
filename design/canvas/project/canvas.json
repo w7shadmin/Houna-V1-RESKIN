@@ -88,6 +88,29 @@
       "x": 2300,
       "y": 4840
     },
+    "DuskPressed.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Houna dusk — pressed logo",
+      "w": 390,
+      "x": 2914,
+      "y": 7200
+    },
+    "DuskScene.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Houna dusk — tap the mark on Home",
+      "w": 390,
+      "x": 7000,
+      "y": 2420
+    },
+    "DuskStory.dc.html": {
+      "h": 1603,
+      "title": "Houna dusk — storyboard & build plan",
+      "w": 1172,
+      "x": 7470,
+      "y": 2420
+    },
     "HomeAr.dc.html": {
       "h": 844,
       "is_interactive": true,
@@ -177,6 +200,27 @@
       "w": 1280,
       "x": 0,
       "y": 6240
+    },
+    "MoonConcepts.dc.html": {
+      "h": 1530,
+      "title": "Houna moon — concepts",
+      "w": 1332,
+      "x": 3464,
+      "y": 7200
+    },
+    "MoonPhases.dc.html": {
+      "h": 1380,
+      "title": "Houna moon — real phases",
+      "w": 1468,
+      "x": 4876,
+      "y": 7200
+    },
+    "PressedLogo.dc.html": {
+      "h": 1720,
+      "title": "Pressed logo — side by side",
+      "w": 1424,
+      "x": 0,
+      "y": 7200
     },
     "Professional.dc.html": {
       "h": 1080,
@@ -282,6 +326,22 @@
       "x": 7000,
       "y": 0
     },
+    "StarfieldPressedSilver.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Houna starfield — pressed logo, silver moon",
+      "w": 390,
+      "x": 1974,
+      "y": 7200
+    },
+    "StarfieldPressedTeal.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Houna starfield — pressed logo, teal moon",
+      "w": 390,
+      "x": 1504,
+      "y": 7200
+    },
     "Sunrise.dc.html": {
       "h": 844,
       "is_interactive": true,
@@ -289,6 +349,29 @@
       "w": 390,
       "x": 7000,
       "y": 4840
+    },
+    "SunriseFromBelow.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Houna sunrise — from below (tap the mark)",
+      "w": 390,
+      "x": 8722,
+      "y": 4840
+    },
+    "SunriseFromBelowStory.dc.html": {
+      "h": 1300,
+      "title": "Houna sunrise — from below, storyboard",
+      "w": 1442,
+      "x": 9192,
+      "y": 4840
+    },
+    "SunrisePressed.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Houna sunrise — pressed logo",
+      "w": 390,
+      "x": 2444,
+      "y": 7200
     },
     "SunriseStory.dc.html": {
       "h": 1378,
@@ -390,88 +473,12 @@
       "x": 5590,
       "y": 4840
     },
-    "DuskScene.dc.html": {
-      "h": 844,
-      "is_interactive": true,
-      "title": "Houna dusk — tap the mark on Home",
-      "w": 390,
-      "x": 7000,
-      "y": 2420
-    },
-    "DuskStory.dc.html": {
-      "h": 1603,
-      "title": "Houna dusk — storyboard & build plan",
-      "w": 1172,
-      "x": 7470,
-      "y": 2420
-    },
-    "PressedLogo.dc.html": {
-      "h": 1720,
-      "title": "Pressed logo — side by side",
-      "w": 1424,
+    "SearchPhase3.dc.html": {
+      "h": 1640,
+      "title": "Directory search — phase 3",
+      "w": 1808,
       "x": 0,
-      "y": 7200
-    },
-    "StarfieldPressedTeal.dc.html": {
-      "h": 844,
-      "is_interactive": true,
-      "title": "Houna starfield — pressed logo, teal moon",
-      "w": 390,
-      "x": 1504,
-      "y": 7200
-    },
-    "StarfieldPressedSilver.dc.html": {
-      "h": 844,
-      "is_interactive": true,
-      "title": "Houna starfield — pressed logo, silver moon",
-      "w": 390,
-      "x": 1974,
-      "y": 7200
-    },
-    "SunrisePressed.dc.html": {
-      "h": 844,
-      "is_interactive": true,
-      "title": "Houna sunrise — pressed logo",
-      "w": 390,
-      "x": 2444,
-      "y": 7200
-    },
-    "DuskPressed.dc.html": {
-      "h": 844,
-      "is_interactive": true,
-      "title": "Houna dusk — pressed logo",
-      "w": 390,
-      "x": 2914,
-      "y": 7200
-    },
-    "MoonConcepts.dc.html": {
-      "h": 1530,
-      "title": "Houna moon — concepts",
-      "w": 1332,
-      "x": 3464,
-      "y": 7200
-    },
-    "MoonPhases.dc.html": {
-      "h": 1380,
-      "title": "Houna moon — real phases",
-      "w": 1468,
-      "x": 4876,
-      "y": 7200
-    },
-    "SunriseFromBelow.dc.html": {
-      "h": 844,
-      "is_interactive": true,
-      "title": "Houna sunrise — from below (tap the mark)",
-      "w": 390,
-      "x": 8722,
-      "y": 4840
-    },
-    "SunriseFromBelowStory.dc.html": {
-      "h": 1300,
-      "title": "Houna sunrise — from below, storyboard",
-      "w": 1442,
-      "x": 9192,
-      "y": 4840
+      "y": 9500
     }
   },
   "createdOnFiles": {
@@ -509,7 +516,7 @@
     },
     "titleMorning": {
       "kind": "title1",
-      "maxW": 10634,
+      "maxW": 8000,
       "text": "Houna — Sunrise",
       "w": 240,
       "x": 0,
@@ -522,6 +529,14 @@
       "w": 240,
       "x": 0,
       "y": 6900
+    },
+    "titleSearch": {
+      "kind": "title1",
+      "maxW": 1808,
+      "text": "Houna — Directory search",
+      "w": 240,
+      "x": 0,
+      "y": 9200
     }
   },
   "order": [
@@ -585,7 +600,8 @@
     "MoonConcepts.dc.html",
     "MoonPhases.dc.html",
     "SunriseFromBelow.dc.html",
-    "SunriseFromBelowStory.dc.html"
+    "SunriseFromBelowStory.dc.html",
+    "SearchPhase3.dc.html"
   ],
   "pages": [],
   "title": "Houna Redesign"

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View, type StyleProp, type TextStyle } from 'react-native';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { Building2, HeartPulse, type LucideIcon } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -7,13 +7,44 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { radius } from '@/constants/theme';
 import { resolveImageUrl } from '@/lib/hounaApi';
 import type { SearchItem } from '@/lib/directorySearch';
+import { pieces } from '@/lib/searchHighlight';
 import Card from '@/components/ui/Card';
 import CanvasIcon from '@/components/ui/CanvasIcon';
 import Button from '@/components/ui/Button';
 import IconTile from '@/components/ui/IconTile';
 import LottieTopicIcon from '@/components/directory/LottieTopicIcon';
 
-/* Values below are the canvas "Directory search" artboard's. */
+/* Values below are the canvas "Directory search" artboard's (phase 3: "Directory search — phase 3"). */
+
+const NONE: ReadonlySet<string> = new Set();
+
+/** Text with the search's matched words (`lit`, from `SearchResult.lit`) in the accent. */
+export function LitText({
+  text,
+  lit = NONE,
+  style,
+  numberOfLines,
+}: {
+  text: string;
+  lit?: ReadonlySet<string>;
+  style?: StyleProp<TextStyle>;
+  numberOfLines?: number;
+}) {
+  const { colors } = useTheme();
+  return (
+    <Text numberOfLines={numberOfLines} style={style}>
+      {pieces(text, lit).map((p, i) =>
+        p.lit ? (
+          <Text key={i} style={{ color: colors.primary }}>
+            {p.text}
+          </Text>
+        ) : (
+          p.text
+        ),
+      )}
+    </Text>
+  );
+}
 
 /** Section header: tracked label, optional "See all" / "Show less" link. */
 export function SectionHeader({
@@ -53,10 +84,12 @@ export function TopicResultCard({
   item,
   learnMore,
   onPress,
+  lit,
 }: {
   item: SearchItem;
   learnMore: string;
   onPress: () => void;
+  lit?: ReadonlySet<string>;
 }) {
   const { colors } = useTheme();
   const { fonts, isRTL } = useLanguage();
@@ -86,9 +119,11 @@ export function TopicResultCard({
       </View>
       <View style={styles.topicBody}>
         <View style={styles.flex}>
-          <Text style={[styles.topicTitle, isRTL && styles.topicTitleArabic, { color: colors.text, fontFamily: fonts.display }]}>
-            {item.title}
-          </Text>
+          <LitText
+            text={item.title}
+            lit={lit}
+            style={[styles.topicTitle, isRTL && styles.topicTitleArabic, { color: colors.text, fontFamily: fonts.display }]}
+          />
           <Text style={[styles.topicDesc, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{item.subtitle}</Text>
         </View>
         <Text style={[styles.learnMore, { color: colors.primary, fontFamily: fonts.medium }]}>{learnMore}</Text>
@@ -108,7 +143,21 @@ function initials(name: string): string {
 }
 
 /** Article / professional / podcast / organization / wellness / event / speaker / Tanafas row. */
-export function ResultRow({ item, meta, onPress }: { item: SearchItem; meta?: string; onPress: () => void }) {
+export function ResultRow({
+  item,
+  meta,
+  onPress,
+  lit,
+  why,
+}: {
+  item: SearchItem;
+  meta?: string;
+  onPress: () => void;
+  /** The search's matched words, lit in the title and the why line. */
+  lit?: ReadonlySet<string>;
+  /** People: why they came up (`whyLine`: the matched specialty, location, languages). */
+  why?: string;
+}) {
   const { colors } = useTheme();
   const { fonts } = useLanguage();
   const image = resolveImageUrl(item.imageUrl);
@@ -145,18 +194,23 @@ export function ResultRow({ item, meta, onPress }: { item: SearchItem; meta?: st
     <Card onPress={onPress} accessibilityLabel={item.title} style={styles.row}>
       {media}
       <View style={styles.rowText}>
-        <Text
+        <LitText
+          text={item.title}
+          lit={lit}
           numberOfLines={2}
           style={[styles.rowTitle, isPerson && styles.rowTitlePerson, { color: colors.text, fontFamily: fonts.semiBold }]}
-        >
-          {item.title}
-        </Text>
+        />
         {isPerson ? (
-          !!item.subtitle && (
-            <Text numberOfLines={1} style={[styles.rowRole, { color: colors.primary, fontFamily: fonts.medium }]}>
-              {item.subtitle}
-            </Text>
-          )
+          <>
+            {!!item.subtitle && (
+              <Text numberOfLines={1} style={[styles.rowRole, { color: colors.primary, fontFamily: fonts.medium }]}>
+                {item.subtitle}
+              </Text>
+            )}
+            {!!why && (
+              <LitText text={why} lit={lit} numberOfLines={1} style={[styles.rowWhy, { color: colors.textTertiary, fontFamily: fonts.regular }]} />
+            )}
+          </>
         ) : (
           !!meta && (
             <Text
@@ -339,6 +393,10 @@ const styles = StyleSheet.create({
   },
   rowRole: {
     fontSize: 13.5,
+  },
+  rowWhy: {
+    fontSize: 12.5,
+    lineHeight: 12.5 * 1.4,
   },
   rowMetaLatin: {
     fontSize: 10.5,

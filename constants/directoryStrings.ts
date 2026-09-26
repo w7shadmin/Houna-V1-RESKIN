@@ -26,6 +26,7 @@ export const directoryStrings = {
         professionals: 'Professionals',
         podcasts: 'Podcasts',
         events: 'Events',
+        places: 'Places',
       },
       sections: {
         topic: 'Topic',
@@ -38,6 +39,12 @@ export const directoryStrings = {
       },
       // Tanafas in the results: how a scene is named, and the words each kind is also found by.
       meditateTitle: '{name} meditation',
+      // Before typing, and when nothing matched.
+      tryTopic: 'Try a topic',
+      breatheNow: 'Breathe now',
+      // A corrected spelling: "{word}" is lit.
+      showingFor: 'Showing results for {word}',
+      searchInstead: 'Search for {q} instead',
       kindWords: { breathe: 'breathing exercise', meditate: 'meditation' },
       seeAll: 'See all',
       showLess: 'Show less',
@@ -48,7 +55,7 @@ export const directoryStrings = {
       wellnessCount: { one: '{n} wellness center', few: '{n} wellness centers' },
       matching: 'matching “{q}”',
       noResults: 'Nothing matched “{q}”.',
-      noResultsHint: 'Try another word, or browse the directory below.',
+      noResultsHint: 'Try another word, one of these topics, or browse the directory.',
       loading: 'Searching…',
       partialError: "Some results couldn't load.",
       crisis: "If you're struggling right now, talk to someone today.",
@@ -198,6 +205,7 @@ export const directoryStrings = {
         professionals: 'المختصون',
         podcasts: 'البودكاست',
         events: 'الفعاليات',
+        places: 'الأماكن',
       },
       sections: {
         topic: 'موضوع',
@@ -209,6 +217,10 @@ export const directoryStrings = {
         events: 'الفعاليات والمتحدثون',
       },
       meditateTitle: 'تأمّل {name}',
+      tryTopic: 'جرّب موضوعاً',
+      breatheNow: 'تنفّس الآن',
+      showingFor: 'نتائج البحث عن {word}',
+      searchInstead: 'ابحث عن «{q}» بدلاً من ذلك',
       kindWords: { breathe: 'تمرين تنفس', meditate: 'تأمل' },
       seeAll: 'عرض الكل',
       showLess: 'عرض أقل',
@@ -219,7 +231,7 @@ export const directoryStrings = {
       wellnessCount: { one: 'مركز عافية واحد', two: 'مركزا عافية', few: '{n} مراكز عافية', many: '{n} مركز عافية' },
       matching: 'تطابق «{q}»',
       noResults: 'لا توجد نتائج لـ«{q}».',
-      noResultsHint: 'جرّب كلمة أخرى، أو تصفّح الدليل أدناه.',
+      noResultsHint: 'جرّب كلمة أخرى، أو أحد هذه المواضيع، أو تصفّح الدليل.',
       loading: 'جارٍ البحث…',
       partialError: 'تعذّر تحميل بعض النتائج.',
       crisis: 'إن كنت تمرّ بوقت صعب الآن، تحدّث إلى أحدٍ اليوم.',

@@ -360,7 +360,14 @@ edge: a full build is ~5 min) and serves one file per language, rebuilt daily
 into `houna_cache`. `supabase/functions/houna-proxy` is the proxy's source,
 recovered from the old MVP (the dashboard can't export it); deploying it
 replaces the live proxy, so test it side by side first. Both are Deno, so
-`tsconfig.json` excludes `supabase/functions`. A search
+`tsconfig.json` excludes `supabase/functions`. The screen (canvas "Directory
+search — phase 3"): `SearchIndex.query` returns what matched (`lit`, lit in
+titles by `LitText`) and a corrected spelling ("Showing results for …", with
+an exact-search way back); professionals show `whyLine` (the matched
+specialty first, then location and languages; `lib/searchHighlight.ts`);
+chips count each kind and hide empty ones, Places included; suggestions show
+once the box is tapped and when nothing matched. No recent searches: decided,
+for privacy on shared phones. A search
 that sounds like a crisis (`lib/crisisIntent.ts`, draft word lists awaiting
 clinical review) puts a crisis card first. **Proxy gotcha**: `/therapists`'
 `lastPage` is always the current page + 1, never the real last page, so

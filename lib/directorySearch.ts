@@ -14,6 +14,7 @@ import {
 import { getCountry } from './countries';
 import { normalizeForSearch } from './searchText';
 import { SearchIndex } from './searchRank';
+import type { ProfessionalProfile } from './searchHighlight';
 
 /**
  * Unified directory search, phase 1 (FEATURES_BRIEF §3): everything is
@@ -39,8 +40,8 @@ export interface SearchItem {
   extra: string[];
   /** The same item's name in the other language (a professional's Arabic and Latin names), searched like the title. */
   aliases?: string[];
-  /** Professionals: what their own page says (location, languages, who they work with, specialties). */
-  facts?: string[];
+  /** Professionals: what their own page says (location, languages, who they work with, specialties), searched and shown. */
+  profile?: ProfessionalProfile;
   /** Tanafas items: the exercise's tone. */
   tone?: 'glow' | 'dawn' | 'dusk' | 'bloom';
 }
@@ -82,7 +83,7 @@ export function buildSearchIndex(items: SearchItem[]): SearchIndex<SearchItem> {
       title: it.title,
       fields: [
         { text: [it.title, ...(it.aliases ?? [])].join(' \n '), weight: 3 },
-        { text: [it.subtitle, ...(it.facts ?? [])].join(' \n '), weight: 2 },
+        { text: [it.subtitle, ...(it.profile ? [...Object.values(it.profile.info), it.profile.specialties ?? ''] : [])].join(' \n '), weight: 2 },
         { text: it.extra.join(' \n '), weight: 1 },
       ],
     })),
@@ -217,15 +218,15 @@ export const SOURCES: Record<SourceKey, (lang: Lang) => Promise<SearchItem[] | P
 };
 
 /**
- * Each professional's facts by slug, from the daily server index: kept like
+ * Each professional's profile by slug, from the daily server index: kept like
  * the lists, and an empty map while the first build runs or if it fails, so
  * search never waits on it.
  */
-export function professionalFacts(lang: Lang): Promise<Map<string, string[]>> {
-  return kept(`professional-facts:${lang}`, async () => {
+export function professionalProfiles(lang: Lang): Promise<Map<string, ProfessionalProfile>> {
+  return kept(`professional-profiles:${lang}`, async () => {
     const index = await fetchSearchIndex(lang);
     if (!index) throw new Error('The search index is still being built');
-    return index.professionals.map((p) => [p.slug, [...Object.values(p.info), ...(p.specialties ? [p.specialties] : [])]] as [string, string[]]);
+    return index.professionals.map((p) => [p.slug, { info: p.info, specialties: p.specialties }] as [string, ProfessionalProfile]);
   })
     .then((entries) => new Map(entries))
     .catch(() => new Map());

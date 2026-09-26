@@ -13,7 +13,8 @@ import { BREATHE_ORDER, BREATHE_TONE } from '@/constants/breathPatterns';
 import { MEDITATION_SCENES } from '@/components/meditation/scenes';
 import { EXERCISE_TEXT } from '@/components/tanafas/BreathePlayers';
 import { safeUrl } from '@/lib/hounaApi';
-import { buildSearchIndex, type LocalExercise, type SearchItem } from '@/lib/directorySearch';
+import { buildSearchIndex, tanafasItems, type LocalExercise, type SearchItem } from '@/lib/directorySearch';
+import { whyLine } from '@/lib/searchHighlight';
 import { isCrisisQuery } from '@/lib/crisisIntent';
 import { useDirectorySearch, type LocalContent } from '@/hooks/useDirectorySearch';
 import Card from '@/components/ui/Card';
@@ -23,6 +24,7 @@ import CanvasIcon, { DirectionalIcon } from '@/components/ui/CanvasIcon';
 import {
   CrisisCard,
   CrisisRow,
+  LitText,
   PlaceCountCard,
   ResultRow,
   SectionHeader,
@@ -36,8 +38,11 @@ import {
  */
 const WEB_NO_OUTLINE = Platform.OS === 'web' ? ({ outlineStyle: 'none' } as unknown as TextStyle) : null;
 
-type Filter = 'all' | 'topics' | 'tanafas' | 'articles' | 'professionals' | 'podcasts' | 'events';
-const FILTERS: Filter[] = ['all', 'topics', 'tanafas', 'articles', 'professionals', 'podcasts', 'events'];
+type Filter = 'all' | 'topics' | 'tanafas' | 'articles' | 'professionals' | 'places' | 'podcasts' | 'events';
+const FILTERS: Filter[] = ['all', 'topics', 'tanafas', 'articles', 'professionals', 'places', 'podcasts', 'events'];
+
+/** The topics offered before typing and when nothing matched (slugs of `t.home.resourcesRail.topics`). */
+const SUGGESTED_TOPICS = ['anxiety', 'depression', 'attention-deficit-hyperactivity-adhd', 'autism', 'eating-disorders', 'abuse'];
 
 /** How many of each group "All" shows before "See all" (canvas; Tanafas and events added after). */
 const PREVIEW = { topics: 1, tanafas: 2, articles: 2, professionals: 2, podcasts: 1, events: 2, places: 0 } as const;
@@ -58,11 +63,15 @@ interface HubRow {
 }
 
 /**
- * Directory hub = unified search (canvas "Directory search"). With no query
- * it shows the category rows (the hub the subpages' back buttons
- * `router.replace` to — CLAUDE.md's hub-first navigation); typing shows
- * results grouped Topic → Articles → Professionals → Podcasts →
- * Organizations & wellness centers, always closed by a crisis line.
+ * Directory hub = unified search (canvas "Directory search", and "Directory
+ * search — phase 3"). With no query it shows the category rows (the hub the
+ * subpages' back buttons `router.replace` to — CLAUDE.md's hub-first
+ * navigation), with a few topics and an exercise to try once the box has been
+ * tapped. Typing shows results grouped Topic → Tanafas → Articles →
+ * Professionals → Podcasts → Events → Places, the matched words lit and each
+ * professional's reason for coming up, chips counting each kind, and a
+ * corrected spelling said out loud; always closed by a crisis line. Nothing
+ * anyone searched for is kept (no recent searches, by decision).
  */
 export default function DirectoryHubScreen() {
   const { colors } = useTheme();
@@ -78,6 +87,8 @@ export default function DirectoryHubScreen() {
   const [armed, setArmed] = useState(false);
   const [focused, setFocused] = useState(false);
   const [filter, setFilter] = useState<Filter>('all');
+  /** "Search for … instead": this query, searched exactly as typed (no spelling correction). */
+  const [exactFor, setExactFor] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Partial<Record<Group | 'organizations' | 'wellness', boolean>>>({});
 
   // The app's own content in the results: the topics, and Tanafas' exercises and scenes.
@@ -109,7 +120,8 @@ export default function DirectoryHubScreen() {
   const searchIndex = useMemo(() => buildSearchIndex(index.items), [index.items]);
 
   const groups = useMemo(() => {
-    const hits = searchIndex.search(debounced);
+    const result = searchIndex.query(debounced, { exact: exactFor === debounced });
+    const hits = result.items;
     const of = (type: SearchItem['type']) => hits.filter((h) => h.type === type);
     let professionals = of('professional');
     if (index.near) {
@@ -126,8 +138,33 @@ export default function DirectoryHubScreen() {
       wellness: of('wellness'),
       events: hits.filter((h) => h.type === 'event' || h.type === 'speaker'),
       total: hits.length,
+      lit: result.lit,
+      corrected: result.corrected,
     };
-  }, [searchIndex, index.near, debounced]);
+  }, [searchIndex, index.near, debounced, exactFor]);
+
+  /** How many of each kind matched, for the chips (kinds with none are hidden). */
+  const counts: Record<Filter, number> = {
+    all: groups.total,
+    topics: groups.topics.length,
+    tanafas: groups.tanafas.length,
+    articles: groups.articles.length,
+    professionals: groups.professionals.length,
+    places: groups.organizations.length + groups.wellness.length,
+    podcasts: groups.podcasts.length,
+    events: groups.events.length,
+  };
+
+  // Before typing (and when nothing matched): a few topics, and one exercise.
+  const suggestions = useMemo(
+    () => SUGGESTED_TOPICS.map((slug) => t.home.resourcesRail.topics.find((tp) => tp.slug === slug)).filter((tp) => !!tp),
+    [t],
+  );
+  const breatheNow = useMemo(() => tanafasItems(local.exercises.slice(0, 1), local.kindWords)[0], [local]);
+  const suggest = (label: string) => {
+    setArmed(true);
+    setQuery(label);
+  };
 
   /** A search that sounds like someone in crisis puts the crisis card first. */
   const crisis = useMemo(() => isCrisisQuery(debounced), [debounced]);
@@ -210,6 +247,15 @@ export default function DirectoryHubScreen() {
   );
 
   const show = (f: Filter) => filter === 'all' || filter === f;
+  const chipLabel = (f: Filter) => `${f === 'tanafas' ? t.tabs.tanafas : s.filters[f]} ${num(counts[f])}`;
+  const [showingBefore, showingAfter = ''] = s.showingFor.split('{word}');
+  const topicChips = (list: typeof suggestions) => (
+    <View style={styles.suggestions}>
+      {list.map((tp) => (
+        <Chip key={tp.slug} label={tp.label} onPress={() => suggest(tp.label)} />
+      ))}
+    </View>
+  );
   const q = debounced.trim();
   const labelLatin = fonts.labelTracked;
 
@@ -280,9 +326,40 @@ export default function DirectoryHubScreen() {
         </View>
 
         {!searching ? (
-          browse
+          <>
+            {armed && (
+              <>
+                <View style={styles.section}>
+                  <SectionHeader label={s.tryTopic} />
+                  {topicChips(suggestions)}
+                </View>
+                {breatheNow && (
+                  <View style={styles.section}>
+                    <SectionHeader label={s.breatheNow} />
+                    <ResultRow item={breatheNow} meta={breatheNow.subtitle} onPress={() => open(breatheNow)} />
+                  </View>
+                )}
+              </>
+            )}
+            {browse}
+          </>
         ) : (
           <>
+            {groups.corrected && (
+              <View style={styles.corrected}>
+                <Text style={[styles.correctedText, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
+                  {showingBefore}
+                  <Text style={{ color: colors.primary, fontFamily: fonts.semiBold }}>{groups.corrected}</Text>
+                  {showingAfter}
+                </Text>
+                <Pressable onPress={() => setExactFor(debounced)} accessibilityRole="button" hitSlop={8}>
+                  <Text style={[styles.instead, { color: colors.textTertiary, fontFamily: fonts.regular }]}>
+                    {s.searchInstead.replace('{q}', q)}
+                  </Text>
+                </Pressable>
+              </View>
+            )}
+
             {crisis && (
               <CrisisCard
                 title={s.crisisCard.title}
@@ -292,17 +369,19 @@ export default function DirectoryHubScreen() {
               />
             )}
 
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              accessibilityRole="tablist"
-              accessibilityLabel={s.filtersLabel}
-              contentContainerStyle={styles.filters}
-            >
-              {FILTERS.map((f) => (
-                <Chip key={f} size="sm" label={f === 'tanafas' ? t.tabs.tanafas : s.filters[f]} selected={filter === f} onPress={() => setFilter(f)} />
-              ))}
-            </ScrollView>
+            {groups.total > 0 && (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                accessibilityRole="tablist"
+                accessibilityLabel={s.filtersLabel}
+                contentContainerStyle={styles.filters}
+              >
+                {FILTERS.filter((f) => f === 'all' || f === filter || counts[f] > 0).map((f) => (
+                  <Chip key={f} size="sm" label={chipLabel(f)} selected={filter === f} onPress={() => setFilter(f)} />
+                ))}
+              </ScrollView>
+            )}
 
             {show('topics') && groups.topics.length > 0 && (
               <View style={styles.section}>
@@ -312,7 +391,7 @@ export default function DirectoryHubScreen() {
                   onAction={() => toggle('topics')}
                 />
                 {shown('topics', groups.topics).map((item) => (
-                  <TopicResultCard key={item.key} item={item} learnMore={s.learnMore} onPress={() => open(item)} />
+                  <TopicResultCard key={item.key} item={item} learnMore={s.learnMore} lit={groups.lit} onPress={() => open(item)} />
                 ))}
               </View>
             )}
@@ -325,7 +404,7 @@ export default function DirectoryHubScreen() {
                   onAction={() => toggle('tanafas')}
                 />
                 {shown('tanafas', groups.tanafas).map((item) => (
-                  <ResultRow key={item.key} item={item} meta={metaFor(item)} onPress={() => open(item)} />
+                  <ResultRow key={item.key} item={item} meta={metaFor(item)} lit={groups.lit} onPress={() => open(item)} />
                 ))}
               </View>
             )}
@@ -338,7 +417,7 @@ export default function DirectoryHubScreen() {
                   onAction={() => toggle('articles')}
                 />
                 {shown('articles', groups.articles).map((item) => (
-                  <ResultRow key={item.key} item={item} meta={metaFor(item)} onPress={() => open(item)} />
+                  <ResultRow key={item.key} item={item} meta={metaFor(item)} lit={groups.lit} onPress={() => open(item)} />
                 ))}
               </View>
             )}
@@ -355,7 +434,7 @@ export default function DirectoryHubScreen() {
                   onAction={() => toggle('professionals')}
                 />
                 {shown('professionals', groups.professionals).map((item) => (
-                  <ResultRow key={item.key} item={item} onPress={() => open(item)} />
+                  <ResultRow key={item.key} item={item} lit={groups.lit} why={whyLine(item.profile, groups.lit)} onPress={() => open(item)} />
                 ))}
               </View>
             )}
@@ -368,7 +447,7 @@ export default function DirectoryHubScreen() {
                   onAction={() => toggle('podcasts')}
                 />
                 {shown('podcasts', groups.podcasts).map((item) => (
-                  <ResultRow key={item.key} item={item} meta={metaFor(item)} onPress={() => open(item)} />
+                  <ResultRow key={item.key} item={item} meta={metaFor(item)} lit={groups.lit} onPress={() => open(item)} />
                 ))}
               </View>
             )}
@@ -381,7 +460,7 @@ export default function DirectoryHubScreen() {
                   onAction={() => toggle('events')}
                 />
                 {shown('events', groups.events).map((item) => (
-                  <ResultRow key={`${item.type}:${item.key}`} item={item} meta={metaFor(item)} onPress={() => open(item)} />
+                  <ResultRow key={`${item.type}:${item.key}`} item={item} meta={metaFor(item)} lit={groups.lit} onPress={() => open(item)} />
                 ))}
               </View>
             )}
@@ -408,9 +487,19 @@ export default function DirectoryHubScreen() {
                   )}
                 </View>
                 {expanded.organizations &&
-                  groups.organizations.map((item) => <ResultRow key={item.key} item={item} onPress={() => open(item)} />)}
+                  groups.organizations.map((item) => <ResultRow key={item.key} item={item} lit={groups.lit} onPress={() => open(item)} />)}
                 {expanded.wellness &&
-                  groups.wellness.map((item) => <ResultRow key={item.key} item={item} onPress={() => open(item)} />)}
+                  groups.wellness.map((item) => <ResultRow key={item.key} item={item} lit={groups.lit} onPress={() => open(item)} />)}
+              </View>
+            )}
+
+            {/* The Places chip: organizations and wellness centers, in full. */}
+            {filter === 'places' && counts.places > 0 && (
+              <View style={styles.section}>
+                <SectionHeader label={s.sections.places} />
+                {[...groups.organizations, ...groups.wellness].map((item) => (
+                  <ResultRow key={`${item.type}:${item.key}`} item={item} lit={groups.lit} onPress={() => open(item)} />
+                ))}
               </View>
             )}
 
@@ -427,6 +516,7 @@ export default function DirectoryHubScreen() {
                   {s.noResults.replace('{q}', q)}
                 </Text>
                 <Text style={[styles.emptyHint, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{s.noResultsHint}</Text>
+                {topicChips(suggestions.slice(0, 3))}
               </View>
             )}
 
@@ -492,6 +582,22 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  suggestions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  corrected: {
+    gap: 2,
+    marginTop: -4,
+  },
+  correctedText: {
+    fontSize: 14.5,
+  },
+  instead: {
+    fontSize: 13.5,
+    textDecorationLine: 'underline',
   },
   filters: {
     gap: 8,
