@@ -65,7 +65,8 @@ export default function BreathePlayer(props: PlayerProps) {
   }
 }
 
-const EXERCISE_TEXT = {
+/** Each exercise's text in `t.tanafas.exercises` (also used by the directory search). */
+export const EXERCISE_TEXT = {
   'anxiety-relief': 'anxietyRelief',
   'steady-mind': 'steadyMind',
   'panic-relief': 'panicRelief',

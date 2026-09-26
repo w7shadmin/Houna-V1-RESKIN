@@ -1,7 +1,11 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   fetchArticles,
+  fetchEvents,
   fetchOrganizations,
   fetchPodcasts,
+  fetchSearchIndex,
+  fetchSpeakers,
   fetchTherapists,
   fetchWellnessCenters,
   type CountryOption,
@@ -20,11 +24,11 @@ import { SearchIndex } from './searchRank';
  * houna-proxy) needs that Edge Function's source, which isn't in this repo.
  */
 
-export type SearchType = 'topic' | 'article' | 'professional' | 'podcast' | 'organization' | 'wellness';
+export type SearchType = 'topic' | 'tanafas' | 'article' | 'professional' | 'podcast' | 'organization' | 'wellness' | 'event' | 'speaker';
 
 export interface SearchItem {
   type: SearchType;
-  /** Route param (slug/id) or, for articles/podcasts, the external URL. */
+  /** Route param (slug/id); for articles/podcasts, the external URL; for Tanafas, "breathe:<exercise>" / "meditate:<scene>". */
   key: string;
   title: string;
   subtitle: string;
@@ -33,6 +37,12 @@ export interface SearchItem {
   source?: string;
   /** What's searched: the title, the subtitle, then anything else (summary, services…). */
   extra: string[];
+  /** The same item's name in the other language (a professional's Arabic and Latin names), searched like the title. */
+  aliases?: string[];
+  /** Professionals: what their own page says (location, languages, who they work with, specialties). */
+  facts?: string[];
+  /** Tanafas items: the exercise's tone. */
+  tone?: 'glow' | 'dawn' | 'dusk' | 'bloom';
 }
 
 export interface LocalTopic {
@@ -71,33 +81,75 @@ export function buildSearchIndex(items: SearchItem[]): SearchIndex<SearchItem> {
       item: it,
       title: it.title,
       fields: [
-        { text: it.title, weight: 3 },
-        { text: it.subtitle, weight: 2 },
+        { text: [it.title, ...(it.aliases ?? [])].join(' \n '), weight: 3 },
+        { text: [it.subtitle, ...(it.facts ?? [])].join(' \n '), weight: 2 },
         { text: it.extra.join(' \n '), weight: 1 },
       ],
     })),
   );
 }
 
-/* ──────────────── Sources (cached per language) ──────────────── */
+/* ──────────────── Sources (kept on the phone, per language) ──────────────── */
 
-export type SourceKey = 'articles' | 'podcasts' | 'professionals' | 'organizations' | 'wellness';
+export type SourceKey = 'articles' | 'podcasts' | 'professionals' | 'organizations' | 'wellness' | 'events' | 'speakers';
 
 interface ProfessionalsResult {
   items: SearchItem[];
   countries: CountryOption[];
 }
 
-const cache = new Map<string, Promise<unknown>>();
+/** Bump when a saved list's shape changes, so old copies are ignored. */
+const STORE_VERSION = 1;
+/** A saved list this recent is used as is; an older one is used while a fresh one loads for next time. */
+const FRESH_MS = 24 * 60 * 60 * 1000;
+/** A saved list older than this isn't shown at all: the search waits for a fresh one. */
+const STALE_MS = 14 * 24 * 60 * 60 * 1000;
 
-function cached<T>(key: string, load: () => Promise<T>): Promise<T> {
-  let p = cache.get(key) as Promise<T> | undefined;
-  if (!p) {
-    p = load();
-    // A failed load shouldn't be cached for the rest of the session.
-    p.catch(() => cache.delete(key));
-    cache.set(key, p);
+const memory = new Map<string, Promise<unknown>>();
+
+async function readSaved<T>(key: string): Promise<{ at: number; data: T } | null> {
+  try {
+    const raw = await AsyncStorage.getItem(`directory-search:v${STORE_VERSION}:${key}`);
+    return raw ? (JSON.parse(raw) as { at: number; data: T }) : null;
+  } catch {
+    return null;
   }
+}
+
+function save<T>(key: string, data: T) {
+  AsyncStorage.setItem(`directory-search:v${STORE_VERSION}:${key}`, JSON.stringify({ at: Date.now(), data })).catch(() => {});
+}
+
+/**
+ * One list, loaded once per session and kept on the phone between sessions,
+ * so a search after the first is instant: a copy under a day old is used as
+ * is; an older one (up to two weeks) is used while a fresh one loads in the
+ * background for next time; anything older, or none, waits for the network.
+ * These are public directory lists, never what anyone searched for.
+ */
+function kept<T>(key: string, load: () => Promise<T>): Promise<T> {
+  let p = memory.get(key) as Promise<T> | undefined;
+  if (p) return p;
+  const fetchAndSave = () =>
+    load().then((data) => {
+      save(key, data);
+      return data;
+    });
+  p = readSaved<T>(key).then((saved) => {
+    const age = saved ? Date.now() - saved.at : Infinity;
+    if (saved && age < STALE_MS) {
+      if (age > FRESH_MS) {
+        fetchAndSave()
+          .then((data) => memory.set(key, Promise.resolve(data)))
+          .catch(() => {});
+      }
+      return saved.data;
+    }
+    return fetchAndSave();
+  });
+  // A failed load shouldn't be remembered for the rest of the session.
+  p.catch(() => memory.delete(key));
+  memory.set(key, p);
   return p;
 }
 
@@ -125,38 +177,84 @@ const professionalItem = (p: Therapist) => item('professional', p.slug, p.name, 
 
 export const SOURCES: Record<SourceKey, (lang: Lang) => Promise<SearchItem[] | ProfessionalsResult>> = {
   articles: (lang) =>
-    cached(`articles:${lang}`, async () =>
+    kept(`articles:${lang}`, async () =>
       (await fetchArticles(lang)).articles.map((a) =>
         item('article', a.url, a.title, a.blurb, a.imageUrl, [], a.sourceDomain),
       ),
     ),
   podcasts: (lang) =>
-    cached(`podcasts:${lang}`, async () =>
+    kept(`podcasts:${lang}`, async () =>
       (await fetchPodcasts(lang)).podcasts.map((p) =>
         item('podcast', p.url, p.title, p.host, p.imageUrl, [p.description], p.sourceDomain),
       ),
     ),
   professionals: (lang) =>
-    cached(`professionals:${lang}`, async () => {
+    kept(`professionals:${lang}`, async () => {
       const { therapists, countries } = await allTherapists(lang);
       return { items: therapists.map(professionalItem), countries };
     }),
   organizations: (lang) =>
-    cached(`organizations:${lang}`, async () =>
+    kept(`organizations:${lang}`, async () =>
       (await fetchOrganizations(undefined, lang)).organizations.map((o) =>
         item('organization', o.id, o.name, o.summary, o.imageUrl),
       ),
     ),
   wellness: (lang) =>
-    cached(`wellness:${lang}`, async () =>
+    kept(`wellness:${lang}`, async () =>
       (await fetchWellnessCenters(undefined, lang)).centers.map((c) =>
         item('wellness', c.id, c.name, c.summary, c.imageUrl, c.services),
       ),
     ),
+  // The subtitle is the site's raw date; the results format it (lib/eventDate.ts).
+  events: (lang) =>
+    kept(`events:${lang}`, async () =>
+      (await fetchEvents(lang)).events.map((e) => item('event', e.slug, e.title, e.date, e.imageUrl, [e.description])),
+    ),
+  speakers: (lang) =>
+    kept(`speakers:${lang}`, async () =>
+      (await fetchSpeakers(lang)).speakers.map((s) => item('speaker', s.slug, s.name, s.role, s.imageUrl, [s.bio])),
+    ),
 };
+
+/**
+ * Each professional's facts by slug, from the daily server index: kept like
+ * the lists, and an empty map while the first build runs or if it fails, so
+ * search never waits on it.
+ */
+export function professionalFacts(lang: Lang): Promise<Map<string, string[]>> {
+  return kept(`professional-facts:${lang}`, async () => {
+    const index = await fetchSearchIndex(lang);
+    if (!index) throw new Error('The search index is still being built');
+    return index.professionals.map((p) => [p.slug, [...Object.values(p.info), ...(p.specialties ? [p.specialties] : [])]] as [string, string[]]);
+  })
+    .then((entries) => new Map(entries))
+    .catch(() => new Map());
+}
+
+/** The sources whose items keep the same key in both languages, so each can borrow the other's names. */
+export const ALIAS_SOURCES: readonly SourceKey[] = ['professionals', 'organizations', 'wellness', 'speakers'];
 
 export function topicItems(topics: readonly LocalTopic[]): SearchItem[] {
   return topics.map((t) => item('topic', t.slug, t.label, t.description, null));
+}
+
+/** A Tanafas breathing exercise or meditation scene, as the search sees it. */
+export interface LocalExercise {
+  kind: 'breathe' | 'meditate';
+  /** The exercise key (BREATHE_ORDER) or scene id. */
+  id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  tone: SearchItem['tone'];
+}
+
+/** Tanafas' exercises and scenes: the kind's own word ("Breathing exercise") is searched too. */
+export function tanafasItems(exercises: readonly LocalExercise[], kindWords: Record<LocalExercise['kind'], string>): SearchItem[] {
+  return exercises.map((e) => ({
+    ...item('tanafas', `${e.kind}:${e.id}`, e.title, e.subtitle, null, [e.description, kindWords[e.kind]]),
+    tone: e.tone,
+  }));
 }
 
 /**
@@ -174,8 +272,8 @@ export function proxyCountryId(iso: string | null | undefined, options: CountryO
 
 /** Slugs of professionals in one proxy country (all pages, capped). */
 export function professionalsInCountry(lang: Lang, countryId: string): Promise<Set<string>> {
-  return cached(`professionals:${lang}:${countryId}`, async () => {
+  return kept(`professionals:${lang}:${countryId}`, async () => {
     const { therapists } = await allTherapists(lang, countryId);
-    return new Set(therapists.map((p) => p.slug));
-  });
+    return therapists.map((p) => p.slug);
+  }).then((slugs) => new Set(slugs));
 }

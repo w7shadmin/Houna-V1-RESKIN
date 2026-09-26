@@ -10,6 +10,7 @@ import type { SearchItem } from '@/lib/directorySearch';
 import Card from '@/components/ui/Card';
 import CanvasIcon from '@/components/ui/CanvasIcon';
 import Button from '@/components/ui/Button';
+import IconTile from '@/components/ui/IconTile';
 import LottieTopicIcon from '@/components/directory/LottieTopicIcon';
 
 /* Values below are the canvas "Directory search" artboard's. */
@@ -106,16 +107,18 @@ function initials(name: string): string {
     .toUpperCase();
 }
 
-/** Article / professional / podcast / organization / wellness row. */
+/** Article / professional / podcast / organization / wellness / event / speaker / Tanafas row. */
 export function ResultRow({ item, meta, onPress }: { item: SearchItem; meta?: string; onPress: () => void }) {
   const { colors } = useTheme();
   const { fonts } = useLanguage();
   const image = resolveImageUrl(item.imageUrl);
-  const isPerson = item.type === 'professional';
+  const isPerson = item.type === 'professional' || item.type === 'speaker';
   const isPodcast = item.type === 'podcast';
 
   let media: React.ReactNode;
-  if (isPodcast) {
+  if (item.type === 'tanafas') {
+    media = <IconTile size={52} tone={item.tone ?? 'glow'} renderIcon={(c, size) => <CanvasIcon name="tanafas" size={size} color={c} />} />;
+  } else if (isPodcast) {
     media = (
       <View style={[styles.media56, { borderRadius: 16, backgroundColor: colors.action }]}>
         <CanvasIcon name="play" size={20} color={colors.onAction} />

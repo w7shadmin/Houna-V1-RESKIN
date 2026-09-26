@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -29,7 +29,8 @@ const TEST_TONES: IconTileTone[] = ['dusk', 'glow', 'dawn'];
  * one-at-a-time carousels with a big round button: breathing exercises run
  * right here (components/tanafas/BreathePlayers.tsx), a meditation opens its
  * full-screen scene. Discover lists the self-reflection tests. The journal is
- * one tap away in the header.
+ * one tap away in the header. A search result can open it at one exercise or
+ * scene (`tab` + `exercise` / `scene` params); otherwise it opens on Breathe.
  */
 export default function TanafasHubScreen() {
   const { colors } = useTheme();
@@ -38,9 +39,10 @@ export default function TanafasHubScreen() {
   const h = t.discover.hub;
   const scenesText = t.tanafas.meditation.scenes;
 
-  const [tab, setTab] = useState<Tab>('breathe');
-  const [breatheIndex, setBreatheIndex] = useState(0);
-  const [sceneIndex, setSceneIndex] = useState(0);
+  const params = useLocalSearchParams<{ tab?: string; exercise?: string; scene?: string }>();
+  const [tab, setTab] = useState<Tab>(params.tab === 'meditate' || params.tab === 'discover' ? params.tab : 'breathe');
+  const [breatheIndex, setBreatheIndex] = useState(() => Math.max(0, BREATHE_ORDER.findIndex((k) => k === params.exercise)));
+  const [sceneIndex, setSceneIndex] = useState(() => Math.max(0, MEDITATION_SCENES.findIndex((sc) => sc.id === params.scene)));
   // Meditation length, chosen here so the player can open straight into the session.
   const [meditateMinutes, setMeditateMinutes] = useState<number | null>(DEFAULT_MEDITATION_MINUTES);
   // How full the breathing orb is (0 rest → 1); the screen glow breathes with it.

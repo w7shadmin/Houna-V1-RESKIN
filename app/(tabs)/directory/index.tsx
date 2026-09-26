@@ -8,10 +8,14 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { layout } from '@/constants/theme';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
+import { formatEventDate } from '@/lib/eventDate';
+import { BREATHE_ORDER, BREATHE_TONE } from '@/constants/breathPatterns';
+import { MEDITATION_SCENES } from '@/components/meditation/scenes';
+import { EXERCISE_TEXT } from '@/components/tanafas/BreathePlayers';
 import { safeUrl } from '@/lib/hounaApi';
-import { buildSearchIndex, type SearchItem } from '@/lib/directorySearch';
+import { buildSearchIndex, type LocalExercise, type SearchItem } from '@/lib/directorySearch';
 import { isCrisisQuery } from '@/lib/crisisIntent';
-import { useDirectorySearch } from '@/hooks/useDirectorySearch';
+import { useDirectorySearch, type LocalContent } from '@/hooks/useDirectorySearch';
 import Card from '@/components/ui/Card';
 import Chip from '@/components/ui/Chip';
 import IconTile, { type IconTileTone } from '@/components/ui/IconTile';
@@ -32,11 +36,11 @@ import {
  */
 const WEB_NO_OUTLINE = Platform.OS === 'web' ? ({ outlineStyle: 'none' } as unknown as TextStyle) : null;
 
-type Filter = 'all' | 'topics' | 'articles' | 'professionals' | 'podcasts';
-const FILTERS: Filter[] = ['all', 'topics', 'articles', 'professionals', 'podcasts'];
+type Filter = 'all' | 'topics' | 'tanafas' | 'articles' | 'professionals' | 'podcasts' | 'events';
+const FILTERS: Filter[] = ['all', 'topics', 'tanafas', 'articles', 'professionals', 'podcasts', 'events'];
 
-/** How many of each group "All" shows before "See all" (canvas). */
-const PREVIEW = { topics: 1, articles: 2, professionals: 2, podcasts: 1, places: 0 } as const;
+/** How many of each group "All" shows before "See all" (canvas; Tanafas and events added after). */
+const PREVIEW = { topics: 1, tanafas: 2, articles: 2, professionals: 2, podcasts: 1, events: 2, places: 0 } as const;
 type Group = keyof typeof PREVIEW;
 
 interface HubRow {
@@ -76,7 +80,22 @@ export default function DirectoryHubScreen() {
   const [filter, setFilter] = useState<Filter>('all');
   const [expanded, setExpanded] = useState<Partial<Record<Group | 'organizations' | 'wellness', boolean>>>({});
 
-  const index = useDirectorySearch(language, profile?.country ?? null, t.home.resourcesRail.topics, armed);
+  // The app's own content in the results: the topics, and Tanafas' exercises and scenes.
+  const local = useMemo<LocalContent>(() => {
+    const exercises: LocalExercise[] = [
+      ...BREATHE_ORDER.map((key) => {
+        const e = t.tanafas.exercises[EXERCISE_TEXT[key]];
+        return { kind: 'breathe' as const, id: key, title: e.title, subtitle: e.subtitle, description: e.description, tone: BREATHE_TONE[key] };
+      }),
+      ...MEDITATION_SCENES.map((scene) => {
+        const text = t.tanafas.meditation.scenes[scene.id];
+        return { kind: 'meditate' as const, id: scene.id, title: s.meditateTitle.replace('{name}', text.name), subtitle: text.description, description: '', tone: 'glow' as const };
+      }),
+    ];
+    return { topics: t.home.resourcesRail.topics, exercises, kindWords: s.kindWords };
+  }, [t, s]);
+
+  const index = useDirectorySearch(language, profile?.country ?? null, local, armed);
 
   useEffect(() => {
     const id = setTimeout(() => setDebounced(query), 150);
@@ -99,11 +118,13 @@ export default function DirectoryHubScreen() {
     }
     return {
       topics: of('topic'),
+      tanafas: of('tanafas'),
       articles: of('article'),
       professionals,
       podcasts: of('podcast'),
       organizations: of('organization'),
       wellness: of('wellness'),
+      events: hits.filter((h) => h.type === 'event' || h.type === 'speaker'),
       total: hits.length,
     };
   }, [searchIndex, index.near, debounced]);
@@ -128,6 +149,18 @@ export default function DirectoryHubScreen() {
       case 'wellness':
         router.push({ pathname: '/directory/wellness-centers/[id]', params: { id: item.key } });
         break;
+      case 'event':
+        router.push({ pathname: '/events/[slug]', params: { slug: item.key } });
+        break;
+      case 'speaker':
+        router.push({ pathname: '/events/speakers/[slug]', params: { slug: item.key } });
+        break;
+      case 'tanafas': {
+        // Opens Tanafas at that exercise or scene ("breathe:anxiety-relief", "meditate:rain").
+        const [kind, id] = item.key.split(':');
+        router.push({ pathname: '/tanafas', params: kind === 'breathe' ? { tab: 'breathe', exercise: id } : { tab: 'meditate', scene: id } });
+        break;
+      }
       default: {
         const url = safeUrl(item.key);
         if (url) Linking.openURL(url);
@@ -143,8 +176,13 @@ export default function DirectoryHubScreen() {
   const sectionAction = (group: Group, list: SearchItem[]) =>
     filter === 'all' && list.length > PREVIEW[group] ? (expanded[group] ? s.showLess : s.seeAll) : undefined;
 
-  const metaFor = (item: SearchItem) =>
-    (item.type === 'podcast' ? s.podcastMeta : s.articleMeta).replace('{source}', item.source ?? '');
+  const metaFor = (item: SearchItem) => {
+    if (item.type === 'tanafas') return item.subtitle;
+    if (item.type === 'event') {
+      return formatEventDate(item.subtitle, { monthsLong: t.journal.dateNames.monthsLong, am: t.events.list.am, pm: t.events.list.pm }, num);
+    }
+    return (item.type === 'podcast' ? s.podcastMeta : s.articleMeta).replace('{source}', item.source ?? '');
+  };
 
   const hubRows: HubRow[] = [
     { href: '/directory/professionals', title: hub.professionalsTitle, subtitle: hub.professionalsSubtitle, icon: Users, tone: 'glow' },
@@ -262,7 +300,7 @@ export default function DirectoryHubScreen() {
               contentContainerStyle={styles.filters}
             >
               {FILTERS.map((f) => (
-                <Chip key={f} size="sm" label={s.filters[f]} selected={filter === f} onPress={() => setFilter(f)} />
+                <Chip key={f} size="sm" label={f === 'tanafas' ? t.tabs.tanafas : s.filters[f]} selected={filter === f} onPress={() => setFilter(f)} />
               ))}
             </ScrollView>
 
@@ -275,6 +313,19 @@ export default function DirectoryHubScreen() {
                 />
                 {shown('topics', groups.topics).map((item) => (
                   <TopicResultCard key={item.key} item={item} learnMore={s.learnMore} onPress={() => open(item)} />
+                ))}
+              </View>
+            )}
+
+            {show('tanafas') && groups.tanafas.length > 0 && (
+              <View style={styles.section}>
+                <SectionHeader
+                  label={t.tabs.tanafas}
+                  action={sectionAction('tanafas', groups.tanafas)}
+                  onAction={() => toggle('tanafas')}
+                />
+                {shown('tanafas', groups.tanafas).map((item) => (
+                  <ResultRow key={item.key} item={item} meta={metaFor(item)} onPress={() => open(item)} />
                 ))}
               </View>
             )}
@@ -318,6 +369,19 @@ export default function DirectoryHubScreen() {
                 />
                 {shown('podcasts', groups.podcasts).map((item) => (
                   <ResultRow key={item.key} item={item} meta={metaFor(item)} onPress={() => open(item)} />
+                ))}
+              </View>
+            )}
+
+            {show('events') && groups.events.length > 0 && (
+              <View style={styles.section}>
+                <SectionHeader
+                  label={s.sections.events}
+                  action={sectionAction('events', groups.events)}
+                  onAction={() => toggle('events')}
+                />
+                {shown('events', groups.events).map((item) => (
+                  <ResultRow key={`${item.type}:${item.key}`} item={item} meta={metaFor(item)} onPress={() => open(item)} />
                 ))}
               </View>
             )}

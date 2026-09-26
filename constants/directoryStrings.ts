@@ -15,7 +15,7 @@ export const directoryStrings = {
     search: {
       eyebrow: 'Directory',
       title: 'What are you looking for?',
-      placeholder: 'Topics, articles, professionals, podcasts',
+      placeholder: 'Topics, people, exercises, events',
       inputLabel: 'Search the directory',
       clear: 'Clear search',
       filtersLabel: 'Result type',
@@ -25,6 +25,7 @@ export const directoryStrings = {
         articles: 'Articles',
         professionals: 'Professionals',
         podcasts: 'Podcasts',
+        events: 'Events',
       },
       sections: {
         topic: 'Topic',
@@ -33,7 +34,11 @@ export const directoryStrings = {
         professionalsNear: 'Professionals near you · {country}',
         podcasts: 'Podcasts',
         places: 'Organizations & wellness centers',
+        events: 'Events & speakers',
       },
+      // Tanafas in the results: how a scene is named, and the words each kind is also found by.
+      meditateTitle: '{name} meditation',
+      kindWords: { breathe: 'breathing exercise', meditate: 'meditation' },
       seeAll: 'See all',
       showLess: 'Show less',
       learnMore: 'Learn more',
@@ -182,7 +187,7 @@ export const directoryStrings = {
     search: {
       eyebrow: 'الدليل',
       title: 'عمّ تبحث؟',
-      placeholder: 'مواضيع، مقالات، مختصون، بودكاست',
+      placeholder: 'مواضيع، مختصون، تمارين، فعاليات',
       inputLabel: 'ابحث في الدليل',
       clear: 'مسح البحث',
       filtersLabel: 'نوع النتيجة',
@@ -192,6 +197,7 @@ export const directoryStrings = {
         articles: 'المقالات',
         professionals: 'المختصون',
         podcasts: 'البودكاست',
+        events: 'الفعاليات',
       },
       sections: {
         topic: 'موضوع',
@@ -200,7 +206,10 @@ export const directoryStrings = {
         professionalsNear: 'مختصون بالقرب منك · {country}',
         podcasts: 'البودكاست',
         places: 'المنظمات ومراكز العافية',
+        events: 'الفعاليات والمتحدثون',
       },
+      meditateTitle: 'تأمّل {name}',
+      kindWords: { breathe: 'تمرين تنفس', meditate: 'تأمل' },
       seeAll: 'عرض الكل',
       showLess: 'عرض أقل',
       learnMore: 'اعرف المزيد',

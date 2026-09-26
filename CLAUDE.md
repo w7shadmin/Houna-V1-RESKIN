@@ -346,7 +346,21 @@ lists; queries never leave the phone): `lib/searchText.ts` (folding, word
 forms: English endings, Arabic attached letters), `lib/searchRank.ts`
 (weighted fields, prefix/typo matching, each word weighed by its rarity,
 every-word matches first) and `lib/searchConcepts.ts`, the bilingual meaning
-map ("sad" → depression, English ↔ Arabic; content, edit freely). A search
+map ("sad" → depression, English ↔ Arabic; content, edit freely). It covers
+the directory lists, events and speakers, the topics, and Tanafas' exercises
+and scenes (a result opens `/tanafas` with `tab` + `exercise`/`scene`). The
+lists are saved on the phone (AsyncStorage, `directory-search:v1:*`: used as
+is under a day old, shown while refreshing up to two weeks), and each item
+also carries its name in the other language (`aliases`), loaded after.
+Professionals also carry what their own page says (location, languages, who
+they work with, specialties: `facts`), from the `houna-search-index` Edge
+Function (`supabase/functions/houna-search-index`), which reads every
+professional's houna.org page in background steps (houna.org is slow to the
+edge: a full build is ~5 min) and serves one file per language, rebuilt daily
+into `houna_cache`. `supabase/functions/houna-proxy` is the proxy's source,
+recovered from the old MVP (the dashboard can't export it); deploying it
+replaces the live proxy, so test it side by side first. Both are Deno, so
+`tsconfig.json` excludes `supabase/functions`. A search
 that sounds like a crisis (`lib/crisisIntent.ts`, draft word lists awaiting
 clinical review) puts a crisis card first. **Proxy gotcha**: `/therapists`'
 `lastPage` is always the current page + 1, never the real last page, so
