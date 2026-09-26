@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { alpha, layout, nightPalette } from '@/constants/theme';
+import { alpha, layout } from '@/constants/theme';
 import { getTest } from '@/constants/psychometrics';
 import { getResult, saveResultToProfile, type StoredResult } from '@/lib/psychometrics/results';
 import Button from '@/components/ui/Button';
@@ -41,6 +41,7 @@ export default function ResultScreen() {
   const test = result ? getTest(result.testId) : undefined;
   const close = () => (router.canGoBack() ? router.back() : router.replace('/tanafas'));
   const dusk = colors.tones.dusk.fg;
+  const duskText = colors.tones.dusk.text;
   const labelLatin = fonts.labelTracked;
 
   const header = (
@@ -83,7 +84,7 @@ export default function ResultScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
-      <ScreenGlow color={alpha(nightPalette.dusk, 0.2)} rx={90} ry={30} cy={22} />
+      <ScreenGlow color={alpha(colors.tones.dusk.hue, 0.2)} rx={90} ry={30} cy={22} />
       <ScrollView contentContainerStyle={styles.inner} showsVerticalScrollIndicator={false}>
         {header}
 
@@ -91,7 +92,7 @@ export default function ResultScreen() {
           <Text
             style={[
               labelLatin ? styles.eyebrowLatin : styles.eyebrowArabic,
-              { color: dusk, fontFamily: labelLatin ? fonts.labelRegular : fonts.label },
+              { color: duskText, fontFamily: labelLatin ? fonts.labelRegular : fonts.label },
             ]}
           >
             {r.eyebrow.replace('{test}', test.title[language])}

@@ -125,7 +125,7 @@ export function ResultRow({ item, meta, onPress }: { item: SearchItem; meta?: st
       <Image source={{ uri: image }} style={[styles.media56, { borderRadius: 28 }]} />
     ) : (
       <View style={[styles.media56, { borderRadius: 28, backgroundColor: colors.tones.glow.bg, borderColor: colors.tones.glow.border, borderWidth: 1 }]}>
-        <Text style={{ fontFamily: fonts.display, fontSize: 20, color: colors.tones.glow.fg }}>{initials(item.title)}</Text>
+        <Text style={{ fontFamily: fonts.display, fontSize: 20, color: colors.tones.glow.text }}>{initials(item.title)}</Text>
       </View>
     );
   } else {

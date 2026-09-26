@@ -1,16 +1,16 @@
 /**
- * Houna Mental Health App — Design Token System ("Nightlight" / "Daylight")
+ * Houna Mental Health App — Design Token System (Night / Dusk / Sunrise)
  *
  * Every value here is copied from the redesign canvas
- * (https://claude.ai/artifact/EMxmwt7o1Uq6kx32BdAUA7) — the "Nightlight —
- * direction & system" and "Daylight — direction & system" sheets, plus the
- * Home artboards for the tab bar. Translucent values are the canvas's own
- * rgba() alphas over Moonlight (Night) or Ink (Day); nothing is eyeballed.
- * Don't improvise values here — add them to the canvas first.
+ * (https://claude.ai/artifact/EMxmwt7o1Uq6kx32BdAUA7) — the Nightlight,
+ * Dusk (formerly Daylight; `day` in code) and Sunrise (the canvas's
+ * "Morning" row) direction & system sheets, plus the Home artboards for the
+ * tab bar. Translucent values are the canvas's own rgba() alphas; nothing is
+ * eyeballed. Don't improvise values here — add them to the canvas first.
  *
- * Night and Day are both full themes. Which one applies is resolved at
- * runtime by `ThemeProvider` (contexts/ThemeContext.tsx) from the phone's
- * light/dark setting plus a locally persisted override. Components should
+ * All three are full themes. The one in effect is the person's pick in
+ * Profile → Appearance, persisted locally by `ThemeProvider`
+ * (contexts/ThemeContext.tsx); Night until they choose. Components should
  * read tokens through `useTheme()`, not these exports directly.
  */
 /* ──────────────────────── Brand Palette ──────────────────────── */
@@ -47,6 +47,37 @@ export const dayPalette = {
   bloomDeep: '#B24B6B',
   /** Pale fill (Daylight sheet swatch-card ground). */
   paleFill: '#EEF3F1',
+} as const;
+
+/**
+ * Sunrise sheet swatches (the canvas's "Morning" row): Houna's original
+ * brand palette plus the first app's icon colours. Coral and Sky are Peach
+ * and Light Cyan deepened only as far as icons need; small text in those
+ * hues takes the deeper `…Text` step.
+ */
+export const sunrisePalette = {
+  mist: '#F2F6F4', // Ground — every screen
+  paper: '#FFFFFF', // Cards, sheets, tab bar
+  charcoal: '#1D2B2A', // Primary text
+  darkTurquoise: '#196662', // Primary actions, active tab, accent text
+  turquoise: '#3BAAA7', // Logo, glows, selected borders
+  grey80: '#58595B', // Secondary text
+  stone: '#6D6F72', // Tertiary text, inactive icons
+  coral: '#E8582C', // From Peach — icons & warmth
+  coralText: '#BF4729',
+  sky: '#0A91BB', // From Light Cyan — icons, secondary accent
+  skyText: '#08799B',
+  /** Raspberry, deepened for the bloom tone. */
+  raspberryDeep: '#C2475A',
+  /** The brand's light hues, for glows and tile fills. */
+  peach: '#F9A980',
+  lightCyan: '#20C4F4',
+  raspberry: '#F37B83',
+  /** Pale fill (swatch cards, topic stage). */
+  paleFill: '#E6F2EF',
+  /** Check-in sheet and its scrim. */
+  sheet: '#FAFCFB',
+  scrim: '#C9CDCB',
 } as const;
 
 /**
@@ -92,12 +123,16 @@ export function flatten(color: string, over: string): string {
 
 /* ──────────────────── Semantic Color Tokens ──────────────────── */
 
-export type ColorScheme = 'night' | 'day';
+export type ColorScheme = 'night' | 'day' | 'sunrise';
 
 /** A tinted accent as used by icon tiles, badges and highlights. */
 export interface AccentTone {
-  /** Icon / text colour. */
+  /** Icon, fill and graphic colour. */
   fg: string;
+  /** The tone as text (labels, links, tags) — `fg`, or a deeper step where `fg` is too light to read. */
+  text: string;
+  /** The tone's light hue, for glows and tinted fills (`alpha(hue, …)`). */
+  hue: string;
   /** Tile fill. */
   bg: string;
   /** Tile border. */
@@ -246,10 +281,10 @@ export const nightColors: ColorTokens = {
   onAccent: N.midnight,
 
   tones: {
-    glow: { fg: N.hounaGlow, bg: TONE_BG.glow, border: TONE_BORDER.glow },
-    dawn: { fg: N.dawn, bg: TONE_BG.dawn, border: TONE_BORDER.dawn },
-    dusk: { fg: N.dusk, bg: TONE_BG.dusk, border: TONE_BORDER.dusk },
-    bloom: { fg: N.bloom, bg: TONE_BG.bloom, border: TONE_BORDER.bloom },
+    glow: { fg: N.hounaGlow, text: N.hounaGlow, hue: N.hounaGlow, bg: TONE_BG.glow, border: TONE_BORDER.glow },
+    dawn: { fg: N.dawn, text: N.dawn, hue: N.dawn, bg: TONE_BG.dawn, border: TONE_BORDER.dawn },
+    dusk: { fg: N.dusk, text: N.dusk, hue: N.dusk, bg: TONE_BG.dusk, border: TONE_BORDER.dusk },
+    bloom: { fg: N.bloom, text: N.bloom, hue: N.bloom, bg: TONE_BG.bloom, border: TONE_BORDER.bloom },
   },
 
   crisis: { bg: alpha(N.dawn, 0.08), border: alpha(N.dawn, 0.4), borderSoft: alpha(N.dawn, 0.35), icon: N.dawn },
@@ -314,10 +349,10 @@ export const dayColors: ColorTokens = {
   // The Daylight sheet keeps the Night tile fills/borders and swaps only
   // the icon colour to the deep variant.
   tones: {
-    glow: { fg: D.hounaDeepTeal, bg: TONE_BG.glow, border: TONE_BORDER.glow },
-    dawn: { fg: D.dawnDeep, bg: TONE_BG.dawn, border: TONE_BORDER.dawn },
-    dusk: { fg: D.duskDeep, bg: TONE_BG.dusk, border: TONE_BORDER.dusk },
-    bloom: { fg: D.bloomDeep, bg: TONE_BG.bloom, border: TONE_BORDER.bloom },
+    glow: { fg: D.hounaDeepTeal, text: D.hounaDeepTeal, hue: N.hounaGlow, bg: TONE_BG.glow, border: TONE_BORDER.glow },
+    dawn: { fg: D.dawnDeep, text: D.dawnDeep, hue: N.dawn, bg: TONE_BG.dawn, border: TONE_BORDER.dawn },
+    dusk: { fg: D.duskDeep, text: D.duskDeep, hue: N.dusk, bg: TONE_BG.dusk, border: TONE_BORDER.dusk },
+    bloom: { fg: D.bloomDeep, text: D.bloomDeep, hue: N.bloom, bg: TONE_BG.bloom, border: TONE_BORDER.bloom },
   },
 
   crisis: { bg: alpha(N.dawn, 0.08), border: alpha(N.dawn, 0.4), borderSoft: alpha(N.dawn, 0.35), icon: D.dawnDeep },
@@ -350,14 +385,81 @@ export const dayColors: ColorTokens = {
   topicGlow: '#86A9F0',
 };
 
+const S = sunrisePalette;
+
+export const sunriseColors: ColorTokens = {
+  background: S.mist,
+  surface: S.paper,
+  card: S.paper,
+  cardPressed: alpha(S.charcoal, 0.06),
+  inputBackground: S.paper,
+
+  text: S.charcoal,
+  textSecondary: S.grey80,
+  textTertiary: S.stone,
+  placeholder: S.stone,
+
+  border: alpha(S.charcoal, 0.1),
+  borderLight: alpha(S.charcoal, 0.08),
+  borderControl: alpha(S.charcoal, 0.12),
+  borderControlStrong: alpha(S.charcoal, 0.14),
+  borderStrong: alpha(S.charcoal, 0.16),
+
+  control: S.paper,
+  controlStrong: S.paper,
+
+  primary: S.darkTurquoise,
+  onPrimary: S.paper,
+  primaryLightest: alpha(S.turquoise, 0.12),
+
+  action: S.darkTurquoise,
+  onAction: S.paper,
+
+  accent: S.coralText,
+  onAccent: S.paper,
+
+  // Tile fills and borders in the brand's light hues; icons in the deepened ones.
+  tones: {
+    glow: { fg: S.darkTurquoise, text: S.darkTurquoise, hue: S.turquoise, bg: alpha(S.turquoise, 0.12), border: alpha(S.turquoise, 0.28) },
+    dawn: { fg: S.coral, text: S.coralText, hue: S.peach, bg: alpha(S.peach, 0.12), border: alpha(S.peach, 0.28) },
+    dusk: { fg: S.sky, text: S.skyText, hue: S.lightCyan, bg: alpha(S.lightCyan, 0.12), border: alpha(S.lightCyan, 0.3) },
+    bloom: { fg: S.raspberryDeep, text: S.raspberryDeep, hue: S.raspberry, bg: alpha(S.raspberry, 0.12), border: alpha(S.raspberry, 0.3) },
+  },
+
+  crisis: { bg: alpha(S.peach, 0.08), border: alpha(S.peach, 0.4), borderSoft: alpha(S.peach, 0.35), icon: S.coral },
+  danger: '#C2503F',
+  onDanger: '#FFFFFF',
+
+  tabBarBackground: S.paper,
+  tabBarBorder: alpha(S.charcoal, 0.08),
+  tabBarActive: S.darkTurquoise,
+  tabBarInactive: S.stone,
+  tabBarRaised: S.darkTurquoise,
+  onTabBarRaised: S.paper,
+  tabBarRaisedRing: S.mist,
+
+  glow: S.turquoise,
+
+  // The official logo artwork's own teal and grey.
+  logo: { primary: S.turquoise, secondary: '#525052' },
+
+  mapDot: alpha(S.charcoal, 0.3),
+  mapLand: alpha(S.charcoal, 0.1),
+
+  sheet: S.sheet,
+  scrim: S.scrim,
+  faint: alpha(S.charcoal, 0.25),
+  ringIdle: alpha(S.charcoal, 0.35),
+
+  topicStage: S.paleFill,
+  topicGlow: '#5FB08E',
+};
+
 export const themeColors: Record<ColorScheme, ColorTokens> = {
   night: nightColors,
   day: dayColors,
+  sunrise: sunriseColors,
 };
-
-export function schemeFromSystem(system: string | null | undefined): ColorScheme {
-  return system === 'light' ? 'day' : 'night';
-}
 
 /* ──────────────────────── Layout ──────────────────────── */
 

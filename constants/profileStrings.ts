@@ -33,7 +33,7 @@ export const profileStrings = {
     settings: {
       language: 'Language',
       appearance: 'Appearance',
-      appearanceOptions: { system: 'System', night: 'Night', day: 'Dusk' },
+      appearanceOptions: { sunrise: 'Sunrise', day: 'Dusk', night: 'Night' },
       notifications: 'Notifications',
       communityMap: 'Community map',
       exportJournal: 'Export my journal',
@@ -76,7 +76,7 @@ export const profileStrings = {
     settings: {
       language: 'اللغة',
       appearance: 'المظهر',
-      appearanceOptions: { system: 'النظام', night: 'ليلي', day: 'الغسق' },
+      appearanceOptions: { sunrise: 'الشروق', day: 'الغسق', night: 'ليلي' },
       notifications: 'الإشعارات',
       communityMap: 'خريطة المجتمع',
       exportJournal: 'تصدير يومياتي',

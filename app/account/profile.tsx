@@ -106,7 +106,7 @@ export default function AccountProfileScreen() {
               {profile.avatar_url ? (
                 <Image source={{ uri: profile.avatar_url }} style={styles.avatarImg} resizeMode="cover" />
               ) : (
-                <Text style={[styles.initial, { color: colors.tones.glow.fg, fontFamily: fonts.display }]}>{initial}</Text>
+                <Text style={[styles.initial, { color: colors.tones.glow.text, fontFamily: fonts.display }]}>{initial}</Text>
               )}
               {uploading && (
                 <View style={[styles.avatarOverlay, { backgroundColor: colors.scrim }]}>

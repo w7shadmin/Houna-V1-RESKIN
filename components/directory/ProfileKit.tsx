@@ -219,7 +219,7 @@ export function TagList({ items }: { items: string[] }) {
     <View style={styles.tags}>
       {items.map((item, i) => (
         <View key={`${item}-${i}`} style={[styles.tag, { backgroundColor: tone.bg, borderColor: tone.border }]}>
-          <Text style={[styles.tagText, { color: tone.fg, fontFamily: fonts.medium }]}>{item}</Text>
+          <Text style={[styles.tagText, { color: tone.text, fontFamily: fonts.medium }]}>{item}</Text>
         </View>
       ))}
     </View>

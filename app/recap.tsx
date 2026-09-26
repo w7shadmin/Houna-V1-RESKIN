@@ -6,7 +6,7 @@ import Svg, { Circle } from 'react-native-svg';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { alpha, dayPalette, layout, nightPalette } from '@/constants/theme';
+import { alpha, dayPalette, layout, nightPalette, sunrisePalette } from '@/constants/theme';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { loadEntries, type MoodTag } from '@/lib/journal';
 import { MOOD_STYLE } from '@/constants/moods';
@@ -25,27 +25,34 @@ type SlideKey = 'intro' | 'breathing' | 'meditation' | 'journal' | 'moods' | 'co
 /* ──────────────── Canvas values ("Recap (tap through)", Night + Day) ──────────────── */
 
 const N = nightPalette;
-const GLOW = { teal: N.hounaGlow, dusk: N.dusk, dawn: N.dawn };
+const S = sunrisePalette;
+type GlowKey = 'teal' | 'dusk' | 'dawn';
+/** Night and Dusk glow in the Nightlight hues; Sunrise in the brand's own. */
+const GLOW: Record<'nightlight' | 'sunrise', Record<GlowKey, string>> = {
+  nightlight: { teal: N.hounaGlow, dusk: N.dusk, dawn: N.dawn },
+  sunrise: { teal: S.turquoise, dusk: S.lightCyan, dawn: S.peach },
+};
 
 /** Per-slide ground and glows, verbatim from the canvas's BGS lists. */
 const SLIDE_STYLE: Record<
   SlideKey,
-  { night: string; day: string; glows: { c: string; a: number; rx: number; ry: number; cx: number; cy: number }[] }
+  { night: string; day: string; sunrise: string; glows: { c: GlowKey; a: number; rx: number; ry: number; cx: number; cy: number }[] }
 > = {
-  intro: { night: N.midnight, day: dayPalette.daybreak, glows: [{ c: GLOW.teal, a: 0.3, rx: 80, ry: 50, cx: 50, cy: 38 }] },
-  breathing: { night: '#0E1E38', day: '#DCF0ED', glows: [{ c: GLOW.teal, a: 0.4, rx: 90, ry: 60, cx: 50, cy: 30 }] },
-  meditation: { night: N.nightfall, day: '#FBF8F2', glows: [{ c: GLOW.dusk, a: 0.4, rx: 90, ry: 60, cx: 50, cy: 30 }] },
-  journal: { night: N.midnight, day: dayPalette.daybreak, glows: [{ c: GLOW.dawn, a: 0.32, rx: 90, ry: 60, cx: 50, cy: 30 }] },
+  intro: { night: N.midnight, day: dayPalette.daybreak, sunrise: S.mist, glows: [{ c: 'teal', a: 0.3, rx: 80, ry: 50, cx: 50, cy: 38 }] },
+  breathing: { night: '#0E1E38', day: '#DCF0ED', sunrise: '#DCF0ED', glows: [{ c: 'teal', a: 0.4, rx: 90, ry: 60, cx: 50, cy: 30 }] },
+  meditation: { night: N.nightfall, day: '#FBF8F2', sunrise: S.sheet, glows: [{ c: 'dusk', a: 0.4, rx: 90, ry: 60, cx: 50, cy: 30 }] },
+  journal: { night: N.midnight, day: dayPalette.daybreak, sunrise: S.mist, glows: [{ c: 'dawn', a: 0.32, rx: 90, ry: 60, cx: 50, cy: 30 }] },
   moods: {
     night: '#10173A',
     day: dayPalette.paleFill,
+    sunrise: S.paleFill,
     glows: [
-      { c: GLOW.dusk, a: 0.3, rx: 70, ry: 50, cx: 30, cy: 30 },
-      { c: GLOW.teal, a: 0.28, rx: 70, ry: 50, cx: 70, cy: 70 },
+      { c: 'dusk', a: 0.3, rx: 70, ry: 50, cx: 30, cy: 30 },
+      { c: 'teal', a: 0.28, rx: 70, ry: 50, cx: 70, cy: 70 },
     ],
   },
-  community: { night: N.midnight, day: dayPalette.daybreak, glows: [{ c: GLOW.teal, a: 0.34, rx: 80, ry: 50, cx: 50, cy: 36 }] },
-  share: { night: N.nightfall, day: '#FBF8F2', glows: [{ c: GLOW.dusk, a: 0.34, rx: 90, ry: 60, cx: 50, cy: 40 }] },
+  community: { night: N.midnight, day: dayPalette.daybreak, sunrise: S.mist, glows: [{ c: 'teal', a: 0.34, rx: 80, ry: 50, cx: 50, cy: 36 }] },
+  share: { night: N.nightfall, day: '#FBF8F2', sunrise: S.sheet, glows: [{ c: 'dusk', a: 0.34, rx: 90, ry: 60, cx: 50, cy: 40 }] },
 };
 
 /** Emotional-landscape orb slots, largest first (colours come from constants/moods.ts). */
@@ -75,7 +82,7 @@ const EXERCISE_KEYS = {
  * card never includes journal text or moods.
  */
 export default function RecapScreen() {
-  const { colors, isNight } = useTheme();
+  const { colors, isNight, scheme } = useTheme();
   const router = useRouter();
   const { t, fonts, isRTL, language } = useLanguage();
   const { profile } = useAuth();
@@ -206,7 +213,7 @@ export default function RecapScreen() {
     const fav = sceneName(recap.favouriteScene);
     body = (
       <>
-        {eyebrow(r.meditation.eyebrow, colors.tones.dusk.fg)}
+        {eyebrow(r.meditation.eyebrow, colors.tones.dusk.text)}
         {bigNumber(recap.meditationMinutes)}
         {unit(arabicPlural(recap.meditationMinutes, r.meditation.unit))}
         {fav && factCard(r.meditation.favourite, fav)}
@@ -215,7 +222,7 @@ export default function RecapScreen() {
   } else if (slide === 'journal' && recap) {
     body = (
       <>
-        {eyebrow(r.journal.eyebrow, colors.tones.dawn.fg)}
+        {eyebrow(r.journal.eyebrow, colors.tones.dawn.text)}
         {bigNumber(recap.journalDays)}
         {unit(arabicPlural(recap.journalDays, r.journal.unit))}
         {recap.wordsWritten > 0 && (
@@ -281,16 +288,16 @@ export default function RecapScreen() {
   }
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: isNight ? style.night : style.day }]} edges={['top', 'bottom']}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: style[scheme] }]} edges={['top', 'bottom']}>
       {style.glows.map((g) => (
-        <ScreenGlow key={`${g.cx}-${g.cy}`} color={alpha(g.c, g.a)} rx={g.rx} ry={g.ry} cx={g.cx} cy={g.cy} fade={0.7} />
+        <ScreenGlow key={`${g.cx}-${g.cy}`} color={alpha(GLOW[scheme === 'sunrise' ? 'sunrise' : 'nightlight'][g.c], g.a)} rx={g.rx} ry={g.ry} cx={g.cx} cy={g.cy} fade={0.7} />
       ))}
 
       <View style={styles.inner}>
         <View style={styles.top}>
           <View style={styles.segments} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
             {slides.map((s, k) => (
-              <View key={s} style={[styles.segment, { backgroundColor: k <= index ? colors.text : alpha(isNight ? N.moonlight : dayPalette.ink, 0.22) }]} />
+              <View key={s} style={[styles.segment, { backgroundColor: k <= index ? colors.text : alpha(colors.text, 0.22) }]} />
             ))}
           </View>
           <View style={styles.headerRow}>

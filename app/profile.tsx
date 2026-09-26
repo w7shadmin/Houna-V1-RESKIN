@@ -4,7 +4,7 @@ import { useFocusEffect, useRouter, type Href } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useTheme, type AppearancePreference } from '@/contexts/ThemeContext';
+import { APPEARANCE_OPTIONS, useTheme, type AppearancePreference } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { alpha, layout, nightPalette } from '@/constants/theme';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
@@ -101,7 +101,7 @@ export default function ProfileScreen() {
 
         {profile ? (
           <View style={styles.identity}>
-            <View style={[styles.avatarRing, { boxShadow: `0 0 0 4px ${colors.background}, 0 0 0 5px ${alpha(nightPalette.hounaGlow, 0.5)}` }]}>
+            <View style={[styles.avatarRing, { boxShadow: `0 0 0 4px ${colors.background}, 0 0 0 5px ${alpha(colors.tones.glow.hue, 0.5)}` }]}>
               {avatar ? (
                 <Image source={{ uri: avatar }} style={styles.avatarImage} />
               ) : (
@@ -162,7 +162,7 @@ export default function ProfileScreen() {
           onPress={go('/recap')}
           style={({ pressed }) => [
             styles.recap,
-            { backgroundColor: colors.sheet, borderColor: alpha(nightPalette.dusk, 0.3) },
+            { backgroundColor: colors.sheet, borderColor: colors.tones.dusk.border },
             pressed && styles.pressed,
           ]}
         >
@@ -189,7 +189,7 @@ export default function ProfileScreen() {
                 .map((tr) => ({ label: tr.label[language], value: latest.scores[tr.key].normalised0to1 }))}
             />
             <View style={styles.cardText}>
-              {eyebrow(p.traits.eyebrow, colors.tones.dusk.fg)}
+              {eyebrow(p.traits.eyebrow, colors.tones.dusk.text)}
               <Text style={[styles.cardTitle, { color: colors.text, fontFamily: fonts.semiBold }]}>
                 {p.traits.from.replace('{test}', test.title[language])}
               </Text>
@@ -204,7 +204,7 @@ export default function ProfileScreen() {
                 hitSlop={8}
                 onPress={go({ pathname: '/tanafas/discover/result/[resultId]', params: { resultId: latest.id } })}
               >
-                <Text style={[styles.cardLink, { color: colors.tones.dusk.fg, fontFamily: fonts.semiBold }]}>{p.traits.view}</Text>
+                <Text style={[styles.cardLink, { color: colors.tones.dusk.text, fontFamily: fonts.semiBold }]}>{p.traits.view}</Text>
               </Pressable>
             </View>
           </View>
@@ -278,7 +278,7 @@ function AppearanceRow() {
     <SettingRow label={t.profile.settings.appearance}>
       <Segmented
         label={t.profile.settings.appearance}
-        options={(['system', 'night', 'day'] as AppearancePreference[]).map((id) => ({ id, label: opts[id] }))}
+        options={APPEARANCE_OPTIONS.map((id) => ({ id, label: opts[id] }))}
         value={preference}
         onChange={(id) => setPreference(id as AppearancePreference)}
       />
@@ -349,17 +349,18 @@ function Segmented({
 
 /** Recap card glows: Dusk from the top end corner, Houna glow from the bottom start (canvas). */
 function RecapGlow() {
+  const { colors } = useTheme();
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill}>
       <Svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
         <Defs>
           <RadialGradient id="recapDusk" gradientUnits="userSpaceOnUse" cx={90} cy={0} rx={90} ry={120} fx={90} fy={0}>
-            <Stop offset="0" stopColor={nightPalette.dusk} stopOpacity={0.55} />
-            <Stop offset="0.6" stopColor={nightPalette.dusk} stopOpacity={0} />
+            <Stop offset="0" stopColor={colors.tones.dusk.hue} stopOpacity={0.55} />
+            <Stop offset="0.6" stopColor={colors.tones.dusk.hue} stopOpacity={0} />
           </RadialGradient>
           <RadialGradient id="recapGlow" gradientUnits="userSpaceOnUse" cx={0} cy={100} rx={80} ry={110} fx={0} fy={100}>
-            <Stop offset="0" stopColor={nightPalette.hounaGlow} stopOpacity={0.4} />
-            <Stop offset="0.6" stopColor={nightPalette.hounaGlow} stopOpacity={0} />
+            <Stop offset="0" stopColor={colors.tones.glow.hue} stopOpacity={0.4} />
+            <Stop offset="0.6" stopColor={colors.tones.glow.hue} stopOpacity={0} />
           </RadialGradient>
         </Defs>
         <Rect x={0} y={0} width={100} height={100} fill="url(#recapDusk)" />

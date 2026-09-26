@@ -6,19 +6,20 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-  schemeFromSystem,
-  themeColors,
-  type ColorScheme,
-  type ColorTokens,
-} from '@/constants/theme';
+import { themeColors, type ColorScheme, type ColorTokens } from '@/constants/theme';
 
 /* ──────────────────── Types ──────────────────── */
 
-/** What the person picked in Profile → Appearance. */
-export type AppearancePreference = 'system' | 'night' | 'day';
+/**
+ * What the person picked in Profile → Appearance: always one of the themes.
+ * There's no "follow the phone" option; until they pick, it's Night (a
+ * stored "system" from before Sunrise replaced it falls back to Night too).
+ */
+export type AppearancePreference = ColorScheme;
+
+/** The Appearance choices, in the order they're offered: through the day. */
+export const APPEARANCE_OPTIONS: readonly AppearancePreference[] = ['sunrise', 'day', 'night'];
 
 interface ThemeContextValue {
   /** The scheme actually in effect. */
@@ -36,14 +37,13 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 const STORAGE_KEY = 'houna-appearance';
 
 function isPreference(v: unknown): v is AppearancePreference {
-  return v === 'system' || v === 'night' || v === 'day';
+  return v === 'night' || v === 'day' || v === 'sunrise';
 }
 
 /* ──────────────────── Provider ──────────────────── */
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const system = useColorScheme();
-  const [preference, setPreferenceState] = useState<AppearancePreference>('system');
+  const [preference, setPreferenceState] = useState<AppearancePreference>('night');
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -67,7 +67,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
-  const scheme: ColorScheme = preference === 'system' ? schemeFromSystem(system) : preference;
+  const scheme: ColorScheme = preference;
   const tokens = themeColors[scheme];
 
   const value = useMemo<ThemeContextValue>(

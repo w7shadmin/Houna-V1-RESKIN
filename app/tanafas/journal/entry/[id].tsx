@@ -193,7 +193,7 @@ export default function JournalEntryScreen() {
                 hitSlop={8}
                 style={({ pressed }) => [styles.skip, pressed && styles.pressed]}
               >
-                <Text style={[styles.skipText, { color: colors.tones.dusk.fg, fontFamily: fonts.medium }]}>{e.writeFreely}</Text>
+                <Text style={[styles.skipText, { color: colors.tones.dusk.text, fontFamily: fonts.medium }]}>{e.writeFreely}</Text>
               </Pressable>
             </View>
           )}

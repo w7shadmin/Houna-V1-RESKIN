@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { alpha, layout, nightPalette } from '@/constants/theme';
+import { alpha, layout } from '@/constants/theme';
 import { arabicNumber } from '@/lib/arabicNumerals';
 import { getTest } from '@/constants/psychometrics';
 import { scoreTest } from '@/lib/psychometrics/score';
@@ -56,6 +56,7 @@ export default function TestScreen() {
   const chosen = item ? answers[item.id] : undefined;
   const labels = test.scale.labels[language];
   const dusk = colors.tones.dusk.fg;
+  const duskText = colors.tones.dusk.text;
   const labelLatin = fonts.labelTracked;
 
   const finish = async () => {
@@ -72,7 +73,7 @@ export default function TestScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
-      <ScreenGlow color={alpha(nightPalette.dusk, 0.2)} rx={80} ry={36} cy={22} />
+      <ScreenGlow color={alpha(colors.tones.dusk.hue, 0.2)} rx={80} ry={36} cy={22} />
       <ScrollView contentContainerStyle={styles.inner} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <IconButton
@@ -139,7 +140,7 @@ export default function TestScreen() {
                 <Text
                   style={[
                     labelLatin ? styles.promptLatin : styles.promptArabic,
-                    { color: dusk, fontFamily: labelLatin ? fonts.labelRegular : fonts.label },
+                    { color: duskText, fontFamily: labelLatin ? fonts.labelRegular : fonts.label },
                   ]}
                 >
                   {test.prompt[language]}
@@ -163,7 +164,7 @@ export default function TestScreen() {
                     style={({ pressed }) => [
                       styles.option,
                       selected
-                        ? { backgroundColor: alpha(nightPalette.dusk, 0.14), borderColor: dusk }
+                        ? { backgroundColor: alpha(colors.tones.dusk.hue, 0.14), borderColor: dusk }
                         : { backgroundColor: colors.card, borderColor: colors.border },
                       pressed && !selected && styles.pressed,
                     ]}

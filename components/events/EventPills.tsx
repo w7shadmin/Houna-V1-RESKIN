@@ -27,10 +27,10 @@ export function EventPills({ event }: { event: Pick<EventItem, 'isVirtual' | 'st
   const dawn = colors.tones.dawn;
   return (
     <View style={styles.pills}>
-      {event.isVirtual && pill(s.virtual, dusk.fg, colors.sheet, dusk.border, <Video size={12} color={dusk.fg} strokeWidth={1.8} />)}
+      {event.isVirtual && pill(s.virtual, dusk.text, colors.sheet, dusk.border, <Video size={12} color={dusk.fg} strokeWidth={1.8} />)}
       {event.status === 'ended'
         ? pill(s.past, colors.textSecondary, colors.sheet, colors.borderControl)
-        : pill(s.upcoming, dawn.fg, colors.sheet, dawn.border)}
+        : pill(s.upcoming, dawn.text, colors.sheet, dawn.border)}
     </View>
   );
 }

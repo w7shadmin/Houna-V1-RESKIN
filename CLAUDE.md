@@ -188,18 +188,25 @@ too (`MEDITATION_MINUTES`, passed as the `minutes` route param), so the
 full-screen player starts straight away. Every breathing and meditation
 session ends with `lib/sessionEndAlert.ts`'s gentle buzz.
 
-## Current skin — "Nightlight" / "Daylight"
+## Current skin — Night / Dusk / Sunrise
 
 Designed on the canvas at https://claude.ai/artifact/EMxmwt7o1Uq6kx32BdAUA7
-(Night row = primary, Day row = light theme). Everything below is today's
+(Night row = primary, Dusk row = the light theme once called Daylight,
+Sunrise row = Houna's original brand palette). Everything below is today's
 visual choice, not a requirement; take values from the canvas, never by eye.
 
-**Themes** (`constants/theme.ts`): `nightColors` / `dayColors`, built from
-the Nightlight and Daylight sheet swatches (`nightPalette`, `dayPalette`).
-`ThemeProvider` (`contexts/ThemeContext.tsx`) follows the phone's light/dark
-setting, with a System / Night / Day override in Profile persisted locally.
-**Read tokens with `useTheme()`** — there is no static `colors` export; a
-theme switch re-renders in place. Cards are border-only (no drop shadows);
+**Themes** (`constants/theme.ts`): `nightColors` / `dayColors` (Dusk; still
+`day` in code) / `sunriseColors`, built from the sheet swatches
+(`nightPalette`, `dayPalette`, `sunrisePalette`). There's no "follow the
+phone" option: the theme is the person's pick in Profile / More →
+Appearance (Sunrise · Dusk · Night, `APPEARANCE_OPTIONS`), persisted
+locally, Night until they choose. **Read tokens with `useTheme()`** — there
+is no static `colors` export; a theme switch re-renders in place. `isNight`
+is for Night-only features (the starfield, Home's stars, status bar); for
+colours, branch on tokens, not on the scheme. A tone (`colors.tones.*`) has
+`fg` (icons, fills), `text` (labels, links, tags — deeper where `fg` is too
+light to read, as Sunrise's coral and sky are) and `hue` (the light colour
+for glows and tinted fills); don't reach for `nightPalette` hues for glows. Cards are border-only (no drop shadows);
 light comes from glows (`shadows.glow`, `raisedButtonShadow`, `ScreenGlow`).
 Content caps at 430px (`layout.maxContentWidth`).
 
@@ -314,9 +321,9 @@ screens is touched.
 
 ## How to reskin
 
-1. Update `nightPalette` / `dayPalette` and the `nightColors` / `dayColors`
-   token sets in `constants/theme.ts` — every screen reads them through
-   `useTheme()`.
+1. Update `nightPalette` / `dayPalette` / `sunrisePalette` and the
+   `nightColors` / `dayColors` / `sunriseColors` token sets in
+   `constants/theme.ts` — every screen reads them through `useTheme()`.
 2. Change `latinFontFamily` / `arabicFontFamily` and the font loading in
    `app/_layout.tsx` together.
 3. Re-decide the meditation player's focus mode (`FOCUS`) and the native

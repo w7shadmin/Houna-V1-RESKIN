@@ -19,7 +19,7 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { Language } from '@/constants/strings';
 import { spacing, typography, radius, shadows, latinFontFamily, arabicFontFamily } from '@/constants/theme';
-import { useTheme, type AppearancePreference } from '@/contexts/ThemeContext';
+import { APPEARANCE_OPTIONS, useTheme } from '@/contexts/ThemeContext';
 
 interface MenuItem {
   icon: LucideIcon;
@@ -134,7 +134,7 @@ export default function MoreScreen() {
             accessibilityLabel={t.profile.settings.appearance}
             style={[styles.languageSwitcher, { backgroundColor: colors.surface, borderColor: colors.border }]}
           >
-            {(['system', 'night', 'day'] as AppearancePreference[]).map((option) => {
+            {APPEARANCE_OPTIONS.map((option) => {
               const active = option === preference;
               return (
                 <Pressable

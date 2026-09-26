@@ -139,11 +139,11 @@ export function Body({ children }: { children: string }) {
 export function Tag({ label, tone }: { label: string; tone: IconTileTone }) {
   const { colors } = useTheme();
   const { fonts } = useLanguage();
-  const fg = colors.tones[tone].fg;
+  const { fg, text } = colors.tones[tone];
   const latin = fonts.labelTracked;
   return (
     <View style={[styles.tag, { backgroundColor: alpha(fg, 0.12), borderColor: alpha(fg, 0.32) }]}>
-      <Text style={[latin ? styles.tagLatin : styles.tagArabic, { color: fg, fontFamily: latin ? fonts.labelRegular : fonts.label }]}>{label}</Text>
+      <Text style={[latin ? styles.tagLatin : styles.tagArabic, { color: text, fontFamily: latin ? fonts.labelRegular : fonts.label }]}>{label}</Text>
     </View>
   );
 }

@@ -64,7 +64,7 @@ export default React.memo(function ListItemCard({
           <View style={styles.tagRow}>
             {visibleTags.map((tag, i) => (
               <View key={i} style={[styles.tag, { backgroundColor: colors.tones.glow.bg, borderColor: colors.tones.glow.border }]}>
-                <Text numberOfLines={1} style={[styles.tagText, { color: colors.tones.glow.fg, fontFamily: fonts.medium }]}>
+                <Text numberOfLines={1} style={[styles.tagText, { color: colors.tones.glow.text, fontFamily: fonts.medium }]}>
                   {tag}
                 </Text>
               </View>

@@ -3,7 +3,7 @@ import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-nativ
 import { Check, RotateCcw } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { alpha, nightPalette } from '@/constants/theme';
+import { alpha, type ColorTokens } from '@/constants/theme';
 import {
   BREATH_PATTERNS,
   BREATHE_TONE,
@@ -72,10 +72,9 @@ const EXERCISE_TEXT = {
   'tension-release': 'tensionRelease',
 } as const;
 
-/** Glow for the round button and the screen, from the Nightlight swatch of the tone. */
-export function toneGlow(tone: IconTileTone, a = 0.3): string {
-  const swatch = { glow: nightPalette.hounaGlow, dawn: nightPalette.dawn, dusk: nightPalette.dusk, bloom: nightPalette.bloom }[tone];
-  return alpha(swatch, a);
+/** Glow for the round button and the screen, from the tone's light hue. */
+export function toneGlow(colors: ColorTokens, tone: IconTileTone, a = 0.3): string {
+  return alpha(colors.tones[tone].hue, a);
 }
 
 function useNum() {
@@ -241,6 +240,7 @@ function PhasePlayer({ exercise, breath, nav }: PlayerProps) {
   const idle = useIdleSlots(exercise);
   const { e, tone } = idle;
   const accent = colors.tones[tone].fg;
+  const accentText = colors.tones[tone].text;
   const phases = BREATH_PATTERNS[exercise as 'anxiety-relief' | 'steady-mind'];
   const phaseLabel = (p: BreathPhase) => ('inhale' in e ? e[p.key] : p.key);
 
@@ -292,9 +292,9 @@ function PhasePlayer({ exercise, breath, nav }: PlayerProps) {
       }
       label={
         inSession ? (
-          <TrackedLabel color={accent}>{`${s.round} ${num(clock.round)} ${s.ofTotal} ${num(cycle.totalRounds)}`}</TrackedLabel>
+          <TrackedLabel color={accentText}>{`${s.round} ${num(clock.round)} ${s.ofTotal} ${num(cycle.totalRounds)}`}</TrackedLabel>
         ) : status === 'complete' ? (
-          <TrackedLabel color={accent}>{arabicPlural(roundsDone, s.roundsDone).replace('{n}', num(roundsDone))}</TrackedLabel>
+          <TrackedLabel color={accentText}>{arabicPlural(roundsDone, s.roundsDone).replace('{n}', num(roundsDone))}</TrackedLabel>
         ) : (
           idle.label
         )
@@ -330,7 +330,7 @@ function PhasePlayer({ exercise, breath, nav }: PlayerProps) {
             <SideButton label={s.end} onPress={cycle.reset} renderIcon={(c) => <RotateCcw size={22} color={c} strokeWidth={1.7} />} />
             <MainButton
               label={status === 'running' ? s.pause : s.resume}
-              glow={toneGlow(tone)}
+              glow={toneGlow(colors, tone)}
               onPress={status === 'running' ? cycle.pause : cycle.resume}
               renderIcon={(c) => <CanvasIcon name={status === 'running' ? 'pause' : 'play'} size={28} color={c} />}
             />
@@ -339,13 +339,13 @@ function PhasePlayer({ exercise, breath, nav }: PlayerProps) {
         ) : status === 'complete' ? (
           <>
             <EndButton label={s.done} onPress={cycle.reset} />
-            <MainButton label={s.startAgain} glow={toneGlow(tone)} onPress={cycle.start} renderIcon={(c) => <RotateCcw size={26} color={c} strokeWidth={1.8} />} />
+            <MainButton label={s.startAgain} glow={toneGlow(colors, tone)} onPress={cycle.start} renderIcon={(c) => <RotateCcw size={26} color={c} strokeWidth={1.8} />} />
             <SideSpacer />
           </>
         ) : (
           <>
             <SideSpacer />
-            <MainButton label={idle.beginLabel} glow={toneGlow(tone)} onPress={cycle.start} renderIcon={PlayIcon} />
+            <MainButton label={idle.beginLabel} glow={toneGlow(colors, tone)} onPress={cycle.start} renderIcon={PlayIcon} />
             <SideSpacer />
           </>
         )
@@ -365,6 +365,7 @@ function GroundingPlayer({ exercise, breath, nav }: PlayerProps) {
   const idle = useIdleSlots(exercise);
   const { tone } = idle;
   const accent = colors.tones[tone].fg;
+  const accentText = colors.tones[tone].text;
   const steps = ex.steps;
 
   const [status, setStatus] = useState<'idle' | 'running' | 'complete'>('idle');
@@ -424,9 +425,9 @@ function GroundingPlayer({ exercise, breath, nav }: PlayerProps) {
       }
       label={
         running ? (
-          <TrackedLabel color={accent}>{ex.stepCounter(step + 1, steps.length, current.sense)}</TrackedLabel>
+          <TrackedLabel color={accentText}>{ex.stepCounter(step + 1, steps.length, current.sense)}</TrackedLabel>
         ) : status === 'complete' ? (
-          <TrackedLabel color={accent}>{ex.completionSubtitle}</TrackedLabel>
+          <TrackedLabel color={accentText}>{ex.completionSubtitle}</TrackedLabel>
         ) : (
           idle.label
         )
@@ -470,7 +471,7 @@ function GroundingPlayer({ exercise, breath, nav }: PlayerProps) {
             />
             <MainButton
               label={isLast ? ex.finish : ex.next}
-              glow={toneGlow(tone)}
+              glow={toneGlow(colors, tone)}
               onPress={next}
               renderIcon={(c) =>
                 isLast ? <Check size={28} color={c} strokeWidth={2} /> : <DirectionalIcon isRTL={isRTL} name="arrow" size={28} strokeWidth={1.8} color={c} />
@@ -481,13 +482,13 @@ function GroundingPlayer({ exercise, breath, nav }: PlayerProps) {
         ) : status === 'complete' ? (
           <>
             <EndButton label={s.done} onPress={() => setStatus('idle')} />
-            <MainButton label={ex.startAgain} glow={toneGlow(tone)} onPress={begin} renderIcon={(c) => <RotateCcw size={26} color={c} strokeWidth={1.8} />} />
+            <MainButton label={ex.startAgain} glow={toneGlow(colors, tone)} onPress={begin} renderIcon={(c) => <RotateCcw size={26} color={c} strokeWidth={1.8} />} />
             <SideSpacer />
           </>
         ) : (
           <>
             <SideSpacer />
-            <MainButton label={idle.beginLabel} glow={toneGlow(tone)} onPress={begin} renderIcon={PlayIcon} />
+            <MainButton label={idle.beginLabel} glow={toneGlow(colors, tone)} onPress={begin} renderIcon={PlayIcon} />
             <SideSpacer />
           </>
         )
@@ -507,6 +508,7 @@ function TensionPlayer({ exercise, breath, nav }: PlayerProps) {
   const idle = useIdleSlots(exercise);
   const { tone } = idle;
   const accent = colors.tones[tone].fg;
+  const accentText = colors.tones[tone].text;
   const groups = ex.groups;
 
   const [status, setStatus] = useState<Status>('idle');
@@ -608,10 +610,10 @@ function TensionPlayer({ exercise, breath, nav }: PlayerProps) {
       label={
         inSession ? (
           <FadeIn key={phase}>
-            <TrackedLabel color={accent}>{`${isTense ? ex.tense : ex.release} · ${num(secondsLeft)}`}</TrackedLabel>
+            <TrackedLabel color={accentText}>{`${isTense ? ex.tense : ex.release} · ${num(secondsLeft)}`}</TrackedLabel>
           </FadeIn>
         ) : status === 'complete' ? (
-          <TrackedLabel color={accent}>{ex.releasedTension}</TrackedLabel>
+          <TrackedLabel color={accentText}>{ex.releasedTension}</TrackedLabel>
         ) : (
           idle.label
         )
@@ -651,7 +653,7 @@ function TensionPlayer({ exercise, breath, nav }: PlayerProps) {
             />
             <MainButton
               label={status === 'running' ? s.pause : s.resume}
-              glow={toneGlow(tone)}
+              glow={toneGlow(colors, tone)}
               onPress={() => setStatus(status === 'running' ? 'paused' : 'running')}
               renderIcon={(c) => <CanvasIcon name={status === 'running' ? 'pause' : 'play'} size={28} color={c} />}
             />
@@ -666,13 +668,13 @@ function TensionPlayer({ exercise, breath, nav }: PlayerProps) {
         ) : status === 'complete' ? (
           <>
             <EndButton label={s.done} onPress={() => setStatus('idle')} />
-            <MainButton label={ex.startAgain} glow={toneGlow(tone)} onPress={begin} renderIcon={(c) => <RotateCcw size={26} color={c} strokeWidth={1.8} />} />
+            <MainButton label={ex.startAgain} glow={toneGlow(colors, tone)} onPress={begin} renderIcon={(c) => <RotateCcw size={26} color={c} strokeWidth={1.8} />} />
             <SideSpacer />
           </>
         ) : (
           <>
             <SideSpacer />
-            <MainButton label={idle.beginLabel} glow={toneGlow(tone)} onPress={begin} renderIcon={PlayIcon} />
+            <MainButton label={idle.beginLabel} glow={toneGlow(colors, tone)} onPress={begin} renderIcon={PlayIcon} />
             <SideSpacer />
           </>
         )

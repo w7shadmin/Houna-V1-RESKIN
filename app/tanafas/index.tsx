@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { alpha, layout, nightPalette } from '@/constants/theme';
+import { alpha, layout } from '@/constants/theme';
 import { BREATHE_ORDER, BREATHE_TONE, DEFAULT_MEDITATION_MINUTES, MEDITATION_MINUTES } from '@/constants/breathPatterns';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { MEDITATION_SCENES, SCENE_ORBS, type SceneId } from '@/components/meditation/scenes';
@@ -50,7 +50,7 @@ export default function TanafasHubScreen() {
   const scene = MEDITATION_SCENES[sceneIndex];
   const sceneOrb = SCENE_ORBS[scene.id as SceneId];
   const glow =
-    tab === 'discover' ? alpha(nightPalette.dusk, 0.22) : tab === 'breathe' ? toneGlow(BREATHE_TONE[exercise], 0.36) : sceneOrb.glow;
+    tab === 'discover' ? alpha(colors.tones.dusk.hue, 0.22) : tab === 'breathe' ? toneGlow(colors, BREATHE_TONE[exercise], 0.36) : sceneOrb.glow;
   const glowOpacity = breath.interpolate({ inputRange: [0, 1], outputRange: [0.65, 1] });
 
   const cycle = (n: number, count: number, d: number) => (n + d + count) % count;
@@ -183,7 +183,7 @@ function DiscoverPanel() {
         <Text
           style={[
             latin ? styles.eyebrowLatin : styles.eyebrowArabic,
-            { color: colors.tones.dusk.fg, fontFamily: latin ? fonts.labelRegular : fonts.label },
+            { color: colors.tones.dusk.text, fontFamily: latin ? fonts.labelRegular : fonts.label },
           ]}
         >
           {d.eyebrow}
@@ -194,12 +194,12 @@ function DiscoverPanel() {
         <Text style={[styles.body, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{d.body}</Text>
       </View>
 
-      <View style={[styles.note, { backgroundColor: alpha(nightPalette.dusk, 0.08), borderColor: colors.tones.dusk.border }]}>
+      <View style={[styles.note, { backgroundColor: alpha(colors.tones.dusk.hue, 0.08), borderColor: colors.tones.dusk.border }]}>
         <CanvasIcon name="info" size={20} strokeWidth={1.7} color={colors.tones.dusk.fg} />
         <View style={styles.noteText}>
           <Text style={[styles.noteBody, { color: colors.text, fontFamily: fonts.regular }]}>{d.disclaimer}</Text>
           <Pressable accessibilityRole="link" onPress={() => router.navigate('/directory/professionals')} hitSlop={8}>
-            <Text style={[styles.noteLink, { color: colors.tones.dusk.fg, fontFamily: fonts.semiBold }]}>{d.findProfessional}</Text>
+            <Text style={[styles.noteLink, { color: colors.tones.dusk.text, fontFamily: fonts.semiBold }]}>{d.findProfessional}</Text>
           </Pressable>
         </View>
       </View>
