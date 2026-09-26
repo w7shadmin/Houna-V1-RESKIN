@@ -1,10 +1,13 @@
 // "Home — appearance": changing the theme from Home. Tapping the "houna هنا" logo cycles Sunrise →
-// Dusk → Night (the order of the day), a strip of three icons above it turning like a dial; Home's
-// centre shows the theme's own sun or moon inside its ring of dots, and on a change the current one
-// sets off the right edge while the next rises in from the left, as the colours cross over.
+// Dusk → Night (the order of the day), a strip of three icons above it turning like a dial. Two Home
+// styles, both in the app while the client decides (More → Appearance → Home): "Sun & moon", where
+// Home's centre is the theme's own sun or moon alone, and a change sets it off the right edge, the
+// colours crossfade over the empty sky, and the next rises in from the left as they arrive; and
+// "Classic", the mark in its ring, where the colours just crossfade.
 // Writes an interactive prototype and a storyboard with notes.
 const fs = require('fs');
 const { DISCS, pressedMark } = require('./pressed-kit.js');
+const { mark, halo: markHalo } = require('./make-appicons.js');
 const P = __dirname + '/../project/';
 
 /* ── The three themes' Home tokens (the canvas Home boards') ── */
@@ -61,11 +64,23 @@ let seed = 11;
 const rnd = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
 const STARS = Array.from({ length: 60 }, () => `<span style="position: absolute; left: ${(rnd() * 390).toFixed(0)}px; top: ${(rnd() * 844).toFixed(0)}px; width: 1.4px; height: 1.4px; border-radius: 999px; background: rgba(242,236,221,${(0.25 + rnd() * 0.5).toFixed(2)})"></span>`).join('');
 
-function home(T, { rtl = false } = {}) {
+const rgbOf = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)).join(',');
+/** Classic's centre: the mark with its edge halo, in its ring of 28 dots (MarkHalo). */
+function classicHero(T) {
   const ring = Array.from({ length: 28 }, (_, i) => {
     const t = i / 28, a = t * Math.PI * 2 - Math.PI / 2, s = 2.5 + 4 * Math.sin(t * Math.PI);
     return `<span style="position: absolute; left: ${(CX + RING_R * Math.cos(a) - s / 2).toFixed(1)}px; top: ${(CY + RING_R * Math.sin(a) - s / 2).toFixed(1)}px; width: ${s.toFixed(1)}px; height: ${s.toFixed(1)}px; border-radius: 999px; background: ${i < 14 ? T.ringA : T.ringB}; opacity: ${(0.22 + 0.78 * Math.sin(t * Math.PI)).toFixed(2)}"></span>`;
   }).join('');
+  return `${ring}<div style="position: absolute; left: ${CX - 95}px; top: ${CY - 95}px; width: 190px; height: 190px">${markHalo(190, 70, rgbOf(T.logoP), T.stars ? 0.4 : 0.5)}${mark(70, T.logoP)}</div>`;
+}
+
+/**
+ * Home without its strip. `hero`: 'classic' draws the mark in its ring; 'none' leaves the centre
+ * empty for a sun or moon drawn above (Sun & moon: the body alone, no ring); 'slot' leaves a
+ * {{classic}} hole round the classic centre, for the prototype to show or hide.
+ */
+function home(T, { rtl = false, hero = 'none' } = {}) {
+  const ring = hero === 'classic' ? classicHero(T) : hero === 'slot' ? `<div style="display: {{classic}}">${classicHero(T)}</div>` : '';
   const button = (side, inner) => `<span style="position: absolute; ${side}: 16px; top: 22px; width: 44px; height: 44px; border-radius: 999px; background: ${T.ctrl}; border: 1px solid ${T.ctrlLine}; box-sizing: border-box; display: flex; align-items: center; justify-content: center">${inner}</span>`;
   const bloom = `<span style="width: 18px; height: 18px; border-radius: 999px; border: 2px solid ${T.accent}; box-sizing: border-box"></span>`;
   const person = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="${T.sec}" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6"></circle><path d="M5 20c1.2-3.6 4-5.4 7-5.4s5.8 1.8 7 5.4"></path></svg>`;
@@ -106,9 +121,13 @@ const BODIES = [
 ];
 const bodyBox = (inner, style) => `<div style="position: absolute; left: ${CX - 95}px; top: ${CY - 95}px; width: 190px; height: 190px; ${style}">${inner}</div>`;
 
-/* ── The move: the leaving body sets to the right, the next rises in from the left ── */
+/* ── The move (as the app: components/home/HomeBody.tsx, THEME_FADE_MS) ── */
+// Sun & moon: the body sets to the right (1300 ms); with the sky empty the screen is captured and
+// the new colours fade in under it (1000 ms); the next body rises from the left over 1500 ms, landing
+// just after they've settled. Classic: the colours fade at once, the mark stays.
 const OUT = { x: 300, y: 72 }; // off the edge, a little lower: setting / rising
-const TIMING = { total: 1150, leave: [0, 900], enter: [300, 900], colours: [250, 600], strip: [0, 400] };
+const TIMING = { total: 2900, leave: [0, 1300], colours: [1400, 1000], enter: [1400, 1500], strip: [0, 400] };
+const CLASSIC = { colours: [60, 1000], total: 1060 };
 const css = `
 @keyframes breath{0%{transform:scale(0.95);opacity:0.35}50%{transform:scale(1.06);opacity:1}100%{transform:scale(0.95);opacity:0.35}}
 ${['A', 'B'].map((v) => `
@@ -138,13 +157,17 @@ ${css}
 </style>
 </helmet>
 <div style="position: relative; width: 390px; height: 844px; overflow: hidden; background: #0B1026">
-${THEMES.map((T, k) => `<div style="position: absolute; inset: 0; z-index: {{z${k}}}; opacity: {{o${k}}}; animation: {{a${k}}}">${home(T)}</div>`).join('\n')}
-${BODIES.map((b, k) => bodyBox(b, `z-index: 10; opacity: {{bo${k}}}; animation: {{ba${k}}}`)).join('\n')}
+${THEMES.map((T, k) => `<div style="position: absolute; inset: 0; z-index: {{z${k}}}; opacity: {{o${k}}}; animation: {{a${k}}}">${home(T, { hero: 'slot' })}</div>`).join('\n')}
+${BODIES.map((b, k) => bodyBox(b, `z-index: 10; display: {{sky}}; opacity: {{bo${k}}}; animation: {{ba${k}}}`)).join('\n')}
 <div style="position: absolute; left: ${CX - 9}px; top: ${STRIP_Y}px; width: 18px; height: 18px; z-index: 11">
 ${THEMES.map((T, k) => `<span style="position: absolute; left: 0; top: 0; width: 18px; height: 18px; transform: translateX({{ix${k}}}px) scale({{is${k}}}); opacity: {{io${k}}}; color: {{ic${k}}}; transition: {{it${k}}}; animation: {{ia${k}}}">${icon(T.key, 'currentColor')}</span>`).join('\n')}
 </div>
 <button type="button" aria-label="{{label}}" onClick="{{next}}" style="position: absolute; left: ${CX - 50}px; top: 4px; width: 100px; height: 74px; z-index: 12; border: 0; background: transparent; cursor: pointer; border-radius: 16px"></button>
-<span style="position: absolute; left: 0; right: 0; top: 690px; z-index: 12; text-align: center; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; color: {{hintColor}}; pointer-events: none">TAP THE LOGO</span>
+<span style="position: absolute; left: 0; right: 0; top: 682px; z-index: 12; text-align: center; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; color: {{hintColor}}; pointer-events: none">TAP THE LOGO · HOME STYLE</span>
+<div style="position: absolute; left: 50%; top: 700px; transform: translateX(-50%); z-index: 12; display: flex; gap: 4px; padding: 3px; border-radius: 999px; background: {{switchBg}}; border: 1px solid {{switchLine}}">
+<button type="button" onClick="{{toSky}}" aria-pressed="{{skyOn}}" style="border: 0; border-radius: 999px; padding: 5px 12px; font: 600 11px 'Figtree', system-ui, sans-serif; cursor: pointer; background: {{skyBg}}; color: {{skyFg}}">Sun &amp; moon</button>
+<button type="button" onClick="{{toClassic}}" aria-pressed="{{classicOn}}" style="border: 0; border-radius: 999px; padding: 5px 12px; font: 600 11px 'Figtree', system-ui, sans-serif; cursor: pointer; background: {{classicBg}}; color: {{classicFg}}">Classic</button>
+</div>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
@@ -152,25 +175,29 @@ const NAMES = ${JSON.stringify(THEMES.map((T) => T.name))};
 const ACCENT = ${JSON.stringify(THEMES.map((T) => T.accent))};
 const TER = ${JSON.stringify(THEMES.map((T) => T.ter))};
 const SLOT = ${SLOT};
+const T = ${JSON.stringify(TIMING)};
+const C = ${JSON.stringify(CLASSIC)};
+const SWITCH = ${JSON.stringify(THEMES.map((T) => ({ bg: T.ctrl, line: T.ctrlLine, on: T.accent, onFg: T.ground, off: T.sec })))};
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.state = { cur: 2, prev: -1, n: 0 };
+    this.state = { cur: 2, prev: -1, n: 0, sky: true };
   }
   renderVals() {
-    const { cur, prev, n } = this.state;
+    const { cur, prev, n, sky } = this.state;
     const v = n % 2 ? 'A' : 'B';
     const vals = {};
+    // Sun & moon: the body sets; the colours fade over the empty sky; the next rises as they arrive.
+    // Classic: the colours just fade.
+    const fade = sky ? T.colours : C.colours;
     for (let k = 0; k < 3; k++) {
-      // The screens: the new one fades in over the old as the bodies cross.
       const on = k === cur, off = k === prev;
       vals['z' + k] = on ? 2 : off ? 1 : 0;
       vals['o' + k] = on ? 1 : 0;
-      vals['a' + k] = n && on ? 'fadein' + v + ' 600ms ease-in-out 250ms both' : n && off ? 'none' : 'none';
+      vals['a' + k] = n && on ? 'fadein' + v + ' ' + fade[1] + 'ms ease-in-out ' + fade[0] + 'ms both' : 'none';
       if (off) vals['o' + k] = 1;
-      // The bodies: the old one sets to the right, the new one rises from the left.
       vals['bo' + k] = on ? 1 : 0;
-      vals['ba' + k] = n && on ? 'enter' + v + ' 900ms cubic-bezier(0.2,0.7,0.3,1) 300ms both' : n && off ? 'leave' + v + ' 900ms cubic-bezier(0.55,0,0.8,0.4) both' : 'none';
+      vals['ba' + k] = n && on ? 'enter' + v + ' ' + T.enter[1] + 'ms cubic-bezier(0.2,0.6,0.3,1) ' + T.enter[0] + 'ms both' : n && off ? 'leave' + v + ' ' + T.leave[1] + 'ms cubic-bezier(0.45,0,0.75,0.45) both' : 'none';
       if (off && n) vals['bo' + k] = 1;
       // The strip: centre lit; the next on the left, the previous on the right.
       const rel = (k - cur + 3) % 3;
@@ -179,14 +206,29 @@ class Component extends DCLogic {
       vals['io' + k] = rel === 0 ? 1 : 0.55;
       vals['ic' + k] = rel === 0 ? ACCENT[cur] : TER[cur];
       const wraps = n && rel === 1;
-      vals['it' + k] = wraps ? 'none' : 'transform 400ms ease, opacity 400ms ease, color 600ms ease 250ms';
+      vals['it' + k] = wraps ? 'none' : 'transform 400ms ease, opacity 400ms ease, color ' + fade[1] + 'ms ease ' + fade[0] + 'ms';
       vals['ia' + k] = wraps ? 'stripin' + v + ' 400ms ease both' : 'none';
     }
     const next = (cur + 1) % 3;
+    const S = SWITCH[cur];
+    // A change runs to its end before the next tap, as in the app.
+    const busy = () => this.until && Date.now() < this.until;
     return Object.assign(vals, {
       label: 'Appearance: ' + NAMES[cur] + '. Tap for ' + NAMES[next],
       hintColor: TER[cur],
-      next: () => this.setState({ cur: next, prev: cur, n: n + 1 })
+      sky: sky ? 'block' : 'none',
+      classic: sky ? 'none' : 'block',
+      switchBg: S.bg, switchLine: S.line,
+      skyOn: String(sky), classicOn: String(!sky),
+      skyBg: sky ? S.on : 'transparent', skyFg: sky ? S.onFg : S.off,
+      classicBg: sky ? 'transparent' : S.on, classicFg: sky ? S.off : S.onFg,
+      toSky: () => { this.until = 0; this.setState({ sky: true, prev: -1, n: 0 }); },
+      toClassic: () => { this.until = 0; this.setState({ sky: false, prev: -1, n: 0 }); },
+      next: () => {
+        if (busy()) return;
+        this.until = Date.now() + (sky ? T.total : C.total);
+        this.setState({ cur: next, prev: cur, n: n + 1 });
+      }
     });
   }
 }
@@ -208,44 +250,56 @@ const arc = (p) => {
   }
   return [OUT.x, OUT.y];
 };
-/** Home at time t (ms) into a change from theme a to theme b, as a static picture. */
+/** The strip with `cur` lit, its colours from `tint` (the theme whose colours are showing). */
+const stripAt = (cur, tint = cur) => `<div style="position: absolute; left: ${CX - 9}px; top: ${STRIP_Y}px; width: 18px; height: 18px">${THEMES.map((T, k) => {
+  const rel = (k - cur + 3) % 3;
+  return `<span style="position: absolute; left: 0; top: 0; transform: translateX(${slot(k, cur)}px) scale(${rel === 0 ? 1.25 : 0.9}); opacity: ${rel === 0 ? 1 : 0.55}">${icon(T.key, rel === 0 ? THEMES[tint].accent : THEMES[tint].ter)}</span>`;
+}).join('')}</div>`;
+/** Sun & moon Home at time t (ms) into a change from theme a to theme b, as a static picture. */
 function still(a, b, t) {
   const colours = ease(clamp01((t - TIMING.colours[0]) / TIMING.colours[1]));
-  const leave = ease(clamp01((t - TIMING.leave[0]) / TIMING.leave[1]));
-  const enter = ease(clamp01((t - TIMING.enter[0]) / TIMING.enter[1]));
+  // As the app's curves: the setting body speeds up as it goes, the rising one slows as it lands.
+  const leave = Math.pow(clamp01((t - TIMING.leave[0]) / TIMING.leave[1]), 1.8);
+  const enter = 1 - Math.pow(1 - clamp01((t - TIMING.enter[0]) / TIMING.enter[1]), 2.5);
   const [lx, ly] = arc(leave);
   const [ex, ey] = arc(1 - enter);
   const cur = t >= TIMING.strip[1] / 2 ? b : a;
-  const strip = THEMES.map((T, k) => {
-    const rel = (k - cur + 3) % 3;
-    return `<span style="position: absolute; left: 0; top: 0; transform: translateX(${slot(k, cur)}px) scale(${rel === 0 ? 1.25 : 0.9}); opacity: ${rel === 0 ? 1 : 0.55}">${icon(T.key, rel === 0 ? THEMES[cur].accent : THEMES[cur].ter)}</span>`;
-  }).join('');
   return `<div style="position: relative; width: 390px; height: 844px; overflow: hidden">
 ${home(THEMES[a])}
 <div style="position: absolute; inset: 0; opacity: ${colours.toFixed(2)}">${home(THEMES[b])}</div>
-${leave < 1 ? bodyBox(BODIES[a], `transform: translate(${(-ex * 0 + lx).toFixed(0)}px, ${ly.toFixed(0)}px); opacity: ${(1 - Math.max(0, leave - 0.45) / 0.55).toFixed(2)}`) : ''}
+${leave < 1 ? bodyBox(BODIES[a], `transform: translate(${lx.toFixed(0)}px, ${ly.toFixed(0)}px); opacity: ${(1 - Math.max(0, leave - 0.45) / 0.55).toFixed(2)}`) : ''}
 ${enter > 0 ? bodyBox(BODIES[b], `transform: translate(${(-ex).toFixed(0)}px, ${ey.toFixed(0)}px); opacity: ${Math.min(1, enter / 0.55).toFixed(2)}`) : ''}
-<div style="position: absolute; left: ${CX - 9}px; top: ${STRIP_Y}px; width: 18px; height: 18px">${strip}</div>
+${stripAt(cur, colours < 0.5 ? a : b)}
+</div>`;
+}
+/** Classic Home at time t (ms) into a change from theme a to theme b: the colours fade, the mark stays. */
+function stillClassic(a, b, t) {
+  const colours = ease(clamp01((t - CLASSIC.colours[0]) / CLASSIC.colours[1]));
+  const cur = t >= TIMING.strip[1] / 2 ? b : a;
+  return `<div style="position: relative; width: 390px; height: 844px; overflow: hidden">
+${home(THEMES[a], { hero: 'classic' })}
+<div style="position: absolute; inset: 0; opacity: ${colours.toFixed(2)}">${home(THEMES[b], { hero: 'classic' })}</div>
+${stripAt(cur, colours < 0.5 ? a : b)}
 </div>`;
 }
 const S = 0.6;
 const phone = (inner) => `<div style="width: ${390 * S}px; height: ${844 * S}px; border-radius: 28px; overflow: hidden; box-shadow: 0 0 0 1px rgba(242,236,221,0.10), 0 16px 40px rgba(0,0,0,0.35)"><div style="transform: scale(${S}); transform-origin: 0 0">${inner}</div></div>`;
-const topBar = (k, rtl) => `<div style="position: relative; width: 390px; height: 84px; overflow: hidden; border-radius: 18px; box-shadow: 0 0 0 1px rgba(242,236,221,0.10)">${home(THEMES[k], { rtl })}<div style="position: absolute; left: ${CX - 9}px; top: ${STRIP_Y}px; width: 18px; height: 18px">${THEMES.map((T, i) => {
-  const rel = (i - k + 3) % 3;
-  return `<span style="position: absolute; left: 0; top: 0; transform: translateX(${slot(i, k)}px) scale(${rel === 0 ? 1.25 : 0.9}); opacity: ${rel === 0 ? 1 : 0.55}">${icon(T.key, rel === 0 ? THEMES[k].accent : THEMES[k].ter)}</span>`;
-}).join('')}</div></div>`;
+const topBar = (k, rtl) => `<div style="position: relative; width: 390px; height: 84px; overflow: hidden; border-radius: 18px; box-shadow: 0 0 0 1px rgba(242,236,221,0.10)">${home(THEMES[k], { rtl })}${stripAt(k)}</div>`;
 const caption = (n, t, note) => `<div style="display: flex; align-items: baseline; gap: 8px"><span style="font-family: 'DM Mono', monospace; font-size: 12px; color: #6FD6CF">${n}</span><span style="font-size: 15px; font-weight: 600; color: #F2ECDD">${t}</span></div>${note ? `<span style="font-size: 13px; line-height: 1.5; color: #B6BAD6">${note}</span>` : ''}`;
 const heading = (eyebrow, title, body) => `<div style="display: flex; flex-direction: column; gap: 6px; max-width: 1100px"><span style="font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.16em; color: #6FD6CF">${eyebrow}</span><span style="font-family: 'Marcellus', serif; font-size: 32px; color: #F2ECDD">${title}</span>${body ? `<span style="font-size: 15px; line-height: 1.55; color: #B6BAD6">${body}</span>` : ''}</div>`;
-const TIMES = [[0, 'Tap'], [420, 'Setting'], [720, 'Crossing'], [1150, 'Settled']];
-const transitionRow = (a, b) => `<div style="display: flex; gap: 28px">${TIMES.map(([t, label], i) => `<div style="display: flex; flex-direction: column; gap: 10px; width: ${390 * S}px">${phone(still(a, b, t))}${caption(i + 1, label, `${t} ms`)}</div>`).join('')}</div>`;
+const TIMES = [[0, 'Tap'], [900, 'Setting'], [1900, 'Colours fading, the next rising'], [2900, 'Settled']];
+const CLASSIC_TIMES = [[0, 'Tap'], [400, 'Fading'], [700, 'Fading'], [1060, 'Settled']];
+const row = (times, frame) => `<div style="display: flex; gap: 28px">${times.map(([t, label], i) => `<div style="display: flex; flex-direction: column; gap: 10px; width: ${390 * S}px">${phone(frame(t))}${caption(i + 1, label, `${t} ms`)}</div>`).join('')}</div>`;
+const transitionRow = (a, b) => row(TIMES, (t) => still(a, b, t));
+const classicRow = (a, b) => row(CLASSIC_TIMES, (t) => stillClassic(a, b, t));
 
 const NOTES = [
+  ['Two Home styles, for now', 'Both are in the app while the client decides: More → Appearance → Home, “Sun & moon” or “Classic”. Both have the logo toggle; only Home’s centre differs. When one is chosen, the other and the setting go.'],
   ['The sky doesn’t mirror', 'The sun and moon always travel left → right, setting off the right edge and rising in from the left, in Arabic too. The strip moves the same way: the next theme waits on the left.'],
-  ['Order and wrap', 'Sunrise → Dusk → Night → Sunrise, the order of the day. Three taps bring you back; the icon wrapping round fades in rather than sweeping across.'],
-  ['The body is the scene’s', 'Home now shows the same sun or moon its scene does (tonight’s real moon at Night), so tapping it opens the scene with nothing to transform: the body just carries on.'],
-  ['Timing', 'The strip turns at once (400 ms). The body sets over 900 ms; the next rises from 300 ms; the colours cross over 250–850 ms, while the two bodies pass. About a second in all.'],
-  ['Reduce Motion, haptics, access', 'Reduce Motion: a crossfade, no travel. A light haptic tick on each tap. The logo is a button: “Appearance: Night. Double-tap for Sunrise.”'],
-  ['Profile and More stay', 'The same three options remain in Profile and More → Appearance; changing it there crossfades Home next time it’s shown.'],
+  ['A true crossfade', 'The whole screen fades from the old colours to the new, tab bar and all: a picture of the screen is laid over it, the colours switch underneath, and the picture fades away over a second. Profile and More’s Appearance choices fade the same way.'],
+  ['Timing (Sun & moon)', 'The strip turns at once (400 ms). The body sets over 1.3 s; with the sky empty, the colours fade over 1 s; the next body rises over 1.5 s, landing just after they’ve settled. About 3 s in all; the logo waits till it’s done.'],
+  ['The body is the scene’s', 'Sun & moon shows the same sun or moon its scene does (tonight’s real moon at Night), alone, with no ring of dots; tapping it opens the scene with nothing to transform: the body just carries on.'],
+  ['Reduce Motion, haptics, access', 'Reduce Motion: the bodies fade in place, no travel. A light haptic tick on each tap. The logo is a button: “Appearance: Night. Double-tap for Sunrise.”'],
 ];
 
 const W = 64 * 2 + 3 * 390 + 2 * 28;
@@ -269,33 +323,41 @@ ${css}
 <div style="display: flex; flex-direction: column; gap: 12px">
 <span style="font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.16em; color: #6FD6CF">HOUNA · HOME</span>
 <h1 style="margin: 0; font-family: 'Marcellus', serif; font-weight: 400; font-size: 64px; line-height: 1; color: #F2ECDD">Home — appearance</h1>
-<p style="margin: 0; max-width: 1000px; font-size: 17px; line-height: 1.5; color: #B6BAD6">Changing the theme from Home: tap the logo and it turns to the next, Sunrise → Dusk → Night, a strip of three icons above it turning like a dial. Home’s centre shows that theme’s own sun or moon inside its ring of dots, and on a change the current one sets off the right edge as the next rises in from the left, the colours crossing over as they pass. The prototype beside this board plays it.</p>
+<p style="margin: 0; max-width: 1000px; font-size: 17px; line-height: 1.5; color: #B6BAD6">Changing the theme from Home: tap the logo and it turns to the next, Sunrise → Dusk → Night, a strip of three icons above it turning like a dial. Two Home styles, both in the app while the client decides. In “Sun & moon”, Home’s centre is that theme’s own sun or moon, alone; on a change it sets off the right edge, the colours fade across the empty sky, and the next rises in from the left as they arrive. In “Classic”, the mark stays in its ring and the colours fade across. The prototype beside this board plays both (switch at the bottom).</p>
 </div>
 <section style="display: flex; flex-direction: column; gap: 18px">
-${heading('THE TOGGLE', 'The logo and its strip', 'The current theme’s icon lit in the middle; the next on the left, the last on the right. The logo is the button. English and Arabic top bars: the buttons swap sides, the strip doesn’t.')}
+${heading('THE TOGGLE · BOTH STYLES', 'The logo and its strip', 'The current theme’s icon lit in the middle; the next on the left, the last on the right. The logo is the button. English and Arabic top bars: the buttons swap sides, the strip doesn’t.')}
 <div style="display: grid; grid-template-columns: repeat(3, 390px); gap: 20px 28px">
 ${[0, 1, 2].map((k) => `<div style="display: flex; flex-direction: column; gap: 8px">${topBar(k, false)}${caption('EN', THEMES[k].name)}</div>`).join('')}
 ${[0, 1, 2].map((k) => `<div style="display: flex; flex-direction: column; gap: 8px">${topBar(k, true)}${caption('AR', THEMES[k].name)}</div>`).join('')}
 </div>
 </section>
 <section style="display: flex; flex-direction: column; gap: 18px">
-${heading('HOME', 'Each theme’s own sun or moon', 'The body sits in Home’s ring of dots, the mark pressed into it, breathing as it does in its scene.')}
+${heading('SUN & MOON', 'Each theme’s own sun or moon, alone', 'In place of the mark and its ring: the body alone, the mark pressed into it, breathing as it does in its scene.')}
 <div style="display: flex; gap: 28px">${[0, 1, 2].map((k) => `<div style="display: flex; flex-direction: column; gap: 10px; width: ${390 * S}px">${phone(still(k, k, 0))}${caption(k + 1, THEMES[k].name, ['Pale-gold sun, short turning rays.', 'Amber evening sun, a glow, no rays.', 'Tonight’s real teal moon (full tonight).'][k])}</div>`).join('')}</div>
 </section>
 <section style="display: flex; flex-direction: column; gap: 18px">
-${heading('THE CHANGE · SUNRISE → DUSK', 'The sun sets to the right; the evening sun rises from the left')}
+${heading('SUN & MOON · SUNRISE → DUSK', 'The sun sets; the colours fade; the evening sun rises', 'The sky is empty while the colours fade, so nothing moves under the fading picture; the next body lands just after the new colours have settled.')}
 ${transitionRow(0, 1)}
 </section>
 <section style="display: flex; flex-direction: column; gap: 18px">
-${heading('THE CHANGE · DUSK → NIGHT', 'The evening sun sets; the moon rises')}
+${heading('SUN & MOON · DUSK → NIGHT', 'The evening sun sets; the colours fade; the moon rises')}
 ${transitionRow(1, 2)}
+</section>
+<section style="display: flex; flex-direction: column; gap: 18px">
+${heading('CLASSIC', 'The mark in its ring, with the same toggle', 'Home as before, the logo now the toggle. A change is the crossfade alone: the whole screen fades from the old colours to the new over a second, the mark staying where it is.')}
+<div style="display: flex; gap: 28px">${[0, 1, 2].map((k) => `<div style="display: flex; flex-direction: column; gap: 10px; width: ${390 * S}px">${phone(stillClassic(k, k, 0))}${caption(k + 1, THEMES[k].name)}</div>`).join('')}</div>
+</section>
+<section style="display: flex; flex-direction: column; gap: 18px">
+${heading('CLASSIC · NIGHT → SUNRISE', 'The colours fade across')}
+${classicRow(2, 0)}
 </section>
 <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
 ${NOTES.map(([t, b]) => `<div style="display: flex; flex-direction: column; gap: 8px; padding: 20px; border-radius: 18px; background: rgba(242,236,221,0.045); border: 1px solid rgba(242,236,221,0.10)"><span style="font-size: 15px; font-weight: 600; color: #F2ECDD">${t}</span><span style="font-size: 13.5px; line-height: 1.55; color: #B6BAD6">${b}</span></div>`).join('')}
 </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":${W},"height":3200}}'>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":${W},"height":4682}}'>
 class Component extends DCLogic {
   renderVals() {
     return {};
