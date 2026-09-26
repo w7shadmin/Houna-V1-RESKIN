@@ -14,7 +14,7 @@ import { CommunityDotMap } from '@/components/community/WorldMap';
 import MarkHalo from '@/components/starfield/MarkHalo';
 import { useStarfield } from '@/contexts/StarfieldContext';
 import { NATIVE, useReduceMotion } from '@/hooks/useCalmLoop';
-import AppearanceToggle from '@/components/home/AppearanceToggle';
+import AppearanceToggle, { STRIP_TURN_MS } from '@/components/home/AppearanceToggle';
 import HomeBody, { startSkyChange, type SkyChange } from '@/components/home/HomeBody';
 import MoodBloom, { HOME_BLOOM } from '@/components/mood/MoodBloom';
 import Card from '@/components/ui/Card';
@@ -153,13 +153,18 @@ export default function HomeScreen() {
     if (Platform.OS !== 'web') Haptics.selectionAsync().catch(() => {});
     const to = nextTheme;
     setTurningTo(to);
+    // The crossfade starts from a picture of the screen, so let the strip finish its turn (and
+    // that frame be drawn) first; a picture taken mid-turn would show it jumping back.
+    const turned = Date.now() + STRIP_TURN_MS + 50;
+    const switchColours = () =>
+      new Promise((ready) => setTimeout(ready, Math.max(0, turned - Date.now()))).then(() => setPreference(to));
     let done: Promise<unknown>;
     if (sky) {
-      const run = startSkyChange(preference, to, reduceMotion, () => setPreference(to));
+      const run = startSkyChange(preference, to, reduceMotion, switchColours);
       setChange(run.change);
       done = run.done;
     } else {
-      done = setPreference(to).then(() => new Promise((settled) => setTimeout(settled, THEME_FADE_MS)));
+      done = switchColours().then(() => new Promise((settled) => setTimeout(settled, THEME_FADE_MS)));
     }
     done.finally(() => {
       setChange(null);

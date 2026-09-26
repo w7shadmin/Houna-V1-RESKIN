@@ -72,12 +72,8 @@ export default function CanvasIcon({ name, size = 24, color, strokeWidth = 1.6 }
       );
       break;
     case 'moon':
-      body = (
-        <>
-          <Path d="M16.4 16.2A7.2 7.2 0 1 1 8.2 4.6a5.8 5.8 0 0 0 8.2 11.6z" {...stroke} />
-          <Path d="M18.6 3.4v3M17.1 4.9h3M20.4 9.2v2M19.4 10.2h2" {...stroke} />
-        </>
-      );
+      // A crescent: a circle (r 8.5) with a slightly smaller one (r 7.4) bitten from its upper right.
+      body = <Path d="M10.38 3.66A8.5 8.5 0 1 0 20.01 14.84A7.4 7.4 0 0 1 10.38 3.66z" {...stroke} />;
       break;
     case 'home':
       body = (

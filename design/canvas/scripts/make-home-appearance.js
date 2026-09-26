@@ -49,8 +49,8 @@ const ICONS = {
   sunrise: '<circle cx="12" cy="12" r="4.4"></circle><path d="M12 2.6v2.3M12 19.1v2.3M2.6 12h2.3M19.1 12h2.3M5.4 5.4l1.6 1.6M17 17l1.6 1.6M5.4 18.6 7 17M17 7l1.6-1.6"></path>',
   // Dusk: the low sun on the horizon, rays above and water below (the setting evening sun).
   dusk: '<path d="M7 14.5a5 5 0 0 1 10 0"></path><path d="M2.5 14.5h19"></path><path d="M12 5.2v2.2M5.3 8.2l1.5 1.3M18.7 8.2l-1.5 1.3M3.2 11.6l1.9.5M20.8 11.6l-1.9.5"></path><path d="M5.5 17.6h9M16.8 17.6h1.7M8 20.4h8"></path>',
-  // Night: the crescent moon with two small sparkling stars.
-  night: '<path d="M16.4 16.2A7.2 7.2 0 1 1 8.2 4.6a5.8 5.8 0 0 0 8.2 11.6z"></path><path d="M18.6 3.4v3M17.1 4.9h3M20.4 9.2v2M19.4 10.2h2"></path>',
+  // Night: the crescent moon.
+  night: '<path d="M10.38 3.66A8.5 8.5 0 1 0 20.01 14.84A7.4 7.4 0 0 1 10.38 3.66z"></path>',
 };
 const icon = (key, color) => `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[key]}</svg>`;
 /**

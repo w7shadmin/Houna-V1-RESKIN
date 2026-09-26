@@ -9,6 +9,8 @@ import { NATIVE } from '@/hooks/useCalmLoop';
 const ICON: Record<ColorScheme, CanvasIconName> = { sunrise: 'sun', day: 'sunset', night: 'moon' };
 const SIZE = 18;
 const SLOT = 30;
+/** How long the strip takes to turn one step. */
+export const STRIP_TURN_MS = 400;
 
 /**
  * Where a theme's icon sits when `current` is shown: in the middle; the next
@@ -44,7 +46,7 @@ export default function AppearanceToggle({ current, onPress, accessibilityLabel,
   useEffect(() => {
     if (from === current) return;
     turn.setValue(0);
-    Animated.timing(turn, { toValue: 1, duration: 400, easing: Easing.out(Easing.quad), useNativeDriver: NATIVE }).start(() => setFrom(current));
+    Animated.timing(turn, { toValue: 1, duration: STRIP_TURN_MS, easing: Easing.out(Easing.quad), useNativeDriver: NATIVE }).start(() => setFrom(current));
     // Only a new `current` starts a turn.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current]);
