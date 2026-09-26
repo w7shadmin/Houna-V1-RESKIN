@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "houna",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
@@ -26,13 +26,18 @@
         {
           "image": "./assets/images/icon.png",
           "resizeMode": "contain",
-          "backgroundColor": "#EFF0EE"
+          "backgroundColor": "#F5F1E8",
+          "dark": {
+            "image": "./assets/images/icon.png",
+            "backgroundColor": "#0B1026"
+          }
         }
       ],
       "expo-sqlite",
       "expo-video",
       "expo-audio",
       "expo-navigation-bar",
+      "./plugins/withNavigationBarContrastOff",
       [
         "expo-image-picker",
         {
@@ -51,9 +56,12 @@
       ],
       "package": "com.anonymous.houna",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon.png",
+        "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#3BAAA7"
       }
+    },
+    "androidNavigationBar": {
+      "enforceContrast": false
     }
   }
 }

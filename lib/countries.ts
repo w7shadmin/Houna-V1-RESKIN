@@ -231,12 +231,17 @@ const GCC_SET = new Set<string>(GCC_CODES);
  * alphabetically by its name in the given language.
  */
 export function getCountryList(language: 'en' | 'ar'): Country[] {
+  const cached = listCache[language];
+  if (cached) return cached;
+  // One collator for the whole sort: `localeCompare(b, locale)` builds a new
+  // one per comparison, which made this sort take seconds on Hermes.
+  const collator = new Intl.Collator(language);
   const priority = GCC_CODES.map((code) => COUNTRIES.find((c) => c.code === code)!);
-  const rest = COUNTRIES.filter((c) => !GCC_SET.has(c.code)).sort((a, b) =>
-    a[language].localeCompare(b[language], language),
-  );
-  return [...priority, ...rest];
+  const rest = COUNTRIES.filter((c) => !GCC_SET.has(c.code)).sort((a, b) => collator.compare(a[language], b[language]));
+  return (listCache[language] = [...priority, ...rest]);
 }
+
+const listCache: Partial<Record<'en' | 'ar', Country[]>> = {};
 
 export function getCountryName(code: string, language: 'en' | 'ar'): string | null {
   const country = COUNTRIES.find((c) => c.code === code);

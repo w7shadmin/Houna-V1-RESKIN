@@ -50,15 +50,13 @@ Changing the app icon or any native splash asset (`app.json`'s `icon`,
 `npx expo prebuild --clean` followed by reinstalling the Android dev client
 — a plain JS reload won't pick up native asset changes.
 
-**Known follow-up, not resolved**: `assets/images/icon.png`'s mark was
-recentered and `android.adaptiveIcon` was added (`foregroundImage` set to
-the same full `icon.png`), but the on-device launcher icon still doesn't
-look right. Unconfirmed but worth checking first: Android's adaptive-icon
-mask only shows the center ~66% of the foreground layer as a safe zone —
-using the full icon (background circle + mark, no extra padding) as
-`foregroundImage` is a common way to get it cropped unevenly by the
-launcher. A dedicated foreground-only asset with proper safe-zone padding
-would likely fix it.
+**Adaptive icon**: `android.adaptiveIcon.foregroundImage` is
+`assets/images/adaptive-icon.png` — the white mark alone on a transparent
+canvas at ~46% of its width, over `backgroundColor`. Android's launcher
+mask only shows the center ~66% of the foreground layer, so never point it
+at the full-bleed `icon.png` (that crops the ring to the edge). Regenerate
+the foreground from `icon.png` if the mark changes, keeping it inside the
+~61% safe-zone circle.
 
 ### Supabase conventions
 
@@ -124,13 +122,12 @@ whichever skin is using it.
 This is a mental health app; some users are in distress. These hold
 regardless of visual skin:
 
-- **Wim Hof / Nervous System Reset**
-  (`app/tanafas/breathing/nervous-system-reset.tsx`) must show a
-  full-screen safety warning before every session, acknowledged
-  explicitly, never persisted across sessions. The breath-retention timer
-  counts **up**, never auto-advances at a target, never pressures
-  continuation, and has no streaks or personal bests. The user ends the
-  hold themselves.
+- **Breath retention (Wim Hof / "Nervous System Reset") was removed** after
+  device testing. If any breath-hold exercise is ever reintroduced, it must
+  show a full-screen safety warning before every session, acknowledged
+  explicitly, never persisted across sessions; its retention timer counts
+  **up**, never auto-advances at a target, never pressures continuation,
+  and has no streaks or personal bests. The user ends the hold themselves.
 - Crisis resources must never be buried behind a generic label or deep
   navigation.
 - No streaks or guilt mechanics on mood logging (`lib/streaks.ts` tracks
@@ -172,81 +169,239 @@ deterministic regardless of entry point or platform.
 
 ### Pressed-state convention
 
-Cards that combine a border with `shadows.card` (an always-visible
-turquoise-tinted shadow/elevation) must dim the whole card via
-`pressed && { opacity: 0.85 }` on press, never overlay a separate
-`colors.cardPressed` background fill. Overlaying a new-colored fill on top
-of a shadow/border that stays static reads as two competing highlights
-instead of one. Plain bordered buttons/chips without `shadows.card` can
-still use the `cardPressed` background-overlay pattern — it only breaks
-when combined with a static tinted shadow.
+Pressing a card or control dims it — `pressed && { opacity: 0.85 }` — as
+one coherent change (`components/ui/Card.tsx`, `Button.tsx`). Never overlay
+a second colour fill on top of a surface that also has a static border or
+glow: two highlights read as competing. Plain chips may use the
+`colors.cardPressed` fill instead (`Chip.tsx`), since they have nothing
+else lit.
 
 ### The breathing session shell
 
-`components/breathing/PhaseBreathingSession.tsx` is a reusable component;
-each exercise (`app/tanafas/breathing/*.tsx`) passes in a phase-timing
-config. Never hardcode one exercise's timings into the shell itself.
+Breathing exercises run in place on the Tanafas hub, not on screens of
+their own: `components/tanafas/BreathePlayers.tsx` has one player per kind
+(timed phases, five-senses grounding, muscle relaxation), and the timed
+player's `useBreathCycle` is the reusable phase state machine. Every
+exercise's timings live in `constants/breathPatterns.ts`. Never hardcode one
+exercise's timings into a player. Meditation lengths are chosen on the hub
+too (`MEDITATION_MINUTES`, passed as the `minutes` route param), so the
+full-screen player starts straight away. Every breathing and meditation
+session ends with `lib/sessionEndAlert.ts`'s gentle buzz.
 
-## Current skin — the part to replace for a new visual direction
+## Current skin — Night / Dusk / Sunrise
 
-Everything below is today's specific visual choice, not a requirement. A
-reskin is free to change all of it.
+Designed on the canvas at https://claude.ai/artifact/EMxmwt7o1Uq6kx32BdAUA7
+(Night row = primary, Dusk row = the light theme once called Daylight,
+Sunrise row = Houna's original brand palette). The scripts that generate its
+boards, and a snapshot of its files, are in `design/canvas/` (see its README;
+re-read the live canvas before publishing). Everything below is today's
+visual choice, not a requirement; take values from the canvas, never by eye.
 
-**Brand palette** (`constants/theme.ts`): White `#FFFFFF`, Turquoise
-`#3BAAA7`, Dark Turquoise `#196662`, Broken White `#EFF0EE`, Grey 30/50/80,
-Black; accents Yellow, Raspberry, Light Cyan, Peach. Card shadows tinted
-turquoise (`shadows.card`/`cardLg`/`tab`). Content caps at 430px
-(`layout.maxContentWidth`).
+**Themes** (`constants/theme.ts`): `nightColors` / `dayColors` (Dusk; still
+`day` in code) / `sunriseColors`, built from the sheet swatches
+(`nightPalette`, `dayPalette`, `sunrisePalette`). There's no "follow the
+phone" option: the theme is the person's pick in Profile / More →
+Appearance (Sunrise · Dusk · Night, `APPEARANCE_OPTIONS`), persisted
+locally, Night until they choose. **Read tokens with `useTheme()`** — there
+is no static `colors` export; a theme switch re-renders in place. `isNight`
+is for Night-only features (the starfield, Home's stars, status bar); for
+colours, branch on tokens, not on the scheme. A tone (`colors.tones.*`) has
+`fg` (icons, fills), `text` (labels, links, tags — deeper where `fg` is too
+light to read, as Sunrise's coral and sky are) and `hue` (the light colour
+for glows and tinted fills); don't reach for `nightPalette` hues for glows. Cards are border-only (no drop shadows);
+light comes from glows (`shadows.glow`, `raisedButtonShadow`, `ScreenGlow`).
+Content caps at 430px (`layout.maxContentWidth`).
 
-**Fonts**: Inter for Latin UI, Scheherazade New for Arabic
-(`latinFontFamily`/`arabicFontFamily` in `theme.ts`) — swap both if
-changing the type system; keeping distinct Latin/Arabic families is a
-reasonable choice to preserve even in a reskin, whatever the specific fonts
-become.
+**Fonts** (`latinFontFamily` / `arabicFontFamily`, via `useLanguage().fonts`):
+Figtree body + Marcellus display + DM Mono tracked-caps labels for Latin;
+IBM Plex Sans Arabic body + Amiri display for Arabic, whose labels are
+untracked Plex (`fonts.labelTracked` is false).
 
-**Logo**: `components/Logo.tsx`, used in exactly 2 places (splash, entry
-screen). Swapping the logo replaces the whole asset, not a color.
+**8-point grid**: sizes, gaps and paddings are multiples of 8, with 4 and
+12 (`grid(0.5)`, `grid(1.5)`) for tight inner spacing — `grid(n)` /
+`spacing` in `theme.ts`. Screen side padding is 16 (`layout.screenPadding`),
+not the canvas's 20. `TabBar` is the reference: 64 above the inset (8 · 24
+icon · 4 · 20 label · 8), raised button 56 sharing the icons' bottom edge.
+Spacing is on the grid everywhere except About and Voices; snap those when
+touched.
 
-**Two hardcoded-dark exceptions**: the splash screen
-(`components/SplashIntro*.tsx`) and the meditation player
-(`app/tanafas/meditation/*.tsx`) use `palette.turquoise` /
-`palette.turquoiseDark` / plain white/black directly, bypassing the
-light-mode-only `colors` token surface. Decide deliberately whether a new
-skin keeps this pattern (a permanently-dark "focus mode" for these two
-screens) or unifies them with the rest of the light UI.
+**Android nav bar**: the tab bar runs edge-to-edge under the system
+buttons. RN 0.81 re-enables the nav-bar contrast scrim at startup (a dark
+band in Night), so `plugins/withNavigationBarContrastOff.js` turns it off
+in `MainActivity` — `app.json`'s `enforceContrast` alone isn't enough.
 
-**Legacy icon-tile exception**: `OLD_MVP_ICON_HEX` (`lib/color.ts`) is a
-small hardcoded hex set used only for topic icon tiles, in
-`app/(tabs)/index.tsx`, `app/(tabs)/directory/index.tsx`,
-`app/tanafas/index.tsx`, and `app/tanafas/breathing/index.tsx`. It predates
-the current token system and isn't part of the brand palette — safe to
-drop entirely in a reskin, replacing it with tokens from `theme.ts` or a
-new palette.
+**Primitives** (`components/ui/`): `Button`, `IconButton`, `Chip`, `Card`,
+`IconTile` (the one tile pattern: glow / dawn / dusk / bloom tones), `Label`,
+`TabBar`, `CanvasIcon` (canvas stroke icons; use `DirectionalIcon` for ones
+that mirror in RTL), `Orb`, `ScreenGlow`. Build new UI from these.
+
+**Logo**: `components/Logo.tsx` (`variant="themed"` recolours the official
+artwork's fills from `colors.logo`; paths untouched) and `HounaMark.tsx`
+(the pin alone). The splash intro uses the same tokens.
+
+**Meditation player — permanent dark focus mode, decided**: its chrome sits
+over full-screen video, so `components/meditation/MeditationPlayer.tsx`
+uses Nightlight Midnight/Moonlight in both themes (`FOCUS`). Its background
+audio can only be verified in an Android dev-client build.
+
+**Native splash**: `app.json` has Daybreak and Midnight (`dark`) grounds;
+needs `npx expo prebuild --clean` + reinstalling the dev client to apply,
+like `userInterfaceStyle: "automatic"`.
+
+**Legacy, still to migrate**: the old `palette` export and older styling
+(`shadows.card`, `primaryLightest`) remain on About, More's leftovers, Voices
+and `ComingSoon`. Move them onto the primitives and tokens when touched, then
+delete `palette`.
+
+**Account screens** (`app/account/*`) are built from
+`components/account/AccountKit.tsx`: `AccountScreen` (back button, tracked
+eyebrow, display title), `Field`, `FormMessage`, `OrDivider`, `SwitchLink`,
+`SettingsGroup`/`SettingsRow` and `ThemedSwitch`. Use these for any new
+account or settings screen.
+
+**Houna starfield** (Night only): tapping Home's mark fades Home's chrome
+and the tab bar (`contexts/StarfieldContext.tsx`, one shared `chrome`
+value) and hands the mark to `app/starfield.tsx`, a transparent modal that
+draws its moon at the measured spot (`x`/`y` params), then glides it to the
+middle over a turning, twinkling sky with shooting stars
+(`components/starfield/`), the mark becoming the moon on the way: a small
+solid teal disc about the mark's size with the mark pressed in
+(`MoonDisc`), its halo joined to the disc's edge (`EdgeHalo`). The moon is
+in tonight's real phase (`lib/moonPhase.ts`, from the date alone: offline, no
+permissions), lit on the right while waxing as seen from the Gulf, the dark part
+in earthshine with the mark just visible. The lit shape is two clipping windows
+over whole faces (a half-disc slid sideways, a round window squeezed across), so
+the pressed mark never distorts and the breath animates natively: the lit part
+swells a little on the in-breath, never past the quarter line, and the halo
+follows the light (full on full-moon nights). On full-moon nights only (the
+"full" eighth of the cycle, three or four nights a month) a wide, faint ring
+circles it too (the canvas "Moon halo" concept). Canvas: "Houna moon — real
+phases", option B. The moon fades as one layer (`needsOffscreenAlphaCompositing`):
+Android otherwise fades its stacked faces separately and it seems to sweep
+through phases. The only word is "Tanafas"; tapping the
+moon or Back reverses it. Home's mark is `components/starfield/MarkHalo.tsx`
+(dot ring, edge halo, 5s breath), and it crossfades into the moon mid-glide;
+ambient loops use `hooks/useCalmLoop.ts` (focus- and Reduce-Motion-aware).
+Every visit counts as a breathing session (`starfield`, titled Tanafas in
+Recap): the foreground time from arrival until the moon is tapped, with the
+app-wide 10s minimum (`MIN_SESSION_SECONDS`), into Recap, streaks and the
+leaderboard.
+
+**Houna sunrise and Houna dusk** (Sunrise and Dusk; the starfield's
+counterparts, canvas "Houna sunrise" / "Houna dusk"): the same handoff from
+Home's mark, to `app/sunrise.tsx` / `app/dusk.tsx`, thin wrappers round one
+scene (`components/sunrise/SunScene.tsx`) that reads a `SunScene` from
+`theme.ts` (`sunriseScene` / `duskScene`). A first sky comes in as Home steps
+back (pre-dawn; golden hour), and the sun arrives by the scene's `entrance`.
+Dusk `glide`s: the mark glides down as the moon does to where that sun settles
+(`settle`: the moon's 0.42; Dusk's lower 0.55, a setting sun), becoming the sun.
+Sunrise `rise`s (canvas "Houna sunrise — from below"): the mark fades where it
+is, a `horizon` glow gathers along the bottom edge, and the sun comes up through
+it from below the screen, a touch larger while low, and sinks back on the way
+out. Either way, a small sun (`SunDisc`: pale-gold with short turning
+rays; amber with none; the mark pressed into it) as the second sky takes over (morning; violet dusk,
+where `FirstStars` then come out, with the starfield's `ShootingStars`
+now and then). The disc and mark stay still; the edge
+halo, rays and wide sunglow breathe on the shared clock exactly as the
+moon's halo does. Counted as `sunrise` / `dusk` sessions, titled Tanafas in
+Recap. Every theme's mark now opens a scene. All three share
+`hooks/useBreathingScene.ts` (the measured handoff, visit counting,
+keep-awake / hidden bars / Back); keep one animation per value inside a
+parallel, or stopping one stops all. The web preview may only paint frames
+on demand, so JS-driven animations there can look stuck mid-way; that's the
+preview, not the scene.
+
+**Tanafas player**: the Breathe and Meditate carousels share
+`components/tanafas/PlayerFrame.tsx` (stage, title row, tag, description,
+tiles, round button). Pressing play on a breathing exercise keeps the
+layout and fades each slot over to the session (round, phase, time left).
+The stage (`BreatheStages.tsx`) is a ring of dots around a translucent,
+glassy orb that inflates and deflates (box breathing: a square of dots
+around a rounded-square orb), with the Houna mark pressed into its middle
+(one even shape a shade deeper than the orb, scaling with it: `components/ui/PressedMark.tsx`, the
+one pressed mark the orbs, the suns and the moon share); the screen glow breathes with it.
+The dots move on Home's clock (`StarfieldContext`), rippling like its ring;
+a ring also turns (not while grounding lights it, never the square, whose
+corners the bead follows), and none take Home's 5s breath, which would
+fight the exercise's own pace.
+Nothing is drawn over the orb: grounding's count is in its prompt, muscle
+relaxation's countdown in its Tense / Release label. Tones: 4-7-8 glow, box
+dusk, five senses dawn, muscle relaxation bloom (a fourth tone, the mood palette's rose, so neighbours in the carousel never share a colour). Meditate's stage
+(`SceneStage.tsx`) plays the scene's footage muted inside its orb, cropped
+to `videoFocus` in `components/meditation/scenes.ts`; the plain orb shows
+for scenes without footage.
+
+**Directory pages** are all in the canvas language now: list pages use
+`components/directory/PageHeader.tsx`; the professional / organization /
+wellness-center pages share `components/directory/ProfileKit.tsx` (from the
+canvas "Professional profile" artboard) with data cleanup in
+`lib/directoryProfile.ts` — the scraped socials include Houna's own footer
+accounts (filtered by `ownSocials`), info labels arrive in the page's
+language (mapped by `profileFacts`), and text can carry HTML entities.
+Events (list, event, speaker) uses the same pieces; event dates go through
+`lib/eventDate.ts` (the site sends "19/05/2026, 19:00 pm").
+
+**Directory search** runs on the device (`lib/directorySearch.ts` loads the
+lists; queries never leave the phone): `lib/searchText.ts` (folding, word
+forms: English endings, Arabic attached letters), `lib/searchRank.ts`
+(weighted fields, prefix/typo matching, each word weighed by its rarity,
+every-word matches first) and `lib/searchConcepts.ts`, the bilingual meaning
+map ("sad" → depression, English ↔ Arabic; content, edit freely). It covers
+the directory lists, events and speakers, the topics, and Tanafas' exercises
+and scenes (a result opens `/tanafas` with `tab` + `exercise`/`scene`). The
+lists are saved on the phone (AsyncStorage, `directory-search:v1:*`: used as
+is under a day old, shown while refreshing up to two weeks), and each item
+also carries its name in the other language (`aliases`), loaded after.
+Professionals also carry what their own page says (location, languages, who
+they work with, specialties: `facts`), from the `houna-search-index` Edge
+Function (`supabase/functions/houna-search-index`), which reads every
+professional's houna.org page in background steps (houna.org is slow to the
+edge: a full build is ~5 min) and serves one file per language, rebuilt daily
+into `houna_cache`. `supabase/functions/houna-proxy` is the proxy's source,
+recovered from the old MVP (the dashboard can't export it); deploying it
+replaces the live proxy, so test it side by side first. Both are Deno, so
+`tsconfig.json` excludes `supabase/functions`. A search
+that sounds like a crisis (`lib/crisisIntent.ts`, draft word lists awaiting
+clinical review) puts a crisis card first. **Proxy gotcha**: `/therapists`'
+`lastPage` is always the current page + 1, never the real last page, so
+page until one comes back empty (the search once stopped at 30 of 286).
+
+**Known web-only quirks (native is fine)**: react-native-web resolves
+`start`/`end` offsets as LTR even in Arabic; lucide icons with an RTL flip
+transform draw off-screen on web (use `DirectionalIcon`).
+
+**SVG gradient gotcha (native only)**: react-native-svg drops a `<Stop>`'s
+`stopColor` alpha on the phone and uses `stopOpacity` alone, so an
+`rgba(...)` stop (e.g. from `alpha()`) draws fully opaque there while web
+draws it translucent. Always spread `lib/svgStop.ts`'s `stopProps(color,
+opacity?)` into a `<Stop>` rather than passing an rgba `stopColor`.
+
+**RTL gotcha for measured positions (native only)**: in Arabic, Android
+swaps `left`/`right` style offsets too (RN's `swapLeftAndRightInRTL`), so
+anything placed by measured, physical screen pixels (e.g. the starfield's
+moon, handed over from `measureInWindow`) lands mirrored. Such scenes set
+`direction: 'ltr'` on their root (native only; web never swaps and rejects the
+style), as `app/starfield.tsx` does. The web preview can't show this bug.
 
 **Known inconsistency, not fixed here**: about 6 screens hand-roll their
 own loading/error state instead of the shared `LoadingState`/`ErrorState`/
 `InlineError` components (`components/directory/AsyncState.tsx`) used in
 ~13 others. Cosmetic only — worth normalizing next time one of those
-screens is touched, not urgent enough on its own to justify a
-wide-reaching pass.
+screens is touched.
 
 ## How to reskin
 
-1. Update `constants/theme.ts`'s `palette`/`colors`/`shadows` — this alone
-   recolors nearly the entire app, since virtually every screen consumes
-   tokens rather than hardcoded values.
-2. Decide on new `latinFontFamily`/`arabicFontFamily` values and update the
-   font-loading setup (`app/_layout.tsx`) to match.
-3. Review the two hardcoded-dark exceptions (splash, meditation player) and
-   decide whether that pattern still fits the new visual direction.
-4. Drop `OLD_MVP_ICON_HEX` (`lib/color.ts`) and its call sites in favor of
-   the new token system.
-5. Swap `components/Logo.tsx`'s asset.
-6. If the brand name or voice is changing — not just the colors — update
+1. Update `nightPalette` / `dayPalette` / `sunrisePalette` and the
+   `nightColors` / `dayColors` / `sunriseColors` token sets in
+   `constants/theme.ts` — every screen reads them through `useTheme()`.
+2. Change `latinFontFamily` / `arabicFontFamily` and the font loading in
+   `app/_layout.tsx` together.
+3. Re-decide the meditation player's focus mode (`FOCUS`) and the native
+   splash colours in `app.json`.
+4. Keep the logo artwork; recolour it only through `colors.logo`.
+5. If the brand name or voice is changing — not just the colors — update
    the copy in `constants/*Strings.ts` too. The brand name and tone are
    woven into full sentences, not isolated as a single swappable token.
-7. For anything structurally different (not just color/font/spacing), use
-   `components/ui/Button.tsx` and `components/ui/Card.tsx` as the starting
-   primitives rather than hand-rolling new one-off styles per screen.
-8. Re-verify RTL after any layout change — reflow bugs show up specifically
+6. Restyle `components/ui/*` first; screens compose those primitives.
+7. Re-verify RTL after any layout change — reflow bugs show up specifically
    in the Arabic direction even when the English layout still looks fine.

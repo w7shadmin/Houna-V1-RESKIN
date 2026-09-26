@@ -1,160 +1,248 @@
-import React, { useState } from 'react';
-import { View, Text, Pressable, ScrollView, StyleSheet, Modal } from 'react-native';
-import { useRouter } from 'expo-router';
+import React, { useRef, useState } from 'react';
+import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Wind, Moon, BookOpen, MessageCircle, CheckCircle2, ChevronRight, type LucideIcon } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, palette, spacing, radius, typography, shadows } from '@/constants/theme';
-import { mix, OLD_MVP_ICON_HEX, OLD_MVP_ICON_HEX_PALE } from '@/lib/color';
-import FlatIconTile from '@/components/ui/FlatIconTile';
+import { useTheme } from '@/contexts/ThemeContext';
+import { alpha, layout } from '@/constants/theme';
+import { BREATHE_ORDER, BREATHE_TONE, DEFAULT_MEDITATION_MINUTES, MEDITATION_MINUTES } from '@/constants/breathPatterns';
+import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
+import { MEDITATION_SCENES, SCENE_ORBS, type SceneId } from '@/components/meditation/scenes';
+import { TESTS } from '@/constants/psychometrics';
+import IconButton from '@/components/ui/IconButton';
+import IconTile, { type IconTileTone } from '@/components/ui/IconTile';
+import Card from '@/components/ui/Card';
+import ScreenGlow from '@/components/ui/ScreenGlow';
+import CanvasIcon, { DirectionalIcon } from '@/components/ui/CanvasIcon';
+import BreathePlayer, { toneGlow } from '@/components/tanafas/BreathePlayers';
+import PlayerFrame, { Body, Heading, InfoTiles, LengthTile, MainButton, SideSpacer, Tag, Tile } from '@/components/tanafas/PlayerFrame';
+import SceneStage from '@/components/tanafas/SceneStage';
 
-interface HubCard {
-  id: 'breathing' | 'meditation' | 'journal' | 'voices';
-  title: string;
-  subtitle: string;
-  description: string;
-  icon: LucideIcon;
-  color: string;
-  bg: string;
-  available: boolean;
-}
+type Tab = 'breathe' | 'meditate' | 'discover';
 
+/** Discover's test tiles cycle through the canvas's three tones. */
+const TEST_TONES: IconTileTone[] = ['dusk', 'glow', 'dawn'];
+
+/**
+ * Tanafas hub (canvas "Tanafas — Breathe · Meditate · Discover"), opened
+ * from the raised tab-bar button as a modal. Breathe and Meditate are
+ * one-at-a-time carousels with a big round button: breathing exercises run
+ * right here (components/tanafas/BreathePlayers.tsx), a meditation opens its
+ * full-screen scene. Discover lists the self-reflection tests. The journal is
+ * one tap away in the header. A search result can open it at one exercise or
+ * scene (`tab` + `exercise` / `scene` params); otherwise it opens on Breathe.
+ */
 export default function TanafasHubScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
-  const { t, fonts } = useLanguage();
-  const hub = t.tanafas.hub;
-  const [comingSoon, setComingSoon] = useState<string | null>(null);
+  const { t, fonts, isRTL } = useLanguage();
+  const h = t.discover.hub;
+  const scenesText = t.tanafas.meditation.scenes;
 
-  const cards: HubCard[] = [
-    {
-      id: 'breathing',
-      title: hub.breathingTitle,
-      subtitle: hub.breathingSubtitle,
-      description: hub.breathingDescription,
-      icon: Wind,
-      color: OLD_MVP_ICON_HEX.lightCyan,
-      bg: OLD_MVP_ICON_HEX_PALE.lightCyan,
-      available: true,
-    },
-    {
-      id: 'meditation',
-      title: hub.meditationTitle,
-      subtitle: hub.meditationSubtitle,
-      description: hub.meditationDescription,
-      icon: Moon,
-      color: OLD_MVP_ICON_HEX.peach,
-      bg: OLD_MVP_ICON_HEX_PALE.peach,
-      available: true,
-    },
-    {
-      id: 'journal',
-      title: hub.journalTitle,
-      subtitle: hub.journalSubtitle,
-      description: hub.journalDescription,
-      icon: BookOpen,
-      color: OLD_MVP_ICON_HEX.raspberry,
-      bg: OLD_MVP_ICON_HEX_PALE.raspberry,
-      available: true,
-    },
-    {
-      id: 'voices',
-      title: t.tanafas.voices.hubTitle,
-      subtitle: t.tanafas.voices.hubSubtitle,
-      description: t.tanafas.voices.hubDescription,
-      icon: MessageCircle,
-      color: OLD_MVP_ICON_HEX.gold,
-      bg: OLD_MVP_ICON_HEX_PALE.gold,
-      available: true,
-    },
-  ];
+  const params = useLocalSearchParams<{ tab?: string; exercise?: string; scene?: string }>();
+  const [tab, setTab] = useState<Tab>(params.tab === 'meditate' || params.tab === 'discover' ? params.tab : 'breathe');
+  const [breatheIndex, setBreatheIndex] = useState(() => Math.max(0, BREATHE_ORDER.findIndex((k) => k === params.exercise)));
+  const [sceneIndex, setSceneIndex] = useState(() => Math.max(0, MEDITATION_SCENES.findIndex((sc) => sc.id === params.scene)));
+  // Meditation length, chosen here so the player can open straight into the session.
+  const [meditateMinutes, setMeditateMinutes] = useState<number | null>(DEFAULT_MEDITATION_MINUTES);
+  // How full the breathing orb is (0 rest → 1); the screen glow breathes with it.
+  const breath = useRef(new Animated.Value(0)).current;
 
-  const handlePress = (card: HubCard) => {
-    if (!card.available) {
-      setComingSoon(card.title);
-      return;
-    }
-    if (card.id === 'breathing') {
-      router.push('/tanafas/breathing');
-    } else if (card.id === 'meditation') {
-      router.push('/tanafas/meditation');
-    } else if (card.id === 'journal') {
-      router.push('/tanafas/journal');
-    } else if (card.id === 'voices') {
-      router.push('/tanafas/voices');
-    }
+  const exercise = BREATHE_ORDER[breatheIndex];
+  const scene = MEDITATION_SCENES[sceneIndex];
+  const sceneOrb = SCENE_ORBS[scene.id as SceneId];
+  const glow =
+    tab === 'discover' ? alpha(colors.tones.dusk.hue, 0.22) : tab === 'breathe' ? toneGlow(colors, BREATHE_TONE[exercise], 0.36) : sceneOrb.glow;
+  const glowOpacity = breath.interpolate({ inputRange: [0, 1], outputRange: [0.65, 1] });
+
+  const cycle = (n: number, count: number, d: number) => (n + d + count) % count;
+  const switchTab = (next: Tab) => {
+    breath.stopAnimation();
+    breath.setValue(0);
+    setTab(next);
   };
+  const close = () => (router.canGoBack() ? router.back() : router.replace('/(tabs)'));
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Text style={[styles.title, { color: colors.text, fontFamily: fonts.bold }]}>{hub.title}</Text>
-        <Text style={[styles.subtitle, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-          {hub.subtitle}
-        </Text>
+      <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { opacity: tab === 'breathe' ? glowOpacity : 1 }]}>
+        <ScreenGlow color={glow} rx={70} ry={38} cy={30} />
+      </Animated.View>
 
-        <View style={styles.cards}>
-          {cards.map((card) => {
-            const Icon = card.icon;
-            return (
-              <Pressable
-                key={card.id}
-                onPress={() => handlePress(card)}
-                style={({ pressed }) => [
-                  styles.card,
-                  { backgroundColor: colors.card, borderColor: colors.border, ...shadows.card },
-                  pressed && styles.pressed,
-                ]}
-              >
-                <FlatIconTile icon={Icon} color={card.color} bg={card.bg} size={52} />
-                <View style={styles.cardText}>
-                  <Text style={[styles.cardTitle, { color: colors.text, fontFamily: fonts.bold }]}>
-                    {card.title}
-                  </Text>
-                  <Text style={[styles.cardSubtitle, { color: colors.primary, fontFamily: fonts.semiBold }]}>
-                    {card.subtitle}
-                  </Text>
+      <View style={styles.inner}>
+        {/* Header: close · tabs · journal */}
+        <View style={styles.header}>
+          <IconButton
+            variant="subtle"
+            accessibilityLabel={h.close}
+            onPress={close}
+            renderIcon={(c) => <CanvasIcon name="close" size={18} strokeWidth={1.8} color={c} />}
+          />
+          <View accessibilityRole="tablist" accessibilityLabel={h.tabsLabel} style={styles.tabs}>
+            {(['breathe', 'meditate', 'discover'] as Tab[]).map((key) => {
+              const selected = tab === key;
+              return (
+                <Pressable
+                  key={key}
+                  accessibilityRole="tab"
+                  aria-selected={selected}
+                  onPress={() => switchTab(key)}
+                  style={[styles.tab, { borderBottomColor: selected ? colors.primary : 'transparent' }]}
+                >
                   <Text
-                    numberOfLines={2}
-                    style={[styles.cardDesc, { color: colors.textSecondary, fontFamily: fonts.regular }]}
+                    style={[
+                      styles.tabText,
+                      { color: selected ? colors.text : colors.textTertiary, fontFamily: fonts.semiBold },
+                    ]}
                   >
-                    {card.description}
+                    {h.tabs[key]}
                   </Text>
-                </View>
-                <ChevronRight size={20} color={colors.textTertiary} strokeWidth={1.8} />
-              </Pressable>
-            );
-          })}
+                </Pressable>
+              );
+            })}
+          </View>
+          <IconButton
+            variant="subtle"
+            accessibilityLabel={h.journal}
+            onPress={() => router.push('/tanafas/journal')}
+            renderIcon={(c) => <CanvasIcon name="journal" size={20} color={c} />}
+          />
         </View>
-      </ScrollView>
 
-      <Modal visible={comingSoon !== null} transparent animationType="fade" onRequestClose={() => setComingSoon(null)}>
-        <Pressable style={styles.modalBackdrop} onPress={() => setComingSoon(null)}>
-          <Pressable style={[styles.modalCard, { backgroundColor: colors.card }]} onPress={(e) => e.stopPropagation()}>
-            <View style={[styles.modalIcon, { backgroundColor: colors.primaryLightest }]}>
-              <CheckCircle2 size={32} color={colors.primary} strokeWidth={1.5} />
-            </View>
-            <Text style={[styles.modalTitle, { color: colors.text, fontFamily: fonts.bold }]}>
-              {hub.comingSoonTitle}
-            </Text>
-            <Text style={[styles.modalBody, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-              {comingSoon ? hub.comingSoonBody(comingSoon) : ''}
-            </Text>
-            <Pressable
-              onPress={() => setComingSoon(null)}
-              style={({ pressed }) => [
-                styles.modalBtn,
-                { backgroundColor: colors.primary },
-                pressed && { backgroundColor: mix(colors.primary, palette.black, 0.15) },
-              ]}
-            >
-              <Text style={[styles.modalBtnText, { color: colors.onPrimary, fontFamily: fonts.semiBold }]}>
-                {hub.gotIt}
-              </Text>
-            </Pressable>
-          </Pressable>
-        </Pressable>
-      </Modal>
+        {tab === 'discover' ? (
+          <DiscoverPanel />
+        ) : tab === 'breathe' ? (
+          <BreathePlayer
+            key={exercise}
+            exercise={exercise}
+            breath={breath}
+            nav={{
+              count: BREATHE_ORDER.length,
+              index: breatheIndex,
+              onPrev: () => setBreatheIndex((i) => cycle(i, BREATHE_ORDER.length, -1)),
+              onNext: () => setBreatheIndex((i) => cycle(i, BREATHE_ORDER.length, 1)),
+            }}
+          />
+        ) : (
+          <PlayerFrame
+            mode={scene.id}
+            nav={{
+              count: MEDITATION_SCENES.length,
+              index: sceneIndex,
+              onPrev: () => setSceneIndex((i) => cycle(i, MEDITATION_SCENES.length, -1)),
+              onNext: () => setSceneIndex((i) => cycle(i, MEDITATION_SCENES.length, 1)),
+            }}
+            stage={<SceneStage scene={scene} />}
+            heading={<Heading>{scenesText[scene.id].name}</Heading>}
+            label={<Tag label={h.ambientScene} tone="glow" />}
+            body={<Body>{scenesText[scene.id].description}</Body>}
+            info={
+              <InfoTiles>
+                <LengthTile
+                  label={h.duration}
+                  options={MEDITATION_MINUTES}
+                  value={meditateMinutes}
+                  onChange={setMeditateMinutes}
+                  unit={t.tanafas.session.minPlural}
+                  optionLabel={(m) =>
+                    m === null ? h.noLimit : `${isRTL ? arabicNumber(m) : m} ${arabicPlural(m, t.tanafas.meditation.player.min)}`
+                  }
+                  accent={sceneOrb.c}
+                />
+                <Tile label={h.video}>{scene.video ? h.on : h.off}</Tile>
+              </InfoTiles>
+            }
+            controls={
+              <>
+                <SideSpacer />
+                <MainButton
+                  label={`${h.begin} — ${scenesText[scene.id].name}`}
+                  glow={glow}
+                  onPress={() => router.push({ pathname: '/tanafas/meditation/[scene]', params: { scene: scene.id, minutes: meditateMinutes === null ? 'none' : String(meditateMinutes) } })}
+                  renderIcon={(c) => <CanvasIcon name="play" size={28} color={c} />}
+                />
+                <SideSpacer />
+              </>
+            }
+          />
+        )}
+      </View>
     </SafeAreaView>
+  );
+}
+
+function DiscoverPanel() {
+  const { colors } = useTheme();
+  const router = useRouter();
+  const { t, fonts, isRTL, language } = useLanguage();
+  const d = t.discover.discover;
+  const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
+  const latin = fonts.labelTracked;
+
+  return (
+    <ScrollView contentContainerStyle={styles.discover} showsVerticalScrollIndicator={false}>
+      <View style={styles.discoverHead}>
+        <Text
+          style={[
+            latin ? styles.eyebrowLatin : styles.eyebrowArabic,
+            { color: colors.tones.dusk.text, fontFamily: latin ? fonts.labelRegular : fonts.label },
+          ]}
+        >
+          {d.eyebrow}
+        </Text>
+        <Text accessibilityRole="header" style={[styles.discoverTitle, isRTL && styles.discoverTitleArabic, { color: colors.text, fontFamily: fonts.display }]}>
+          {d.title}
+        </Text>
+        <Text style={[styles.body, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{d.body}</Text>
+      </View>
+
+      <View style={[styles.note, { backgroundColor: alpha(colors.tones.dusk.hue, 0.08), borderColor: colors.tones.dusk.border }]}>
+        <CanvasIcon name="info" size={20} strokeWidth={1.7} color={colors.tones.dusk.fg} />
+        <View style={styles.noteText}>
+          <Text style={[styles.noteBody, { color: colors.text, fontFamily: fonts.regular }]}>{d.disclaimer}</Text>
+          <Pressable accessibilityRole="link" onPress={() => router.navigate('/directory/professionals')} hitSlop={8}>
+            <Text style={[styles.noteLink, { color: colors.tones.dusk.text, fontFamily: fonts.semiBold }]}>{d.findProfessional}</Text>
+          </Pressable>
+        </View>
+      </View>
+
+      <View style={styles.tests}>
+        {TESTS.length === 0 && (
+          <Text style={[styles.body, { color: colors.textTertiary, fontFamily: fonts.regular }]}>{d.empty}</Text>
+        )}
+        {TESTS.map((test, k) => {
+          const n = test.items.length;
+          const minutes = Math.max(1, Math.ceil((n * 10) / 60));
+          const meta = `${arabicPlural(n, d.questions).replace('{n}', num(n))} · ${d.minutes.replace('{n}', num(minutes))}`;
+          return (
+            <Card
+              key={test.id}
+              onPress={() => router.push({ pathname: '/tanafas/discover/[testId]', params: { testId: test.id } })}
+              accessibilityLabel={`${test.title[language]}, ${meta}`}
+              style={styles.testCard}
+            >
+              <IconTile
+                size={48}
+                tone={TEST_TONES[k % TEST_TONES.length]}
+                renderIcon={(c) => <CanvasIcon name="reflection" size={22} strokeWidth={1.6} color={c} />}
+              />
+              <View style={styles.testText}>
+                <Text style={[styles.testTitle, { color: colors.text, fontFamily: fonts.semiBold }]}>{test.title[language]}</Text>
+                <Text
+                  style={[
+                    latin ? styles.testMetaLatin : styles.testMetaArabic,
+                    { color: colors.textTertiary, fontFamily: latin ? fonts.labelRegular : fonts.regular },
+                  ]}
+                >
+                  {meta}
+                </Text>
+              </View>
+              <DirectionalIcon isRTL={isRTL} name="chevron" size={18} color={colors.textTertiary} />
+            </Card>
+          );
+        })}
+      </View>
+    </ScrollView>
   );
 }
 
@@ -162,89 +250,106 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
   },
-  scroll: {
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xxl,
+  inner: {
+    flex: 1,
+    width: '100%',
+    maxWidth: layout.maxContentWidth,
+    alignSelf: 'center',
+    paddingTop: 16,
+    paddingHorizontal: layout.screenPadding,
+    paddingBottom: 24,
   },
-  title: {
-    fontSize: typography.fontSize.xxl,
-    marginTop: spacing.md,
-  },
-  subtitle: {
-    fontSize: typography.fontSize.body,
-    marginTop: spacing.xs,
-    marginBottom: spacing.lg,
-  },
-  cards: {
-    gap: spacing.md,
-  },
-  card: {
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: radius.lg,
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  tabs: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  tab: {
+    height: 44,
+    paddingHorizontal: 4,
+    justifyContent: 'center',
+    borderBottomWidth: 2,
+  },
+  tabText: {
+    fontSize: 15,
+  },
+  stage: {
+    width: 250,
+    height: 250,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  discover: {
+    paddingTop: 24,
+    gap: 16,
+  },
+  discoverHead: {
+    gap: 8,
+  },
+  eyebrowLatin: {
+    fontSize: 12,
+    letterSpacing: 12 * 0.16,
+    textTransform: 'uppercase',
+  },
+  eyebrowArabic: {
+    fontSize: 13.5,
+  },
+  discoverTitle: {
+    fontSize: 30,
+    lineHeight: 30 * 1.12,
+  },
+  discoverTitleArabic: {
+    lineHeight: 44,
+  },
+  body: {
+    fontSize: 14.5,
+    lineHeight: 14.5 * 1.5,
+  },
+  note: {
+    flexDirection: 'row',
+    gap: 12,
+    padding: 16,
+    borderRadius: 18,
     borderWidth: 1,
-    padding: spacing.md,
-    gap: spacing.md,
   },
-  pressed: {
-    opacity: 0.85,
-  },
-  cardText: {
+  noteText: {
     flex: 1,
+    gap: 8,
   },
-  cardTitle: {
-    fontSize: typography.fontSize.body,
+  noteBody: {
+    fontSize: 13.5,
+    lineHeight: 13.5 * 1.45,
   },
-  cardSubtitle: {
-    fontSize: typography.fontSize.xs,
-    marginTop: 1,
+  noteLink: {
+    fontSize: 13.5,
   },
-  cardDesc: {
-    fontSize: typography.fontSize.xs,
-    lineHeight: typography.lineHeight.sm,
-    marginTop: spacing.xs,
+  tests: {
+    gap: 12,
   },
-  modalBackdrop: {
+  testCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    padding: 16,
+  },
+  testText: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: spacing.xl,
+    gap: 4,
   },
-  modalCard: {
-    width: '100%',
-    maxWidth: 320,
-    borderRadius: radius.xl,
-    padding: spacing.lg,
-    alignItems: 'center',
+  testTitle: {
+    fontSize: 16,
   },
-  modalIcon: {
-    width: 64,
-    height: 64,
-    borderRadius: radius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.md,
+  testMetaLatin: {
+    fontSize: 11,
+    letterSpacing: 11 * 0.1,
+    textTransform: 'uppercase',
   },
-  modalTitle: {
-    fontSize: typography.fontSize.lg,
-  },
-  modalBody: {
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.body,
-    textAlign: 'center',
-    marginTop: spacing.sm,
-  },
-  modalBtn: {
-    width: '100%',
-    height: 42,
-    borderRadius: radius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: spacing.lg,
-  },
-  modalBtnText: {
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.sm,
+  testMetaArabic: {
+    fontSize: 12.5,
   },
 });

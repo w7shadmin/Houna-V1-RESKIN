@@ -411,3 +411,32 @@ export async function fetchResourceDetail(slug: string, lang: 'en' | 'ar' = 'en'
   return resp.json();
 }
 
+
+/* ── Search index (the houna-search-index edge function, supabase/functions/houna-search-index) ── */
+
+export interface ProfessionalFacts {
+  slug: string;
+  /** Location, languages, organizations, work with: labels in the page's language. */
+  info: Record<string, string>;
+  specialties: string | null;
+}
+
+export interface SearchIndexResponse {
+  builtAt: string;
+  lang: 'en' | 'ar';
+  professionals: ProfessionalFacts[];
+}
+
+/**
+ * What each professional's own page says (where they are, their languages,
+ * who they work with, specialties), gathered once a day on the server for the
+ * directory search. `null` while the very first build is still running.
+ */
+export async function fetchSearchIndex(lang: 'en' | 'ar' = 'en'): Promise<SearchIndexResponse | null> {
+  const url = new URL(`${SUPABASE_URL}/functions/v1/houna-search-index`);
+  url.searchParams.set('lang', lang);
+  const resp = await fetch(url.toString(), { headers });
+  if (resp.status === 202) return null;
+  if (!resp.ok) throw new Error(`Failed to load the search index (${resp.status})`);
+  return resp.json();
+}

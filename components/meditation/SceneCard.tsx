@@ -117,6 +117,6 @@ const styles = StyleSheet.create({
   cardDesc: {
     color: 'rgba(255,255,255,0.85)',
     fontSize: typography.fontSize.xs,
-    marginTop: 2,
+    marginTop: 4,
   },
 });

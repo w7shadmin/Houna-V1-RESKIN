@@ -3,11 +3,13 @@ import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, typography } from '@/constants/theme';
+import { spacing, typography } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { MEDITATION_SCENES } from '@/components/meditation/scenes';
 import SceneCard from '@/components/meditation/SceneCard';
 
 export default function MeditationSceneListScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
   const { t, fonts } = useLanguage();
   const list = t.tanafas.meditation.list;

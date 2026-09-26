@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TextInput, Pressable, Switch, ScrollView, ActivityIndicator, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
+import { View, Text, Image, TextInput, Pressable, Switch, ScrollView, ActivityIndicator, StyleSheet } from 'react-native';
+import KeyboardSafeView from '@/components/ui/KeyboardSafeView';
 import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { ImagePlus, X, CheckCircle2 } from 'lucide-react-native';
 import DetailScreen from '@/components/DetailScreen';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { colors, spacing, radius, typography } from '@/constants/theme';
+import { spacing, radius, typography } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { submitPost } from '@/lib/voices';
 
 export default function VoicesSubmitScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
   const { t, isRTL, fonts } = useLanguage();
   const { session } = useAuth();
@@ -80,7 +83,7 @@ export default function VoicesSubmitScreen() {
 
   return (
     <DetailScreen title={s.submitTitle}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
+      <KeyboardSafeView>
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
           <Text style={[styles.subtitle, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{s.submitSubtitle}</Text>
 
@@ -162,7 +165,7 @@ export default function VoicesSubmitScreen() {
             )}
           </Pressable>
         </ScrollView>
-      </KeyboardAvoidingView>
+      </KeyboardSafeView>
     </DetailScreen>
   );
 }

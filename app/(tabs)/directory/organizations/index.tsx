@@ -2,17 +2,19 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, FlatList, Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, typography } from '@/constants/theme';
-import { arabicNumber } from '@/lib/arabicNumerals';
+import { grid, layout, radius } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
+import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { fetchOrganizations, type Organization, type CountryOption } from '@/lib/hounaApi';
 import { LoadingState, ErrorState, InlineError } from '@/components/directory/AsyncState';
 import ListItemCard from '@/components/directory/ListItemCard';
 import FilterToggle from '@/components/directory/FilterToggle';
 import ChipFilter from '@/components/directory/ChipFilter';
+import PageHeader from '@/components/directory/PageHeader';
 
 export default function OrganizationsListScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
   const { t, language, isRTL, fonts } = useLanguage();
   const s = t.directory.organizations;
@@ -53,49 +55,42 @@ export default function OrganizationsListScreen() {
 
   const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
   const countryOptions = [{ value: '', label: common.all }, ...countries];
+  const header = <PageHeader title={s.title} intro={t.directory.hub.organizationsSubtitle} />;
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
-      <View style={styles.headerRow}>
-        <Pressable
-          onPress={() => router.replace('/directory')}
-          hitSlop={12}
-          style={({ pressed }) => [
-            styles.backBtn,
-            { backgroundColor: colors.card, borderColor: colors.border },
-            pressed && { backgroundColor: colors.cardPressed },
-          ]}
-        >
-          <ArrowLeft size={18} color={colors.text} style={isRTL ? styles.flip : undefined} />
-        </Pressable>
-        <Text style={[styles.title, { color: colors.text, fontFamily: fonts.bold }]}>{s.title}</Text>
-      </View>
-
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
       {loading && orgs.length === 0 ? (
-        <LoadingState label={s.loading} />
+        <View style={styles.stateWrap}>
+          {header}
+          <LoadingState label={s.loading} />
+        </View>
       ) : error && orgs.length === 0 ? (
-        <ErrorState message={error} retryLabel={common.tryAgain} onRetry={handleRetry} />
+        <View style={styles.stateWrap}>
+          {header}
+          <ErrorState message={error} retryLabel={common.tryAgain} onRetry={handleRetry} />
+        </View>
       ) : (
         <FlatList
           data={orgs}
           keyExtractor={(item, i) => `${item.id}-${i}`}
           contentContainerStyle={styles.listContent}
           ListHeaderComponent={
-            <View>
-              <FilterToggle
-                label={common.filterByCountry}
-                activeCount={country ? 1 : 0}
-                expanded={showFilters}
-                onPress={() => setShowFilters((v) => !v)}
-              />
-              {showFilters && (
+            <View style={styles.listHeader}>
+              {header}
+              {/* Only offer the filter when the server sent countries to pick from. */}
+              {countries.length > 0 && (
+                <FilterToggle
+                  label={common.filterByCountry}
+                  activeCount={country ? 1 : 0}
+                  expanded={showFilters}
+                  onPress={() => setShowFilters((v) => !v)}
+                />
+              )}
+              {showFilters && countries.length > 0 && (
                 <View style={[styles.filterPanel, { backgroundColor: colors.card, borderColor: colors.border }]}>
                   <ChipFilter label={common.country} options={countryOptions} value={country} onChange={setCountry} />
                   {!!country && (
-                    <Pressable
-                      onPress={() => setCountry('')}
-                      style={({ pressed }) => pressed && { opacity: 0.6 }}
-                    >
+                    <Pressable onPress={() => setCountry('')} accessibilityRole="button" style={({ pressed }) => pressed && styles.pressed}>
                       <Text style={[styles.resetText, { color: colors.primary, fontFamily: fonts.semiBold }]}>
                         {common.resetFilter}
                       </Text>
@@ -103,8 +98,8 @@ export default function OrganizationsListScreen() {
                   )}
                 </View>
               )}
-              <Text style={[styles.count, { color: colors.textTertiary, fontFamily: fonts.regular }]}>
-                {num(orgs.length)} {orgs.length === 1 ? s.countOne : s.countOther}
+              <Text style={[styles.count, { color: colors.textTertiary, fontFamily: fonts.medium }]}>
+                {arabicPlural(orgs.length, s.count).replace('{n}', num(orgs.length))}
               </Text>
             </View>
           }
@@ -115,9 +110,7 @@ export default function OrganizationsListScreen() {
                 title={item.name}
                 description={item.summary}
                 imageResizeMode="contain"
-                onPress={() =>
-                  router.push({ pathname: '/directory/organizations/[id]', params: { id: item.id } })
-                }
+                onPress={() => router.push({ pathname: '/directory/organizations/[id]', params: { id: item.id } })}
               />
             </View>
           )}
@@ -129,7 +122,7 @@ export default function OrganizationsListScreen() {
             ) : null
           }
           ListFooterComponent={
-            !!(error && orgs.length > 0) ? (
+            error && orgs.length > 0 ? (
               <InlineError message={error} retryLabel={common.tryAgain} onRetry={handleRetry} />
             ) : null
           }
@@ -143,52 +136,46 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
   },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.md,
-  },
-  backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  flip: {
-    transform: [{ scaleX: -1 }],
-  },
-  title: {
-    fontSize: typography.fontSize.xl,
+  stateWrap: {
+    flex: 1,
+    width: '100%',
+    maxWidth: layout.maxContentWidth,
+    alignSelf: 'center',
+    padding: grid(2),
   },
   listContent: {
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xxl,
+    width: '100%',
+    maxWidth: layout.maxContentWidth,
+    alignSelf: 'center',
+    padding: grid(2),
+    paddingBottom: grid(5),
+  },
+  listHeader: {
+    gap: grid(2),
+    marginBottom: grid(1.5),
   },
   filterPanel: {
-    borderRadius: radius.lg,
+    gap: grid(1),
+    borderRadius: radius.cardLg,
     borderWidth: 1,
-    padding: spacing.md,
-    marginBottom: spacing.md,
+    padding: grid(2),
+  },
+  pressed: {
+    opacity: 0.6,
   },
   resetText: {
-    fontSize: typography.fontSize.sm,
-    marginTop: spacing.xs,
+    fontSize: 14,
   },
   count: {
-    fontSize: typography.fontSize.xs,
-    marginBottom: spacing.sm,
+    fontSize: 13,
+    lineHeight: 16,
   },
   itemWrap: {
-    marginBottom: spacing.sm,
+    marginBottom: grid(1.5),
   },
   empty: {
     textAlign: 'center',
-    fontSize: typography.fontSize.sm,
-    paddingVertical: spacing.xxl,
+    fontSize: 14,
+    paddingVertical: grid(6),
   },
 });

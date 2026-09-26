@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -6,32 +6,44 @@ import {
   Pressable,
   ScrollView,
   ActivityIndicator,
+  Platform,
   Share,
   StyleSheet,
+  type TextStyle,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Trash2, Check, Pencil, Share2, X } from 'lucide-react-native';
+import { Trash2 } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, typography } from '@/constants/theme';
+import { alpha, grid, layout, radius } from '@/constants/theme';
+import { MOOD_STYLE } from '@/constants/moods';
+import { useTheme } from '@/contexts/ThemeContext';
 import { arabicNumber } from '@/lib/arabicNumerals';
+import KeyboardSafeView from '@/components/ui/KeyboardSafeView';
+import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
 import {
   getEntry,
   saveEntry,
   updateEntry,
   deleteEntry,
   getPromptForToday,
-  formatEntryDateShort,
   formatEntryDateLong,
-  MOOD_EMOJI,
   type JournalEntry,
   type MoodTag,
 } from '@/lib/journal';
-import { recordTanafasSession } from '@/lib/usageTracking';
 import MoodPicker from '@/components/journal/MoodPicker';
 import ConfirmDialog from '@/components/journal/ConfirmDialog';
+import MoodGlyph from '@/components/mood/MoodGlyph';
+import Button from '@/components/ui/Button';
+import IconButton from '@/components/ui/IconButton';
+import { DirectionalIcon } from '@/components/ui/CanvasIcon';
+import { GroupLabel } from '@/components/directory/ProfileKit';
+
+/** The field's own border shows focus; the browser's focus ring would be a second one (web only). */
+const WEB_NO_OUTLINE = Platform.OS === 'web' ? ({ outlineStyle: 'none' } as unknown as TextStyle) : null;
 
 export default function JournalEntryScreen() {
+  const { colors } = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
   const isNew = id === 'new';
   const router = useRouter();
@@ -42,6 +54,12 @@ export default function JournalEntryScreen() {
   const [loading, setLoading] = useState(!isNew);
   const [existing, setExisting] = useState<JournalEntry | null>(null);
   const [text, setText] = useState('');
+  // Where the text field sits in the scroll content, so typing stays above the keyboard:
+  // the whole field when it fits, otherwise its bottom (where the cursor usually is).
+  const field = useRef({ y: 0, h: 0 });
+  const keyboard = useKeyboardScroll((visible) =>
+    Math.max(field.current.y - 16, field.current.y + field.current.h + 16 - visible),
+  );
   const [mood, setMood] = useState<MoodTag | null>(null);
   const [isEditing, setIsEditing] = useState(isNew);
   const [promptVisible, setPromptVisible] = useState(isNew);
@@ -93,11 +111,7 @@ export default function JournalEntryScreen() {
     }
     setSaved(true);
     setIsEditing(false);
-
-    // Streak/leaderboard activity signal (Segment 5) — Alias-only, silent;
-    // same 'mood' kind HomeMoodCard's quick check-in uses, since either one
-    // marks the day as active for streak purposes.
-    recordTanafasSession('mood', new Date()).catch(() => {});
+    // Deliberately no streak/leaderboard signal: mood logging never feeds a streak.
   };
 
   const handleDelete = async () => {
@@ -122,160 +136,123 @@ export default function JournalEntryScreen() {
     );
   }
 
+  const labelLatin = fonts.labelTracked;
+  const eyebrow = formatEntryDateLong(displayEntry ? new Date(displayEntry.date + 'T00:00:00') : new Date(), t.journal.dateNames, num);
+  const heading = !displayEntry ? e.newEntry : isEditing ? e.editEntry : e.yourEntry;
+
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
-      <View style={styles.headerRow}>
-        <Pressable
+      <View style={styles.topBar}>
+        <IconButton
+          variant="control"
+          accessibilityLabel={t.directory.common.goBack}
           onPress={handleBack}
-          hitSlop={12}
-          style={({ pressed }) => [
-            styles.iconBtn,
-            { backgroundColor: colors.card, borderColor: colors.border },
-            pressed && { backgroundColor: colors.cardPressed },
-          ]}
-        >
-          <ArrowLeft size={18} color={colors.text} style={isRTL ? styles.flip : undefined} />
-        </Pressable>
-        <View style={{ flex: 1 }} />
+          renderIcon={(c) => <DirectionalIcon isRTL={isRTL} name="back" size={20} strokeWidth={1.8} color={c} />}
+        />
         {existing && isEditing && (
-          <Pressable
-            onPress={() => setShowDeleteConfirm(true)}
-            hitSlop={12}
-            style={({ pressed }) => [
-              styles.iconBtn,
-              { backgroundColor: colors.card, borderColor: colors.border },
-              pressed && { backgroundColor: colors.cardPressed },
-            ]}
+          <IconButton
+            variant="control"
             accessibilityLabel={e.delete}
-          >
-            <Trash2 size={18} color={colors.textTertiary} />
-          </Pressable>
+            onPress={() => setShowDeleteConfirm(true)}
+            renderIcon={() => <Trash2 size={18} color={colors.danger} strokeWidth={1.8} />}
+          />
         )}
       </View>
 
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        {displayEntry ? (
-          <>
-            <View style={[styles.badge, { backgroundColor: colors.primaryLightest }]}>
-              <Text style={styles.badgeEmoji}>{MOOD_EMOJI[displayEntry.mood]}</Text>
-              <Text style={[styles.badgeText, { color: colors.primary, fontFamily: fonts.semiBold }]}>
-                {formatEntryDateShort(displayEntry.date, t.journal.dateNames, num)}
-              </Text>
-            </View>
-            <Text style={[styles.heading, { color: colors.text, fontFamily: fonts.bold }]}>
-              {isEditing ? e.editEntry : e.yourEntry}
-            </Text>
-          </>
-        ) : (
-          <>
-            <View style={[styles.badge, { backgroundColor: colors.primaryLightest }]}>
-              <Text style={[styles.badgeText, { color: colors.primary, fontFamily: fonts.semiBold }]}>
-                {e.newEntry}
-              </Text>
-            </View>
-            <Text style={[styles.heading, { color: colors.text, fontFamily: fonts.bold }]}>
-              {formatEntryDateLong(new Date(), t.journal.dateNames, num)}
-            </Text>
-          </>
-        )}
-
-        {isEditing && promptVisible && (
-          <View style={[styles.promptCard, { backgroundColor: colors.primaryLightest, borderColor: colors.border }]}>
-            <View style={styles.promptRow}>
-              <Text style={[styles.promptText, { color: colors.primary, fontFamily: fonts.medium }]}>{prompt}</Text>
-              <Pressable
-                onPress={() => setPromptVisible(false)}
-                style={({ pressed }) => [
-                  styles.skipBtn,
-                  { backgroundColor: colors.card },
-                  pressed && { backgroundColor: colors.cardPressed },
+      <KeyboardSafeView>
+        <ScrollView
+          ref={keyboard.scrollRef}
+          {...keyboard.scrollProps}
+          contentContainerStyle={styles.scroll}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.header}>
+            <View style={styles.eyebrowRow}>
+              {displayEntry && <MoodGlyph mood={displayEntry.mood} size={grid(2.5)} />}
+              <Text
+                style={[
+                  labelLatin ? styles.eyebrowLatin : styles.eyebrowArabic,
+                  { color: colors.primary, fontFamily: labelLatin ? fonts.labelRegular : fonts.label },
                 ]}
               >
-                <X size={12} color={colors.textSecondary} />
-                <Text style={[styles.skipText, { color: colors.textSecondary, fontFamily: fonts.semiBold }]}>
-                  {e.skipPrompt}
-                </Text>
+                {eyebrow}
+              </Text>
+            </View>
+            <Text accessibilityRole="header" style={[styles.heading, isRTL && styles.headingArabic, { color: colors.text, fontFamily: fonts.display }]}>
+              {heading}
+            </Text>
+          </View>
+
+          {isEditing && promptVisible && (
+            <View style={[styles.prompt, { backgroundColor: colors.tones.dusk.bg, borderColor: colors.tones.dusk.border }]}>
+              <Text style={[styles.promptText, isRTL && styles.promptTextArabic, { color: colors.text, fontFamily: fonts.display }]}>{prompt}</Text>
+              <Pressable
+                onPress={() => setPromptVisible(false)}
+                accessibilityRole="button"
+                hitSlop={8}
+                style={({ pressed }) => [styles.skip, pressed && styles.pressed]}
+              >
+                <Text style={[styles.skipText, { color: colors.tones.dusk.text, fontFamily: fonts.medium }]}>{e.writeFreely}</Text>
               </Pressable>
             </View>
-            <Pressable
-              onPress={() => setPromptVisible(false)}
-              style={({ pressed }) => pressed && { opacity: 0.6 }}
-            >
-              <Text style={[styles.writeFreely, { color: colors.primary, fontFamily: fonts.medium }]}>
-                {e.writeFreely}
-              </Text>
-            </Pressable>
-          </View>
-        )}
+          )}
 
-        <TextInput
-          value={text}
-          onChangeText={setText}
-          editable={isEditing}
-          multiline
-          textAlign={isRTL ? 'right' : 'left'}
-          placeholder={isEditing ? e.placeholder : ''}
-          placeholderTextColor={colors.placeholder}
-          style={[
-            styles.textArea,
-            { borderColor: colors.border, backgroundColor: colors.card, color: colors.text, fontFamily: fonts.regular },
-          ]}
-        />
-
-        <View style={styles.moodSection}>
-          <Text style={[styles.moodLabel, { color: colors.text, fontFamily: fonts.semiBold }]}>{e.howFeeling}</Text>
-          <MoodPicker value={mood} onChange={isEditing ? setMood : () => {}} disabled={!isEditing} />
-        </View>
-
-        {isEditing ? (
-          <Pressable
-            onPress={handleSave}
-            disabled={!canSave}
-            style={({ pressed }) => [
-              styles.primaryBtn,
-              { backgroundColor: canSave ? colors.primary : colors.border },
-              pressed && { opacity: 0.85 },
+          <TextInput
+            value={text}
+            onChangeText={setText}
+            {...keyboard.inputProps}
+            onLayout={(ev) => {
+              const { y, height } = ev.nativeEvent.layout;
+              const grew = height > field.current.h;
+              field.current = { y, h: height };
+              if (grew) keyboard.reveal();
+            }}
+            editable={isEditing}
+            multiline
+            textAlign={isRTL ? 'right' : 'left'}
+            placeholder={isEditing ? e.placeholder : ''}
+            placeholderTextColor={colors.placeholder}
+            accessibilityLabel={e.placeholder}
+            style={[
+              styles.textArea,
+              isEditing && styles.textAreaEditing,
+              WEB_NO_OUTLINE,
+              isEditing
+                ? { borderColor: colors.borderControl, backgroundColor: colors.inputBackground }
+                : styles.textRead,
+              { color: colors.text, fontFamily: fonts.regular },
             ]}
-          >
-            <Check size={20} color={canSave ? colors.onPrimary : colors.textTertiary} />
-            <Text
-              style={[
-                styles.primaryBtnText,
-                { color: canSave ? colors.onPrimary : colors.textTertiary, fontFamily: fonts.bold },
-              ]}
-            >
-              {e.save}
-            </Text>
-          </Pressable>
-        ) : (
-          <View style={styles.actions}>
-            <Pressable
-              onPress={() => setIsEditing(true)}
-              style={({ pressed }) => [
-                styles.secondaryBtn,
-                { borderColor: colors.border, backgroundColor: colors.card },
-                pressed && { backgroundColor: colors.cardPressed },
-              ]}
-            >
-              <Pencil size={18} color={colors.text} />
-              <Text style={[styles.secondaryBtnText, { color: colors.text, fontFamily: fonts.bold }]}>{e.edit}</Text>
-            </Pressable>
-            <Pressable
-              onPress={handleShare}
-              style={({ pressed }) => [
-                styles.primaryBtn,
-                { backgroundColor: colors.primary },
-                pressed && { opacity: 0.85 },
-              ]}
-            >
-              <Share2 size={18} color={colors.onPrimary} />
-              <Text style={[styles.primaryBtnText, { color: colors.onPrimary, fontFamily: fonts.bold }]}>
-                {e.share}
-              </Text>
-            </Pressable>
+          />
+
+          <View style={styles.moodSection}>
+            <GroupLabel>{e.howFeeling}</GroupLabel>
+            {isEditing ? (
+              <MoodPicker value={mood} onChange={setMood} />
+            ) : (
+              mood && (
+                <View style={[styles.moodPill, { backgroundColor: alpha(MOOD_STYLE[mood].color, 0.16), borderColor: MOOD_STYLE[mood].color }]}>
+                  <MoodGlyph mood={mood} size={grid(2.5)} />
+                  <Text style={[styles.moodPillText, { color: colors.text, fontFamily: fonts.medium }]}>{t.journal.moodLabels[mood]}</Text>
+                </View>
+              )
+            )}
           </View>
-        )}
-      </ScrollView>
+
+          {isEditing ? (
+            <Button label={e.save} onPress={handleSave} disabled={!canSave} block />
+          ) : (
+            <View style={styles.actions}>
+              <View style={styles.flex}>
+                <Button variant="secondary" label={e.edit} onPress={() => setIsEditing(true)} block />
+              </View>
+              <View style={styles.flex}>
+                <Button label={e.share} onPress={handleShare} block />
+              </View>
+            </View>
+          )}
+        </ScrollView>
+      </KeyboardSafeView>
 
       <ConfirmDialog
         visible={showDiscardConfirm}
@@ -315,132 +292,107 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  headerRow: {
+  topBar: {
     flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-  },
-  iconBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  flip: {
-    transform: [{ scaleX: -1 }],
+    justifyContent: 'space-between',
+    paddingHorizontal: grid(2),
+    paddingTop: grid(2),
   },
   scroll: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.xxl,
+    width: '100%',
+    maxWidth: layout.maxContentWidth,
+    alignSelf: 'center',
+    padding: grid(2),
+    paddingBottom: grid(5),
+    gap: grid(2),
   },
-  badge: {
+  header: {
+    gap: grid(1),
+  },
+  eyebrowRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    height: 24,
-    gap: spacing.xs + 2,
-    alignSelf: 'flex-start',
-    borderRadius: radius.full,
-    paddingHorizontal: spacing.sm + 2,
-    marginBottom: spacing.xs,
+    gap: grid(1),
   },
-  badgeEmoji: {
-    fontSize: typography.fontSize.sm,
-  },
-  badgeText: {
-    fontSize: typography.fontSize.xs,
-    lineHeight: typography.lineHeight.xs,
+  eyebrowLatin: {
+    fontSize: 12,
+    letterSpacing: 12 * 0.16,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+  },
+  eyebrowArabic: {
+    fontSize: 13.5,
   },
   heading: {
-    fontSize: typography.fontSize.lg,
-    marginBottom: spacing.md,
+    fontSize: 32,
+    lineHeight: 40,
   },
-  promptCard: {
+  headingArabic: {
+    lineHeight: 48,
+  },
+  prompt: {
+    gap: grid(1.5),
     borderWidth: 1,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    marginBottom: spacing.md,
-  },
-  promptRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: spacing.sm,
+    borderRadius: radius.cardLg,
+    padding: 16,
   },
   promptText: {
-    flex: 1,
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.body,
+    fontSize: 20,
+    lineHeight: 28,
   },
-  skipBtn: {
-    height: 24,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.xxs + 1,
-    borderRadius: radius.full,
-    paddingHorizontal: spacing.sm,
+  promptTextArabic: {
+    lineHeight: 36,
+  },
+  skip: {
+    alignSelf: 'flex-start',
   },
   skipText: {
-    fontSize: typography.fontSize.xs,
-    lineHeight: typography.lineHeight.xs,
-  },
-  writeFreely: {
-    fontSize: typography.fontSize.xs,
-    marginTop: spacing.sm,
+    fontSize: 14,
   },
   textArea: {
-    minHeight: 220,
     borderWidth: 1,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    fontSize: typography.fontSize.body,
-    lineHeight: typography.lineHeight.body,
+    borderRadius: radius.card,
+    padding: grid(2),
+    fontSize: 16,
+    lineHeight: 26,
     textAlignVertical: 'top',
   },
+  textAreaEditing: {
+    minHeight: 240,
+  },
+  /** Reading: the text sits on the page, no box. */
+  textRead: {
+    borderColor: 'transparent',
+    backgroundColor: 'transparent',
+    // A hair of inset so the first glyph isn't clipped at the field's edge.
+    paddingHorizontal: 4,
+    paddingVertical: 0,
+  },
   moodSection: {
-    marginTop: spacing.lg,
+    gap: grid(1.5),
   },
-  moodLabel: {
-    fontSize: typography.fontSize.sm,
-    marginBottom: spacing.sm + 2,
-  },
-  primaryBtn: {
-    flex: 1,
-    height: 50,
+  moodPill: {
+    alignSelf: 'flex-start',
+    height: grid(5),
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    borderRadius: radius.lg,
-    marginTop: spacing.lg,
+    gap: grid(1),
+    borderWidth: 1,
+    borderRadius: 999,
+    paddingStart: grid(1),
+    paddingEnd: grid(2),
   },
-  primaryBtnText: {
-    fontSize: typography.fontSize.body,
-    lineHeight: typography.lineHeight.body,
+  moodPillText: {
+    fontSize: 14,
   },
   actions: {
     flexDirection: 'row',
-    gap: spacing.sm + 4,
+    gap: grid(1.5),
   },
-  secondaryBtn: {
+  flex: {
     flex: 1,
-    height: 50,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    borderWidth: 1,
-    borderRadius: radius.lg,
-    marginTop: spacing.lg,
+    minWidth: 0,
   },
-  secondaryBtnText: {
-    fontSize: typography.fontSize.body,
-    lineHeight: typography.lineHeight.body,
+  pressed: {
+    opacity: 0.6,
   },
 });

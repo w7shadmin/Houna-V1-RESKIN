@@ -12,30 +12,31 @@ import {
   Headphones,
   Maximize2,
   Minimize2,
-  Infinity as InfinityIcon,
   CheckCircle2,
-  Minus,
-  Plus,
 } from 'lucide-react-native';
 import { setAudioModeAsync, useAudioPlayer } from 'expo-audio';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import * as NavigationBar from 'expo-navigation-bar';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { spacing, radius, typography } from '@/constants/theme';
-import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
-import { recordTanafasSession } from '@/lib/usageTracking';
+import { spacing, radius, typography, alpha, nightPalette } from '@/constants/theme';
+import { arabicNumber } from '@/lib/arabicNumerals';
+import { pingActivity, recordTanafasSession } from '@/lib/usageTracking';
+import { logSession } from '@/lib/sessionLog';
+import { sessionEndAlert } from '@/lib/sessionEndAlert';
 import AmbientVisual from './AmbientVisual';
 import type { MeditationScene } from './scenes';
 
-const SESSION_OPTIONS = [5, 10, 20] as const;
+/**
+ * The player is a permanently dark focus mode in both themes: its controls
+ * sit over full-screen video, so they use the Nightlight palette directly
+ * (Midnight ground, Moonlight chrome) rather than switching with Day.
+ */
+const FOCUS = { midnight: nightPalette.midnight, moonlight: nightPalette.moonlight };
+
 /** How long the player's UI stays visible without interaction before fading out, while actively playing. */
 const CONTROLS_IDLE_MS = 3000;
 const CONTROLS_FADE_IN_MS = 200;
 const CONTROLS_FADE_OUT_MS = 400;
-const CUSTOM_MIN_MINUTES = 1;
-const CUSTOM_MAX_MINUTES = 180;
-const DEFAULT_CUSTOM_MINUTES = 25;
-const CUSTOM_STEP_MINUTES = 5;
 const TICK_MS = 1000;
 /** Ambient audio fades out over the last few seconds instead of cutting abruptly at completion. */
 const FADE_OUT_SECONDS = 5;
@@ -45,22 +46,22 @@ const AUDIO_ONLY_STORAGE_KEY = 'houna-meditation-audio-only';
 interface MeditationPlayerProps {
   scene: MeditationScene;
   sceneName: string;
-  sceneDescription: string;
+  /** Session length, chosen on the Tanafas hub; null = no limit. */
+  minutes: number | null;
   placeholderNotice: string;
   onExit: () => void;
 }
 
 /**
  * Ambient meditation player — hardcoded dark/white regardless of theme, per
- * CLAUDE.md's explicit exception for the meditation player. Open-ended
- * ambience rather than phase-cycling, so this doesn't reuse
- * PhaseBreathingSession; the session-length/pause/resume/complete shape is
- * still deliberately consistent with it.
+ * CLAUDE.md's explicit exception for the meditation player. The length is
+ * chosen on the Tanafas hub, so the player starts straight away and keeps
+ * its chrome to the time, pause and restart (all fading out while playing).
  */
 export default function MeditationPlayer({
   scene,
   sceneName,
-  sceneDescription,
+  minutes,
   placeholderNotice,
   onExit,
 }: MeditationPlayerProps) {
@@ -100,9 +101,8 @@ export default function MeditationPlayer({
     return () => sub.remove();
   }, []);
 
-  const [sessionMinutes, setSessionMinutes] = useState<number>(10);
-  const [isCustomMode, setIsCustomMode] = useState(false);
-  const [isInfiniteSession, setIsInfiniteSession] = useState(false);
+  const isInfiniteSession = minutes === null;
+  const sessionMinutes = minutes ?? 0;
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [elapsed, setElapsed] = useState(0);
@@ -136,30 +136,6 @@ export default function MeditationPlayer({
     });
   };
 
-  const selectPreset = (mins: number) => {
-    setIsCustomMode(false);
-    setIsInfiniteSession(false);
-    setSessionMinutes(mins);
-  };
-
-  const selectCustom = () => {
-    setIsCustomMode(true);
-    setIsInfiniteSession(false);
-    setSessionMinutes((prev) => ((SESSION_OPTIONS as readonly number[]).includes(prev) ? DEFAULT_CUSTOM_MINUTES : prev));
-  };
-
-  const selectInfinite = () => {
-    setIsCustomMode(true);
-    setIsInfiniteSession(true);
-  };
-
-  const clampCustomMinutes = (total: number) => Math.min(CUSTOM_MAX_MINUTES, Math.max(CUSTOM_MIN_MINUTES, total));
-
-  const stepCustom = (delta: number) => {
-    setIsInfiniteSession(false);
-    setSessionMinutes((prev) => clampCustomMinutes(prev + delta));
-  };
-
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   // A genuinely infinite total (not a huge finite number) so the completion
   // check below (`next >= totalSeconds`) and the near-end audio fade-out
@@ -184,6 +160,7 @@ export default function MeditationPlayer({
   }, []);
 
   const audioPlayer = useAudioPlayer(scene.audio);
+  const releaseLockScreenRef = useRef<() => void>(() => {});
   const fadingOutRef = useRef(false);
   const fadeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -229,6 +206,7 @@ export default function MeditationPlayer({
   const recordIfStarted = useCallback((endedAt: Date) => {
     if (sessionStartRef.current) {
       recordTanafasSession('meditation', sessionStartRef.current, endedAt).catch(() => {});
+      logSession('meditation', scene.id, sessionStartRef.current, endedAt).catch(() => {});
       sessionStartRef.current = null;
     }
   }, []);
@@ -245,6 +223,7 @@ export default function MeditationPlayer({
     elapsedBaseRef.current = 0;
     segmentStartMsRef.current = null;
     if (scene.audio) audioPlayer.volume = 1;
+    releaseLockScreenRef.current();
   }, [stop, stopFade, recordIfStarted, scene.audio, audioPlayer]);
 
   const tickAndCheckCompletion = useCallback(() => {
@@ -259,7 +238,9 @@ export default function MeditationPlayer({
       stop();
       setIsRunning(false);
       setIsComplete(true);
+      sessionEndAlert();
       recordIfStarted(new Date());
+      releaseLockScreenRef.current();
     } else {
       setElapsed(rawElapsed);
     }
@@ -290,9 +271,30 @@ export default function MeditationPlayer({
 
   useEffect(() => {
     if (!scene.audio) return;
-    if (isActive) audioPlayer.play();
-    else audioPlayer.pause();
-  }, [isActive, scene.audio, audioPlayer]);
+    if (isActive) {
+      audioPlayer.play();
+      // Makes this the lock-screen media player, which runs expo-audio's
+      // media-playback foreground service. Without it Android freezes the
+      // backgrounded app after ~90s and the audio stops while locked, even
+      // with shouldPlayInBackground set.
+      try {
+        audioPlayer.setActiveForLockScreen(true, { title: t.tanafas.meditation.scenes[scene.id].name, artist: 'Houna' });
+      } catch {
+        // Non-fatal: playback still works in the foreground.
+      }
+    } else audioPlayer.pause();
+  }, [isActive, scene.audio, scene.id, audioPlayer, t]);
+
+  /** Drops the lock-screen player (and its foreground service) when a session ends. Only call while mounted. */
+  const releaseLockScreen = useCallback(() => {
+    if (!scene.audio) return;
+    try {
+      audioPlayer.clearLockScreenControls();
+    } catch {
+      // Already cleared.
+    }
+  }, [audioPlayer, scene.audio]);
+  releaseLockScreenRef.current = releaseLockScreen;
 
   // Auto-hide the header/timer/controls while actively playing, so the
   // ambient scene is unobstructed — matches ordinary video-player UX. Stays
@@ -362,6 +364,7 @@ export default function MeditationPlayer({
   const handleStart = () => {
     if (isComplete) reset();
     sessionStartRef.current = new Date();
+    pingActivity('meditation').catch(() => {});
     segmentStartMsRef.current = Date.now();
     setIsRunning(true);
     setIsPaused(false);
@@ -376,7 +379,25 @@ export default function MeditationPlayer({
     segmentStartMsRef.current = Date.now();
     setIsPaused(false);
   };
-  const handleReset = () => reset();
+  // Starts from the whole length again without leaving the session (or its lock-screen player).
+  const handleRestart = () => {
+    stopFade();
+    fadingOutRef.current = false;
+    if (scene.audio) audioPlayer.volume = 1;
+    elapsedBaseRef.current = 0;
+    segmentStartMsRef.current = Date.now();
+    setElapsed(0);
+    setIsPaused(false);
+  };
+
+  // The length was chosen before opening, so the session begins straight away.
+  const startedRef = useRef(false);
+  useEffect(() => {
+    if (startedRef.current) return;
+    startedRef.current = true;
+    handleStart();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const handleExit = () => {
     stop();
     recordIfStarted(new Date());
@@ -398,7 +419,7 @@ export default function MeditationPlayer({
         <AmbientVisual scene={scene} animate={isActive && isForeground} />
       ) : (
         <View style={styles.audioOnlyBg}>
-          <Headphones size={40} color="rgba(255,255,255,0.22)" strokeWidth={1.2} />
+          <Headphones size={40} color={alpha(FOCUS.moonlight, 0.22)} strokeWidth={1.2} />
         </View>
       )}
 
@@ -422,30 +443,29 @@ export default function MeditationPlayer({
             hitSlop={16}
             style={({ pressed }) => [
               styles.iconBtn,
-              pressed && { backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: radius.full },
+              pressed && { backgroundColor: alpha(FOCUS.moonlight, 0.15), borderRadius: radius.full },
             ]}
           >
-            <ArrowLeft size={22} color="#ffffff" style={isRTL ? styles.flip : undefined} />
+            <View style={isRTL ? styles.flip : undefined}>
+<ArrowLeft size={22} color={FOCUS.moonlight} />
+</View>
           </Pressable>
           <View style={styles.headerTextWrap}>
             <Text style={[styles.headerTitle, { fontFamily: fonts.bold }]}>{sceneName}</Text>
-            {!isRunning && !isComplete && (
-              <Text style={[styles.headerSubtitle, { fontFamily: fonts.regular }]}>{sceneDescription}</Text>
-            )}
           </View>
           <Pressable
             onPress={() => setIsFullscreen((v) => !v)}
             hitSlop={16}
             style={({ pressed }) => [
               styles.iconBtn,
-              pressed && { backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: radius.full },
+              pressed && { backgroundColor: alpha(FOCUS.moonlight, 0.15), borderRadius: radius.full },
             ]}
             accessibilityLabel={isFullscreen ? p.exitFullscreen : p.fullscreen}
           >
             {isFullscreen ? (
-              <Minimize2 size={20} color="#ffffff" />
+              <Minimize2 size={20} color={FOCUS.moonlight} />
             ) : (
-              <Maximize2 size={20} color="#ffffff" />
+              <Maximize2 size={20} color={FOCUS.moonlight} />
             )}
           </Pressable>
         </View>
@@ -453,7 +473,7 @@ export default function MeditationPlayer({
         <View style={styles.main}>
           {isComplete ? (
             <View style={styles.completionWrap}>
-              <CheckCircle2 size={56} color="#ffffff" strokeWidth={1.5} />
+              <CheckCircle2 size={56} color={FOCUS.moonlight} strokeWidth={1.5} />
               <Text style={[styles.completionTitle, { fontFamily: fonts.bold }]}>{p.wellDone}</Text>
               <Text style={[styles.completionBody, { fontFamily: fonts.regular }]}>{p.completionBody}</Text>
             </View>
@@ -464,117 +484,7 @@ export default function MeditationPlayer({
                 {isInfiniteSession ? p.elapsed : p.remaining}
               </Text>
             </View>
-          ) : (
-            <View style={styles.selectorWrap}>
-              <Text style={[styles.selectorLabel, { fontFamily: fonts.semiBold }]}>{p.chooseSession}</Text>
-              <View style={styles.selectorRow}>
-                {SESSION_OPTIONS.map((mins) => {
-                  const active = !isCustomMode && mins === sessionMinutes;
-                  return (
-                    <Pressable
-                      key={mins}
-                      onPress={() => selectPreset(mins)}
-                      style={({ pressed }) => [
-                        styles.pill,
-                        active && styles.pillActive,
-                        pressed && (active ? { opacity: 0.85 } : { backgroundColor: 'rgba(255,255,255,0.15)' }),
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.pillText,
-                          { fontFamily: fonts.semiBold },
-                          active && styles.pillTextActive,
-                        ]}
-                      >
-                        {num(mins)} {arabicPlural(mins, p.min)}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
-                <Pressable
-                  onPress={selectCustom}
-                  style={({ pressed }) => [
-                    styles.pill,
-                    isCustomMode && styles.pillActive,
-                    pressed && (isCustomMode ? { opacity: 0.85 } : { backgroundColor: 'rgba(255,255,255,0.15)' }),
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.pillText,
-                      { fontFamily: fonts.semiBold },
-                      isCustomMode && styles.pillTextActive,
-                    ]}
-                  >
-                    {p.custom}
-                  </Text>
-                </Pressable>
-              </View>
-
-              {isCustomMode && (
-                <View style={styles.customWrap}>
-                  <View style={styles.stepperRow}>
-                    <Pressable
-                      onPress={() => stepCustom(-CUSTOM_STEP_MINUTES)}
-                      disabled={isInfiniteSession}
-                      hitSlop={8}
-                      style={({ pressed }) => [
-                        styles.stepperBtn,
-                        isInfiniteSession && styles.stepperBtnDisabled,
-                        pressed && !isInfiniteSession && { backgroundColor: 'rgba(255,255,255,0.28)' },
-                      ]}
-                    >
-                      <Minus size={20} color={isInfiniteSession ? 'rgba(255,255,255,0.35)' : '#ffffff'} strokeWidth={2.4} />
-                    </Pressable>
-
-                    <Text
-                      style={[
-                        styles.customValue,
-                        { fontFamily: fonts.bold },
-                        isInfiniteSession && styles.customValueDisabled,
-                      ]}
-                    >
-                      {num(sessionMinutes)} {arabicPlural(sessionMinutes, p.min)}
-                    </Text>
-
-                    <Pressable
-                      onPress={() => stepCustom(CUSTOM_STEP_MINUTES)}
-                      disabled={isInfiniteSession}
-                      hitSlop={8}
-                      style={({ pressed }) => [
-                        styles.stepperBtn,
-                        isInfiniteSession && styles.stepperBtnDisabled,
-                        pressed && !isInfiniteSession && { backgroundColor: 'rgba(255,255,255,0.28)' },
-                      ]}
-                    >
-                      <Plus size={20} color={isInfiniteSession ? 'rgba(255,255,255,0.35)' : '#ffffff'} strokeWidth={2.4} />
-                    </Pressable>
-                  </View>
-
-                  <Pressable
-                    onPress={selectInfinite}
-                    style={({ pressed }) => [
-                      styles.infinityPill,
-                      isInfiniteSession && styles.infinityPillActive,
-                      pressed && !isInfiniteSession && { backgroundColor: 'rgba(255,255,255,0.15)' },
-                    ]}
-                  >
-                    <InfinityIcon size={16} color={isInfiniteSession ? '#000000' : '#ffffff'} strokeWidth={2} />
-                    <Text
-                      style={[
-                        styles.infinityPillText,
-                        { fontFamily: fonts.semiBold },
-                        isInfiniteSession && styles.infinityPillTextActive,
-                      ]}
-                    >
-                      {p.noLimit}
-                    </Text>
-                  </Pressable>
-                </View>
-              )}
-            </View>
-          )}
+          ) : null}
         </View>
 
         {!hasRealMedia && (
@@ -585,33 +495,23 @@ export default function MeditationPlayer({
           {!isComplete && (
             <Pressable
               onPress={handleToggleAudioOnly}
-              style={({ pressed }) => [styles.smallIconBtn, pressed && { backgroundColor: 'rgba(255,255,255,0.24)' }]}
+              style={({ pressed }) => [styles.smallIconBtn, pressed && { backgroundColor: alpha(FOCUS.moonlight, 0.24) }]}
               accessibilityLabel={visualEnabled ? p.audioOnly : p.videoOn}
             >
               {visualEnabled ? (
-                <VideoIcon size={18} color="#ffffff" />
+                <VideoIcon size={18} color={FOCUS.moonlight} />
               ) : (
-                <Headphones size={18} color="#ffffff" />
+                <Headphones size={18} color={FOCUS.moonlight} />
               )}
-            </Pressable>
-          )}
-
-          {!isRunning && !isComplete && (
-            <Pressable
-              onPress={handleStart}
-              style={({ pressed }) => [styles.primaryBtn, pressed && { backgroundColor: 'rgba(255,255,255,0.32)' }]}
-            >
-              <Play size={22} color="#ffffff" fill="#ffffff" />
-              <Text style={[styles.primaryBtnText, { fontFamily: fonts.bold }]}>{p.begin}</Text>
             </Pressable>
           )}
 
           {isActive && (
             <Pressable
               onPress={handlePause}
-              style={({ pressed }) => [styles.primaryBtn, pressed && { backgroundColor: 'rgba(255,255,255,0.32)' }]}
+              style={({ pressed }) => [styles.primaryBtn, pressed && { backgroundColor: alpha(FOCUS.moonlight, 0.32) }]}
             >
-              <Pause size={22} color="#ffffff" fill="#ffffff" />
+              <Pause size={22} color={FOCUS.moonlight} fill={FOCUS.moonlight} />
               <Text style={[styles.primaryBtnText, { fontFamily: fonts.bold }]}>{p.pause}</Text>
             </Pressable>
           )}
@@ -619,9 +519,9 @@ export default function MeditationPlayer({
           {isPaused && (
             <Pressable
               onPress={handleResume}
-              style={({ pressed }) => [styles.primaryBtn, pressed && { backgroundColor: 'rgba(255,255,255,0.32)' }]}
+              style={({ pressed }) => [styles.primaryBtn, pressed && { backgroundColor: alpha(FOCUS.moonlight, 0.32) }]}
             >
-              <Play size={22} color="#ffffff" fill="#ffffff" />
+              <Play size={22} color={FOCUS.moonlight} fill={FOCUS.moonlight} />
               <Text style={[styles.primaryBtnText, { fontFamily: fonts.bold }]}>{p.resume}</Text>
             </Pressable>
           )}
@@ -629,20 +529,20 @@ export default function MeditationPlayer({
           {isComplete && (
             <Pressable
               onPress={handleStart}
-              style={({ pressed }) => [styles.primaryBtn, pressed && { backgroundColor: 'rgba(255,255,255,0.32)' }]}
+              style={({ pressed }) => [styles.primaryBtn, pressed && { backgroundColor: alpha(FOCUS.moonlight, 0.32) }]}
             >
-              <RotateCcw size={20} color="#ffffff" />
+              <RotateCcw size={20} color={FOCUS.moonlight} />
               <Text style={[styles.primaryBtnText, { fontFamily: fonts.bold }]}>{p.startAgain}</Text>
             </Pressable>
           )}
 
           {isRunning && (
             <Pressable
-              onPress={handleReset}
-              style={({ pressed }) => [styles.smallIconBtn, pressed && { backgroundColor: 'rgba(255,255,255,0.24)' }]}
+              onPress={handleRestart}
+              style={({ pressed }) => [styles.smallIconBtn, pressed && { backgroundColor: alpha(FOCUS.moonlight, 0.24) }]}
               accessibilityLabel={p.startAgain}
             >
-              <RotateCcw size={18} color="#ffffff" />
+              <RotateCcw size={18} color={FOCUS.moonlight} />
             </Pressable>
           )}
         </View>
@@ -655,11 +555,11 @@ export default function MeditationPlayer({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: FOCUS.midnight,
   },
   audioOnlyBg: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#000000',
+    backgroundColor: FOCUS.midnight,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -693,13 +593,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitle: {
-    color: '#ffffff',
+    color: FOCUS.moonlight,
     fontSize: typography.fontSize.md,
-  },
-  headerSubtitle: {
-    color: 'rgba(255,255,255,0.75)',
-    fontSize: typography.fontSize.xs,
-    marginTop: 2,
   },
   main: {
     flex: 1,
@@ -707,106 +602,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: spacing.lg,
   },
-  selectorWrap: {
-    alignItems: 'center',
-  },
-  selectorLabel: {
-    color: 'rgba(255,255,255,0.85)',
-    fontSize: typography.fontSize.sm,
-    marginBottom: spacing.md,
-  },
-  selectorRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: spacing.sm,
-  },
-  customWrap: {
-    alignItems: 'center',
-    gap: spacing.md,
-    marginTop: spacing.lg,
-  },
-  stepperRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.lg,
-  },
-  stepperBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: radius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.14)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.4)',
-  },
-  stepperBtnDisabled: {
-    opacity: 0.4,
-  },
-  customValue: {
-    color: '#ffffff',
-    fontSize: typography.fontSize.xxl,
-    minWidth: 130,
-    textAlign: 'center',
-  },
-  customValueDisabled: {
-    color: 'rgba(255,255,255,0.5)',
-  },
-  infinityPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    height: 34,
-    paddingHorizontal: spacing.lg,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.4)',
-  },
-  infinityPillActive: {
-    backgroundColor: '#ffffff',
-    borderColor: '#ffffff',
-  },
-  infinityPillText: {
-    color: '#ffffff',
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.sm,
-  },
-  infinityPillTextActive: {
-    color: '#000000',
-  },
-  pill: {
-    height: 34,
-    paddingHorizontal: spacing.lg,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.4)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  pillActive: {
-    backgroundColor: '#ffffff',
-    borderColor: '#ffffff',
-  },
-  pillText: {
-    color: '#ffffff',
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.sm,
-  },
-  pillTextActive: {
-    color: '#000000',
-  },
   timeWrap: {
     alignItems: 'center',
   },
   timeText: {
-    color: '#ffffff',
+    color: FOCUS.moonlight,
     fontSize: 64,
     fontVariant: ['tabular-nums'],
   },
   remainingLabel: {
-    color: 'rgba(255,255,255,0.75)',
+    color: alpha(FOCUS.moonlight, 0.75),
     fontSize: typography.fontSize.sm,
     marginTop: spacing.xs,
     textTransform: 'uppercase',
@@ -817,19 +622,19 @@ const styles = StyleSheet.create({
     maxWidth: 300,
   },
   completionTitle: {
-    color: '#ffffff',
+    color: FOCUS.moonlight,
     fontSize: typography.fontSize.xxl,
     marginTop: spacing.lg,
   },
   completionBody: {
-    color: 'rgba(255,255,255,0.85)',
+    color: alpha(FOCUS.moonlight, 0.85),
     fontSize: typography.fontSize.sm,
     lineHeight: typography.lineHeight.body,
     textAlign: 'center',
     marginTop: spacing.md,
   },
   placeholderNotice: {
-    color: 'rgba(255,255,255,0.55)',
+    color: alpha(FOCUS.moonlight, 0.55),
     fontSize: 10,
     textAlign: 'center',
     paddingHorizontal: spacing.xl,
@@ -848,14 +653,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing.sm,
-    backgroundColor: 'rgba(255,255,255,0.18)',
+    backgroundColor: alpha(FOCUS.moonlight, 0.18),
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.4)',
+    borderColor: alpha(FOCUS.moonlight, 0.4),
     paddingHorizontal: spacing.xl,
     borderRadius: radius.full,
   },
   primaryBtnText: {
-    color: '#ffffff',
+    color: FOCUS.moonlight,
     fontSize: typography.fontSize.body,
     lineHeight: typography.lineHeight.body,
   },
@@ -865,8 +670,8 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.12)',
+    backgroundColor: alpha(FOCUS.moonlight, 0.12),
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
+    borderColor: alpha(FOCUS.moonlight, 0.3),
   },
 });

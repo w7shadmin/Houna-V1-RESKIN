@@ -5,10 +5,12 @@ import { Sparkles, Trash2 } from 'lucide-react-native';
 import DetailScreen from '@/components/DetailScreen';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { colors, spacing, radius, typography } from '@/constants/theme';
+import { spacing, radius, typography } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { fetchPost, deletePost, type VoicePost } from '@/lib/voices';
 
 export default function VoicePostScreen() {
+  const { colors } = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { t, fonts } = useLanguage();

@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import { View, StyleSheet } from 'react-native';
 import Svg, { Path, Circle, Line, Text as SvgText } from 'react-native-svg';
-import { colors } from '@/constants/theme';
-import { MOOD_COLORS, MOOD_VALUES, localDateString, type JournalEntry, type MoodTag } from '@/lib/journal';
+import { useTheme } from '@/contexts/ThemeContext';
+import { MOOD_COLORS, MOOD_VALUES, MOOD_VALUE_MAX, localDateString, type JournalEntry, type MoodTag } from '@/lib/journal';
 
 export interface DayPoint {
   dateStr: string;
@@ -26,7 +26,7 @@ const PAD_BOTTOM = 28;
 const INNER_W = CHART_W - PAD_X * 2;
 const INNER_H = CHART_H - PAD_TOP - PAD_BOTTOM;
 
-/** Ported from the old MVP's MoodHistoryScreen chart — same layout math, smoothing and axis logic, redrawn with react-native-svg. */
+/** Mood over 7 or 30 days: a quiet trend line with each day's dot in its mood's colour (constants/moods.ts). Layout math from the old MVP's chart. */
 export default function MoodTrendChart({
   moodEntries,
   range,
@@ -34,6 +34,7 @@ export default function MoodTrendChart({
   selectedDateStr,
   onSelectDate,
 }: MoodTrendChartProps) {
+  const { colors } = useTheme();
   const days = useMemo<DayPoint[]>(() => {
     const result: DayPoint[] = [];
     const today = new Date();
@@ -54,7 +55,7 @@ export default function MoodTrendChart({
     return daysWithMood.map((d, i) => {
       const x = PAD_X + (daysWithMood.length > 1 ? (i / (daysWithMood.length - 1)) * INNER_W : INNER_W / 2);
       const moodVal = MOOD_VALUES[d.entry!.mood];
-      const y = PAD_TOP + (1 - (moodVal - 1) / 5) * INNER_H;
+      const y = PAD_TOP + (1 - (moodVal - 1) / (MOOD_VALUE_MAX - 1)) * INNER_H;
       return { x, y, dateStr: d.dateStr, label: d.dayLabel, mood: d.entry!.mood as MoodTag };
     });
   }, [daysWithMood]);
@@ -82,8 +83,8 @@ export default function MoodTrendChart({
   return (
     <View style={styles.wrap}>
       <Svg viewBox={`0 0 ${CHART_W} ${CHART_H}`} width="100%" height={CHART_H}>
-        {[6, 1].map((val) => {
-          const y = PAD_TOP + (1 - (val - 1) / 5) * INNER_H;
+        {[MOOD_VALUE_MAX, 1].map((val) => {
+          const y = PAD_TOP + (1 - (val - 1) / (MOOD_VALUE_MAX - 1)) * INNER_H;
           return (
             <Line
               key={val}
@@ -98,7 +99,7 @@ export default function MoodTrendChart({
         })}
 
         {!!smoothPath && (
-          <Path d={smoothPath} fill="none" stroke={colors.primary} strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" opacity={0.7} />
+          <Path d={smoothPath} fill="none" stroke={colors.textTertiary} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" opacity={0.6} />
         )}
 
         {points.map((p, i) => {
@@ -112,7 +113,7 @@ export default function MoodTrendChart({
                 cy={p.y}
                 r={selected ? 7 : 5}
                 fill={MOOD_COLORS[p.mood]}
-                stroke="#ffffff"
+                stroke={colors.background}
                 strokeWidth={1.5}
                 onPress={() => onSelectDate(p.dateStr)}
               />

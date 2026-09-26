@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Breathing session</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;family=Figtree:wght@400;500;600&amp;family=Marcellus&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B1026;font-family:'Figtree',system-ui,sans-serif;color:#F2ECDD}
+a{color:#F2ECDD;text-decoration:none}
+@keyframes box-orb{0%{transform:scale(0.42)}25%{transform:scale(1)}50%{transform:scale(1)}75%{transform:scale(0.42)}100%{transform:scale(0.42)}}
+@keyframes box-glow{0%{opacity:0.65}25%{opacity:1}50%{opacity:1}75%{opacity:0.65}100%{opacity:0.65}}
+@keyframes box-bead{0%{transform:translate(-110px,-110px)}25%{transform:translate(110px,-110px)}50%{transform:translate(110px,110px)}75%{transform:translate(-110px,110px)}100%{transform:translate(-110px,-110px)}}
+@keyframes phase-word{0%{opacity:1}24.8%{opacity:1}25%{opacity:0}100%{opacity:0}}
+@keyframes phase-tag{0%{opacity:1}24.8%{opacity:1}25%{opacity:0.4}100%{opacity:0.4}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; box-sizing: border-box; background: #0B1026; font-family: 'Figtree', system-ui, sans-serif; color: #F2ECDD; display: flex; flex-direction: column; padding: 20px 20px 40px">
+<span aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 390px; height: 844px; background: radial-gradient(70% 38% at 50% 30%, {{glow}}, rgba(11,16,38,0) 72%); animation: box-glow 16s ease-in-out 0s infinite; animation-play-state: {{play}}"></span>
+
+<div style="position: relative; display: flex; align-items: center; justify-content: space-between; gap: 8px">
+<a href="Tanafas.dc.html" aria-label="Close Tanafas" style="flex-shrink: 0; width: 44px; height: 44px; border-radius: 999px; display: flex; align-items: center; justify-content: center; background: rgba(242,236,221,0.06); border: 1px solid rgba(242,236,221,0.12)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></a>
+<div role="tablist" aria-label="Tanafas" style="display: flex; gap: 16px">
+<a href="Tanafas.dc.html" role="tab" aria-selected="true" style="height: 44px; display: flex; align-items: center; padding: 0 2px; border-bottom: 2px solid {{tabLine}}; color: {{tabOn}}; font-size: 15px; font-weight: 600; box-sizing: border-box">Breathe</a>
+<a href="Tanafas.dc.html" role="tab" aria-selected="false" style="height: 44px; display: flex; align-items: center; padding: 0 2px; color: {{tabOff}}; font-size: 15px; font-weight: 600">Meditate</a>
+<a href="Tanafas.dc.html" role="tab" aria-selected="false" style="height: 44px; display: flex; align-items: center; padding: 0 2px; color: {{tabOff}}; font-size: 15px; font-weight: 600">Discover</a>
+</div>
+<a href="#journal" aria-label="Journal" style="flex-shrink: 0; width: 44px; height: 44px; border-radius: 999px; display: flex; align-items: center; justify-content: center; background: rgba(242,236,221,0.06); border: 1px solid rgba(242,236,221,0.12)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"></path><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"></path><path d="M9 7.5h6"></path></svg></a>
+</div>
+
+<div style="position: relative; flex-grow: 1; display: flex; flex-direction: column; min-height: 0">
+<div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px">
+<div aria-hidden="true" style="position: relative; width: 250px; height: 250px">
+<sc-for list="{{dots}}" as="d" hint-placeholder-count="28">
+<span style="position: absolute; left: {{d.x}}px; top: {{d.y}}px; width: {{d.s}}px; height: {{d.s}}px; border-radius: 999px; background: {{d.c}}; opacity: {{d.o}}"></span>
+</sc-for>
+<span style="position: absolute; left: 56px; top: 56px; width: 137px; height: 137px; box-sizing: border-box; border-radius: {{middleRadius}}; border: 1px solid rgba(242,236,221,0.14)"></span>
+<div style="position: absolute; left: 37px; top: 37px; width: 176px; height: 176px; animation: box-orb 16s ease-in-out 0s infinite; animation-play-state: {{play}}">
+<span style="position: absolute; left: 0; top: 0; width: 176px; height: 176px; border-radius: {{orbRadius}}; background: {{orbFill}}; box-shadow: 0 0 90px {{orbGlow}}"></span>
+<div style="position: absolute; left: 0; top: 0; width: 176px; height: 176px; opacity: 0.7"><svg aria-hidden="true" width="64" height="64" viewBox="17 5.4 20.6 20.6" style="position: absolute; left: 56px; top: 56px"><g transform="translate(-10.7 -6.6)"><g transform="translate(29.24 13.384)"><path d="M50.18,33.714a6.82,6.82,0,0,1-2.116-1.448,7.132,7.132,0,0,1-1.448-2.116,6.565,6.565,0,0,1-.5-2.561,7.052,7.052,0,0,1,.5-2.617,6.228,6.228,0,0,1,1.448-2.116A7.132,7.132,0,0,1,50.18,21.41a6.565,6.565,0,0,1,2.561-.5,7.052,7.052,0,0,1,2.617.5,6.228,6.228,0,0,1,2.116,1.448,7.132,7.132,0,0,1,1.448,2.116,6.843,6.843,0,0,1,.5,2.617,6.565,6.565,0,0,1-.5,2.561,6.82,6.82,0,0,1-1.448,2.116,7.132,7.132,0,0,1-2.116,1.448,6.843,6.843,0,0,1-2.617.5,6.769,6.769,0,0,1-2.561-.5m-.835-14.253a8.809,8.809,0,0,0-2.784,1.893,8.2,8.2,0,0,0-1.893,2.839A8.871,8.871,0,0,0,44,27.646a9.074,9.074,0,0,0,.668,3.452,8.224,8.224,0,0,0,1.893,2.784,8.525,8.525,0,0,0,2.784,1.893,9.251,9.251,0,0,0,6.9,0,9.744,9.744,0,0,0,2.839-1.893A8.525,8.525,0,0,0,60.981,31.1a9.251,9.251,0,0,0,0-6.9,9.744,9.744,0,0,0-1.893-2.839,8.2,8.2,0,0,0-2.839-1.893,8.871,8.871,0,0,0-3.452-.668,7.232,7.232,0,0,0-3.452.668" transform="translate(-44 -18.785)" fill="{{markFill}}"></path></g><g transform="translate(31.801 13.392)"><path d="M48.6,24.924c0,3.4,6.124,5.679,6.124,8.685,0-3.006,6.124-5.289,6.124-8.685a6.124,6.124,0,0,0-12.248,0M57.452,24.367A2.672,2.672,0,1,1,54.779,21.695a2.71,2.71,0,0,1,2.672,2.672Z" transform="translate(-48.6 -18.8)" fill="{{markFill}}" fill-rule="evenodd"></path></g></g></svg></div>
+</div>
+<span style="position: absolute; left: 120px; top: 120px; width: 10px; height: 10px; border-radius: 999px; background: {{fg}}; box-shadow: 0 0 14px {{beadGlow}}; animation: box-bead 16s linear 0s infinite; animation-play-state: {{play}}"></span>
+</div>
+
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%">
+<span aria-hidden="true" style="width: 40px; height: 40px"></span>
+<div style="flex: 1; min-height: 104px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center">
+<div role="status" aria-label="{{statusLabel}}" style="display: grid">
+<span style="grid-area: 1 / 1; font-family: 'Marcellus', serif; font-size: 27px; line-height: 1.12; color: #F2ECDD; opacity: 0; animation: phase-word 16s linear 0s infinite; animation-play-state: {{play}}">Inhale</span>
+<span style="grid-area: 1 / 1; font-family: 'Marcellus', serif; font-size: 27px; line-height: 1.12; color: #F2ECDD; opacity: 0; animation: phase-word 16s linear -12s infinite; animation-play-state: {{play}}">Hold</span>
+<span style="grid-area: 1 / 1; font-family: 'Marcellus', serif; font-size: 27px; line-height: 1.12; color: #F2ECDD; opacity: 0; animation: phase-word 16s linear -8s infinite; animation-play-state: {{play}}">Exhale</span>
+<span style="grid-area: 1 / 1; font-family: 'Marcellus', serif; font-size: 27px; line-height: 1.12; color: #F2ECDD; opacity: 0; animation: phase-word 16s linear -4s infinite; animation-play-state: {{play}}">Hold</span>
+</div>
+<span style="font-family: 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.14em; color: {{fg}}">ROUND 1 OF 12</span>
+</div>
+<span aria-hidden="true" style="width: 40px; height: 40px"></span>
+</div>
+
+<div aria-hidden="true" style="min-height: 44px; display: flex; gap: 16px">
+<span style="font-family: 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.14em; color: #F2ECDD; opacity: 0.4; animation: phase-tag 16s linear 0s infinite; animation-play-state: {{play}}">INHALE</span>
+<span style="font-family: 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.14em; color: #F2ECDD; opacity: 0.4; animation: phase-tag 16s linear -12s infinite; animation-play-state: {{play}}">HOLD</span>
+<span style="font-family: 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.14em; color: #F2ECDD; opacity: 0.4; animation: phase-tag 16s linear -8s infinite; animation-play-state: {{play}}">EXHALE</span>
+<span style="font-family: 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.14em; color: #F2ECDD; opacity: 0.4; animation: phase-tag 16s linear -4s infinite; animation-play-state: {{play}}">HOLD</span>
+</div>
+<span aria-hidden="true" style="height: 6px"></span>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 12px">
+<div role="progressbar" aria-label="Session progress" aria-valuenow="3" aria-valuemin="0" aria-valuemax="100" style="width: 100%; height: 4px; border-radius: 999px; background: rgba(242,236,221,0.12); overflow: hidden"><div style="width: 3%; height: 100%; border-radius: 999px; background: {{fg}}"></div></div>
+<span style="font-family: 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.14em; color: #8990B5">{{timeLabel}}</span>
+</div>
+<div style="display: flex; align-items: center; justify-content: center; gap: 24px">
+<a href="Tanafas.dc.html" aria-label="End session" style="width: 56px; height: 56px; border-radius: 999px; display: flex; align-items: center; justify-content: center; background: rgba(242,236,221,0.06); border: 1px solid rgba(242,236,221,0.12); color: #F2ECDD"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7"></path><path d="M4 4v4.5h4.5"></path></svg></a>
+<button type="button" aria-label="{{toggleLabel}}" onClick="{{toggle}}" style="width: 80px; height: 80px; border-radius: 999px; display: flex; align-items: center; justify-content: center; background: #F2ECDD; border: 0; color: #0B1026; box-shadow: 0 0 36px {{buttonGlow}}">
+<sc-if value="{{paused}}" hint-placeholder-val="{{ false }}"><svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"></path></svg></sc-if>
+<sc-if value="{{running}}" hint-placeholder-val="{{ true }}"><svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1.2"></rect><rect x="14" y="5" width="4" height="14" rx="1.2"></rect></svg></sc-if>
+</button>
+<span aria-hidden="true" style="width: 56px; height: 56px"></span>
+</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+const TONES = { glow: '#6FD6CF', dusk: '#B3A7F5', dawn: '#F2B880', bloom: '#EA90A8' };
+const GLOWS = { glow: '#6FD6CF', dusk: '#B3A7F5', dawn: '#F2B880', bloom: '#EA90A8' };
+const MIDNIGHT = '#0B1026';
+function rgb(h) { return [1, 3, 5].map(function (k) { return parseInt(h.slice(k, k + 2), 16); }); }
+function rgba(h, a) { return 'rgba(' + rgb(h).join(',') + ',' + a + ')'; }
+function over(h, a, base) { var f = rgb(h), b = rgb(base); return '#' + f.map(function (v, k) { return Math.round(v * a + b[k] * (1 - a)).toString(16).padStart(2, '0'); }).join(''); }
+function orbVals(tone, shape) {
+  var fg = TONES[tone];
+  return {
+    orbRadius: shape === 'square' ? '38.7px' : '999px',
+    orbFill: 'radial-gradient(circle at 34% 30%, ' + rgba('#FFFFFF', 0.76) + ' 0%, ' + rgba(over(fg, 0.35, '#FFFFFF'), 0.52) + ' 40%, ' + rgba(fg, 0.43) + ' 100%)',
+    orbGlow: rgba(fg, 0.38),
+    markFill: over(MIDNIGHT, 0.25, fg),
+    middleRadius: shape === 'square' ? '28px' : '999px'
+  };
+}
+function stageDots(tone, shape) {
+  var N = 28, R = 110, C = 125, fg = TONES[tone], partner = tone === 'glow' ? TONES.dusk : fg;
+  return Array.from({ length: N }, function (_, k) {
+    var t = k / N, x, y;
+    if (shape === 'ring') { var a = t * Math.PI * 2 - Math.PI / 2; x = C + R * Math.cos(a); y = C + R * Math.sin(a); }
+    else { var side = Math.floor(t * 4), f = t * 4 - side, al = -R + 2 * R * f; var xy = side === 0 ? [al, -R] : side === 1 ? [R, al] : side === 2 ? [-al, R] : [-R, -al]; x = C + xy[0]; y = C + xy[1]; }
+    var s = 3 + 4 * Math.sin(t * Math.PI);
+    return { x: (x - s / 2).toFixed(1), y: (y - s / 2).toFixed(1), s: s.toFixed(1), o: (0.2 + 0.8 * Math.sin(t * Math.PI)).toFixed(2), c: k < N / 2 ? fg : partner };
+  });
+}
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { paused: false };
+  }
+  renderVals() {
+    const paused = this.state.paused;
+    const tone = 'dusk', fg = TONES[tone];
+    const on = '#F2ECDD', off = '#8990B5';
+    return Object.assign({}, orbVals(tone, 'square'), {
+      dots: stageDots(tone, 'square'),
+      fg, beadGlow: rgba(fg, 0.9),
+      tabOn: on, tabOff: off, tabLine: TONES.glow,
+      glow: rgba(GLOWS[tone], 0.30), buttonGlow: rgba(GLOWS[tone], 0.35),
+      paused, running: !paused,
+      play: paused ? 'paused' : 'running',
+      statusLabel: paused ? 'Paused' : 'Box breathing, round 1 of 12',
+      timeLabel: paused ? 'PAUSED' : '2:59 LEFT',
+      toggleLabel: paused ? 'Resume' : 'Pause',
+      toggle: () => this.setState({ paused: !paused })
+    });
+  }
+}
+</script>
+</body>
+</html>

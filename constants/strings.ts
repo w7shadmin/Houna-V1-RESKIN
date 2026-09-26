@@ -15,6 +15,11 @@ import { eventsStrings } from './eventsStrings';
 import { journalStrings } from './journalStrings';
 import { homeStrings } from './homeStrings';
 import { accountStrings } from './accountStrings';
+import { crisisStrings } from './crisisStrings';
+import { checkInStrings } from './checkInStrings';
+import { discoverStrings } from './discoverStrings';
+import { recapStrings } from './recapStrings';
+import { profileStrings } from './profileStrings';
 
 export type Language = 'en' | 'ar';
 
@@ -48,6 +53,11 @@ export const strings = {
       explore: 'Explore Houna',
     },
     home: homeStrings.en,
+    crisis: crisisStrings.en,
+    checkIn: checkInStrings.en,
+    discover: discoverStrings.en,
+    recap: recapStrings.en,
+    profile: profileStrings.en,
     directory: directoryStrings.en,
     events: eventsStrings.en,
     about: {
@@ -107,6 +117,11 @@ export const strings = {
       explore: 'استكشف هُنا',
     },
     home: homeStrings.ar,
+    crisis: crisisStrings.ar,
+    checkIn: checkInStrings.ar,
+    discover: discoverStrings.ar,
+    recap: recapStrings.ar,
+    profile: profileStrings.ar,
     directory: directoryStrings.ar,
     events: eventsStrings.ar,
     about: {

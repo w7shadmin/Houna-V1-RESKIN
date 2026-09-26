@@ -1,17 +1,17 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, FlatList, Pressable, Linking, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router';
+import { View, Text, FlatList, Linking, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, typography } from '@/constants/theme';
-import { arabicNumber } from '@/lib/arabicNumerals';
+import { grid, layout } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
+import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { fetchPodcasts, safeUrl, type Podcast } from '@/lib/hounaApi';
 import { LoadingState, ErrorState, InlineError } from '@/components/directory/AsyncState';
 import ListItemCard from '@/components/directory/ListItemCard';
+import PageHeader from '@/components/directory/PageHeader';
 
 export default function PodcastsListScreen() {
-  const router = useRouter();
+  const { colors } = useTheme();
   const { t, language, isRTL, fonts } = useLanguage();
   const s = t.directory.podcasts;
   const common = t.directory.common;
@@ -38,42 +38,36 @@ export default function PodcastsListScreen() {
   }, [load]);
 
   const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
-
-  const handleOpen = (podcast: Podcast) => {
-    const url = safeUrl(podcast.url);
-    if (url) Linking.openURL(url);
+  const open = (item: Podcast) => {
+    const url = safeUrl(item.url);
+    if (url) Linking.openURL(url).catch(() => {});
   };
+  const header = <PageHeader title={s.title} intro={t.directory.hub.podcastsSubtitle} />;
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
-      <View style={styles.headerRow}>
-        <Pressable
-          onPress={() => router.back()}
-          hitSlop={12}
-          style={({ pressed }) => [
-            styles.backBtn,
-            { backgroundColor: colors.card, borderColor: colors.border },
-            pressed && { backgroundColor: colors.cardPressed },
-          ]}
-        >
-          <ArrowLeft size={18} color={colors.text} style={isRTL ? styles.flip : undefined} />
-        </Pressable>
-        <Text style={[styles.title, { color: colors.text, fontFamily: fonts.bold }]}>{s.title}</Text>
-      </View>
-
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
       {loading && podcasts.length === 0 ? (
-        <LoadingState label={s.loading} />
+        <View style={styles.stateWrap}>
+          {header}
+          <LoadingState label={s.loading} />
+        </View>
       ) : error && podcasts.length === 0 ? (
-        <ErrorState message={error} retryLabel={common.tryAgain} onRetry={load} />
+        <View style={styles.stateWrap}>
+          {header}
+          <ErrorState message={error} retryLabel={common.tryAgain} onRetry={load} />
+        </View>
       ) : (
         <FlatList
           data={podcasts}
           keyExtractor={(item, i) => `${item.title}-${i}`}
           contentContainerStyle={styles.listContent}
           ListHeaderComponent={
-            <Text style={[styles.count, { color: colors.textTertiary, fontFamily: fonts.regular }]}>
-              {num(podcasts.length)} {podcasts.length === 1 ? s.countOne : s.countOther}
-            </Text>
+            <View style={styles.listHeader}>
+              {header}
+              <Text style={[styles.count, { color: colors.textTertiary, fontFamily: fonts.medium }]}>
+                {arabicPlural(podcasts.length, s.count).replace('{n}', num(podcasts.length))}
+              </Text>
+            </View>
           }
           renderItem={({ item }) => (
             <View style={styles.itemWrap}>
@@ -83,7 +77,7 @@ export default function PodcastsListScreen() {
                 subtitle={item.host}
                 description={item.description}
                 imageResizeMode="contain"
-                onPress={() => handleOpen(item)}
+                onPress={() => open(item)}
               />
             </View>
           )}
@@ -95,9 +89,7 @@ export default function PodcastsListScreen() {
             ) : null
           }
           ListFooterComponent={
-            error && podcasts.length > 0 ? (
-              <InlineError message={error} retryLabel={common.tryAgain} onRetry={load} />
-            ) : null
+            error && podcasts.length > 0 ? <InlineError message={error} retryLabel={common.tryAgain} onRetry={load} /> : null
           }
         />
       )}
@@ -109,42 +101,34 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
   },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.md,
-  },
-  backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  flip: {
-    transform: [{ scaleX: -1 }],
-  },
-  title: {
-    fontSize: typography.fontSize.xl,
+  stateWrap: {
+    flex: 1,
+    width: '100%',
+    maxWidth: layout.maxContentWidth,
+    alignSelf: 'center',
+    padding: grid(2),
   },
   listContent: {
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xxl,
+    width: '100%',
+    maxWidth: layout.maxContentWidth,
+    alignSelf: 'center',
+    padding: grid(2),
+    paddingBottom: grid(5),
+  },
+  listHeader: {
+    gap: grid(2),
+    marginBottom: grid(1.5),
   },
   count: {
-    fontSize: typography.fontSize.xs,
-    marginBottom: spacing.sm,
+    fontSize: 13,
+    lineHeight: 16,
   },
   itemWrap: {
-    marginBottom: spacing.sm,
+    marginBottom: grid(1.5),
   },
   empty: {
     textAlign: 'center',
-    fontSize: typography.fontSize.sm,
-    paddingVertical: spacing.xxl,
+    fontSize: 14,
+    paddingVertical: grid(6),
   },
 });

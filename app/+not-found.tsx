@@ -1,9 +1,11 @@
 import { Link, Stack } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, typography, spacing } from '@/constants/theme';
+import { typography, spacing } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function NotFoundScreen() {
+  const { colors } = useTheme();
   const { t, fonts } = useLanguage();
 
   return (

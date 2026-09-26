@@ -1,11 +1,16 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, Pressable, ActivityIndicator, Share, StyleSheet } from 'react-native';
+import { View, Text, ActivityIndicator, Share, StyleSheet } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { Award, Share2 } from 'lucide-react-native';
-import DetailScreen from '@/components/DetailScreen';
+import { Award } from 'lucide-react-native';
+import { AccountScreen, FormMessage } from '@/components/account/AccountKit';
+import { GroupLabel } from '@/components/directory/ProfileKit';
+import Button from '@/components/ui/Button';
+import Chip from '@/components/ui/Chip';
+import IconTile from '@/components/ui/IconTile';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { colors, palette, spacing, radius, typography, shadows } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
+import { grid, radius } from '@/constants/theme';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import {
   getMyStreak,
@@ -21,6 +26,7 @@ import {
 type Period = 'week' | 'all';
 
 export default function StatsScreen() {
+  const { colors } = useTheme();
   const { t, isRTL, fonts } = useLanguage();
   const { session, profile } = useAuth();
   const s = t.account.stats;
@@ -65,273 +71,197 @@ export default function StatsScreen() {
 
   if (!session) return null;
 
+  const labelLatin = fonts.labelTracked;
+  const label = [labelLatin ? styles.labelLatin : styles.labelArabic, { color: colors.textTertiary, fontFamily: labelLatin ? fonts.labelRegular : fonts.label }];
+
   return (
-    <DetailScreen title={s.title}>
-      <Text style={[styles.subtitle, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{s.subtitle}</Text>
-
-      <View style={[styles.streakCard, { backgroundColor: palette.turquoiseDark }]}>
+    <AccountScreen title={s.title} subtitle={s.subtitle}>
+      <View style={[styles.streakCard, { backgroundColor: colors.tones.glow.bg, borderColor: colors.tones.glow.border }]}>
         <View style={styles.streakMain}>
-          <Text style={[styles.streakNumber, { fontFamily: fonts.bold }]}>{streak ? num(streak.current) : '—'}</Text>
-          <Text style={[styles.streakLabel, { fontFamily: fonts.semiBold }]}>{s.currentStreak}</Text>
+          <Text style={label}>{s.currentStreak}</Text>
+          <Text style={[styles.streakNumber, isRTL && styles.streakNumberArabic, { color: colors.text, fontFamily: fonts.display }]}>
+            {streak ? num(streak.current) : '—'}
+          </Text>
+          {!!streak && <Text style={[styles.streakDays, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{daysText(streak.current)}</Text>}
         </View>
-        <View style={styles.streakDivider} />
-        <View style={styles.streakSecondary}>
-          <Text style={[styles.longestNumber, { fontFamily: fonts.semiBold }]}>{streak ? num(streak.longest) : '—'}</Text>
-          <Text style={[styles.longestLabel, { fontFamily: fonts.regular }]}>{s.longestStreak}</Text>
+        <View style={[styles.streakDivider, { backgroundColor: colors.tones.glow.border }]} />
+        <View style={styles.streakSide}>
+          <Text style={label}>{s.longestStreak}</Text>
+          <Text style={[styles.longestNumber, isRTL && styles.longestNumberArabic, { color: colors.text, fontFamily: fonts.display }]}>
+            {streak ? num(streak.longest) : '—'}
+          </Text>
         </View>
       </View>
 
-      {!!streak && streak.current === 0 && (
-        <Text style={[styles.emptyNote, { color: colors.textTertiary, fontFamily: fonts.regular }]}>{s.noStreakYet}</Text>
-      )}
-
+      {!!streak && streak.current === 0 && <FormMessage message={s.noStreakYet} tone="muted" />}
       {!!streak && streak.current > 0 && (
-        <Pressable
-          onPress={handleShare}
-          style={({ pressed }) => [styles.shareBtn, { borderColor: colors.border }, pressed && { backgroundColor: colors.cardPressed }]}
-        >
-          <Share2 size={16} color={colors.primary} strokeWidth={2} />
-          <Text style={[styles.shareBtnText, { color: colors.primary, fontFamily: fonts.semiBold }]}>{s.share}</Text>
-        </Pressable>
+        <View style={styles.shareRow}>
+          <Button variant="secondary" label={s.share} onPress={handleShare} />
+        </View>
       )}
 
-      <Text style={[styles.sectionTitle, { color: colors.text, fontFamily: fonts.bold }]}>{s.badgesTitle}</Text>
-      <View style={styles.badgeGrid}>
-        {BADGE_THRESHOLDS.map((days) => {
-          const earned = earnedBadges.has(badgeCodeForThreshold(days));
-          return (
-            <View
-              key={days}
-              style={[
-                styles.badgeCard,
-                { backgroundColor: colors.card, borderColor: colors.border },
-                earned && shadows.card,
-                !earned && styles.badgeCardLocked,
-              ]}
-            >
-              <View style={[styles.badgeIcon, { backgroundColor: earned ? colors.primaryLightest : colors.surface }]}>
-                <Award size={20} color={earned ? colors.primary : colors.textTertiary} strokeWidth={1.8} />
-              </View>
-              <Text
-                numberOfLines={2}
-                style={[styles.badgeLabel, { color: earned ? colors.text : colors.textTertiary, fontFamily: fonts.semiBold }]}
-              >
-                {arabicPlural(days, s.badgeName).replace('{n}', num(days))}
-              </Text>
-            </View>
-          );
-        })}
-      </View>
-
-      <Text style={[styles.sectionTitle, { color: colors.text, fontFamily: fonts.bold }]}>{s.leaderboardTitle}</Text>
-      <Text style={[styles.leaderboardSubtitle, { color: colors.textTertiary, fontFamily: fonts.regular }]}>
-        {s.leaderboardSubtitle}
-      </Text>
-
-      <View style={[styles.periodSwitcher, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-        {(['week', 'all'] as Period[]).map((p) => {
-          const active = p === period;
-          return (
-            <Pressable
-              key={p}
-              onPress={() => setPeriod(p)}
-              style={[styles.periodOption, active && { backgroundColor: colors.primary }]}
-            >
-              <Text
-                style={[
-                  styles.periodOptionText,
-                  { color: active ? colors.onPrimary : colors.textSecondary, fontFamily: fonts.semiBold },
-                ]}
-              >
-                {p === 'week' ? s.thisWeek : s.allTime}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
-
-      {loadingBoard ? (
-        <ActivityIndicator style={styles.boardLoading} color={colors.primary} />
-      ) : leaderboard.length === 0 ? (
-        <Text style={[styles.emptyNote, { color: colors.textTertiary, fontFamily: fonts.regular }]}>{s.leaderboardEmpty}</Text>
-      ) : (
-        <View style={[styles.boardCard, { backgroundColor: colors.card, borderColor: colors.border, ...shadows.card }]}>
-          {leaderboard.map((row, i) => {
-            const isYou = profile?.username === row.username;
+      <View style={styles.section}>
+        <GroupLabel>{s.badgesTitle}</GroupLabel>
+        <View style={styles.badges}>
+          {BADGE_THRESHOLDS.map((days) => {
+            const earned = earnedBadges.has(badgeCodeForThreshold(days));
             return (
-              <View
-                key={row.username}
-                style={[
-                  styles.boardRow,
-                  i > 0 && { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.borderLight },
-                  isYou && { backgroundColor: colors.primaryLightest },
-                ]}
-              >
-                <Text style={[styles.boardRank, { color: colors.textTertiary, fontFamily: fonts.semiBold }]}>{num(i + 1)}</Text>
-                <Text
-                  numberOfLines={1}
-                  style={[styles.boardUsername, { color: colors.text, fontFamily: fonts.semiBold }]}
-                >
-                  {row.username}
-                  {isYou ? ` (${s.you})` : ''}
-                </Text>
-                <Text style={[styles.boardCount, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-                  {num(row.session_count)}
+              <View key={days} style={[styles.badge, !earned && styles.badgeLocked]}>
+                <IconTile
+                  size={46}
+                  tone={earned ? 'glow' : 'dusk'}
+                  renderIcon={(c, size) => <Award size={size} color={earned ? c : colors.textTertiary} strokeWidth={1.6} />}
+                />
+                <Text numberOfLines={1} style={[styles.badgeLabel, { color: earned ? colors.text : colors.textTertiary, fontFamily: fonts.medium }]}>
+                  {arabicPlural(days, s.badgeName).replace('{n}', num(days))}
                 </Text>
               </View>
             );
           })}
         </View>
-      )}
-    </DetailScreen>
+      </View>
+
+      <View style={styles.section}>
+        <GroupLabel>{s.leaderboardTitle}</GroupLabel>
+        <Text style={[styles.note, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{s.leaderboardSubtitle}</Text>
+        <View style={styles.chips}>
+          <Chip size="sm" label={s.thisWeek} selected={period === 'week'} onPress={() => setPeriod('week')} />
+          <Chip size="sm" label={s.allTime} selected={period === 'all'} onPress={() => setPeriod('all')} />
+        </View>
+
+        {loadingBoard ? (
+          <ActivityIndicator style={styles.boardLoading} color={colors.primary} />
+        ) : leaderboard.length === 0 ? (
+          <FormMessage message={s.leaderboardEmpty} tone="muted" />
+        ) : (
+          <View style={[styles.board, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            {leaderboard.map((row, i) => {
+              const isYou = profile?.username === row.username;
+              return (
+                <View
+                  key={row.username}
+                  style={[
+                    styles.boardRow,
+                    i > 0 && { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
+                    isYou && { backgroundColor: colors.tones.glow.bg },
+                  ]}
+                >
+                  <Text style={[styles.rank, { color: i < 3 ? colors.primary : colors.textTertiary, fontFamily: fonts.display }]}>{num(i + 1)}</Text>
+                  <Text numberOfLines={1} style={[styles.boardName, { color: colors.text, fontFamily: isYou ? fonts.semiBold : fonts.medium }]}>
+                    {row.username}
+                    {isYou ? ` · ${s.you}` : ''}
+                  </Text>
+                  <Text style={[styles.boardCount, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{num(row.session_count)}</Text>
+                </View>
+              );
+            })}
+          </View>
+        )}
+      </View>
+    </AccountScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  subtitle: {
-    fontSize: typography.fontSize.body,
-    marginTop: spacing.sm,
-    marginBottom: spacing.lg,
+  labelLatin: {
+    fontSize: 11.5,
+    letterSpacing: 11.5 * 0.14,
+    textTransform: 'uppercase',
+  },
+  labelArabic: {
+    fontSize: 13,
   },
   streakCard: {
     flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: radius.lg,
-    padding: spacing.lg,
-    marginBottom: spacing.sm,
+    alignItems: 'stretch',
+    borderWidth: 1,
+    borderRadius: radius.cardLg,
+    padding: grid(3),
+    gap: grid(3),
   },
   streakMain: {
-    flex: 1.2,
-    alignItems: 'center',
+    flex: 1,
+    gap: grid(0.5),
   },
   streakNumber: {
-    fontSize: 44,
-    color: palette.white,
-    lineHeight: 50,
+    fontSize: 64,
+    lineHeight: 72,
   },
-  streakLabel: {
-    fontSize: typography.fontSize.sm,
-    color: 'rgba(255,255,255,0.9)',
-    marginTop: spacing.xxs,
+  streakNumberArabic: {
+    lineHeight: 96,
+  },
+  streakDays: {
+    fontSize: 15,
   },
   streakDivider: {
-    width: StyleSheet.hairlineWidth,
-    alignSelf: 'stretch',
-    backgroundColor: 'rgba(255,255,255,0.25)',
+    width: 1,
   },
-  streakSecondary: {
-    flex: 1,
-    alignItems: 'center',
+  streakSide: {
+    minWidth: grid(9),
+    gap: grid(0.5),
   },
   longestNumber: {
-    fontSize: typography.fontSize.xxl,
-    color: palette.white,
+    fontSize: 32,
+    lineHeight: 40,
   },
-  longestLabel: {
-    fontSize: typography.fontSize.xs,
-    color: 'rgba(255,255,255,0.85)',
-    marginTop: spacing.xxs,
-    textAlign: 'center',
+  longestNumberArabic: {
+    lineHeight: 52,
   },
-  emptyNote: {
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.sm,
-    marginTop: spacing.sm,
-    marginBottom: spacing.lg,
-  },
-  shareBtn: {
+  shareRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.xs,
-    height: 40,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    marginTop: spacing.sm,
-    marginBottom: spacing.lg,
   },
-  shareBtnText: {
-    fontSize: typography.fontSize.sm,
+  section: {
+    gap: grid(1.5),
+    marginTop: grid(1),
   },
-  sectionTitle: {
-    fontSize: typography.fontSize.md,
-    marginBottom: spacing.sm,
-  },
-  badgeGrid: {
+  badges: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-    marginBottom: spacing.lg,
+    justifyContent: 'space-between',
   },
-  badgeCard: {
-    width: '31%',
+  badge: {
     alignItems: 'center',
-    borderRadius: radius.md,
-    borderWidth: 1,
-    padding: spacing.sm,
+    gap: grid(1),
   },
-  badgeCardLocked: {
+  badgeLocked: {
     opacity: 0.55,
   },
-  badgeIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.xs,
-  },
   badgeLabel: {
-    fontSize: 11,
-    lineHeight: 14,
-    textAlign: 'center',
+    fontSize: 12.5,
   },
-  leaderboardSubtitle: {
-    fontSize: typography.fontSize.xs,
-    marginBottom: spacing.md,
+  note: {
+    fontSize: 14,
+    lineHeight: 20,
   },
-  periodSwitcher: {
+  chips: {
     flexDirection: 'row',
-    borderRadius: radius.full,
-    borderWidth: 1,
-    padding: 4,
-    marginBottom: spacing.md,
-  },
-  periodOption: {
-    flex: 1,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: radius.full,
-  },
-  periodOptionText: {
-    fontSize: typography.fontSize.sm,
+    gap: grid(1),
   },
   boardLoading: {
-    paddingVertical: spacing.lg,
+    marginVertical: grid(3),
   },
-  boardCard: {
-    borderRadius: radius.lg,
+  board: {
     borderWidth: 1,
+    borderRadius: radius.card,
     overflow: 'hidden',
-    marginBottom: spacing.xxl,
   },
   boardRow: {
+    minHeight: grid(7),
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
-    paddingVertical: spacing.sm + 2,
-    paddingHorizontal: spacing.md,
+    gap: grid(2),
+    paddingHorizontal: grid(2),
   },
-  boardRank: {
-    width: 22,
-    fontSize: typography.fontSize.sm,
+  rank: {
+    width: grid(3),
+    fontSize: 20,
+    textAlign: 'center',
   },
-  boardUsername: {
+  boardName: {
     flex: 1,
-    fontSize: typography.fontSize.body,
+    minWidth: 0,
+    fontSize: 15.5,
   },
   boardCount: {
-    fontSize: typography.fontSize.sm,
+    fontSize: 15,
   },
 });

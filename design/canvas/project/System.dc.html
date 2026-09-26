@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Nightlight design system</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=DM+Mono:wght@400;500&amp;family=Figtree:wght@400;500;600&amp;family=IBM+Plex+Sans+Arabic:wght@400;500;600&amp;family=Marcellus&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B1026;font-family:'Figtree',system-ui,sans-serif;color:#F2ECDD}
+a{color:#6FD6CF}a:hover{color:#A8EDE8}
+</style>
+</helmet>
+<div style="width: 1280px; height: 1180px; box-sizing: border-box; padding: 64px; background: #0B1026; font-family: 'Figtree', system-ui, sans-serif; color: #F2ECDD; display: flex; flex-direction: column; gap: 48px">
+
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 40px">
+<div style="display: flex; flex-direction: column; gap: 12px">
+<span style="font-family: 'DM Mono', monospace; font-size: 13px; letter-spacing: 0.18em; color: #6FD6CF">HOUNA · DESIGN DIRECTION</span>
+<h1 style="margin: 0; font-family: 'Marcellus', serif; font-weight: 400; font-size: 76px; line-height: 1; color: #F2ECDD">Nightlight</h1>
+<p style="margin: 0; font-size: 19px; line-height: 1.5; color: #B6BAD6; max-width: 620px">A steady light in the dark that says <em style="font-family: 'Marcellus', serif; font-style: normal; color: #F2ECDD">you are here</em> — the Houna mark as a glowing pin on a quiet night sky.</p>
+</div>
+<div style="display: flex; align-items: center; gap: 24px">
+<img src="/_blob/7dff467aa09ab880cc53e60ff6e989f6" alt="Houna mark" style="width: 96px; height: 96px">
+<img src="/_blob/eb9d2a7e77fe2f8552aa5d179bf214ca" alt="Houna wordmark" style="width: 186px; height: 88px">
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px">
+
+<section style="display: flex; flex-direction: column; gap: 18px">
+<h2 style="margin: 0; font-family: 'DM Mono', monospace; font-weight: 500; font-size: 13px; letter-spacing: 0.18em; color: #8990B5">COLOR</h2>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px">
+<sc-for list="{{swatches}}" as="s" hint-placeholder-count="9">
+<div style="display: flex; flex-direction: column; border-radius: 18px; overflow: hidden; border: 1px solid rgba(242,236,221,0.12)">
+<div style="height: 76px; background: {{s.hex}}"></div>
+<div style="display: flex; flex-direction: column; gap: 3px; padding: 12px 14px; background: #10173A">
+<span style="font-size: 15px; font-weight: 600; color: #F2ECDD">{{s.name}}</span>
+<span style="font-family: 'DM Mono', monospace; font-size: 12px; color: #B6BAD6">{{s.hex}}</span>
+<span style="font-size: 12.5px; line-height: 1.35; color: #8990B5">{{s.role}}</span>
+</div>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column; gap: 18px">
+<h2 style="margin: 0; font-family: 'DM Mono', monospace; font-weight: 500; font-size: 13px; letter-spacing: 0.18em; color: #8990B5">TYPE</h2>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 20px; border-radius: 18px; background: rgba(242,236,221,0.04); border: 1px solid rgba(242,236,221,0.10)">
+<span style="font-family: 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.12em; color: #8990B5">DISPLAY · MARCELLUS</span>
+<span style="font-family: 'Marcellus', serif; font-size: 44px; line-height: 1.05; color: #F2ECDD">You are here</span>
+</div>
+<div dir="rtl" style="display: flex; flex-direction: column; gap: 10px; padding: 20px; border-radius: 18px; background: rgba(242,236,221,0.04); border: 1px solid rgba(242,236,221,0.10)">
+<span dir="ltr" style="align-self: flex-end; font-family: 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.12em; color: #8990B5">DISPLAY · AMIRI</span>
+<span lang="ar" style="font-family: 'Amiri', serif; font-weight: 700; font-size: 44px; line-height: 1.3; color: #F2ECDD">أنت هُنا</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 20px; border-radius: 18px; background: rgba(242,236,221,0.04); border: 1px solid rgba(242,236,221,0.10)">
+<span style="font-family: 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.12em; color: #8990B5">BODY · FIGTREE</span>
+<span style="font-size: 16px; line-height: 1.55; color: #B6BAD6">A non-profit haven for mental health support, knowledge, and resources in the Arab world.</span>
+</div>
+<div dir="rtl" style="display: flex; flex-direction: column; gap: 10px; padding: 20px; border-radius: 18px; background: rgba(242,236,221,0.04); border: 1px solid rgba(242,236,221,0.10)">
+<span dir="ltr" style="align-self: flex-end; font-family: 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.12em; color: #8990B5">BODY · IBM PLEX SANS ARABIC</span>
+<span lang="ar" style="font-family: 'IBM Plex Sans Arabic', sans-serif; font-size: 16px; line-height: 1.75; color: #B6BAD6">ملاذ غير ربحي لدعم الصحة النفسية والموارد في العالم العربي.</span>
+</div>
+<div style="grid-column: span 2; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 20px; border-radius: 18px; background: rgba(242,236,221,0.04); border: 1px solid rgba(242,236,221,0.10)">
+<span style="font-family: 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.12em; color: #8990B5">LABELS · DM MONO, TRACKED CAPS (LATIN ONLY)</span>
+<span style="font-family: 'DM Mono', monospace; font-size: 14px; letter-spacing: 0.16em; color: #6FD6CF">YOU'RE NOT ALONE</span>
+<span lang="ar" dir="rtl" style="font-family: 'IBM Plex Sans Arabic', sans-serif; font-weight: 500; font-size: 15px; color: #6FD6CF">لست وحدك</span>
+</div>
+</div>
+</section>
+</div>
+
+<section style="display: flex; flex-direction: column; gap: 18px">
+<h2 style="margin: 0; font-family: 'DM Mono', monospace; font-weight: 500; font-size: 13px; letter-spacing: 0.18em; color: #8990B5">COMPONENTS</h2>
+<div style="display: flex; align-items: flex-start; gap: 40px">
+
+<div style="display: flex; flex-direction: column; gap: 14px">
+<span style="font-size: 13px; color: #8990B5">Buttons</span>
+<div style="display: flex; align-items: center; gap: 12px">
+<button type="button" style="height: 52px; padding: 0 26px; border-radius: 999px; background: #F2ECDD; border: 0; color: #0B1026; font-family: 'Figtree', sans-serif; font-size: 16px; font-weight: 600">Explore Resources</button>
+<button type="button" style="height: 52px; padding: 0 24px; border-radius: 999px; background: rgba(242,236,221,0.06); border: 1px solid rgba(242,236,221,0.16); color: #F2ECDD; font-family: 'Figtree', sans-serif; font-size: 16px; font-weight: 500">See all</button>
+<button type="button" aria-label="Play" style="width: 56px; height: 56px; border-radius: 999px; display: flex; align-items: center; justify-content: center; background: #F2ECDD; border: 0; color: #0B1026"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"></path></svg></button>
+<button type="button" aria-label="Close" style="width: 44px; height: 44px; border-radius: 999px; display: flex; align-items: center; justify-content: center; background: rgba(242,236,221,0.08); border: 1px solid rgba(242,236,221,0.14); color: #F2ECDD"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></button>
+</div>
+<span style="margin-top: 10px; font-size: 13px; color: #8990B5">Chips</span>
+<div style="display: flex; gap: 8px">
+<button type="button" style="height: 40px; padding: 0 18px; border-radius: 999px; background: #F2ECDD; border: 1px solid #F2ECDD; color: #0B1026; font-family: 'DM Mono', monospace; font-size: 12.5px; letter-spacing: 0.1em; font-weight: 500">ALL</button>
+<button type="button" style="height: 40px; padding: 0 18px; border-radius: 999px; background: rgba(242,236,221,0.06); border: 1px solid rgba(242,236,221,0.12); color: #F2ECDD; font-family: 'DM Mono', monospace; font-size: 12.5px; letter-spacing: 0.1em">THERAPISTS</button>
+<button type="button" style="height: 40px; padding: 0 18px; border-radius: 999px; background: rgba(242,236,221,0.06); border: 1px solid rgba(242,236,221,0.12); color: #F2ECDD; font-family: 'DM Mono', monospace; font-size: 12.5px; letter-spacing: 0.1em">EVENTS</button>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 14px">
+<span style="font-size: 13px; color: #8990B5">Icon tiles</span>
+<div style="display: flex; gap: 12px">
+<span style="width: 52px; height: 52px; border-radius: 16px; display: flex; align-items: center; justify-content: center; background: rgba(111,214,207,0.12); border: 1px solid rgba(111,214,207,0.28); color: #6FD6CF"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20a6.5 6.5 0 0 1 13 0"></path><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18.5 20a6.5 6.5 0 0 0-3-5.5"></path></svg></span>
+<span style="width: 52px; height: 52px; border-radius: 16px; display: flex; align-items: center; justify-content: center; background: rgba(242,184,128,0.12); border: 1px solid rgba(242,184,128,0.28); color: #F2B880"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="1.5"></rect><path d="M9 7h2M13 7h2M9 11h2M13 11h2M9 15h2M13 15h2M10 21v-3h4v3"></path></svg></span>
+<span style="width: 52px; height: 52px; border-radius: 16px; display: flex; align-items: center; justify-content: center; background: rgba(179,167,245,0.12); border: 1px solid rgba(179,167,245,0.30); color: #B3A7F5"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14z"></path><path d="M5 19 13 11"></path></svg></span>
+</div>
+<span style="margin-top: 10px; font-size: 13px; color: #8990B5">Mood orbs</span>
+<div style="display: flex; gap: 10px">
+<sc-for list="{{orbs}}" as="o" hint-placeholder-count="6">
+<span style="width: 40px; height: 40px; border-radius: 999px; background: radial-gradient(circle at 34% 30%, {{o.hi}} 0, {{o.c}} 52%, {{o.lo}} 100%)"></span>
+</sc-for>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 14px; flex-grow: 1">
+<span style="font-size: 13px; color: #8990B5">Card</span>
+<div style="display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: 20px; background: rgba(242,236,221,0.045); border: 1px solid rgba(242,236,221,0.10)">
+<span style="flex-shrink: 0; width: 46px; height: 46px; border-radius: 14px; display: flex; align-items: center; justify-content: center; background: rgba(111,214,207,0.12); border: 1px solid rgba(111,214,207,0.28); color: #6FD6CF"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20a6.5 6.5 0 0 1 13 0"></path><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18.5 20a6.5 6.5 0 0 0-3-5.5"></path></svg></span>
+<span style="flex-grow: 1; display: flex; flex-direction: column; gap: 3px"><span style="font-size: 15.5px; font-weight: 600; color: #F2ECDD">Mental Health Professionals</span><span style="font-size: 13px; color: #8990B5">Find therapists, psychologists, and psychiatrists near you.</span></span>
+</div>
+<span style="margin-top: 10px; font-size: 13px; color: #8990B5">Tab bar — Tanafas raised, never shows an active state</span>
+<div style="display: flex; align-items: flex-end; justify-content: space-between; height: 84px; padding: 0 16px 14px; border-radius: 22px; background: #0F1534; border: 1px solid rgba(242,236,221,0.08)">
+<span style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; color: #F2ECDD; font-size: 11.5px; font-weight: 600"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path><path d="M10 21v-6h4v6"></path></svg>Home</span>
+<span style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; color: #8990B5; font-size: 11.5px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>Directory</span>
+<span style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; color: #8990B5; font-size: 11.5px"><span style="margin-top: -30px; width: 58px; height: 58px; border-radius: 999px; background: #F2ECDD; color: #0B1026; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 5px #0B1026, 0 0 30px rgba(111,214,207,0.45)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10a3 3 0 1 0-3-3"></path><path d="M3 12h15a3 3 0 1 1-3 3"></path><path d="M3 16h7"></path></svg></span>Tanafas</span>
+<span style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; color: #8990B5; font-size: 11.5px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg>Events</span>
+<span style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; color: #8990B5; font-size: 11.5px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>More</span>
+</div>
+</div>
+
+</div>
+</section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1180}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const swatches = [
+      { name: 'Midnight', hex: '#0B1026', role: 'Ground — every screen' },
+      { name: 'Nightfall', hex: '#121A3E', role: 'Raised surfaces, sheets' },
+      { name: 'Moonlight', hex: '#F2ECDD', role: 'Primary text & primary actions' },
+      { name: 'Mist', hex: '#B6BAD6', role: 'Secondary text' },
+      { name: 'Haze', hex: '#8990B5', role: 'Tertiary text, inactive icons' },
+      { name: 'Houna glow', hex: '#6FD6CF', role: 'Brand accent on dark' },
+      { name: 'Houna teal', hex: '#3BAAA7', role: 'Brand teal — logo, deep fills' },
+      { name: 'Dawn', hex: '#F2B880', role: 'Warmth & urgent support' },
+      { name: 'Dusk', hex: '#B3A7F5', role: 'Secondary accent' }
+    ];
+    const orbs = [
+      { c: '#6FD6CF', hi: '#D9FAF6', lo: '#2E8F8A' },
+      { c: '#CFC8B6', hi: '#FFFFFF', lo: '#8A8474' },
+      { c: '#B3A7F5', hi: '#EEEAFF', lo: '#6A5CC4' },
+      { c: '#86A9F0', hi: '#E3ECFF', lo: '#3D5DB0' },
+      { c: '#F2B880', hi: '#FFF1E0', lo: '#B9713A' },
+      { c: '#EE97AE', hi: '#FFE6EE', lo: '#B24B6B' }
+    ];
+    return { swatches, orbs };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Houna bloom mood states (Day)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&amp;family=DM+Mono:wght@400;500&amp;family=Figtree:wght@400;500;600&amp;family=Marcellus&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F5F1E8;font-family:'Figtree',system-ui,sans-serif;color:#1B2140}
+a{color:#1B2140}a:hover{color:#000000}
+@keyframes breathe{0%,100%{transform:scale(0.95)}50%{transform:scale(1.05)}}
+.breathe{animation:breathe 6s ease-in-out infinite;transform-origin:50% 50%}
+</style>
+</helmet>
+<div style="width: 1280px; height: 560px; box-sizing: border-box; padding: 56px 64px; background: #F5F1E8; font-family: 'Figtree', system-ui, sans-serif; color: #1B2140; display: flex; flex-direction: column; gap: 36px">
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 40px">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-family: 'DM Mono', monospace; font-size: 13px; letter-spacing: 0.18em; color: #237873">MOOD CHECK-IN · HOUNA BLOOM</span>
+<h1 style="margin: 0; font-family: 'Marcellus', serif; font-weight: 400; font-size: 48px; line-height: 1.05; color: #1B2140">The mark opens as you feel lighter</h1>
+</div>
+<div style="display: flex; align-items: center; gap: 12px; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.14em; color: #646A8E">
+<span>HEAVIER</span>
+<svg width="120" height="12" viewBox="0 0 120 12" fill="none" stroke="#646A8E" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M2 6h116M112 1l6 5-6 5"></path></svg>
+<span>LIGHTER</span>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 12px">
+<sc-for list="{{blooms}}" as="b" hint-placeholder-count="7">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 18px 6px 20px; border-radius: 22px; background: #FFFFFF; border: 1px solid rgba(27,33,64,0.10)">
+<div aria-hidden="true" style="position: relative; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center">
+<span style="position: absolute; left: 0; top: 0; width: 120px; height: 120px; border-radius: 999px; background: radial-gradient(closest-side, {{b.glow}}, rgba(245,241,232,0))"></span>
+<svg class="breathe" width="100" height="100" viewBox="0 0 200 200">
+<defs><radialGradient id="g{{b.id}}" cx="50%" cy="40%" r="60%"><stop offset="0" stop-color="{{b.hi}}"></stop><stop offset="1" stop-color="{{b.c}}"></stop></radialGradient></defs>
+<circle cx="100" cy="100" r="84" fill="none" stroke="{{b.c}}" stroke-width="12" opacity="{{b.ringO}}"></circle>
+<path d="M100 152 C 72 142 50 116 54 84 C 80 90 98 116 100 152 Z" fill="url(#g{{b.id}})" transform="rotate({{b.fl}} 100 152)"></path>
+<path d="M100 152 C 128 142 150 116 146 84 C 120 90 102 116 100 152 Z" fill="url(#g{{b.id}})" transform="rotate({{b.fr}} 100 152)"></path>
+<circle cx="100" cy="{{b.hy}}" r="16" fill="{{b.hi}}"></circle>
+</svg>
+</div>
+<span style="font-family: 'Marcellus', serif; font-size: 18px; text-align: center; color: #1B2140">{{b.label}}</span>
+<span lang="ar" dir="rtl" style="font-family: 'Amiri', serif; font-weight: 700; font-size: 18px; color: #4A5078">{{b.ar}}</span>
+<span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.14em; color: #646A8E">STEP {{b.step}} OF 7</span>
+</div>
+</sc-for>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":560}}'>
+const BLOOMS = [
+  { id: 'angry', label: 'Angry', ar: 'غاضب', c: '#E36F5E', hi: '#FFE1DA', glow: 'rgba(227,111,94,0.42)', fold: 38, hy: 76, ringO: 0.4 },
+  { id: 'anxious', label: 'Anxious', ar: 'قلق', c: '#F0B27A', hi: '#FFEEDC', glow: 'rgba(240,178,122,0.42)', fold: 24, hy: 72, ringO: 0.48 },
+  { id: 'sad', label: 'Sad', ar: 'حزين', c: '#82A4EE', hi: '#E2EBFF', glow: 'rgba(130,164,238,0.42)', fold: 12, hy: 78, ringO: 0.55 },
+  { id: 'neutral', label: 'Neutral', ar: 'محايد', c: '#D2CBB9', hi: '#FFFFFF', glow: 'rgba(210,203,185,0.34)', fold: -6, hy: 66, ringO: 0.7 },
+  { id: 'calm', label: 'Calm', ar: 'هادئ', c: '#62D2C9', hi: '#E4FBF7', glow: 'rgba(98,210,201,0.48)', fold: -18, hy: 63, ringO: 0.85 },
+  { id: 'hopeful', label: 'Hopeful', ar: 'متفائل', c: '#9BD67E', hi: '#EEF9E4', glow: 'rgba(155,214,126,0.44)', fold: -26, hy: 60, ringO: 0.95 },
+  { id: 'joyful', label: 'Joyful', ar: 'مبتهج', c: '#F2C76B', hi: '#FFF3D6', glow: 'rgba(242,199,107,0.46)', fold: -34, hy: 57, ringO: 1 }
+];
+class Component extends DCLogic {
+  renderVals() {
+    return { blooms: BLOOMS.map((b, k) => ({ ...b, fl: b.fold, fr: -b.fold, step: k + 1 })) };
+  }
+}
+</script>
+</body>
+</html>

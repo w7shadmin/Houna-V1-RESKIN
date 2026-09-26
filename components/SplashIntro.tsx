@@ -31,16 +31,16 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import Svg, { G, Path } from 'react-native-svg';
-import { palette } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
+import { FIGURE_WITH_HEAD_HOLE_D } from '@/constants/logoSvg';
 
 /* ------------------------------------------------------------------ */
 /* Brand                                                               */
 /* ------------------------------------------------------------------ */
 
-const GROUND = palette.brokenWhite; // Broken White — must match constants/theme.ts, not a hardcoded approximation
-const LETTER = '#3BAAA7'; // Primary Turquoise — Latin letterforms
-const MARK = '#36A9A7'; // the o + figure (as exported in the source SVG)
-const INK = '#525052'; // Arabic wordmark
+// Colours come from the active theme (useTheme in SplashIntro): the ground
+// is the screen background and the logo uses the same `logo` tokens as the
+// themed wordmark, so the intro dissolves into Night or Day seamlessly.
 
 /* ------------------------------------------------------------------ */
 /* Geometry, taken straight from logo-green.svg                        */
@@ -59,9 +59,8 @@ const D = {
   h: 'M23.895,21.576a7.809,7.809,0,0,0-.334-2.283,5.773,5.773,0,0,0-.946-1.949A4.728,4.728,0,0,0,21,16.009a5.245,5.245,0,0,0-2.394-.5,5.42,5.42,0,0,0-3.619,1.281,6.55,6.55,0,0,0-2.116,3.173V30.54H10.7V6.6h2.171V16.677a8.71,8.71,0,0,1,2.394-2.338,5.872,5.872,0,0,1,3.452-1,7.865,7.865,0,0,1,3.173.612,7.1,7.1,0,0,1,2.338,1.726,6.956,6.956,0,0,1,1.392,2.617,10.17,10.17,0,0,1,.5,3.285V30.6H23.951V21.576Z',
   oRing:
     'M50.18,33.714a6.82,6.82,0,0,1-2.116-1.448,7.132,7.132,0,0,1-1.448-2.116,6.565,6.565,0,0,1-.5-2.561,7.052,7.052,0,0,1,.5-2.617,6.228,6.228,0,0,1,1.448-2.116A7.132,7.132,0,0,1,50.18,21.41a6.565,6.565,0,0,1,2.561-.5,7.052,7.052,0,0,1,2.617.5,6.228,6.228,0,0,1,2.116,1.448,7.132,7.132,0,0,1,1.448,2.116,6.843,6.843,0,0,1,.5,2.617,6.565,6.565,0,0,1-.5,2.561,6.82,6.82,0,0,1-1.448,2.116,7.132,7.132,0,0,1-2.116,1.448,6.843,6.843,0,0,1-2.617.5,6.769,6.769,0,0,1-2.561-.5m-.835-14.253a8.809,8.809,0,0,0-2.784,1.893,8.2,8.2,0,0,0-1.893,2.839A8.871,8.871,0,0,0,44,27.646a9.074,9.074,0,0,0,.668,3.452,8.224,8.224,0,0,0,1.893,2.784,8.525,8.525,0,0,0,2.784,1.893,9.251,9.251,0,0,0,6.9,0,9.744,9.744,0,0,0,2.839-1.893A8.525,8.525,0,0,0,60.981,31.1a9.251,9.251,0,0,0,0-6.9,9.744,9.744,0,0,0-1.893-2.839,8.2,8.2,0,0,0-2.839-1.893,8.871,8.871,0,0,0-3.452-.668,7.232,7.232,0,0,0-3.452.668',
-  figure:
-    'M48.6,24.924c0,3.4,6.124,5.679,6.124,8.685,0-3.006,6.124-5.289,6.124-8.685a6.124,6.124,0,0,0-12.248,0',
-  head: 'M60.245,26.672A2.672,2.672,0,1,1,57.572,24a2.71,2.71,0,0,1,2.672,2.672',
+  // Heart with the head cut out (render evenodd) — see logoSvg.ts.
+  figure: FIGURE_WITH_HEAD_HOLE_D,
   u: 'M82.271,28.519a7.809,7.809,0,0,0,.334,2.283,5.773,5.773,0,0,0,.946,1.949,4.728,4.728,0,0,0,1.615,1.336,5.245,5.245,0,0,0,2.394.5,5.42,5.42,0,0,0,3.619-1.281,6.55,6.55,0,0,0,2.116-3.173V19.556h2.171V36.369H93.295V33.419A8.71,8.71,0,0,1,90.9,35.757a5.872,5.872,0,0,1-3.452,1,7.865,7.865,0,0,1-3.173-.612,6.366,6.366,0,0,1-2.283-1.726A6.956,6.956,0,0,1,80.6,31.8a10.169,10.169,0,0,1-.5-3.285V19.5h2.171Z',
   n: 'M128.595,26.984a7.809,7.809,0,0,0-.334-2.283,5.773,5.773,0,0,0-.946-1.949,4.728,4.728,0,0,0-1.615-1.336,5.245,5.245,0,0,0-2.394-.5,5.42,5.42,0,0,0-3.619,1.281,6.55,6.55,0,0,0-2.116,3.173V35.948H115.4V19.19h2.171V22.14a8.711,8.711,0,0,1,2.394-2.338,5.872,5.872,0,0,1,3.452-1,7.865,7.865,0,0,1,3.173.612,7.1,7.1,0,0,1,2.338,1.726,6.956,6.956,0,0,1,1.392,2.617,11.958,11.958,0,0,1,.5,3.285v9.019h-2.171V26.984Z',
   a: 'M149.571,27.6a6.565,6.565,0,0,0,.5,2.561,6.82,6.82,0,0,0,1.448,2.116,7.133,7.133,0,0,0,2.116,1.448,6.1,6.1,0,0,0,6.9-1.336,6.186,6.186,0,0,0,1.281-2,7.117,7.117,0,0,0,.5-2.45v-.557a9.1,9.1,0,0,0-.5-2.505,7.124,7.124,0,0,0-1.281-2.06,6.483,6.483,0,0,0-1.893-1.336,5.84,5.84,0,0,0-2.45-.5,6.565,6.565,0,0,0-2.561.5,6.821,6.821,0,0,0-2.116,1.448,7.133,7.133,0,0,0-1.448,2.116,6.565,6.565,0,0,0-.5,2.561m12.805-8.407h2.171V36h-2.171V33.164A8.162,8.162,0,0,1,159.76,35.5a6.951,6.951,0,0,1-3.563.946,9.074,9.074,0,0,1-3.452-.668,8.809,8.809,0,0,1-2.784-1.893,8.524,8.524,0,0,1-1.893-2.784,9.251,9.251,0,0,1,0-6.9,9.744,9.744,0,0,1,1.893-2.839,8.525,8.525,0,0,1,2.784-1.893A8.871,8.871,0,0,1,156.2,18.8a6.677,6.677,0,0,1,3.619,1,8.7,8.7,0,0,1,2.561,2.338Z',
@@ -77,7 +76,6 @@ const OFF = {
   h: 'translate(-10.7 -6.6)',
   oRing: 'translate(-25.46 -12.001)',
   figure: 'translate(-27.499 -12.008)',
-  head: 'translate(-30.292 -14.313)',
   u: 'translate(-41.462 -12.318)',
   n: 'translate(-57.109 -12.008)',
   a: 'translate(-71.293 -12.008)',
@@ -121,6 +119,11 @@ type Props = {
 
 export default function SplashIntro({ onFinish }: Props) {
   const { width } = useWindowDimensions();
+  const { colors } = useTheme();
+  const GROUND = colors.background;
+  const LETTER = colors.logo.primary;
+  const MARK = colors.logo.primary;
+  const INK = colors.logo.secondary;
   const reduceMotion = useReducedMotion();
 
   const LOGO_W = Math.min(width * 0.58, 268);
@@ -283,7 +286,7 @@ export default function SplashIntro({ onFinish }: Props) {
   );
 
   return (
-    <Animated.View style={[styles.root, overlayStyle]} pointerEvents="none">
+    <Animated.View style={[styles.root, { backgroundColor: GROUND }, overlayStyle]} pointerEvents="none">
       <View style={{ width: LOGO_W, height: LOGO_H }}>
         {/* breath ring, behind everything */}
         <Animated.View
@@ -296,6 +299,7 @@ export default function SplashIntro({ onFinish }: Props) {
               left: ringLeft,
               top: ringTop,
               borderWidth: Math.max(1, unit * 0.5),
+              borderColor: MARK,
             },
             rippleStyle,
           ]}
@@ -308,10 +312,7 @@ export default function SplashIntro({ onFinish }: Props) {
               <Path d={D.oRing} fill={MARK} />
             </G>
             <G transform={OFF.figure}>
-              <Path d={D.figure} fill={MARK} />
-            </G>
-            <G transform={OFF.head}>
-              <Path d={D.head} fill="#FFFFFF" />
+              <Path d={D.figure} fill={MARK} fillRule="evenodd" />
             </G>
           </Layer>
         </Animated.View>
@@ -385,7 +386,6 @@ export const SPLASH_DURATION = TOTAL;
 const styles = StyleSheet.create({
   root: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: GROUND,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 999,
@@ -403,6 +403,5 @@ const styles = StyleSheet.create({
   },
   ripple: {
     position: 'absolute',
-    borderColor: MARK,
   },
 });
