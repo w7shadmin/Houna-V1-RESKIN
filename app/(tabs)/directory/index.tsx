@@ -9,13 +9,15 @@ import { useAuth } from '@/contexts/AuthContext';
 import { layout } from '@/constants/theme';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { safeUrl } from '@/lib/hounaApi';
-import { searchItems, type SearchItem } from '@/lib/directorySearch';
+import { buildSearchIndex, type SearchItem } from '@/lib/directorySearch';
+import { isCrisisQuery } from '@/lib/crisisIntent';
 import { useDirectorySearch } from '@/hooks/useDirectorySearch';
 import Card from '@/components/ui/Card';
 import Chip from '@/components/ui/Chip';
 import IconTile, { type IconTileTone } from '@/components/ui/IconTile';
 import CanvasIcon, { DirectionalIcon } from '@/components/ui/CanvasIcon';
 import {
+  CrisisCard,
   CrisisRow,
   PlaceCountCard,
   ResultRow,
@@ -84,8 +86,11 @@ export default function DirectoryHubScreen() {
   // A new query starts collapsed.
   useEffect(() => setExpanded({}), [debounced]);
 
+  // Built when the loaded items change (each source as it arrives), not on every keystroke.
+  const searchIndex = useMemo(() => buildSearchIndex(index.items), [index.items]);
+
   const groups = useMemo(() => {
-    const hits = searchItems(index.items, debounced);
+    const hits = searchIndex.search(debounced);
     const of = (type: SearchItem['type']) => hits.filter((h) => h.type === type);
     let professionals = of('professional');
     if (index.near) {
@@ -101,7 +106,10 @@ export default function DirectoryHubScreen() {
       wellness: of('wellness'),
       total: hits.length,
     };
-  }, [index.items, index.near, debounced]);
+  }, [searchIndex, index.near, debounced]);
+
+  /** A search that sounds like someone in crisis puts the crisis card first. */
+  const crisis = useMemo(() => isCrisisQuery(debounced), [debounced]);
 
   const searching = debounced.trim().length > 0;
   const nearCount = index.near ? groups.professionals.filter((p) => index.near!.slugs.has(p.key)).length : 0;
@@ -237,6 +245,15 @@ export default function DirectoryHubScreen() {
           browse
         ) : (
           <>
+            {crisis && (
+              <CrisisCard
+                title={s.crisisCard.title}
+                body={s.crisisCard.body}
+                action={s.crisisCard.action}
+                onPress={() => router.push('/crisis')}
+              />
+            )}
+
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -340,7 +357,7 @@ export default function DirectoryHubScreen() {
               <Text style={[styles.status, { color: colors.textTertiary, fontFamily: fonts.regular }]}>{s.partialError}</Text>
             )}
 
-            {!index.loading && groups.total === 0 && (
+            {!index.loading && groups.total === 0 && !crisis && (
               <View style={styles.empty}>
                 <Text style={[styles.emptyTitle, { color: colors.text, fontFamily: fonts.semiBold }]}>
                   {s.noResults.replace('{q}', q)}

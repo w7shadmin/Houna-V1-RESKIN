@@ -341,6 +341,17 @@ language (mapped by `profileFacts`), and text can carry HTML entities.
 Events (list, event, speaker) uses the same pieces; event dates go through
 `lib/eventDate.ts` (the site sends "19/05/2026, 19:00 pm").
 
+**Directory search** runs on the device (`lib/directorySearch.ts` loads the
+lists; queries never leave the phone): `lib/searchText.ts` (folding, word
+forms: English endings, Arabic attached letters), `lib/searchRank.ts`
+(weighted fields, prefix/typo matching, each word weighed by its rarity,
+every-word matches first) and `lib/searchConcepts.ts`, the bilingual meaning
+map ("sad" → depression, English ↔ Arabic; content, edit freely). A search
+that sounds like a crisis (`lib/crisisIntent.ts`, draft word lists awaiting
+clinical review) puts a crisis card first. **Proxy gotcha**: `/therapists`'
+`lastPage` is always the current page + 1, never the real last page, so
+page until one comes back empty (the search once stopped at 30 of 286).
+
 **Known web-only quirks (native is fine)**: react-native-web resolves
 `start`/`end` offsets as LTR even in Arabic; lucide icons with an RTL flip
 transform draw off-screen on web (use `DirectionalIcon`).

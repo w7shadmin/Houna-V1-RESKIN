@@ -47,6 +47,13 @@ export const directoryStrings = {
       loading: 'Searching…',
       partialError: "Some results couldn't load.",
       crisis: "If you're struggling right now, talk to someone today.",
+      // Shown first when a search sounds like someone in crisis (lib/crisisIntent.ts).
+      // DRAFT: safety-critical copy, as crisisStrings.ts; needs clinical review.
+      crisisCard: {
+        title: "You don't have to go through this alone",
+        body: "If you're thinking about ending your life or hurting yourself, please talk to someone now. There are people ready to listen.",
+        action: 'Get support now',
+      },
       browse: 'Browse',
     },
     hub: {
@@ -207,6 +214,12 @@ export const directoryStrings = {
       loading: 'جارٍ البحث…',
       partialError: 'تعذّر تحميل بعض النتائج.',
       crisis: 'إن كنت تمرّ بوقت صعب الآن، تحدّث إلى أحدٍ اليوم.',
+      // DRAFT: needs review by a native clinical reviewer, as crisisStrings.ts.
+      crisisCard: {
+        title: 'لست مضطراً لمواجهة هذا وحدك',
+        body: 'إذا كنت تفكّر في إنهاء حياتك أو إيذاء نفسك، أرجوك تحدّث إلى أحدٍ الآن. هناك من هو مستعدّ للإصغاء إليك.',
+        action: 'احصل على الدعم الآن',
+      },
       browse: 'تصفّح',
     },
     hub: {

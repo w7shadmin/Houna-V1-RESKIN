@@ -9,6 +9,7 @@ import { resolveImageUrl } from '@/lib/hounaApi';
 import type { SearchItem } from '@/lib/directorySearch';
 import Card from '@/components/ui/Card';
 import CanvasIcon from '@/components/ui/CanvasIcon';
+import Button from '@/components/ui/Button';
 import LottieTopicIcon from '@/components/directory/LottieTopicIcon';
 
 /* Values below are the canvas "Directory search" artboard's. */
@@ -198,6 +199,31 @@ export function PlaceCountCard({
   );
 }
 
+/**
+ * First, above every result, when a search sounds like someone in crisis
+ * (`lib/crisisIntent.ts`): a clear card straight to the crisis screen. The
+ * quiet crisis line still closes the results as always.
+ */
+export function CrisisCard({ title, body, action, onPress }: { title: string; body: string; action: string; onPress: () => void }) {
+  const { colors } = useTheme();
+  const { fonts } = useLanguage();
+  return (
+    <View
+      accessibilityRole="summary"
+      style={[styles.crisisCard, { backgroundColor: colors.crisis.bg, borderColor: colors.crisis.border }]}
+    >
+      <View style={styles.crisisHead}>
+        <CanvasIcon name="phone" size={20} strokeWidth={1.8} color={colors.crisis.icon} />
+        <Text accessibilityRole="header" style={[styles.crisisTitle, { color: colors.text, fontFamily: fonts.semiBold }]}>
+          {title}
+        </Text>
+      </View>
+      <Text style={[styles.crisisBody, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{body}</Text>
+      <Button label={action} onPress={onPress} block />
+    </View>
+  );
+}
+
 /** The crisis line that always closes the results. */
 export function CrisisRow({ label, onPress }: { label: string; onPress: () => void }) {
   const { colors } = useTheme();
@@ -343,5 +369,25 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     lineHeight: 20,
+  },
+  crisisCard: {
+    gap: 12,
+    padding: 16,
+    borderRadius: radius.cardLg,
+    borderWidth: 1,
+  },
+  crisisHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  crisisTitle: {
+    flex: 1,
+    fontSize: 17,
+    lineHeight: 24,
+  },
+  crisisBody: {
+    fontSize: 14.5,
+    lineHeight: 21,
   },
 });

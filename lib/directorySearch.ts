@@ -8,13 +8,16 @@ import {
   type Therapist,
 } from './hounaApi';
 import { getCountry } from './countries';
+import { normalizeForSearch } from './searchText';
+import { SearchIndex } from './searchRank';
 
 /**
  * Unified directory search, phase 1 (FEATURES_BRIEF §3): everything is
- * fetched from the existing list endpoints once per language, normalised
- * into `SearchItem`s, cached in memory for the session, and filtered on the
- * device. Phase 2 (a server-side `search` route in houna-proxy) needs that
- * Edge Function's source, which isn't in this repo.
+ * fetched from the existing list endpoints once per language, turned into
+ * `SearchItem`s, cached in memory for the session, and matched and ranked on
+ * the device (`searchRank.ts`: typos, word forms, the bilingual meaning map).
+ * Queries never leave the phone. Phase 2 (a server-side `search` route in
+ * houna-proxy) needs that Edge Function's source, which isn't in this repo.
  */
 
 export type SearchType = 'topic' | 'article' | 'professional' | 'podcast' | 'organization' | 'wellness';
@@ -28,9 +31,8 @@ export interface SearchItem {
   imageUrl: string | null;
   /** Source domain for articles/podcasts. */
   source?: string;
-  /** Normalised title, and title + everything else searchable. */
-  titleNorm: string;
-  haystack: string;
+  /** What's searched: the title, the subtitle, then anything else (summary, services…). */
+  extra: string[];
 }
 
 export interface LocalTopic {
@@ -41,37 +43,14 @@ export interface LocalTopic {
 
 type Lang = 'en' | 'ar';
 
-/** Professionals are paginated at 15; the whole directory is ~2 pages today. Stop at this many regardless. */
-const MAX_PROFESSIONAL_PAGES = 10;
-
-/* ──────────────── Normalisation ──────────────── */
-
 /**
- * Case-, diacritic- and Arabic-letter-form-insensitive: strips Latin
- * accents, Arabic harakat and tatweel, and folds alef/yaa/taa-marbuta/hamza
- * carrier variants so "إكتئاب", "اكتئاب" and "الاكتئاب" all match.
+ * Professionals come 15 to a page; there were 20 pages (286 people) in September 2026. The
+ * proxy's `lastPage` is always the current page + 1, so it can't say when to stop: pages are
+ * fetched a few at a time until one comes back empty or brings no one new. Never more than this.
  */
-export function normalizeForSearch(text: string): string {
-  return text
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .replace(/[ً-ٰٟۖ-ۭ]/g, '')
-    .replace(/ـ/g, '')
-    .replace(/[أإآٱ]/g, 'ا')
-    .replace(/ى/g, 'ي')
-    .replace(/ة/g, 'ه')
-    .replace(/ؤ/g, 'و')
-    .replace(/ئ/g, 'ي')
-    .toLowerCase();
-}
-
-/** Query → tokens; the Arabic definite article is dropped so "الاكتئاب" finds "اكتئاب". */
-export function tokenize(query: string): string[] {
-  return normalizeForSearch(query)
-    .split(/[\s,.;:!?،؛؟]+/)
-    .map((t) => (t.length > 3 ? t.replace(/^ال/, '') : t))
-    .filter(Boolean);
-}
+const MAX_PROFESSIONAL_PAGES = 40;
+/** Pages fetched at once. */
+const PAGE_BATCH = 10;
 
 function item(
   type: SearchType,
@@ -82,27 +61,22 @@ function item(
   extra: string[] = [],
   source?: string,
 ): SearchItem {
-  return {
-    type,
-    key,
-    title,
-    subtitle,
-    imageUrl,
-    source,
-    titleNorm: normalizeForSearch(title),
-    haystack: normalizeForSearch([title, subtitle, ...extra].join(' \n ')),
-  };
+  return { type, key, title, subtitle, imageUrl, source, extra };
 }
 
-/** Items whose text contains every token, title matches first. */
-export function searchItems(items: SearchItem[], query: string): SearchItem[] {
-  const tokens = tokenize(query);
-  if (tokens.length === 0) return [];
-  return items
-    .filter((it) => tokens.every((t) => it.haystack.includes(t)))
-    .map((it) => ({ it, score: tokens.every((t) => it.titleNorm.includes(t)) ? 2 : 1 }))
-    .sort((a, b) => b.score - a.score || a.it.title.localeCompare(b.it.title))
-    .map((x) => x.it);
+/** The search index over everything loaded so far: build it when the items change, then `search(query)`. */
+export function buildSearchIndex(items: SearchItem[]): SearchIndex<SearchItem> {
+  return new SearchIndex(
+    items.map((it) => ({
+      item: it,
+      title: it.title,
+      fields: [
+        { text: it.title, weight: 3 },
+        { text: it.subtitle, weight: 2 },
+        { text: it.extra.join(' \n '), weight: 1 },
+      ],
+    })),
+  );
 }
 
 /* ──────────────── Sources (cached per language) ──────────────── */
@@ -129,11 +103,22 @@ function cached<T>(key: string, load: () => Promise<T>): Promise<T> {
 
 async function allTherapists(lang: Lang, country = ''): Promise<{ therapists: Therapist[]; countries: CountryOption[] }> {
   const first = await fetchTherapists(1, { country }, lang);
-  const last = Math.min(first.lastPage || 1, MAX_PROFESSIONAL_PAGES);
-  const rest = await Promise.all(
-    Array.from({ length: last - 1 }, (_, i) => fetchTherapists(i + 2, { country }, lang)),
-  );
-  return { therapists: [first, ...rest].flatMap((r) => r.therapists), countries: first.countries };
+  const therapists = [...first.therapists];
+  const seen = new Set(therapists.map((t) => t.slug));
+  let next = 2;
+  let more = first.therapists.length > 0;
+  while (more && next <= MAX_PROFESSIONAL_PAGES) {
+    const pages = Array.from({ length: Math.min(PAGE_BATCH, MAX_PROFESSIONAL_PAGES - next + 1) }, (_, i) => next + i);
+    next += pages.length;
+    const results = await Promise.all(pages.map((p) => fetchTherapists(p, { country }, lang)));
+    for (const r of results) {
+      const fresh = r.therapists.filter((t) => !seen.has(t.slug));
+      fresh.forEach((t) => seen.add(t.slug));
+      therapists.push(...fresh);
+      if (fresh.length === 0) more = false;
+    }
+  }
+  return { therapists, countries: first.countries };
 }
 
 const professionalItem = (p: Therapist) => item('professional', p.slug, p.name, p.role, p.imageUrl, [p.summary]);
