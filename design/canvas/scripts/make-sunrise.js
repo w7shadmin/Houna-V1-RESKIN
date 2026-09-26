@@ -25,6 +25,7 @@ const MOON_SETTLE = 0.42;
  * goes, Home returns.
  */
 function choreography(T) {
+  if (T.fromBelow) return belowChoreography(T);
   const MID_Y = Math.round(844 * (T.settle || MOON_SETTLE) - 95);
   const keys = ['chrome', 'markHome', 'markSun', 'disc', 'skyA', 'skyB', ...(T.stars ? ['stars'] : [])];
   const tracks = {
@@ -52,6 +53,48 @@ function choreography(T) {
     } },
   };
   const home = { chrome: 1, sunY: HOME_Y, sunS: 1, markHome: 1, markSun: 0, disc: 0, skyA: 0, skyB: 0, stars: 0 };
+  return { keys, tracks, home };
+}
+
+/** Below the screen's bottom edge: the sun's box top, with its glow just under the edge. */
+const BELOW_Y = 880;
+/** A low sun looks bigger; it shrinks to its settled size as it climbs. */
+const LOW_SCALE = 1.15;
+
+/**
+ * The alternative: the sun comes up from the bottom. Home's mark fades where it is as the day steps
+ * back and the sky deepens to pre-dawn; a warm glow gathers along the bottom edge; then the sun, the
+ * mark already pressed into it, rises from below the screen to where it settles, shrinking a little
+ * as it climbs, as the morning sky takes over. And back: it sinks below the edge, the glow lingers
+ * and goes, and Home's mark and chrome return.
+ */
+function belowChoreography(T) {
+  const MID_Y = Math.round(844 * (T.settle || MOON_SETTLE) - 95);
+  const keys = ['chrome', 'markHome', 'markSun', 'disc', 'skyA', 'skyB', 'horizon'];
+  const on = [[0, 1], [1, 1]];
+  const tracks = {
+    rise: { dur: 5, k: {
+      chrome: [[0, 1], [0.12, 0], [1, 0]],
+      markHome: [[0, 1], [0.04, 1], [0.2, 0], [1, 0]],
+      skyA: [[0, 0], [0.15, 1], [0.45, 1], [0.85, 0], [1, 0]],
+      horizon: [[0, 0], [0.12, 0], [0.35, 1], [0.6, 1], [0.9, 0], [1, 0]],
+      skyB: [[0, 0], [0.35, 0], [1, 1]],
+      sunY: [[0, BELOW_Y], [0.25, BELOW_Y], [0.9, MID_Y], [1, MID_Y]],
+      sunS: [[0, LOW_SCALE], [0.3, LOW_SCALE], [0.9, SUN_SCALE], [1, SUN_SCALE]],
+      markSun: on, disc: on,
+    } },
+    set: { dur: 3.4, k: {
+      chrome: [[0, 0], [0.7, 0], [1, 1]],
+      markHome: [[0, 0], [0.7, 0], [0.9, 1], [1, 1]],
+      skyA: [[0, 0], [0.3, 0.8], [0.6, 0.8], [0.9, 0], [1, 0]],
+      horizon: [[0, 0], [0.3, 0.8], [0.7, 0.6], [1, 0]],
+      skyB: [[0, 1], [0.5, 0], [1, 0]],
+      sunY: [[0, MID_Y], [0.1, MID_Y], [0.7, BELOW_Y], [1, BELOW_Y]],
+      sunS: [[0, SUN_SCALE], [0.7, LOW_SCALE], [1, LOW_SCALE]],
+      markSun: on, disc: on,
+    } },
+  };
+  const home = { chrome: 1, sunY: BELOW_Y, sunS: LOW_SCALE, markHome: 1, markSun: 1, disc: 1, skyA: 0, skyB: 0, horizon: 0 };
   return { keys, tracks, home };
 }
 
@@ -143,7 +186,7 @@ function scene(T, { live, t = 0 }) {
   const C = choreography(T);
   const v = (key) => (live ? C.home[key] : at(C.tracks.rise.k[key], t));
   const op = (key) => `opacity: ${(+v(key)).toFixed(3)}${live ? `; animation: {{a_${key}}}` : ''}`;
-  const sunStyle = live ? `transform: ${sunTransform(HOME_Y, 1)}; animation: {{a_sun}}` : `transform: ${sunTransform(at(C.tracks.rise.k.sunY, t), at(C.tracks.rise.k.sunS, t))}`;
+  const sunStyle = live ? `transform: ${sunTransform(C.home.sunY, C.home.sunS)}; animation: {{a_sun}}` : `transform: ${sunTransform(at(C.tracks.rise.k.sunY, t), at(C.tracks.rise.k.sunS, t))}`;
   const breath = live ? 'animation: {{a_breath}}' : '';
   const glow = live ? 'animation: {{a_glow}}' : '';
   const word = live ? 'opacity: 0; animation: {{a_word}}' : `opacity: ${t >= 1 ? 1 : 0}`;
@@ -184,6 +227,14 @@ ${tab('Home', true)}${tab('Directory')}<span style="flex: 1; display: flex; flex
   const rays = T.rays
     ? `<span style="position: absolute; left: -95px; top: -95px; width: 380px; height: 380px; border-radius: 999px; background: repeating-conic-gradient(from 0deg, rgba(255,222,190,0.45) 0deg 3deg, rgba(255,222,190,0) 3deg 15deg); -webkit-mask-image: radial-gradient(circle, #000 26%, transparent 64%); mask-image: radial-gradient(circle, #000 26%, transparent 64%); animation: rays 120s linear infinite"></span>\n`
     : '';
+  const homeMark = `<div style="position: absolute; left: 0; top: 0; width: 190px; height: 190px; ${op('markHome')}">${halo(190, 70, T.markHalo, 0.5)}${mark(70, T.markHome)}</div>`;
+  // With fromBelow, Home's mark stays at its spot (the button while Home shows); the sun is the button once risen.
+  const standingMark = T.fromBelow
+    ? `<div ${live ? 'role="button" aria-label="{{markLabel}}" onClick="{{toggle}}" ' : ''}style="position: absolute; left: 100px; top: ${HOME_Y}px; width: 190px; height: 190px; cursor: pointer${live ? '; pointer-events: {{markPointer}}' : ''}">${homeMark}</div>`
+    : '';
+  const horizon = T.fromBelow
+    ? `<span aria-hidden="true" style="position: absolute; left: -110px; top: 604px; width: 610px; height: 480px; border-radius: 999px; background: radial-gradient(closest-side, rgba(255,222,190,0.95) 0%, rgba(249,169,128,0.55) 42%, rgba(249,169,128,0) 100%); ${op('horizon')}"></span>`
+    : '';
   const sun = `<div ${live ? 'role="button" aria-label="{{sunLabel}}" onClick="{{toggle}}" ' : ''}style="position: absolute; left: 100px; top: 0; width: 190px; height: 190px; cursor: pointer; ${sunStyle}">
 <div style="position: absolute; left: 0; top: 0; width: 190px; height: 190px; ${op('disc')}">
 <span style="position: absolute; left: -115px; top: -115px; width: 420px; height: 420px; border-radius: 999px; background: radial-gradient(circle closest-side, rgba(${T.glowRgb},0.28) 20%, rgba(${T.glowRgb},0) 100%); ${glow}"></span>
@@ -192,7 +243,7 @@ ${rays}<div style="position: absolute; left: ${(190 - HALO) / 2}px; top: ${(190 
 </div>
 <span style="position: absolute; left: 29px; top: 29px; width: 132px; height: 132px; border-radius: 999px; background: ${T.disc}; box-shadow: 0 0 14px rgba(${T.glowRgb},0.45)"></span>
 </div>
-<div style="position: absolute; left: 0; top: 0; width: 190px; height: 190px; ${op('markHome')}">${halo(190, 70, T.markHalo, 0.5)}${mark(70, T.markHome)}</div>
+${T.fromBelow ? '' : homeMark}
 <div style="position: absolute; left: 0; top: 0; width: 190px; height: 190px; ${op('markSun')}">${T.pressed ? pressedMark(70, DISCS[T.pressed].surface) : mark(70, T.markSun)}</div>
 </div>`;
 
@@ -201,8 +252,8 @@ ${rays}<div style="position: absolute; left: ${(190 - HALO) / 2}px; top: ${(190 
 <span aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 390px; height: 844px; background: ${gradient(T.skyB)}; ${op('skyB')}"></span>
 ${T.shootingStars ? `<div aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 390px; height: 844px; ${op('stars')}">${SHOOTING}</div>` : ''}
 ${T.stars ? `<div aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 390px; height: 844px; ${op('stars')}">${firstStars()}</div>` : ''}
-${sun}
-${chrome}
+${T.fromBelow ? `${horizon}\n` : ''}${sun}
+${T.fromBelow ? `${standingMark}\n` : ''}${chrome}
 <span aria-hidden="true" style="position: absolute; left: 0; right: 0; bottom: 56px; text-align: center; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.3em; color: ${T.word}; ${word}">TANAFAS</span>
 </div>`;
 }
@@ -275,7 +326,7 @@ class Component extends DCLogic {
       a_glow: phase === 'rise' ? 'sunglow 5s ease-in-out ${RISE}s infinite' : 'none',
       a_word: phase === 'rise' ? 'word 4.5s ease-in-out ${RISE + 0.2}s forwards' : 'none',
       sunLabel: phase === 'rise' ? 'Back to Home' : '${T.openLabel}',
-      toggle: () => this.setState({ phase: phase === 'rise' ? 'set' : 'rise' })
+${T.fromBelow ? `      markLabel: '${T.openLabel}',\n      markPointer: phase === 'rise' ? 'none' : 'auto',\n` : ''}      toggle: () => this.setState({ phase: phase === 'rise' ? 'set' : 'rise' })
     });
   }
 }
@@ -327,5 +378,25 @@ class Component extends DCLogic {
 // The pressed-logo alternative: the same scenes, the mark pressed into the sun (canvas only, to compare).
 THEMES.sunrisePressed = { ...THEMES.sunrise, title: 'Houna sunrise — pressed logo', file: 'SunrisePressed.dc.html', story: null, pressed: 'sunrise' };
 THEMES.duskPressed = { ...THEMES.dusk, title: 'Houna dusk — pressed logo', file: 'DuskPressed.dc.html', story: null, pressed: 'dusk' };
+
+// The sun rising from the bottom of the screen instead of gliding down from Home's mark (canvas only, to compare).
+THEMES.sunriseBelow = {
+  ...THEMES.sunrise, pressed: 'sunrise', fromBelow: true,
+  title: 'Houna sunrise — from below', file: 'SunriseFromBelow.dc.html', story: 'SunriseFromBelowStory.dc.html', storyHeight: 1300,
+  frames: [
+    [0, 'Home, Sunrise', 'Tap the mark.'],
+    [0.2, 'The day steps back', 'Home’s words, card, ring and tab bar fade, and the mark with them, where it is. The sky deepens to pre-dawn.'],
+    [0.42, 'First light', 'A warm glow gathers along the bottom edge, and the sun’s rim comes over it.'],
+    [0.66, 'Rising', 'The sun climbs, the logo pressed into it, a little larger while it’s low, as the morning sky takes over.'],
+    [1, 'Breathe', 'It settles where the moon does and breathes as it does: glow, halo and short rays on the in-breath, the disc still. “Tanafas” shows for three seconds. Tap the sun and it sinks back below the edge; Home and its mark return.'],
+  ],
+  intro: 'An alternative to the glide: instead of Home’s mark travelling down and becoming the sun, the mark fades where it is and the sun comes up from the bottom of the screen, the way a real sunrise does, the logo already pressed into it. It takes a little longer (five seconds to settle, against the glide’s 3.6). The prototype beside this board plays it.',
+  plan: [
+    ['One option on the scene', '<code>SunScene</code> gains an entrance: <code>glide</code> (today’s, from the mark’s measured spot) or <code>rise</code> (from below the bottom edge). With <code>rise</code>, Home’s mark fades in place instead of handing over, so no measuring is needed.'],
+    ['A horizon glow', 'One new layer: a warm glow along the bottom edge that gathers before the sun appears and fades as it climbs, and lingers briefly as it sinks again on the way back.'],
+    ['Low sun, a touch bigger', 'The sun starts at 1.15× and eases to its settled size as it rises, as a low sun looks larger. One value, if it reads as a zoom.'],
+    ['Dusk too?', 'The same entrance could run the other way for Dusk: the evening sun coming down toward the bottom edge and settling low, instead of gliding down from the mark.'],
+  ],
+};
 
 for (const T of Object.values(THEMES)) build(T);

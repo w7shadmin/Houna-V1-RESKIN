@@ -457,6 +457,21 @@
       "w": 1468,
       "x": 4876,
       "y": 7200
+    },
+    "SunriseFromBelow.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Houna sunrise — from below (tap the mark)",
+      "w": 390,
+      "x": 8722,
+      "y": 4840
+    },
+    "SunriseFromBelowStory.dc.html": {
+      "h": 1300,
+      "title": "Houna sunrise — from below, storyboard",
+      "w": 1442,
+      "x": 9192,
+      "y": 4840
     }
   },
   "createdOnFiles": {
@@ -494,7 +509,7 @@
     },
     "titleMorning": {
       "kind": "title1",
-      "maxW": 8000,
+      "maxW": 10634,
       "text": "Houna — Sunrise",
       "w": 240,
       "x": 0,
@@ -568,7 +583,9 @@
     "SunrisePressed.dc.html",
     "DuskPressed.dc.html",
     "MoonConcepts.dc.html",
-    "MoonPhases.dc.html"
+    "MoonPhases.dc.html",
+    "SunriseFromBelow.dc.html",
+    "SunriseFromBelowStory.dc.html"
   ],
   "pages": [],
   "title": "Houna Redesign"

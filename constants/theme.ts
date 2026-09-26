@@ -111,6 +111,15 @@ export interface SunScene {
   stars: string | null;
   /** The starfield's far-off shooting stars, now and then, once it has settled. */
   shootingStars: boolean;
+  /**
+   * How the sun arrives: `glide`, Home's mark travelling down and becoming it, as the
+   * starfield's moon does; or `rise`, the mark fading where it is and the sun coming up
+   * from below the bottom edge, through a glow gathering there (canvas "Houna sunrise —
+   * from below").
+   */
+  entrance: 'glide' | 'rise';
+  /** With `rise`: the glow along the bottom edge, its light centre and warm fringe. */
+  horizon: [string, string] | null;
 }
 
 /** Sunrise: pre-dawn warming to morning; a pale-gold sun with short turning rays. */
@@ -126,6 +135,8 @@ export const sunriseScene: SunScene = {
   settle: 0.42,
   stars: null,
   shootingStars: false,
+  entrance: 'rise',
+  horizon: ['#FFDEBE', sunrisePalette.peach],
 };
 
 /**
@@ -146,6 +157,8 @@ export const duskScene: SunScene = {
   settle: 0.55,
   stars: dayPalette.daybreak,
   shootingStars: true,
+  entrance: 'glide',
+  horizon: null,
 };
 
 /**

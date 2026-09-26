@@ -292,9 +292,13 @@ counterparts, canvas "Houna sunrise" / "Houna dusk"): the same handoff from
 Home's mark, to `app/sunrise.tsx` / `app/dusk.tsx`, thin wrappers round one
 scene (`components/sunrise/SunScene.tsx`) that reads a `SunScene` from
 `theme.ts` (`sunriseScene` / `duskScene`). A first sky comes in as Home steps
-back (pre-dawn; golden hour), and the mark glides down as the moon does to
-where that sun settles (`settle`: the moon's 0.42; Dusk's lower 0.55, a
-setting sun), becoming a small sun (`SunDisc`: pale-gold with short turning
+back (pre-dawn; golden hour), and the sun arrives by the scene's `entrance`.
+Dusk `glide`s: the mark glides down as the moon does to where that sun settles
+(`settle`: the moon's 0.42; Dusk's lower 0.55, a setting sun), becoming the sun.
+Sunrise `rise`s (canvas "Houna sunrise — from below"): the mark fades where it
+is, a `horizon` glow gathers along the bottom edge, and the sun comes up through
+it from below the screen, a touch larger while low, and sinks back on the way
+out. Either way, a small sun (`SunDisc`: pale-gold with short turning
 rays; amber with none; the mark pressed into it) as the second sky takes over (morning; violet dusk,
 where `FirstStars` then come out, with the starfield's `ShootingStars`
 now and then). The disc and mark stay still; the edge
