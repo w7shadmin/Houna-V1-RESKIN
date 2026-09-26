@@ -36,13 +36,15 @@ export default function StarfieldScreen() {
   const starfield = useStarfield()!;
   const { clock, setHaloHidden } = starfield;
   const reduceMotion = useReduceMotion();
-  const { rootRef, frame, onLayout, from, to } = useSceneFrame();
+  const { rootRef, frame, onLayout, from, to, fromBody } = useSceneFrame();
   const sky = useRef(new Animated.Value(0)).current;
   const glide = useRef(new Animated.Value(0)).current;
   const word = useRef(new Animated.Value(0)).current;
   const [settled, setSettled] = useState(false);
   // The mark becomes the moon over the middle of the glide, and back, reversed, on the way home.
-  const moonForm = glide.interpolate({ inputRange: [0.3, 0.8], outputRange: [0, 1], extrapolate: 'clamp' });
+  // From Home's "Sun & moon" style the moon arrives whole: nothing to become.
+  const whole = useRef(new Animated.Value(1)).current;
+  const moonForm = fromBody ? whole : glide.interpolate({ inputRange: [0.3, 0.8], outputRange: [0, 1], extrapolate: 'clamp' });
   const markFade = glide.interpolate({ inputRange: [0.3, 0.6], outputRange: [1, 0], extrapolate: 'clamp' });
   const closing = useRef(false);
 
@@ -152,9 +154,11 @@ export default function StarfieldScreen() {
               <MoonDisc form={moonForm} />
               {/* Exactly Home's Night mark (same colours, strength and clock), minus the ring,
                   giving way to the moon's own. */}
-              <Animated.View style={[StyleSheet.absoluteFill, { opacity: markFade }]} pointerEvents="none" needsOffscreenAlphaCompositing>
-                <MarkHalo accent={nightColors.primary} dusk={nightColors.tones.dusk.fg} glow={nightColors.glow} glowStrength={0.4} showRing={false} />
-              </Animated.View>
+              {!fromBody && (
+                <Animated.View style={[StyleSheet.absoluteFill, { opacity: markFade }]} pointerEvents="none" needsOffscreenAlphaCompositing>
+                  <MarkHalo accent={nightColors.primary} dusk={nightColors.tones.dusk.fg} glow={nightColors.glow} glowStrength={0.4} showRing={false} />
+                </Animated.View>
+              )}
             </Pressable>
           </Animated.View>
 

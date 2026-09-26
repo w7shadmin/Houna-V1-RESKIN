@@ -42,11 +42,11 @@ export default function StarSky({ cx, cy, diagonal }: { cx: number; cy: number; 
         r: r[0] + rand() * (r[1] - r[0]),
         o: o[0] + rand() * (o[1] - o[0]),
       }));
-    // Density scales with the sky's area (tuned for a phone: ~160 still stars on screen).
+    // Density scales with the sky's area (tuned for a phone: ~220 still stars on screen).
     const k = (D * D) / (900 * 900);
     return {
-      still: [...scatter(Math.round(200 * k), [0.35, 0.75], [0.12, 0.38]), ...scatter(Math.round(80 * k), [0.75, 1.15], [0.3, 0.6]), ...scatter(Math.round(18 * k), [1.15, 1.7], [0.55, 0.85])],
-      twinklers: scatter(Math.round(36 * k), [1, 1.6], [0.6, 1]).map((s, i) => ({ ...s, phase: (i * 0.37) % 1 })),
+      still: [...scatter(Math.round(280 * k), [0.35, 0.75], [0.12, 0.38]), ...scatter(Math.round(110 * k), [0.75, 1.15], [0.3, 0.6]), ...scatter(Math.round(26 * k), [1.15, 1.7], [0.55, 0.85])],
+      twinklers: scatter(Math.round(50 * k), [1, 1.6], [0.6, 1]).map((s, i) => ({ ...s, phase: (i * 0.37) % 1 })),
     };
   }, [D]);
 

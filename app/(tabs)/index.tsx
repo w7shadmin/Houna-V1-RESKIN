@@ -1,19 +1,21 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AccessibilityInfo, Animated, Easing, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { AccessibilityInfo, Animated, Easing, Platform, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Circle, Defs, Ellipse, RadialGradient, Stop } from 'react-native-svg';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useTheme } from '@/contexts/ThemeContext';
-import { dayPalette, flatten, layout, typography } from '@/constants/theme';
+import { APPEARANCE_OPTIONS, THEME_FADE_MS, useTheme } from '@/contexts/ThemeContext';
+import { dayPalette, flatten, layout, typography, type ColorScheme } from '@/constants/theme';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { getTodayEntry } from '@/lib/journal';
 import { ACTIVITY_PERIODS, fetchCommunityActivity, type CommunityActivity } from '@/lib/communityActivity';
 import { CommunityDotMap } from '@/components/community/WorldMap';
-import Logo from '@/components/Logo';
 import MarkHalo from '@/components/starfield/MarkHalo';
 import { useStarfield } from '@/contexts/StarfieldContext';
-import { NATIVE } from '@/hooks/useCalmLoop';
+import { NATIVE, useReduceMotion } from '@/hooks/useCalmLoop';
+import AppearanceToggle from '@/components/home/AppearanceToggle';
+import HomeBody, { startSkyChange, type SkyChange } from '@/components/home/HomeBody';
 import MoodBloom, { HOME_BLOOM } from '@/components/mood/MoodBloom';
 import Card from '@/components/ui/Card';
 import IconButton from '@/components/ui/IconButton';
@@ -28,9 +30,22 @@ const ROTATE_MS = 4500;
  * profile), the mark with its ring, "You're not alone" and a rotating line,
  * the community card, and the crisis button, which stays on Home by design
  * (CLAUDE.md: crisis resources are never buried).
+ *
+ * In both, the wordmark is the appearance toggle (a strip of sun · setting
+ * sun · moon above it), the colours fading across on a change. Two Home
+ * styles, both kept while the client decides (More → Appearance → Home):
+ * "Classic", as above; and "Sun & moon" (canvas "Home — appearance"), where
+ * the theme's own sun or moon stands alone in place of the mark and its ring:
+ * a change sets it off the right edge, then the next rises in from the left
+ * as the new colours arrive.
  */
 export default function HomeScreen() {
-  const { colors, isNight, scheme } = useTheme();
+  const { colors, isNight, scheme, preference, setPreference, homeStyle } = useTheme();
+  const sky = homeStyle === 'sky';
+  const reduceMotion = useReduceMotion();
+  /** A change of theme under way from the logo: where to, and in "Sun & moon" the bodies moving. */
+  const [turningTo, setTurningTo] = useState<ColorScheme | null>(null);
+  const [change, setChange] = useState<SkyChange | null>(null);
   const { t, isRTL, fonts } = useLanguage();
   const router = useRouter();
   const h = t.home;
@@ -107,7 +122,8 @@ export default function HomeScreen() {
     Animated.timing(sf.chrome, { toValue: 0, duration: 450, easing: Easing.out(Easing.quad), useNativeDriver: NATIVE }).start(() => {
       haloRef.current?.measureInWindow((x, y, w, hgt) => {
         // The scene draws its moon or sun over this exact spot, then hides this mark (haloHidden).
-        router.push({ pathname: scene, params: { x: String(x + w / 2), y: String(y + hgt / 2) } });
+        // "Sun & moon": Home already shows the scene's body, so the scene starts with it whole.
+        router.push({ pathname: scene, params: { x: String(x + w / 2), y: String(y + hgt / 2), ...(sky ? { body: '1' } : {}) } });
       });
     });
   };
@@ -127,6 +143,29 @@ export default function HomeScreen() {
   const chrome = starfield
     ? { style: { opacity: starfield.chrome }, pointerEvents: (starfield.chromeHidden ? 'none' : 'auto') as 'none' | 'auto' }
     : { style: null, pointerEvents: 'auto' as const };
+
+  // The logo (both styles): the next theme, through the day, the colours fading across. In
+  // "Sun & moon" the body sets first, and the next rises as the new colours arrive.
+  const nextTheme = APPEARANCE_OPTIONS[(APPEARANCE_OPTIONS.indexOf(preference) + 1) % APPEARANCE_OPTIONS.length];
+  const themeNames = t.profile.settings.appearanceOptions;
+  const cycleTheme = () => {
+    if (turningTo) return;
+    if (Platform.OS !== 'web') Haptics.selectionAsync().catch(() => {});
+    const to = nextTheme;
+    setTurningTo(to);
+    let done: Promise<unknown>;
+    if (sky) {
+      const run = startSkyChange(preference, to, reduceMotion, () => setPreference(to));
+      setChange(run.change);
+      done = run.done;
+    } else {
+      done = setPreference(to).then(() => new Promise((settled) => setTimeout(settled, THEME_FADE_MS)));
+    }
+    done.finally(() => {
+      setChange(null);
+      setTurningTo(null);
+    });
+  };
 
   const pickPeriod = (i: number) => {
     setAutoRotate(false);
@@ -169,9 +208,12 @@ export default function HomeScreen() {
               />
             )}
           </View>
-          <View accessible accessibilityRole="image" accessibilityLabel={h.topBar.logo}>
-            <Logo variant="themed" width={64} />
-          </View>
+          <AppearanceToggle
+            current={turningTo ?? preference}
+            onPress={cycleTheme}
+            disabled={!!turningTo}
+            accessibilityLabel={h.topBar.appearanceToggle.replace('{current}', themeNames[preference]).replace('{next}', themeNames[nextTheme])}
+          />
           <IconButton
             variant="subtle"
             style={topButton}
@@ -187,13 +229,17 @@ export default function HomeScreen() {
           <Pressable onPress={openScene} accessibilityRole="button" accessibilityLabel={sceneLabel}>
             <View ref={haloRef} collapsable={false} style={starfield?.haloHidden && styles.hidden}>
               {/* Day: the logo's deeper teal, a little stronger — the pale Night glow vanishes on Daybreak. */}
-              <MarkHalo
-                accent={accent}
-                dusk={colors.tones.dusk.fg}
-                glow={isNight ? colors.glow : dayPalette.hounaTeal}
-                glowStrength={isNight ? 0.4 : 0.5}
-                ringOpacity={starfield?.chrome}
-              />
+              {sky ? (
+                <HomeBody scheme={scheme} change={change} reduceMotion={reduceMotion} />
+              ) : (
+                <MarkHalo
+                  accent={accent}
+                  dusk={colors.tones.dusk.fg}
+                  glow={isNight ? colors.glow : dayPalette.hounaTeal}
+                  glowStrength={isNight ? 0.4 : 0.5}
+                  ringOpacity={starfield?.chrome}
+                />
+              )}
             </View>
           </Pressable>
           <Animated.View style={[styles.heroText, chrome.style]} pointerEvents={chrome.pointerEvents}>

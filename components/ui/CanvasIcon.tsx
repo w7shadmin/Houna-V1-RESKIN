@@ -29,7 +29,11 @@ export type CanvasIconName =
   | 'info'
   | 'shield'
   | 'reflection'
-  | 'arrow';
+  | 'arrow'
+  // The appearance strip on Home (canvas "Home — appearance").
+  | 'sun'
+  | 'sunset'
+  | 'moon';
 
 interface CanvasIconProps {
   name: CanvasIconName;
@@ -49,6 +53,32 @@ export default function CanvasIcon({ name, size = 24, color, strokeWidth = 1.6 }
 
   let body: React.ReactNode;
   switch (name) {
+    case 'sun':
+      body = (
+        <>
+          <Circle cx={12} cy={12} r={4.4} {...stroke} />
+          <Path d="M12 2.6v2.3M12 19.1v2.3M2.6 12h2.3M19.1 12h2.3M5.4 5.4l1.6 1.6M17 17l1.6 1.6M5.4 18.6 7 17M17 7l1.6-1.6" {...stroke} />
+        </>
+      );
+      break;
+    case 'sunset':
+      body = (
+        <>
+          <Path d="M7 14.5a5 5 0 0 1 10 0" {...stroke} />
+          <Path d="M2.5 14.5h19" {...stroke} />
+          <Path d="M12 5.2v2.2M5.3 8.2l1.5 1.3M18.7 8.2l-1.5 1.3M3.2 11.6l1.9.5M20.8 11.6l-1.9.5" {...stroke} />
+          <Path d="M5.5 17.6h9M16.8 17.6h1.7M8 20.4h8" {...stroke} />
+        </>
+      );
+      break;
+    case 'moon':
+      body = (
+        <>
+          <Path d="M16.4 16.2A7.2 7.2 0 1 1 8.2 4.6a5.8 5.8 0 0 0 8.2 11.6z" {...stroke} />
+          <Path d="M18.6 3.4v3M17.1 4.9h3M20.4 9.2v2M19.4 10.2h2" {...stroke} />
+        </>
+      );
+      break;
     case 'home':
       body = (
         <>

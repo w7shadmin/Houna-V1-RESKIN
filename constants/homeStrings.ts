@@ -36,6 +36,8 @@ export const homeStrings = {
       moodCheckInPending: 'Mood check-in — not done today',
       profile: 'Your profile',
       logo: 'Houna',
+      // The logo as the appearance toggle (Home style "Sun & moon").
+      appearanceToggle: 'Appearance: {current}. Double-tap for {next}.',
     },
     /**
      * Rotating line under "You're not alone" — one per community period, in
@@ -166,6 +168,7 @@ export const homeStrings = {
       moodCheckInPending: 'تسجيل المزاج — لم يتم اليوم',
       profile: 'ملفك الشخصي',
       logo: 'هُنا',
+      appearanceToggle: 'المظهر: {current}. انقر مرتين للتبديل إلى {next}.',
     },
     /** DRAFT copy from the canvas; awaiting final lines. Same order as `community.periods`. */
     lines: [

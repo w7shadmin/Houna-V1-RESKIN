@@ -19,7 +19,7 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { Language } from '@/constants/strings';
 import { spacing, typography, radius, shadows, latinFontFamily, arabicFontFamily } from '@/constants/theme';
-import { APPEARANCE_OPTIONS, useTheme } from '@/contexts/ThemeContext';
+import { APPEARANCE_OPTIONS, HOME_STYLES, useTheme } from '@/contexts/ThemeContext';
 
 interface MenuItem {
   icon: LucideIcon;
@@ -28,7 +28,7 @@ interface MenuItem {
 }
 
 export default function MoreScreen() {
-  const { colors, preference, setPreference } = useTheme();
+  const { colors, preference, setPreference, homeStyle, setHomeStyle } = useTheme();
   const { language, setLanguage, t, fonts, isRTL } = useLanguage();
   const router = useRouter();
 
@@ -155,6 +155,44 @@ export default function MoreScreen() {
                     ]}
                   >
                     {t.profile.settings.appearanceOptions[option]}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+
+        {/* Home style — both kept while the client decides (ThemeContext HomeStyle). */}
+        <View style={styles.languageSection}>
+          <Text style={[styles.sectionLabel, { color: colors.textTertiary, fontFamily: fonts.semiBold }]}>
+            {t.profile.settings.homeStyle.toUpperCase()}
+          </Text>
+          <View
+            accessibilityRole="radiogroup"
+            accessibilityLabel={t.profile.settings.homeStyle}
+            style={[styles.languageSwitcher, { backgroundColor: colors.surface, borderColor: colors.border }]}
+          >
+            {HOME_STYLES.map((option) => {
+              const active = option === homeStyle;
+              return (
+                <Pressable
+                  key={option}
+                  accessibilityRole="radio"
+                  aria-checked={active}
+                  onPress={() => setHomeStyle(option)}
+                  style={({ pressed }) => [
+                    styles.languageOption,
+                    active && { backgroundColor: colors.primary },
+                    pressed && !active && { backgroundColor: colors.cardPressed },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.languageOptionText,
+                      { color: active ? colors.onPrimary : colors.textSecondary, fontFamily: fonts.semiBold },
+                    ]}
+                  >
+                    {t.profile.settings.homeStyleOptions[option]}
                   </Text>
                 </Pressable>
               );

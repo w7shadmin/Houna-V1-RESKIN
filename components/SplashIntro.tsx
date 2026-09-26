@@ -6,9 +6,14 @@
  * ~0 KB to the bundle.
  *
  * Sequence (see TIMELINE below):
- *   1. The "o" — the mark that carries the figure — arrives alone at centre.
+ *   1. The "o" — the mark that carries the figure — alone at the centre of the
+ *      screen. On the phone it's already there: the native splash shows the
+ *      same mark, same size, same place (assets/images/splash-mark*.png), so
+ *      the handoff doesn't show. On the web, which has no native splash, it
+ *      fades in.
  *   2. One breath: a single ring expands out from it while the mark inhales.
- *   3. h / u / n / a settle in around the o, which stays fixed as the anchor.
+ *   3. h / u / n / a settle in around the o, as the whole lockup eases over
+ *      so that it, not the o, ends up centred.
  *   4. هنا draws right-to-left as one continuous stroke.
  *   5. The two dots are added after the stroke completes — the order Arabic
  *      is actually written in.
@@ -19,7 +24,7 @@
  */
 
 import React, { useEffect } from 'react';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
 import Animated, {
   Easing,
   runOnJS,
@@ -50,9 +55,11 @@ const VB_W = 93.339;
 const VB_H = 44.094;
 const VB = `0 0 ${VB_W} ${VB_H}`;
 
-// Centre + radius of the "o", in viewBox units. Used to place the breath ring.
-const O_CX = 26.6;
-const O_CY = 15.5;
+// Centre + radius of the "o", in viewBox units (its ring's measured bounds). Used to place the
+// breath ring, and to start with the o at the middle of the screen, where the native splash
+// (assets/images/splash-mark*.png) leaves it.
+const O_CX = 27.364;
+const O_CY = 15.615;
 const O_R = 8.1;
 
 const D = {
@@ -97,6 +104,7 @@ const TIMELINE = {
   ripple: { at: 380, dur: 900 },
   inhale: { at: 420, up: 520, down: 480 },
   letters: { at: 820, dur: 420, stagger: 80 },
+  centre: { at: 760, dur: 760 },
   arabic: { at: 1420, dur: 940 },
   dots: { at: 2300, dur: 260, stagger: 100 },
   exit: { at: 2760, dur: 420 },
@@ -133,10 +141,16 @@ export default function SplashIntro({ onFinish }: Props) {
   const ringSize = O_R * 2 * unit;
   const ringLeft = O_CX * unit - ringSize / 2;
   const ringTop = O_CY * unit - ringSize / 2;
+  // How far the lockup starts shifted so that the o sits at the middle of the screen.
+  const shiftX = LOGO_W / 2 - O_CX * unit;
+  const shiftY = LOGO_H / 2 - O_CY * unit;
+  // After the native splash (not on the web) the mark is already showing.
+  const fromSplash = Platform.OS !== 'web';
 
   // Shared values
-  const markOpacity = useSharedValue(0);
-  const markScale = useSharedValue(0.86);
+  const markOpacity = useSharedValue(fromSplash ? 1 : 0);
+  const markScale = useSharedValue(fromSplash ? 1 : 0.86);
+  const centred = useSharedValue(1);
   const breath = useSharedValue(1);
   const rippleScale = useSharedValue(0.92);
   const rippleOpacity = useSharedValue(0);
@@ -158,6 +172,7 @@ export default function SplashIntro({ onFinish }: Props) {
       // Straight to the finished lockup, hold, then dissolve.
       markOpacity.value = 1;
       markScale.value = 1;
+      centred.value = 0;
       letters.forEach((v) => (v.value = 1));
       arabicWidth.value = LOGO_W;
       dot1.value = 1;
@@ -198,7 +213,11 @@ export default function SplashIntro({ onFinish }: Props) {
       )
     );
 
-    // 3 — h, then u / n / a outward from the o
+    // 3 — the lockup eases over to centre, as h, then u / n / a settle outward from the o
+    centred.value = withDelay(
+      t(TIMELINE.centre.at),
+      withTiming(0, { duration: t(TIMELINE.centre.dur), easing: EASE_IN_OUT })
+    );
     letters.forEach((v, i) => {
       v.value = withDelay(
         t(TIMELINE.letters.at + i * TIMELINE.letters.stagger),
@@ -237,6 +256,10 @@ export default function SplashIntro({ onFinish }: Props) {
   /* ---- styles ---- */
 
   const overlayStyle = useAnimatedStyle(() => ({ opacity: overlay.value }));
+
+  const lockupStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: shiftX * centred.value }, { translateY: shiftY * centred.value }],
+  }));
 
   const markStyle = useAnimatedStyle(() => ({
     opacity: markOpacity.value,
@@ -287,7 +310,7 @@ export default function SplashIntro({ onFinish }: Props) {
 
   return (
     <Animated.View style={[styles.root, { backgroundColor: GROUND }, overlayStyle]} pointerEvents="none">
-      <View style={{ width: LOGO_W, height: LOGO_H }}>
+      <Animated.View style={[{ width: LOGO_W, height: LOGO_H }, lockupStyle]}>
         {/* breath ring, behind everything */}
         <Animated.View
           style={[
@@ -375,7 +398,7 @@ export default function SplashIntro({ onFinish }: Props) {
             </G>
           </Layer>
         </Animated.View>
-      </View>
+      </Animated.View>
     </Animated.View>
   );
 }

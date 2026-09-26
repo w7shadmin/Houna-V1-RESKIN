@@ -4,7 +4,12 @@ import { NATIVE, WAVE_STEPS, useCalmLoop, wave } from '@/hooks/useCalmLoop';
 
 /** One cycle of the twinkling, as the starfield's. */
 const TWINKLE_MS = 9000;
-const COUNT = 26;
+/**
+ * One screen-width of drift: ~5px a second on a phone, the pace of the
+ * starfield's turning sky (a lap every eight minutes) high above its moon.
+ */
+const DRIFT_MS = 80000;
+const COUNT = 40;
 
 /** A fixed seed, so the same stars come out every visit. */
 function seeded(seed: number) {
@@ -21,21 +26,24 @@ interface FirstStarsProps {
 }
 
 /**
- * The Houna dusk's first stars: a faint few, high in the violet (thinning toward
+ * The Houna dusk's first stars: a scatter high in the violet (thinning toward
  * the horizon), each twinkling slowly on its own phase of one shared loop, as
- * the starfield's twinkling stars do. A nod to Night next door; held still under
- * Reduce Motion.
+ * the starfield's twinkling stars do, and all drifting slowly left to right as
+ * the starfield's sky turns. The drift is two copies of one screen-wide strip
+ * side by side, so it loops without a seam. A nod to Night next door; held still
+ * under Reduce Motion.
  */
 export default function FirstStars({ width, height, color, shown }: FirstStarsProps) {
   const twinkle = useCalmLoop((v) => Animated.loop(Animated.timing(v, { toValue: 1, duration: TWINKLE_MS, easing: Easing.linear, useNativeDriver: NATIVE })));
+  const drift = useCalmLoop((v) => Animated.loop(Animated.timing(v, { toValue: 1, duration: DRIFT_MS, easing: Easing.linear, useNativeDriver: NATIVE })));
 
   const stars = useMemo(() => {
     const rand = seeded(23);
-    return Array.from({ length: COUNT }, (_, i) => {
+    const strip = Array.from({ length: COUNT }, (_, i) => {
       const r = (rand() < 0.8 ? 1 + rand() * 0.8 : 1.8 + rand() * 0.6) / 2;
       const o = 0.3 + rand() * 0.4;
       return {
-        x: 12 + rand() * (width - 24),
+        x: rand() * width,
         // Most high up, fewer lower down.
         y: height * (0.02 + Math.pow(rand(), 1.4) * 0.36),
         r,
@@ -43,34 +51,47 @@ export default function FirstStars({ width, height, color, shown }: FirstStarsPr
         phase: (i * 0.37) % 1,
       };
     });
+    return [...strip, ...strip.map((s) => ({ ...s, x: s.x + width }))];
   }, [width, height]);
 
   return (
     <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { opacity: shown }]}>
-      {stars.map((s, i) => (
-        <Animated.View
-          key={i}
-          style={[
-            styles.star,
-            {
-              // Placed in the scene's physical pixels (it lays out left-to-right), hence left/top.
-              left: s.x - s.r,
-              top: s.y - s.r,
-              width: s.r * 2,
-              height: s.r * 2,
-              borderRadius: s.r,
-              backgroundColor: color,
-              boxShadow: `0 0 ${(s.r * 4).toFixed(1)}px ${color}`,
-              opacity: twinkle.interpolate({ inputRange: WAVE_STEPS, outputRange: wave(s.phase).map((w) => s.o * (0.35 + 0.65 * (0.5 + 0.5 * w))) }),
-            },
-          ]}
-        />
-      ))}
+      <Animated.View
+        style={[
+          styles.strip,
+          { width: width * 2, height, transform: [{ translateX: drift.interpolate({ inputRange: [0, 1], outputRange: [-width, 0] }) }] },
+        ]}
+      >
+        {stars.map((s, i) => (
+          <Animated.View
+            key={i}
+            style={[
+              styles.star,
+              {
+                // Placed in the scene's physical pixels (it lays out left-to-right), hence left/top.
+                left: s.x - s.r,
+                top: s.y - s.r,
+                width: s.r * 2,
+                height: s.r * 2,
+                borderRadius: s.r,
+                backgroundColor: color,
+                boxShadow: `0 0 ${(s.r * 4).toFixed(1)}px ${color}`,
+                opacity: twinkle.interpolate({ inputRange: WAVE_STEPS, outputRange: wave(s.phase).map((w) => s.o * (0.35 + 0.65 * (0.5 + 0.5 * w))) }),
+              },
+            ]}
+          />
+        ))}
+      </Animated.View>
     </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
+  strip: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+  },
   star: {
     position: 'absolute',
   },

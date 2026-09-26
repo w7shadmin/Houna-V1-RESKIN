@@ -14,6 +14,7 @@ import { useBreathingVisit, useImmersiveScene, useSceneFrame } from '@/hooks/use
 import MarkHalo, { HALO_BOX } from '@/components/starfield/MarkHalo';
 import ShootingStars from '@/components/starfield/ShootingStars';
 import SunDisc from './SunDisc';
+import { HOME_SUN_SCALE } from '@/components/home/HomeBody';
 import FirstStars from './FirstStars';
 
 /** The sun settles a little smaller than Home's mark box (canvas: 0.9). */
@@ -80,14 +81,15 @@ export default function SunScene({ scene, session, closeLabel }: SunSceneProps) 
   const router = useRouter();
   const { t, fonts } = useLanguage();
   const { setHaloHidden } = useStarfield()!;
-  const { rootRef, frame, onLayout, from, to } = useSceneFrame(scene.settle);
+  const { rootRef, frame, onLayout, from, to, fromBody } = useSceneFrame(scene.settle);
   const skyA = useRef(new Animated.Value(0)).current;
   const skyB = useRef(new Animated.Value(0)).current;
   const rising = scene.entrance === 'rise';
   /** 0 → 1: the sun's way from where it starts (Home's mark, or below the bottom edge) to where it settles. */
   const glide = useRef(new Animated.Value(0)).current;
   /** 0 → 1: Home's mark becoming the sun (gliding); rising, the sun is whole from the start. */
-  const sun = useRef(new Animated.Value(rising ? 1 : 0)).current;
+  // From Home's "Sun & moon" style the sun is already whole: nothing to become.
+  const sun = useRef(new Animated.Value(rising || fromBody ? 1 : 0)).current;
   /** Rising: Home's mark, fading where it is. */
   const mark = useRef(new Animated.Value(1)).current;
   /** Rising: the glow gathering along the bottom edge. */
@@ -176,7 +178,7 @@ export default function SunScene({ scene, session, closeLabel }: SunSceneProps) 
       ]),
       rising ? sink : Animated.parallel([
         Animated.timing(glide, { toValue: 0, duration: 1100, easing: Easing.inOut(Easing.cubic), useNativeDriver: NATIVE }),
-        Animated.timing(sun, { toValue: 0, duration: 700, easing: Easing.inOut(Easing.quad), useNativeDriver: NATIVE }),
+        Animated.timing(sun, { toValue: fromBody ? 1 : 0, duration: 700, easing: Easing.inOut(Easing.quad), useNativeDriver: NATIVE }),
         Animated.sequence([
           Animated.delay(300),
           Animated.timing(skyB, { toValue: 0, duration: 800, easing: Easing.in(Easing.quad), useNativeDriver: NATIVE }),
@@ -222,7 +224,9 @@ export default function SunScene({ scene, session, closeLabel }: SunSceneProps) 
                   {
                     scale: rising
                       ? glide.interpolate({ inputRange: [0, 0.08, 1], outputRange: [LOW_SCALE, LOW_SCALE, SUN_SCALE] })
-                      : sun.interpolate({ inputRange: [0, 1], outputRange: [1, SUN_SCALE] }),
+                      : fromBody
+                        ? glide.interpolate({ inputRange: [0, 1], outputRange: [HOME_SUN_SCALE, SUN_SCALE] })
+                        : sun.interpolate({ inputRange: [0, 1], outputRange: [1, SUN_SCALE] }),
                   },
                 ],
               },
@@ -232,7 +236,7 @@ export default function SunScene({ scene, session, closeLabel }: SunSceneProps) 
               <SunDisc form={sun} scene={scene} />
               {/* Gliding: exactly Home's mark in this theme (same colours, strength and clock),
                   minus the ring, giving way to the sun's own. */}
-              {!rising && (
+              {!rising && !fromBody && (
                 <Animated.View style={[StyleSheet.absoluteFill, { opacity: sun.interpolate({ inputRange: [0, 0.6], outputRange: [1, 0], extrapolate: 'clamp' }) }]} pointerEvents="none" needsOffscreenAlphaCompositing>
                   <HomeMark />
                 </Animated.View>
@@ -240,14 +244,21 @@ export default function SunScene({ scene, session, closeLabel }: SunSceneProps) 
             </Pressable>
           </Animated.View>
 
-          {/* Rising: Home's mark stays where it was drawn, fading as the day steps back. */}
+          {/* Rising: Home's mark (or, from "Sun & moon", Home's sun) stays where it was drawn,
+              fading as the day steps back. */}
           {rising && (
             <Animated.View
               pointerEvents="none"
               needsOffscreenAlphaCompositing
               style={[styles.sun, { opacity: mark, transform: [{ translateX: from.x - HALO_BOX / 2 }, { translateY: from.y - HALO_BOX / 2 }] }]}
             >
-              <HomeMark />
+              {fromBody ? (
+                <View style={{ transform: [{ scale: HOME_SUN_SCALE }] }}>
+                  <SunDisc form={sun} scene={scene} />
+                </View>
+              ) : (
+                <HomeMark />
+              )}
             </Animated.View>
           )}
 

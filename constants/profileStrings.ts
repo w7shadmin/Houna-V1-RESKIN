@@ -34,6 +34,9 @@ export const profileStrings = {
       language: 'Language',
       appearance: 'Appearance',
       appearanceOptions: { sunrise: 'Sunrise', day: 'Dusk', night: 'Night' },
+      // Both Home styles kept while the client decides (ThemeContext HomeStyle).
+      homeStyle: 'Home',
+      homeStyleOptions: { sky: 'Sun & moon', classic: 'Classic' },
       notifications: 'Notifications',
       communityMap: 'Community map',
       exportJournal: 'Export my journal',
@@ -77,6 +80,8 @@ export const profileStrings = {
       language: 'اللغة',
       appearance: 'المظهر',
       appearanceOptions: { sunrise: 'الشروق', day: 'الغسق', night: 'ليلي' },
+      homeStyle: 'الرئيسية',
+      homeStyleOptions: { sky: 'الشمس والقمر', classic: 'الكلاسيكي' },
       notifications: 'الإشعارات',
       communityMap: 'خريطة المجتمع',
       exportJournal: 'تصدير يومياتي',

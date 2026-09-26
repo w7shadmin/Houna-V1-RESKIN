@@ -246,7 +246,15 @@ audio can only be verified in an Android dev-client build.
 
 **Native splash**: `app.json` has Daybreak and Midnight (`dark`) grounds;
 needs `npx expo prebuild --clean` + reinstalling the dev client to apply,
-like `userInterfaceStyle: "automatic"`.
+like `userInterfaceStyle: "automatic"`. Its image is the mark alone
+(`assets/images/splash-mark.png` teal, `splash-mark-dark.png` glow; never the
+full-bleed `icon.png`, which draws as a teal box), centred on a transparent
+square: Android scales the whole picture to ~107dp (a 160dp icon box × 2/3,
+whatever `imageWidth` says), so the ring fills 42% of it to match the intro's
+"o" on a 412dp-wide phone (iOS gets `imageWidth: 107` to match). The intro
+(`components/SplashIntro.tsx`) starts from that mark at the screen's centre,
+already showing on native, then eases the lockup over to centre. Regenerate
+both images from `adaptive-icon.png` if the mark or the intro's size changes.
 
 **Legacy, still to migrate**: the old `palette` export and older styling
 (`shadows.card`, `primaryLightest`) remain on About, More's leftovers, Voices
@@ -300,8 +308,9 @@ is, a `horizon` glow gathers along the bottom edge, and the sun comes up through
 it from below the screen, a touch larger while low, and sinks back on the way
 out. Either way, a small sun (`SunDisc`: pale-gold with short turning
 rays; amber with none; the mark pressed into it) as the second sky takes over (morning; violet dusk,
-where `FirstStars` then come out, with the starfield's `ShootingStars`
-now and then). The disc and mark stay still; the edge
+where `FirstStars` then come out, drifting slowly left to right at the pace of
+the starfield's turning sky, with the starfield's `ShootingStars` now and
+then). The disc and mark stay still; the edge
 halo, rays and wide sunglow breathe on the shared clock exactly as the
 moon's halo does. Counted as `sunrise` / `dusk` sessions, titled Tanafas in
 Recap. Every theme's mark now opens a scene. All three share
@@ -310,6 +319,31 @@ keep-awake / hidden bars / Back); keep one animation per value inside a
 parallel, or stopping one stops all. The web preview may only paint frames
 on demand, so JS-driven animations there can look stuck mid-way; that's the
 preview, not the scene.
+
+**Two Home styles, both kept while the client decides** (More → Appearance →
+Home: "Sun & moon" · "Classic"; `HomeStyle` in `contexts/ThemeContext.tsx`,
+persisted as `houna-home-style`, "Sun & moon" until changed). In both, the
+wordmark is the appearance toggle (`components/home/AppearanceToggle.tsx`, a
+strip of sun · setting sun · moon above it, the current one lit, tapping moves
+to the next in `APPEARANCE_OPTIONS` order). Classic is the mark in its ring,
+as above. "Sun & moon" (canvas "Home — appearance"): the mark and its ring of
+dots give way to the theme's own body, alone (`components/home/HomeBody.tsx`:
+tonight's moon, or the scene's sun at `HOME_SUN_SCALE`, in the mark's box so
+nothing round it moves). A change sets the current body off the right edge;
+with the sky empty the colours crossfade, and the next body rises in from the
+left as they arrive (`startSkyChange`). Those directions are physical (the sky
+doesn't mirror in Arabic); Reduce Motion fades the bodies in place. Home then
+passes `body=1` to the scene, and the scene (`fromBody` from `useSceneFrame`)
+starts with that body whole instead of turning the mark into it. When one
+style is chosen, delete the other and the setting.
+
+**Theme changes crossfade** (from Home's logo, More and Profile alike):
+`setPreference` captures the screen (`react-native-view-shot`'s
+`captureScreen`), lays the picture over the whole app, switches the colours
+underneath once it's drawn, then fades it out over `THEME_FADE_MS`; it
+resolves once the new colours are in place. The module is native, so a dev
+client built before it was added (or the web) just switches at once: it's
+loaded lazily, because its import throws when the native side is missing.
 
 **Tanafas player**: the Breathe and Meditate carousels share
 `components/tanafas/PlayerFrame.tsx` (stage, title row, tag, description,

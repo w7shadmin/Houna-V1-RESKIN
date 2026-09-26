@@ -25,9 +25,11 @@ export interface SceneFrame {
  * Where the mark starts (Home's measured spot, in this screen's pixels) and where it
  * settles: centred, `settle` of the way down (the moon's 0.42, a little above the middle). The screen measures its own origin rather
  * than trusting that its coordinates match Home's (on Android they differ by the status bar).
+ * `fromBody`: Home (style "Sun & moon") handed over the scene's own sun or moon, not the mark,
+ * so the scene starts with it whole instead of turning the mark into it.
  */
 export function useSceneFrame(settle = 0.42) {
-  const params = useLocalSearchParams<{ x?: string; y?: string }>();
+  const params = useLocalSearchParams<{ x?: string; y?: string; body?: string }>();
   const rootRef = useRef<View>(null);
   const [frame, setFrame] = useState<SceneFrame | null>(null);
 
@@ -41,7 +43,7 @@ export function useSceneFrame(settle = 0.42) {
     y: (Number(params.y) || frame.oy + frame.height * 0.3) - frame.oy,
   };
   const to = frame && { x: frame.width / 2, y: frame.height * settle };
-  return { rootRef, frame, onLayout, from, to };
+  return { rootRef, frame, onLayout, from, to, fromBody: params.body === '1' };
 }
 
 /**
