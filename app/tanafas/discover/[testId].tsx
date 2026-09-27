@@ -6,7 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { alpha, layout } from '@/constants/theme';
 import { arabicNumber } from '@/lib/arabicNumerals';
-import { getTest } from '@/constants/psychometrics';
+import { getTest, scaleLabels, testText } from '@/constants/psychometrics';
 import { scoreTest } from '@/lib/psychometrics/score';
 import { saveResultLocally } from '@/lib/psychometrics/results';
 import type { Answers } from '@/lib/psychometrics/types';
@@ -54,7 +54,7 @@ export default function TestScreen() {
   const total = test.items.length;
   const item = step >= 0 ? test.items[step] : null;
   const chosen = item ? answers[item.id] : undefined;
-  const labels = test.scale.labels[language];
+  const labels = scaleLabels(test, language);
   const dusk = colors.tones.dusk.fg;
   const duskText = colors.tones.dusk.text;
   const labelLatin = fonts.labelTracked;
@@ -94,6 +94,9 @@ export default function TestScreen() {
               {test.title[language]}
             </Text>
             <Text style={[styles.body, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{test.description[language]}</Text>
+            {test.instructions && (
+              <Text style={[styles.body, { color: colors.text, fontFamily: fonts.regular }]}>{testText(test.instructions, language)}</Text>
+            )}
             <Text style={[styles.source, { color: colors.textTertiary, fontFamily: fonts.regular }]}>
               {s.source}: {test.source.citation}
             </Text>
@@ -143,11 +146,11 @@ export default function TestScreen() {
                     { color: duskText, fontFamily: labelLatin ? fonts.labelRegular : fonts.label },
                   ]}
                 >
-                  {test.prompt[language]}
+                  {testText(test.prompt, language)}
                 </Text>
               )}
               <Text accessibilityRole="header" style={[styles.statement, isRTL && styles.statementArabic, { color: colors.text, fontFamily: fonts.display }]}>
-                {item.text[language]}
+                {testText(item.text, language)}
               </Text>
             </View>
 

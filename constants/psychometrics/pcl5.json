@@ -1,0 +1,63 @@
+{
+  "id": "pcl5",
+  "version": 1,
+  "title": { "en": "After a hard experience (PCL-5)", "ar": "بعد تجربة صعبة (PCL-5)" },
+  "description": {
+    "en": "Twenty questions about how a very stressful experience has affected you in the past month. It asks about difficult memories, so take it when you have a quiet moment.",
+    "ar": "عشرون سؤالاً عن تأثير تجربة شديدة الضغط عليك خلال الشهر الماضي. يسأل عن ذكريات صعبة، فاختر وقتاً هادئاً لإجابته."
+  },
+  "source": {
+    "citation": "Weathers FW, Litz BT, Keane TM, Palmieri PA, Marx BP, Schnurr PP. The PTSD Checklist for DSM-5 (PCL-5). National Center for PTSD; 2013. Arabic: Ibrahim H, Ertl V, Catani C, Ismail AA, Neuner F. The validity of Posttraumatic Stress Disorder Checklist for DSM-5 (PCL-5) as screening instrument with Kurdish and Arab displaced populations living in the Kurdistan region of Iraq. BMC Psychiatry. 2018;18:259. In the Arabic, spelling is normalised (hamzas; three typos: «النفسكِ», «بمشاعر الايجابية», «يؤذيك») with the wording unchanged.",
+    "licence": "Public domain (U.S. Department of Veterans Affairs, National Center for PTSD). Intended for use alongside qualified professionals.",
+    "url": "https://www.ptsd.va.gov/professional/assessment/adult-sr/ptsd-checklist.asp"
+  },
+  "instructions": {
+    "en": "Below is a list of problems that people sometimes have in response to a very stressful experience. Keep in mind the experience that troubles you most. You can stop at any time.",
+    "ar": "فيما يلي قائمة بمشاكل، يعاني منها الناس بعد تعرضهم للأحداث المزعجة. ابقِ الحادثة الأسوأ في ذاكرتك. يمكنك التوقف في أي وقت."
+  },
+  "prompt": { "en": "In the past month, how much were you bothered by", "ar": "في الشهر السابق، إلى أي مدى انزعجت بـ" },
+  "scale": {
+    "min": 0,
+    "max": 4,
+    "labels": {
+      "en": ["Not at all", "A little bit", "Moderately", "Quite a bit", "Extremely"],
+      "ar": ["إطلاقاً", "قليلاً", "متوسط", "إلى حد كبير", "كثيراً جداً"]
+    }
+  },
+  "traits": [
+    {
+      "key": "total",
+      "label": { "en": "Stress after a hard experience", "ar": "الضغط بعد تجربة صعبة" },
+      "description": { "en": "How much the experience has been bothering you in the past month.", "ar": "مدى انزعاجك من التجربة خلال الشهر الماضي." }
+    }
+  ],
+  "items": [
+    { "id": "q1", "trait": "total", "reverse": false, "text": { "en": "Repeated, disturbing, and unwanted memories of the stressful experience?", "ar": "ذكريات متكررة، ومؤلمة ومزعجة حول التجربة الأليمة؟" } },
+    { "id": "q2", "trait": "total", "reverse": false, "text": { "en": "Repeated, disturbing dreams of the stressful experience?", "ar": "أحلام متكررة ومزعجة حول التجربة الأليمة؟" } },
+    { "id": "q3", "trait": "total", "reverse": false, "text": { "en": "Suddenly feeling or acting as if the stressful experience were actually happening again (as if you were actually back there reliving it)?", "ar": "الشعور الفجائي أو التصرف حول التجربة الأليمة بأن ما حدث سوف يحدث مرة أخرى (كأنك تتعايش) التجربة؟" } },
+    { "id": "q4", "trait": "total", "reverse": false, "text": { "en": "Feeling very upset when something reminded you of the stressful experience?", "ar": "الشعور بالانزعاج، عندما يذكرك شيء بالحادثة الأليمة؟" } },
+    { "id": "q5", "trait": "total", "reverse": false, "text": { "en": "Having strong physical reactions when something reminded you of the stressful experience (for example, heart pounding, trouble breathing, sweating)?", "ar": "لديك رد فعل جسدي قوي عندما يذكرك شيء ما بالتجربة الأليمة (مثال: خفقان القلب، ضيق في التنفس، التعرق)؟" } },
+    { "id": "q6", "trait": "total", "reverse": false, "text": { "en": "Avoiding memories, thoughts, or feelings related to the stressful experience?", "ar": "تجنب الذكريات، الأفكار، أو الأحاسيس المرتبطة بالتجربة الأليمة." } },
+    { "id": "q7", "trait": "total", "reverse": false, "text": { "en": "Avoiding external reminders of the stressful experience (for example, people, places, conversations, activities, objects, or situations)?", "ar": "تجنب الأشياء التي تذكرك بالتجربة الأليمة، مثال: (الناس، الأماكن، النقاش، النشاطات، الظروف)؟" } },
+    { "id": "q8", "trait": "total", "reverse": false, "text": { "en": "Trouble remembering important parts of the stressful experience?", "ar": "صعوبة في تذكر أجزاء مهمة من التجربة الأليمة؟" } },
+    { "id": "q9", "trait": "total", "reverse": false, "text": { "en": "Having strong negative beliefs about yourself, other people, or the world (for example, having thoughts such as: I am bad, there is something seriously wrong with me, no one can be trusted, the world is completely dangerous)?", "ar": "وجود شعور سلبي شديد حول نفسك أو الآخرين أو العالم (مثال: وجود أفكار أنا سيء، لدي مشكلة، لا أحد جدير بالثقة، العالم خطير جداً)؟" } },
+    { "id": "q10", "trait": "total", "reverse": false, "text": { "en": "Blaming yourself or someone else for the stressful experience or what happened after it?", "ar": "إلقاء اللوم على نفسك أو الآخرين للتجربة الأليمة أو ما حدث بعدها؟" } },
+    { "id": "q11", "trait": "total", "reverse": false, "text": { "en": "Having strong negative feelings such as fear, horror, anger, guilt, or shame?", "ar": "وجود مشاعر سلبية قوية مثل الخوف، الفزع، الغضب، الذنب، أو الخجل؟" } },
+    { "id": "q12", "trait": "total", "reverse": false, "text": { "en": "Loss of interest in activities that you used to enjoy?", "ar": "فقدان الرغبة في التمتع بالنشاطات السابقة التي كنت تتمتع بها؟" } },
+    { "id": "q13", "trait": "total", "reverse": false, "text": { "en": "Feeling distant or cut off from other people?", "ar": "الشعور بالعزلة والبعد عن الآخرين." } },
+    { "id": "q14", "trait": "total", "reverse": false, "text": { "en": "Trouble experiencing positive feelings (for example, being unable to feel happiness or have loving feelings for people close to you)?", "ar": "صعوبة الإحساس بمشاعر إيجابية (مثال: عدم الشعور بالسعادة، أو عدم الشعور بالحب نحو الناس القريبين منك)؟" } },
+    { "id": "q15", "trait": "total", "reverse": false, "text": { "en": "Irritable behavior, angry outbursts, or acting aggressively?", "ar": "سلوك مضطرب، غضب صارخ، تصرفات عدوانية؟" } },
+    { "id": "q16", "trait": "total", "reverse": false, "text": { "en": "Taking too many risks or doing things that could cause you harm?", "ar": "المخاطرة كثيراً أو القيام بأشياء قد تؤذيك؟" } },
+    { "id": "q17", "trait": "total", "reverse": false, "text": { "en": "Being “superalert” or watchful or on guard?", "ar": "التوجس والتيقظ؟" } },
+    { "id": "q18", "trait": "total", "reverse": false, "text": { "en": "Feeling jumpy or easily startled?", "ar": "الشعور بالإجفال وسرعة التهيج؟" } },
+    { "id": "q19", "trait": "total", "reverse": false, "text": { "en": "Having difficulty concentrating?", "ar": "الصعوبة في التركيز؟" } },
+    { "id": "q20", "trait": "total", "reverse": false, "text": { "en": "Trouble falling or staying asleep?", "ar": "الأرق أو صعوبة الاستمرار في النوم؟" } }
+  ],
+  "scoring": {
+    "method": "sum",
+    "bands": [
+      { "max": 32, "label": { "en": "Below the screening cut-off", "ar": "أقل من حد الفحص" }, "description": { "en": "Your answers are below the level that suggests PTSD. If the experience still troubles you, talking about it with a professional can help.", "ar": "إجاباتك أقل من المستوى الذي يشير إلى اضطراب ما بعد الصدمة. إن كانت التجربة لا تزال تزعجك، فالحديث عنها مع مختص قد يساعد." } },
+      { "max": 80, "label": { "en": "Above the screening cut-off", "ar": "أعلى من حد الفحص" }, "description": { "en": "The experience is still weighing heavily on you. A professional who works with trauma can help — and only they can tell you what this means.", "ar": "التجربة لا تزال تثقل عليك كثيراً. يمكن لمختص يعمل مع الصدمات أن يساعدك — وهو وحده من يستطيع أن يوضح لك ما يعنيه هذا." }, "concern": true }
+    ]
+  }
+}

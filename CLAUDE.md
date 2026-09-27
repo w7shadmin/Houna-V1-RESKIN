@@ -382,6 +382,33 @@ dusk, five senses dawn, muscle relaxation bloom (a fourth tone, the mood palette
 to `videoFocus` in `components/meditation/scenes.ts`; the plain orb shows
 for scenes without footage.
 
+**Discover questionnaires** (phase one: short, free screeners with Arabic
+versions; longer or restricted ones wait for phase two, with professionals on
+board): PHQ-8, GAD-7, WHO-5, ASRS-5, PCL-5 and the adult ACE questionnaire
+(ACEs Aware; its official Arabic question 5 mistranslates "each other" as
+"you", awaiting review), one JSON each in `constants/psychometrics/`
+(registered in `index.ts`). Scoring (`lib/psychometrics/score.ts`) is `mean`
+(trait reflections), `sum` (the screeners' totals; `multiplier` makes WHO-5 a
+percentage) or `count` (items at or above their `threshold`; unused since ASRS
+v1.1 gave way to ASRS-5), with the published cut-offs as bands; a band can say
+what it means (`description`) and flag `concern`, which puts "Talk to someone
+now" (→ `/crisis`) on the results screen. PHQ-8, not PHQ-9: PHQ-9's self-harm
+question needs a crisis flow first (`screensForRisk` is refused). Items and
+answer labels are the instruments' own words: English official, Arabic only
+from official or validated translations, never translated here; a test whose
+Arabic isn't in yet is `arabicPending` (English shows; development builds
+only). PHQ-8's Arabic is the official PHQ-9 "Arabic for Tunisia"
+(phqscreeners), questions 1–8; GAD-7's the official "Arabic for Tunisia" too
+(one misspelling corrected); PCL-5's is Ibrahim et al. 2018, spelling
+normalised; WHO-5's is the 1999 Hillerød translation WHO republishes (with its
+disclaimer; spelling and one agreement fixed); ASRS-5's is the Saudi ADHD
+Society's (Eshraq) standardised version, scored as its permission-free 0–24
+total with no cut-off (the weighted cut-offs need NYU's permission). Licences:
+PHQ/GAD free (Pfizer); ASRS-5 free as a plain total, NYU licence for cut-offs
+or commercial use; PCL-5 public domain; WHO-5 CC BY-NC-SA (non-commercial, with
+WHO's translation disclaimer). Profile shows multi-trait reflections only: a
+screener's score stays on its results screen.
+
 **Directory pages** are all in the canvas language now: list pages use
 `components/directory/PageHeader.tsx`; the professional / organization /
 wellness-center pages share `components/directory/ProfileKit.tsx` (from the

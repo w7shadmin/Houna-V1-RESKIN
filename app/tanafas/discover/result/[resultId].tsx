@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { alpha, layout } from '@/constants/theme';
+import { arabicNumber } from '@/lib/arabicNumerals';
 import { getTest } from '@/constants/psychometrics';
 import { getResult, saveResultToProfile, type StoredResult } from '@/lib/psychometrics/results';
 import Button from '@/components/ui/Button';
@@ -19,6 +20,9 @@ import RadarChart from '@/components/discover/RadarChart';
  * one card per trait (highest first) with its band, the not-a-diagnosis
  * disclaimer, then "Find a professional" as the primary action. Results
  * stay on the phone; "Save to my profile" is an explicit, Alias-only opt-in.
+ * Screeners (`sum` / `count` scoring) also show the score out of its range
+ * and what the band means; a band marked `concern` puts talking to someone
+ * first, with the crisis line a tap away (crisis resources are never buried).
  */
 export default function ResultScreen() {
   const { colors } = useTheme();
@@ -43,6 +47,7 @@ export default function ResultScreen() {
   const dusk = colors.tones.dusk.fg;
   const duskText = colors.tones.dusk.text;
   const labelLatin = fonts.labelTracked;
+  const num = (n: number) => (isRTL ? arabicNumber(Math.round(n)) : String(Math.round(n)));
 
   const header = (
     <View style={styles.header}>
@@ -72,6 +77,8 @@ export default function ResultScreen() {
     .filter((tr) => result.scores[tr.key])
     .map((tr) => ({ ...tr, score: result.scores[tr.key] }))
     .sort((a, b) => b.score.normalised0to1 - a.score.normalised0to1);
+
+  const concern = traits.some((tr) => tr.score.concern);
 
   const save = async () => {
     setSaving(true);
@@ -127,13 +134,27 @@ export default function ResultScreen() {
                   {tr.score.band[language]}
                 </Text>
               </View>
+              {tr.score.max !== undefined && (
+                <Text style={[styles.score, { color: colors.text, fontFamily: fonts.medium }]}>
+                  {r.score.replace('{score}', num(tr.score.raw)).replace('{max}', num(tr.score.max))}
+                </Text>
+              )}
               <View style={[styles.bar, { backgroundColor: colors.border }]} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
                 <View style={[styles.barFill, { width: `${Math.round(tr.score.normalised0to1 * 100)}%`, backgroundColor: dusk }]} />
               </View>
-              <Text style={[styles.traitDesc, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{tr.description[language]}</Text>
+              <Text style={[styles.traitDesc, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
+                {(tr.score.bandDescription ?? tr.description)[language]}
+              </Text>
             </View>
           ))}
         </View>
+
+        {concern && (
+          <View style={[styles.support, { backgroundColor: colors.crisis.bg, borderColor: colors.crisis.border }]}>
+            <Text style={[styles.supportBody, { color: colors.text, fontFamily: fonts.regular }]}>{r.support.body}</Text>
+            <Button label={r.support.talkNow} onPress={() => router.navigate('/crisis')} block />
+          </View>
+        )}
 
         <View style={[styles.disclaimer, { backgroundColor: colors.crisis.bg, borderColor: colors.crisis.borderSoft }]}>
           <CanvasIcon name="shield" size={20} strokeWidth={1.7} color={colors.tones.dawn.fg} />
@@ -229,6 +250,19 @@ const styles = StyleSheet.create({
   },
   bandArabic: {
     fontSize: 12.5,
+  },
+  score: {
+    fontSize: 15,
+  },
+  support: {
+    gap: 16,
+    padding: 16,
+    borderRadius: 18,
+    borderWidth: 1,
+  },
+  supportBody: {
+    fontSize: 15,
+    lineHeight: 22,
   },
   bar: {
     height: 6,

@@ -1,0 +1,189 @@
+{
+  "id": "phq8",
+  "version": 1,
+  "title": {
+    "en": "Mood (PHQ-8)",
+    "ar": "المزاج (PHQ-8)"
+  },
+  "description": {
+    "en": "Eight questions about how often low mood has bothered you over the last two weeks. A widely used screening questionnaire.",
+    "ar": "ثمانية أسئلة عن عدد المرات التي أزعجك فيها المزاج المنخفض خلال الأسبوعين الماضيين. استبيان فحص واسع الاستخدام."
+  },
+  "source": {
+    "citation": "Kroenke K, Strine TW, Spitzer RL, et al. The PHQ-8 as a measure of current depression in the general population. J Affect Disord. 2009;114:163–173. PHQ © Pfizer Inc. (developed by Drs Robert L. Spitzer, Janet B.W. Williams, Kurt Kroenke and colleagues, with an educational grant from Pfizer Inc.). Arabic: the official PHQ-9 “Arabic for Tunisia” translation (phqscreeners.com), questions 1–8.",
+    "licence": "No permission required to reproduce, translate, display or distribute (Pfizer Inc., phqscreeners.com).",
+    "url": "https://www.phqscreeners.com/"
+  },
+  "prompt": {
+    "en": "Over the last 2 weeks, how often have you been bothered by",
+    "ar": "كم عانيت من المشاكل التالية خلال الأسبوعين الماضيين؟"
+  },
+  "scale": {
+    "min": 0,
+    "max": 3,
+    "labels": {
+      "en": [
+        "Not at all",
+        "Several days",
+        "More than half the days",
+        "Nearly every day"
+      ],
+      "ar": [
+        "أبداً",
+        "بعض الأيام",
+        "أكثر من نصف الأيام",
+        "كل يوم تقريباً"
+      ]
+    }
+  },
+  "traits": [
+    {
+      "key": "total",
+      "label": {
+        "en": "Low mood",
+        "ar": "المزاج المنخفض"
+      },
+      "description": {
+        "en": "How much low mood has been part of the last two weeks.",
+        "ar": "مدى حضور المزاج المنخفض في الأسبوعين الماضيين."
+      }
+    }
+  ],
+  "items": [
+    {
+      "id": "q1",
+      "trait": "total",
+      "reverse": false,
+      "text": {
+        "en": "Little interest or pleasure in doing things",
+        "ar": "قلة الاهتمام أو الاستمتاع بممارسة الأشياء."
+      }
+    },
+    {
+      "id": "q2",
+      "trait": "total",
+      "reverse": false,
+      "text": {
+        "en": "Feeling down, depressed, or hopeless",
+        "ar": "الشعور بالحزن أو ضيق الصدر أو اليأس."
+      }
+    },
+    {
+      "id": "q3",
+      "trait": "total",
+      "reverse": false,
+      "text": {
+        "en": "Trouble falling or staying asleep, or sleeping too much",
+        "ar": "الصعوبة في الركون إلى النوم أو النوم بانتظام أو النوم أكثر من العادة."
+      }
+    },
+    {
+      "id": "q4",
+      "trait": "total",
+      "reverse": false,
+      "text": {
+        "en": "Feeling tired or having little energy",
+        "ar": "الشعور بالتعب أو بقلة الحيوية."
+      }
+    },
+    {
+      "id": "q5",
+      "trait": "total",
+      "reverse": false,
+      "text": {
+        "en": "Poor appetite or overeating",
+        "ar": "قلة الشهية أو كثرة الأكل."
+      }
+    },
+    {
+      "id": "q6",
+      "trait": "total",
+      "reverse": false,
+      "text": {
+        "en": "Feeling bad about yourself — or that you are a failure or have let yourself or your family down",
+        "ar": "الشعور بعدم الرضا عن النفس أو بالفشل أو الإحباط تجاه ذويك."
+      }
+    },
+    {
+      "id": "q7",
+      "trait": "total",
+      "reverse": false,
+      "text": {
+        "en": "Trouble concentrating on things, such as reading the newspaper or watching television",
+        "ar": "الصعوبة في التركيز على الأشياء، مثل قراءة الصحف أو مشاهدة التليفزيون."
+      }
+    },
+    {
+      "id": "q8",
+      "trait": "total",
+      "reverse": false,
+      "text": {
+        "en": "Moving or speaking so slowly that other people could have noticed? Or the opposite — being so fidgety or restless that you have been moving around a lot more than usual",
+        "ar": "بطء في الحركة أو الكلام بدرجة ملحوظة من الآخرين؟ أو على العكس من ذلك كثرة التململ والتحرك إلى درجة فوق العادة."
+      }
+    }
+  ],
+  "scoring": {
+    "method": "sum",
+    "bands": [
+      {
+        "max": 4,
+        "label": {
+          "en": "Minimal",
+          "ar": "طفيف"
+        },
+        "description": {
+          "en": "Few signs of low mood right now.",
+          "ar": "علامات قليلة للمزاج المنخفض حالياً."
+        }
+      },
+      {
+        "max": 9,
+        "label": {
+          "en": "Mild",
+          "ar": "خفيف"
+        },
+        "description": {
+          "en": "Some low mood. Keep an eye on how you're feeling, and be gentle with yourself.",
+          "ar": "بعض المزاج المنخفض. انتبه لما تشعر به، وكن لطيفاً مع نفسك."
+        }
+      },
+      {
+        "max": 14,
+        "label": {
+          "en": "Moderate",
+          "ar": "متوسط"
+        },
+        "description": {
+          "en": "Low mood is taking up real room in your days. Talking with a professional could help.",
+          "ar": "المزاج المنخفض يأخذ مساحة حقيقية من أيامك. قد يساعدك الحديث مع مختص."
+        },
+        "concern": true
+      },
+      {
+        "max": 19,
+        "label": {
+          "en": "Moderately severe",
+          "ar": "متوسط إلى شديد"
+        },
+        "description": {
+          "en": "Low mood is weighing on you a lot. It's worth reaching out to a professional soon.",
+          "ar": "المزاج المنخفض يثقل عليك كثيراً. من المفيد أن تتواصل مع مختص قريباً."
+        },
+        "concern": true
+      },
+      {
+        "max": 24,
+        "label": {
+          "en": "Severe",
+          "ar": "شديد"
+        },
+        "description": {
+          "en": "This is a lot to carry. Please reach out to a professional soon — you don't have to manage it alone.",
+          "ar": "هذا حمل ثقيل. يرجى التواصل مع مختص قريباً — لست مضطراً للتعامل معه وحدك."
+        },
+        "concern": true
+      }
+    ]
+  }
+}

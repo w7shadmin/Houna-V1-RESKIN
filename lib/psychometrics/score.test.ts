@@ -68,6 +68,63 @@ test('validateTest accepts a well-formed test', () => {
   assert.deepEqual(validateTest(def), []);
 });
 
+const screener: TestDefinition = {
+  ...def,
+  id: 'screener',
+  scale: { min: 0, max: 3, labels: { en: ['0', '1', '2', '3'], ar: ['0', '1', '2', '3'] } },
+  traits: [{ key: 'total', label: L('Total'), description: L('Total') }],
+  items: [
+    { id: 's1', text: L('s1'), trait: 'total', reverse: false, threshold: 2 },
+    { id: 's2', text: L('s2'), trait: 'total', reverse: false, threshold: 3 },
+    { id: 's3', text: L('s3'), trait: 'total', reverse: false, threshold: 2 },
+  ],
+  scoring: {
+    method: 'sum',
+    bands: [
+      { max: 4, label: L('Low') },
+      { max: 9, label: L('High'), description: L('Talk to someone'), concern: true },
+    ],
+  },
+};
+
+test('sum: totals the answers, with the range and the band’s meaning', () => {
+  const s = scoreTest(screener, { s1: 3, s2: 3, s3: 1 });
+  assert.equal(s.total.raw, 7);
+  assert.equal(s.total.max, 9);
+  assert.equal(s.total.band.en, 'High');
+  assert.equal(s.total.bandDescription?.en, 'Talk to someone');
+  assert.equal(s.total.concern, true);
+  assert.equal(scoreTest(screener, { s1: 1, s2: 1, s3: 1 }).total.concern, undefined);
+});
+
+test('sum: a multiplier scales the total and its range (WHO-5 percentages)', () => {
+  const pct = { ...screener, scoring: { ...screener.scoring, multiplier: 4, bands: [{ max: 36, label: L('All') }] } };
+  const s = scoreTest(pct, { s1: 3, s2: 3, s3: 3 });
+  assert.equal(s.total.raw, 36);
+  assert.equal(s.total.max, 36);
+  assert.equal(s.total.normalised0to1, 1);
+});
+
+test('count: counts items at or above their threshold (ASRS shaded boxes)', () => {
+  const counted = { ...screener, scoring: { method: 'count' as const, bands: [{ max: 1, label: L('Few') }, { max: 3, label: L('Many') }] } };
+  const s = scoreTest(counted, { s1: 2, s2: 2, s3: 3 });
+  assert.equal(s.total.raw, 2); // s1 ≥ 2, s2 < 3, s3 ≥ 2
+  assert.equal(s.total.max, 3);
+  assert.equal(s.total.band.en, 'Many');
+  assert.ok(validateTest({ ...counted, items: [{ ...counted.items[0], threshold: undefined }] }).length > 0);
+});
+
+test('validateTest checks bands against the summed range', () => {
+  assert.deepEqual(validateTest(screener), []);
+  assert.ok(validateTest({ ...screener, scoring: { method: 'sum', bands: [{ max: 3, label: L('x') }] } }).length > 0);
+});
+
+test('validateTest allows empty Arabic only while it’s pending', () => {
+  const noArabic = { ...screener, items: screener.items.map((i) => ({ ...i, text: { en: i.text.en, ar: '' } })) };
+  assert.ok(validateTest(noArabic).length > 0);
+  assert.deepEqual(validateTest({ ...noArabic, arabicPending: true }), []);
+});
+
 test('validateTest refuses risk-screening tests and broken definitions', () => {
   assert.ok(validateTest({ ...def, screensForRisk: true }).length > 0);
   assert.ok(validateTest({ ...def, items: [{ ...def.items[0], trait: 'nope' }] }).length > 0);

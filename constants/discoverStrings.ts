@@ -64,6 +64,11 @@ export const discoverStrings = {
       signInToSave: 'Sign in with an Alias to save results to your profile.',
       staysOnPhone: 'Results stay on this phone unless you save them.',
       notFound: "These results aren't available.",
+      score: 'Score {score} of {max}',
+      support: {
+        body: "You don't have to carry this alone. If things feel like too much right now, talk to someone today.",
+        talkNow: 'Talk to someone now',
+      },
     },
   },
   ar: {
@@ -125,6 +130,11 @@ export const discoverStrings = {
       signInToSave: 'سجّل الدخول باسم مستعار لحفظ النتائج في ملفك الشخصي.',
       staysOnPhone: 'تبقى النتائج على هذا الهاتف ما لم تحفظها.',
       notFound: 'هذه النتائج غير متاحة.',
+      score: 'النتيجة {score} من {max}',
+      support: {
+        body: 'لست مضطراً لحمل هذا وحدك. إن شعرت أن الأمور أكبر من طاقتك الآن، تحدّث مع أحد اليوم.',
+        talkNow: 'تحدّث مع أحد الآن',
+      },
     },
   },
 } as const;

@@ -1,0 +1,136 @@
+{
+  "id": "who5",
+  "version": 1,
+  "title": {
+    "en": "Wellbeing (WHO-5)",
+    "ar": "الرفاه النفسي (WHO-5)"
+  },
+  "description": {
+    "en": "Five statements about how you've been feeling over the last two weeks, from the World Health Organization. Higher is better.",
+    "ar": "خمس عبارات عن شعورك خلال الأسبوعين الماضيين، من منظمة الصحة العالمية. كلما ارتفعت النتيجة كان ذلك أفضل."
+  },
+  "source": {
+    "citation": "World Health Organization. The World Health Organization-Five Well-Being Index (WHO-5). Geneva: WHO; 2024. Arabic: the 1999 translation (Psychiatric Research Unit, Hillerød; © WHO Collaborating Center, Psykiatrisk Forskningsenhed, Psykiatrisk Sygehus, Hillerød), as republished by WHO. It was completed before WHO accepted copyright of the English version in 2024; WHO is not responsible for its content or accuracy, and where they differ the English version is binding. Spelling normalised (hamzas, tanween) and one agreement fixed («مليئا» → «مليئة»), wording unchanged.",
+    "licence": "CC BY-NC-SA 3.0 IGO: non-commercial use; commercial use needs WHO's permission (who.int/copyright).",
+    "url": "https://www.who.int/publications/m/item/WHO-UCN-MSD-MHE-2024.01"
+  },
+  "instructions": {
+    "en": "For each statement, choose what is closest to how you have been feeling over the last two weeks.",
+    "ar": "لكل من العبارات الخمس التالية، اختر ما هو أقرب من كيفما شعرت في الأسبوعين الماضيين. لاحظ بأن درجة أعلى هي لأفضل حالة."
+  },
+  "prompt": {
+    "en": "Over the last two weeks",
+    "ar": "في الأسبوعين الماضيين"
+  },
+  "scale": {
+    "min": 0,
+    "max": 5,
+    "labels": {
+      "en": [
+        "At no time",
+        "Some of the time",
+        "Less than half of the time",
+        "More than half of the time",
+        "Most of the time",
+        "All of the time"
+      ],
+      "ar": [
+        "بتاتاً",
+        "قليل من الوقت (نادراً)",
+        "أقل بقليل من نصف الوقت",
+        "أكثر بقليل من نصف الوقت",
+        "أكثر الأحيان",
+        "دائماً"
+      ]
+    }
+  },
+  "traits": [
+    {
+      "key": "total",
+      "label": {
+        "en": "Wellbeing",
+        "ar": "الرفاه النفسي"
+      },
+      "description": {
+        "en": "Your wellbeing over the last two weeks, from 0 to 100.",
+        "ar": "رفاهك النفسي خلال الأسبوعين الماضيين، من ٠ إلى ١٠٠."
+      }
+    }
+  ],
+  "items": [
+    {
+      "id": "q1",
+      "trait": "total",
+      "reverse": false,
+      "text": {
+        "en": "I have felt cheerful and in good spirits",
+        "ar": "كنت سعيداً وبمزاج جيد"
+      }
+    },
+    {
+      "id": "q2",
+      "trait": "total",
+      "reverse": false,
+      "text": {
+        "en": "I have felt calm and relaxed",
+        "ar": "كنت أشعر بالهدوء والاسترخاء"
+      }
+    },
+    {
+      "id": "q3",
+      "trait": "total",
+      "reverse": false,
+      "text": {
+        "en": "I have felt active and vigorous",
+        "ar": "كنت أشعر بالحيوية والنشاط"
+      }
+    },
+    {
+      "id": "q4",
+      "trait": "total",
+      "reverse": false,
+      "text": {
+        "en": "I woke up feeling fresh and rested",
+        "ar": "كنت أستيقظ نشطاً ومرتاحاً"
+      }
+    },
+    {
+      "id": "q5",
+      "trait": "total",
+      "reverse": false,
+      "text": {
+        "en": "My daily life has been filled with things that interest me",
+        "ar": "كانت أيامي مليئة بأشياء محببة لنفسي"
+      }
+    }
+  ],
+  "scoring": {
+    "method": "sum",
+    "multiplier": 4,
+    "bands": [
+      {
+        "max": 48,
+        "label": {
+          "en": "Lower wellbeing",
+          "ar": "رفاه أقل"
+        },
+        "description": {
+          "en": "Below 50 suggests it's worth checking in with a professional about how you've been.",
+          "ar": "النتيجة الأقل من ٥٠ تعني أنه من المفيد أن تتحدث مع مختص عن حالك مؤخراً."
+        },
+        "concern": true
+      },
+      {
+        "max": 100,
+        "label": {
+          "en": "Good wellbeing",
+          "ar": "رفاه جيد"
+        },
+        "description": {
+          "en": "You've been feeling fairly well lately. Keep doing what helps.",
+          "ar": "كنت تشعر بحال جيدة إلى حد ما مؤخراً. استمر فيما يساعدك."
+        }
+      }
+    ]
+  }
+}

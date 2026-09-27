@@ -46,8 +46,9 @@ export default function ProfileScreen() {
   useFocusEffect(
     useCallback(() => {
       let alive = true;
+      // The latest multi-trait reflection: a screener's score (mood, anxiety…) stays on its own results screen.
       listResults()
-        .then((rs) => alive && setLatest(rs.find((r) => getTest(r.testId)) ?? null))
+        .then((rs) => alive && setLatest(rs.find((r) => (getTest(r.testId)?.traits.length ?? 0) >= 3) ?? null))
         .catch(() => {});
       sessionDays()
         .then((days) => alive && setStreak(computeStreak(days).current))

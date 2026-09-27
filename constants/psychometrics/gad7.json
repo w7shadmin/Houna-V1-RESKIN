@@ -1,0 +1,168 @@
+{
+  "id": "gad7",
+  "version": 1,
+  "title": {
+    "en": "Anxiety (GAD-7)",
+    "ar": "القلق (GAD-7)"
+  },
+  "description": {
+    "en": "Seven questions about how often worry and anxiety have bothered you over the last two weeks. A widely used screening questionnaire.",
+    "ar": "سبعة أسئلة عن عدد المرات التي أزعجك فيها القلق خلال الأسبوعين الماضيين. استبيان فحص واسع الاستخدام."
+  },
+  "source": {
+    "citation": "Spitzer RL, Kroenke K, Williams JBW, Löwe B. A brief measure for assessing generalized anxiety disorder: the GAD-7. Arch Intern Med. 2006;166:1092–1097. GAD-7 © Pfizer Inc. (developed by Drs Robert L. Spitzer, Janet B.W. Williams, Kurt Kroenke and colleagues, with an educational grant from Pfizer Inc.). Arabic: the official GAD-7 “Arabic for Tunisia” translation (phqscreeners.com); one misspelling corrected («فضيعا» → «فظيعاً»).",
+    "licence": "No permission required to reproduce, translate, display or distribute (Pfizer Inc., phqscreeners.com).",
+    "url": "https://www.phqscreeners.com/"
+  },
+  "prompt": {
+    "en": "Over the last 2 weeks, how often have you been bothered by",
+    "ar": "خلال الأسبوعين الماضيين، كم مرّة أقلقتك المشاكل التّالية؟"
+  },
+  "scale": {
+    "min": 0,
+    "max": 3,
+    "labels": {
+      "en": [
+        "Not at all",
+        "Several days",
+        "More than half the days",
+        "Nearly every day"
+      ],
+      "ar": [
+        "أبداً",
+        "بعض الأيام",
+        "أكثر من نصف الأيام",
+        "كل يوم تقريباً"
+      ]
+    }
+  },
+  "traits": [
+    {
+      "key": "total",
+      "label": {
+        "en": "Anxiety",
+        "ar": "القلق"
+      },
+      "description": {
+        "en": "How much worry and anxiety have been part of the last two weeks.",
+        "ar": "مدى حضور القلق في الأسبوعين الماضيين."
+      }
+    }
+  ],
+  "items": [
+    {
+      "id": "q1",
+      "trait": "total",
+      "reverse": false,
+      "text": {
+        "en": "Feeling nervous, anxious, or on edge",
+        "ar": "الشعور بالغضب أو القلق أو الانفعال الشديد."
+      }
+    },
+    {
+      "id": "q2",
+      "trait": "total",
+      "reverse": false,
+      "text": {
+        "en": "Not being able to stop or control worrying",
+        "ar": "عدم القدرة على إنهاء القلق أو التحكّم فيه."
+      }
+    },
+    {
+      "id": "q3",
+      "trait": "total",
+      "reverse": false,
+      "text": {
+        "en": "Worrying too much about different things",
+        "ar": "القلق المفرط على أشياء مختلفة."
+      }
+    },
+    {
+      "id": "q4",
+      "trait": "total",
+      "reverse": false,
+      "text": {
+        "en": "Trouble relaxing",
+        "ar": "الصعوبة في الاسترخاء."
+      }
+    },
+    {
+      "id": "q5",
+      "trait": "total",
+      "reverse": false,
+      "text": {
+        "en": "Being so restless that it is hard to sit still",
+        "ar": "شدة الاضطراب لدرجة صعوبة البقاء في هدوء."
+      }
+    },
+    {
+      "id": "q6",
+      "trait": "total",
+      "reverse": false,
+      "text": {
+        "en": "Becoming easily annoyed or irritable",
+        "ar": "السرعة في الانزعاج أو الانفعال."
+      }
+    },
+    {
+      "id": "q7",
+      "trait": "total",
+      "reverse": false,
+      "text": {
+        "en": "Feeling afraid, as if something awful might happen",
+        "ar": "الشّعور بالخوف كما لو أن شيئاً فظيعاً قد يحدث."
+      }
+    }
+  ],
+  "scoring": {
+    "method": "sum",
+    "bands": [
+      {
+        "max": 4,
+        "label": {
+          "en": "Minimal",
+          "ar": "طفيف"
+        },
+        "description": {
+          "en": "Few signs of anxiety right now.",
+          "ar": "علامات قليلة للقلق حالياً."
+        }
+      },
+      {
+        "max": 9,
+        "label": {
+          "en": "Mild",
+          "ar": "خفيف"
+        },
+        "description": {
+          "en": "Some anxiety. Breathing exercises and rest can help; notice if it grows.",
+          "ar": "بعض القلق. تمارين التنفس والراحة قد تساعد؛ لاحظ إن ازداد."
+        }
+      },
+      {
+        "max": 14,
+        "label": {
+          "en": "Moderate",
+          "ar": "متوسط"
+        },
+        "description": {
+          "en": "Anxiety is taking up real room in your days. Talking with a professional could help.",
+          "ar": "القلق يأخذ مساحة حقيقية من أيامك. قد يساعدك الحديث مع مختص."
+        },
+        "concern": true
+      },
+      {
+        "max": 21,
+        "label": {
+          "en": "Severe",
+          "ar": "شديد"
+        },
+        "description": {
+          "en": "Anxiety is weighing on you a lot. Please reach out to a professional soon — you don't have to manage it alone.",
+          "ar": "القلق يثقل عليك كثيراً. يرجى التواصل مع مختص قريباً — لست مضطراً للتعامل معه وحدك."
+        },
+        "concern": true
+      }
+    ]
+  }
+}
