@@ -25,6 +25,8 @@ export type AuthErrorCode =
   | 'invalid_credentials'
   | 'username_taken'
   | 'invalid_username'
+  /** Renamed twice in the last 30 days already (enforced by a trigger on `profiles`). */
+  | 'username_change_limit'
   | 'cancelled'
   | 'unknown';
 
@@ -47,6 +49,8 @@ interface AuthContextValue {
   signInWithGoogle: () => Promise<AuthResult>;
   signOut: () => Promise<void>;
   claimUsername: (username: string) => Promise<AuthResult>;
+  /** Renames the signed-in Alias. Voices and the leaderboard read names from `profiles`, so they follow. */
+  changeUsername: (username: string) => Promise<AuthResult>;
   updateProfile: (fields: Partial<Pick<Profile, 'avatar_url' | 'country'>>) => Promise<AuthResult>;
   refreshProfile: () => Promise<void>;
 }
@@ -162,6 +166,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [session, refreshProfile],
   );
 
+  const changeUsername = useCallback(
+    async (username: string): Promise<AuthResult> => {
+      if (!session || !profile) return { error: 'unknown' };
+      if (!USERNAME_PATTERN.test(username)) return { error: 'invalid_username' };
+      if (username === profile.username) return { error: null };
+
+      // A change of case only (noor → Noor) is still this person's own name, which the check would call taken.
+      if (username.toLowerCase() !== profile.username.toLowerCase()) {
+        const { data: available } = await supabase.rpc('is_username_available', { candidate: username });
+        if (!available) return { error: 'username_taken' };
+      }
+
+      const { error } = await supabase.from('profiles').update({ username }).eq('id', session.user.id);
+      if (error) {
+        if (error.message?.includes('username_change_limit')) return { error: 'username_change_limit' };
+        return { error: error.code === '23505' ? 'username_taken' : error.code === '23514' ? 'invalid_username' : 'unknown' };
+      }
+
+      await refreshProfile();
+      return { error: null };
+    },
+    [session, profile, refreshProfile],
+  );
+
   const updateProfile = useCallback(
     async (fields: Partial<Pick<Profile, 'avatar_url' | 'country'>>): Promise<AuthResult> => {
       if (!session) return { error: 'unknown' };
@@ -185,10 +213,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signInWithGoogle,
       signOut,
       claimUsername,
+      changeUsername,
       updateProfile,
       refreshProfile,
     }),
-    [loading, session, profile, signUpWithEmail, signInWithEmail, signInWithGoogle, signOut, claimUsername, updateProfile, refreshProfile],
+    [loading, session, profile, signUpWithEmail, signInWithEmail, signInWithGoogle, signOut, claimUsername, changeUsername, updateProfile, refreshProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

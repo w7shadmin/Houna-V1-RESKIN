@@ -126,7 +126,7 @@ export default function AccountProfileScreen() {
       </View>
 
       <SettingsGroup label={s.details}>
-        <SettingsRow title={s.username} value={profile.username} />
+        <SettingsRow title={s.username} value={profile.username} onPress={() => router.push('/account/username')} />
         <SettingsRow title={s.country} value={countryName ?? s.notSet} valueMuted={!countryName} onPress={() => setCountryModalOpen(true)} />
       </SettingsGroup>
 
