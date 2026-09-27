@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>First run — the opening</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=DM+Mono:wght@400;500&amp;family=Figtree:wght@300;400;500;600&amp;family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&amp;family=Marcellus&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font:inherit;color:inherit}
+@keyframes twinkle { 0%,100% { opacity: 0.25 } 50% { opacity: 1 } }
+@keyframes drift { 0% { transform: translate(0,0) scale(1) } 50% { transform: translate(24px,-18px) scale(1.08) } 100% { transform: translate(0,0) scale(1) } }
+@keyframes drift2 { 0% { transform: translate(0,0) scale(1.05) } 50% { transform: translate(-30px,22px) scale(0.95) } 100% { transform: translate(0,0) scale(1.05) } }
+@keyframes spin { to { transform: rotate(360deg) } }
+@keyframes spinBack { to { transform: rotate(-360deg) } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: none } }
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes glowPulse { 0%,100% { opacity: 0.55 } 50% { opacity: 1 } }
+@keyframes bars { 0%,100% { transform: scaleY(0.35) } 50% { transform: scaleY(1) } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important } }
+
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; box-sizing: border-box; font-family: 'Figtree', system-ui, sans-serif; background: #0B1026">
+
+<video src="/_blob/c3e32da2825cc1d310cb7e3472c0cf70" poster="/_blob/02b240bc044405a9bf82dd10dd8e15d0" autoplay="" muted="" loop="" playsinline="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.7) saturate(0.9)"></video>
+<span style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,16,38,0.35) 0%, rgba(11,16,38,0.15) 35%, rgba(11,16,38,0.55) 65%, rgba(11,16,38,0.92) 100%)"></span>
+<div style="position: absolute; left: 0; right: 0; top: 190px; display: flex; flex-direction: column; align-items: center; gap: 18px; text-align: center">
+<span style="font-family: 'Figtree', system-ui, sans-serif; font-weight: 300; font-size: 46px; letter-spacing: 0.5em; margin-left: 0.5em; color: #FFFFFF; animation: fadeUp 1.4s ease 0.3s both">HOUNA</span>
+<span lang="ar" style="font-family: 'Amiri', serif; font-weight: 700; font-size: 30px; color: rgba(255,255,255,0.8); animation: fadeIn 1.4s ease 0.9s both">هُنا</span>
+<span style="max-width: 280px; font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.78); animation: fadeIn 1.4s ease 1.4s both">A quiet place to breathe, rest and come back to.</span>
+</div>
+<div style="position: absolute; left: 32px; right: 32px; top: 680px; display: flex; flex-direction: column; align-items: center; gap: 18px; animation: fadeUp 1.2s ease 2s both">
+<button type="button" style="width: 100%; height: 58px; border-radius: 999px; border: 0; background: #FFFFFF; color: #0B1026; font-size: 17px; font-weight: 600; cursor: pointer">Start</button>
+<button type="button" style="height: 44px; padding: 0 12px; border: 0; background: none; color: rgba(255,255,255,0.85); font-size: 16px; cursor: pointer">I already have an alias</button>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

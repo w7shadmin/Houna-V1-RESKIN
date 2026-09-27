@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Breathe — ridges of breath</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=DM+Mono:wght@400;500&amp;family=Figtree:wght@300;400;500;600&amp;family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&amp;family=Marcellus&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font:inherit;color:inherit}
+@keyframes twinkle { 0%,100% { opacity: 0.25 } 50% { opacity: 1 } }
+@keyframes drift { 0% { transform: translate(0,0) scale(1) } 50% { transform: translate(24px,-18px) scale(1.08) } 100% { transform: translate(0,0) scale(1) } }
+@keyframes drift2 { 0% { transform: translate(0,0) scale(1.05) } 50% { transform: translate(-30px,22px) scale(0.95) } 100% { transform: translate(0,0) scale(1.05) } }
+@keyframes spin { to { transform: rotate(360deg) } }
+@keyframes spinBack { to { transform: rotate(-360deg) } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: none } }
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes glowPulse { 0%,100% { opacity: 0.55 } 50% { opacity: 1 } }
+@keyframes bars { 0%,100% { transform: scaleY(0.35) } 50% { transform: scaleY(1) } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important } }
+@keyframes ridge { 0% { transform: scaleY(0.12); opacity: 0.95 } 5.26% { transform: scaleY(1); opacity: 1 } 14.47% { transform: scaleY(1); opacity: 1 } 25.00% { transform: scaleY(0.6); opacity: 0.7 } 70% { transform: scaleY(0.6); opacity: 0.22 } 99% { transform: scaleY(0.55); opacity: 0.05 } 100% { transform: scaleY(0.12); opacity: 0.95 } }
+@keyframes r0 { 0% { opacity: 0 } 1.2% { opacity: 1 } 19.85% { opacity: 1 } 21.05% { opacity: 0 } 100% { opacity: 0 } }
+@keyframes r1 { 0% { opacity: 0 } 21.05% { opacity: 0 } 22.25% { opacity: 1 } 56.69% { opacity: 1 } 57.89% { opacity: 0 } 100% { opacity: 0 } }
+@keyframes r2 { 0% { opacity: 0 } 57.89% { opacity: 0 } 59.09% { opacity: 1 } 98.80% { opacity: 1 } 100% { opacity: 0 } }
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; box-sizing: border-box; font-family: 'Figtree', system-ui, sans-serif; background: #0B1026">
+
+<button type="button" aria-label="End" style="position: absolute; left: 20px; top: 56px; width: 48px; height: 48px; border-radius: 999px; background: rgba(242,236,221,0.1); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(242,236,221,0.18); display: flex; align-items: center; justify-content: center; color: #F2ECDD; cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: block; flex-shrink: 0"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+<span style="position: absolute; left: 0; right: 0; top: 70px; text-align: center"><span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #B6BAD6; white-space: nowrap">Anxiety relief · 4-7-8</span></span>
+<svg width="390" height="600" viewBox="0 0 390 600" aria-hidden="true" style="position: absolute; left: 0; top: 60px">
+<line x1="24" y1="200" x2="24" y2="560" stroke="rgba(242,236,221,0.07)"></line><line x1="67" y1="200" x2="67" y2="560" stroke="rgba(242,236,221,0.07)"></line><line x1="110" y1="200" x2="110" y2="560" stroke="rgba(242,236,221,0.07)"></line><line x1="153" y1="200" x2="153" y2="560" stroke="rgba(242,236,221,0.07)"></line><line x1="196" y1="200" x2="196" y2="560" stroke="rgba(242,236,221,0.07)"></line><line x1="239" y1="200" x2="239" y2="560" stroke="rgba(242,236,221,0.07)"></line><line x1="282" y1="200" x2="282" y2="560" stroke="rgba(242,236,221,0.07)"></line><line x1="325" y1="200" x2="325" y2="560" stroke="rgba(242,236,221,0.07)"></line><line x1="368" y1="200" x2="368" y2="560" stroke="rgba(242,236,221,0.07)"></line>
+<defs><linearGradient id="rf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0B1026" stop-opacity="0"></stop><stop offset="1" stop-color="#0B1026" stop-opacity="1"></stop></linearGradient></defs>
+<path d="M-20 560 C-30 560 30 250 90 250 S240 560 350 560 Z" fill="#6FD6CF" fill-opacity="0.55" stroke="#6FD6CF" stroke-width="1.2" style="transform-origin: 0 560px; mix-blend-mode: screen; animation: ridge 76s linear -57s infinite"></path><path d="M-20 560 C40 560 100 250 160 250 S310 560 420 560 Z" fill="#B3A7F5" fill-opacity="0.55" stroke="#B3A7F5" stroke-width="1.2" style="transform-origin: 0 560px; mix-blend-mode: screen; animation: ridge 76s linear -38s infinite"></path><path d="M-20 560 C110 560 170 250 230 250 S380 560 490 560 Z" fill="#F2B880" fill-opacity="0.55" stroke="#F2B880" stroke-width="1.2" style="transform-origin: 0 560px; mix-blend-mode: screen; animation: ridge 76s linear -19s infinite"></path><path d="M-20 560 C180 560 240 250 300 250 S450 560 560 560 Z" fill="#EA90A8" fill-opacity="0.55" stroke="#EA90A8" stroke-width="1.2" style="transform-origin: 0 560px; mix-blend-mode: screen; animation: ridge 76s linear 0s infinite"></path>
+<rect x="0" y="480" width="390" height="90" fill="url(#rf)"></rect>
+</svg>
+<div style="position: absolute; left: 24px; top: 150px; display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'DM Mono', monospace; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #EA90A8; white-space: nowrap">This breath</span><span style="font-family: 'DM Mono', monospace; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #F2B880; white-space: nowrap">One ago</span><span style="font-family: 'DM Mono', monospace; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #B3A7F5; white-space: nowrap">Two ago</span><span style="font-family: 'DM Mono', monospace; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #6FD6CF; white-space: nowrap">Three ago</span></div>
+<div style="position: absolute; left: 75px; top: 650px"><span style="position: relative; display: block; width: 240px; height: 32px; font-family: 'Marcellus', serif; font-size: 26px; color: #F2ECDD"><span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; animation: r0 19s linear infinite">Breathe in</span><span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; animation: r1 19s linear infinite">Hold</span><span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; animation: r2 19s linear infinite">Breathe out</span></span></div>
+<span style="position: absolute; left: 0; right: 0; top: 700px; text-align: center; font-size: 15px; color: #B6BAD6">Each breath leaves a ridge. The newest is the brightest.</span>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

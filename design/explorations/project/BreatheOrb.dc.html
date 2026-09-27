@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Breathe — glass orb, the word inside</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=DM+Mono:wght@400;500&amp;family=Figtree:wght@300;400;500;600&amp;family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&amp;family=Marcellus&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font:inherit;color:inherit}
+@keyframes twinkle { 0%,100% { opacity: 0.25 } 50% { opacity: 1 } }
+@keyframes drift { 0% { transform: translate(0,0) scale(1) } 50% { transform: translate(24px,-18px) scale(1.08) } 100% { transform: translate(0,0) scale(1) } }
+@keyframes drift2 { 0% { transform: translate(0,0) scale(1.05) } 50% { transform: translate(-30px,22px) scale(0.95) } 100% { transform: translate(0,0) scale(1.05) } }
+@keyframes spin { to { transform: rotate(360deg) } }
+@keyframes spinBack { to { transform: rotate(-360deg) } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: none } }
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes glowPulse { 0%,100% { opacity: 0.55 } 50% { opacity: 1 } }
+@keyframes bars { 0%,100% { transform: scaleY(0.35) } 50% { transform: scaleY(1) } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important } }
+@keyframes orb { 0% { transform: scale(0.6); animation-timing-function: ease-in-out } 21.053% { transform: scale(1); animation-timing-function: ease-in-out } 57.895% { transform: scale(1); animation-timing-function: ease-in-out } 100.000% { transform: scale(0.6); animation-timing-function: ease-in-out } }
+@keyframes halo { 0% { transform: scale(0.7); opacity: 0.35; animation-timing-function: ease-in-out } 21.053% { transform: scale(1.25); opacity: 0.9; animation-timing-function: ease-in-out } 57.895% { transform: scale(1.25); opacity: 0.9; animation-timing-function: ease-in-out } 100.000% { transform: scale(0.7); opacity: 0.35; animation-timing-function: ease-in-out } }
+@keyframes rise { from { transform: translateY(0); opacity: 0 } 15% { opacity: 0.8 } to { transform: translateY(-360px); opacity: 0 } }
+@keyframes w0 { 0% { opacity: 0 } 1.2% { opacity: 1 } 19.85% { opacity: 1 } 21.05% { opacity: 0 } 100% { opacity: 0 } }
+@keyframes w1 { 0% { opacity: 0 } 21.05% { opacity: 0 } 22.25% { opacity: 1 } 56.69% { opacity: 1 } 57.89% { opacity: 0 } 100% { opacity: 0 } }
+@keyframes w2 { 0% { opacity: 0 } 57.89% { opacity: 0 } 59.09% { opacity: 1 } 98.80% { opacity: 1 } 100% { opacity: 0 } }
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; box-sizing: border-box; font-family: 'Figtree', system-ui, sans-serif; background: #0B1026">
+
+<span style="position: absolute; inset: 0; background: radial-gradient(90% 60% at 50% 45%, rgba(111,214,207,0.20) 0%, rgba(11,16,38,0) 70%), linear-gradient(180deg, #0E1834 0%, #0B1026 100%)"></span>
+<span style="position: absolute; left: 17px; top: 560px; width: 1.5px; height: 1.5px; border-radius: 999px; background: rgba(242,236,221,0.7); animation: rise 12s linear 0s infinite"></span><span style="position: absolute; left: 70px; top: 657px; width: 2.5px; height: 2.5px; border-radius: 999px; background: rgba(242,236,221,0.7); animation: rise 15s linear -1.7s infinite"></span><span style="position: absolute; left: 123px; top: 754px; width: 3.5px; height: 3.5px; border-radius: 999px; background: rgba(242,236,221,0.7); animation: rise 18s linear -3.4s infinite"></span><span style="position: absolute; left: 176px; top: 631px; width: 1.5px; height: 1.5px; border-radius: 999px; background: rgba(242,236,221,0.7); animation: rise 21s linear -5.1s infinite"></span><span style="position: absolute; left: 229px; top: 728px; width: 2.5px; height: 2.5px; border-radius: 999px; background: rgba(242,236,221,0.7); animation: rise 24s linear -6.8s infinite"></span><span style="position: absolute; left: 282px; top: 605px; width: 3.5px; height: 3.5px; border-radius: 999px; background: rgba(242,236,221,0.7); animation: rise 12s linear -8.5s infinite"></span><span style="position: absolute; left: 335px; top: 702px; width: 1.5px; height: 1.5px; border-radius: 999px; background: rgba(242,236,221,0.7); animation: rise 15s linear -10.2s infinite"></span><span style="position: absolute; left: 388px; top: 579px; width: 2.5px; height: 2.5px; border-radius: 999px; background: rgba(242,236,221,0.7); animation: rise 18s linear -11.9s infinite"></span><span style="position: absolute; left: 51px; top: 676px; width: 3.5px; height: 3.5px; border-radius: 999px; background: rgba(242,236,221,0.7); animation: rise 21s linear -13.6s infinite"></span><span style="position: absolute; left: 104px; top: 773px; width: 1.5px; height: 1.5px; border-radius: 999px; background: rgba(242,236,221,0.7); animation: rise 24s linear -15.299999999999999s infinite"></span><span style="position: absolute; left: 157px; top: 650px; width: 2.5px; height: 2.5px; border-radius: 999px; background: rgba(242,236,221,0.7); animation: rise 12s linear -17s infinite"></span><span style="position: absolute; left: 210px; top: 747px; width: 3.5px; height: 3.5px; border-radius: 999px; background: rgba(242,236,221,0.7); animation: rise 15s linear -18.7s infinite"></span><span style="position: absolute; left: 263px; top: 624px; width: 1.5px; height: 1.5px; border-radius: 999px; background: rgba(242,236,221,0.7); animation: rise 18s linear -20.4s infinite"></span><span style="position: absolute; left: 316px; top: 721px; width: 2.5px; height: 2.5px; border-radius: 999px; background: rgba(242,236,221,0.7); animation: rise 21s linear -22.099999999999998s infinite"></span><span style="position: absolute; left: 369px; top: 598px; width: 3.5px; height: 3.5px; border-radius: 999px; background: rgba(242,236,221,0.7); animation: rise 24s linear -23.8s infinite"></span><span style="position: absolute; left: 32px; top: 695px; width: 1.5px; height: 1.5px; border-radius: 999px; background: rgba(242,236,221,0.7); animation: rise 12s linear -25.5s infinite"></span>
+<button type="button" aria-label="End" style="position: absolute; left: 20px; top: 56px; width: 48px; height: 48px; border-radius: 999px; background: rgba(242,236,221,0.1); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(242,236,221,0.18); display: flex; align-items: center; justify-content: center; color: #F2ECDD; cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: block; flex-shrink: 0"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+<span style="position: absolute; left: 0; right: 0; top: 70px; text-align: center"><span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #B6BAD6; white-space: nowrap">Anxiety relief · 4-7-8</span></span>
+<span aria-hidden="true" style="position: absolute; left: 5px; top: 210px; width: 380px; height: 380px; border-radius: 999px; background: radial-gradient(closest-side, rgba(111,214,207,0.35), rgba(111,214,207,0)); animation: halo 19s linear infinite"></span>
+<div aria-hidden="true" style="position: absolute; left: 70px; top: 275px; width: 250px; height: 250px; border-radius: 999px; background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.32) 0%, rgba(185,236,232,0.16) 38%, rgba(111,214,207,0.12) 70%, rgba(111,214,207,0.22) 100%); box-shadow: inset 0 0 40px rgba(217,250,246,0.25), 0 0 40px rgba(111,214,207,0.25); border: 1px solid rgba(217,250,246,0.35); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); animation: orb 19s linear infinite"></div>
+<div style="position: absolute; left: 95px; top: 380px"><span style="position: relative; display: block; width: 200px; height: 40px; font-weight: 300; font-size: 30px; color: #FFFFFF"><span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; animation: w0 19s linear infinite">Inhale</span><span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; animation: w1 19s linear infinite">Hold</span><span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; animation: w2 19s linear infinite">Exhale</span></span></div>
+<div style="position: absolute; left: 0; right: 0; top: 680px; display: flex; flex-direction: column; align-items: center; gap: 8px">
+<span style="font-size: 16px; color: #B6BAD6">Round 2 of 4</span>
+<span style="display: flex; gap: 6px"><span style="width: 22px; height: 3px; border-radius: 2px; background: #6FD6CF"></span><span style="width: 22px; height: 3px; border-radius: 2px; background: #6FD6CF"></span><span style="width: 22px; height: 3px; border-radius: 2px; background: rgba(242,236,221,0.18)"></span><span style="width: 22px; height: 3px; border-radius: 2px; background: rgba(242,236,221,0.18)"></span></span>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

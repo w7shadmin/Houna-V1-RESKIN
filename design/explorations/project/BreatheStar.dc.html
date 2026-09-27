@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Breathe — the eight-point star</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=DM+Mono:wght@400;500&amp;family=Figtree:wght@300;400;500;600&amp;family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&amp;family=Marcellus&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font:inherit;color:inherit}
+@keyframes twinkle { 0%,100% { opacity: 0.25 } 50% { opacity: 1 } }
+@keyframes drift { 0% { transform: translate(0,0) scale(1) } 50% { transform: translate(24px,-18px) scale(1.08) } 100% { transform: translate(0,0) scale(1) } }
+@keyframes drift2 { 0% { transform: translate(0,0) scale(1.05) } 50% { transform: translate(-30px,22px) scale(0.95) } 100% { transform: translate(0,0) scale(1.05) } }
+@keyframes spin { to { transform: rotate(360deg) } }
+@keyframes spinBack { to { transform: rotate(-360deg) } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: none } }
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes glowPulse { 0%,100% { opacity: 0.55 } 50% { opacity: 1 } }
+@keyframes bars { 0%,100% { transform: scaleY(0.35) } 50% { transform: scaleY(1) } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important } }
+@keyframes turn { 0% { transform: rotate(0deg) } 12.50% { transform: rotate(0deg) } 25.00% { transform: rotate(22.5deg) } 37.50% { transform: rotate(22.5deg) } 50.00% { transform: rotate(45deg) } 62.50% { transform: rotate(45deg) } 75.00% { transform: rotate(67.5deg) } 87.50% { transform: rotate(67.5deg) } 100% { transform: rotate(90deg) } }
+@keyframes starLit { 0%, 43.75% { opacity: 0 } 50.00% { opacity: 0.9 } 62.50% { opacity: 0.9 } 68.75%, 100% { opacity: 0 } }
+@keyframes trace { from { offset-distance: 0% } to { offset-distance: 100% } }
+@keyframes s0 { 0% { opacity: 0 } 1.2% { opacity: 1 } 23.80% { opacity: 1 } 25.00% { opacity: 0 } 100% { opacity: 0 } }
+@keyframes s1 { 0% { opacity: 0 } 25.00% { opacity: 0 } 26.20% { opacity: 1 } 48.80% { opacity: 1 } 50.00% { opacity: 0 } 100% { opacity: 0 } }
+@keyframes s2 { 0% { opacity: 0 } 50.00% { opacity: 0 } 51.20% { opacity: 1 } 73.80% { opacity: 1 } 75.00% { opacity: 0 } 100% { opacity: 0 } }
+@keyframes s3 { 0% { opacity: 0 } 75.00% { opacity: 0 } 76.20% { opacity: 1 } 98.80% { opacity: 1 } 100% { opacity: 0 } }
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; box-sizing: border-box; font-family: 'Figtree', system-ui, sans-serif; background: #0B1026">
+
+<span style="position: absolute; inset: 0; background: radial-gradient(70% 45% at 50% 46%, rgba(179,167,245,0.16), rgba(11,16,38,0) 70%)"></span>
+<button type="button" aria-label="End" style="position: absolute; left: 20px; top: 56px; width: 48px; height: 48px; border-radius: 999px; background: rgba(242,236,221,0.1); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(242,236,221,0.18); display: flex; align-items: center; justify-content: center; color: #F2ECDD; cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: block; flex-shrink: 0"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+<span style="position: absolute; left: 0; right: 0; top: 70px; text-align: center"><span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #B6BAD6; white-space: nowrap">Steady mind · star</span></span>
+<svg width="390" height="780" viewBox="0 0 390 780" aria-hidden="true" style="position: absolute; left: 0; top: 0; overflow: visible">
+<polygon points="195.00,258.00 233.66,296.66 288.34,296.66 288.34,351.34 327.00,390.00 288.34,428.66 288.34,483.34 233.66,483.34 195.00,522.00 156.34,483.34 101.66,483.34 101.66,428.66 63.00,390.00 101.66,351.34 101.66,296.66 156.34,296.66" fill="rgba(179,167,245,0.22)" stroke="#B3A7F5" stroke-width="1.5" style="animation: starLit 32s linear infinite"></polygon>
+<polygon points="288.34,296.66 288.34,483.34 101.66,483.34 101.66,296.66" fill="none" stroke="rgba(242,236,221,0.5)" stroke-width="1.2"></polygon>
+<g style="transform-origin: 195px 390px; animation: turn 32s ease-in-out infinite"><polygon points="288.34,296.66 288.34,483.34 101.66,483.34 101.66,296.66" fill="none" stroke="#B3A7F5" stroke-width="1.2" opacity="0.8"></polygon></g>
+</svg>
+<span aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 14px; height: 14px; offset-anchor: center; border-radius: 999px; background: #FFFFFF; box-shadow: 0 0 18px 5px rgba(179,167,245,0.8); offset-path: path('M101.66190488337573 296.6619048833757 H288.3380951166243 V483.3380951166243 H101.66190488337573 Z'); offset-rotate: 0deg; animation: trace 16s linear infinite"></span>
+<svg aria-hidden="true" width="40" height="40" viewBox="17 5.4 20.6 20.6" style="position: absolute; left: 195px; top: 390px; opacity: 0.8; margin-left: -20px; margin-top: -20px; overflow: visible; "><g transform="translate(-10.7 -6.6)"><g transform="translate(29.24 13.384)"><path d="M50.18,33.714a6.82,6.82,0,0,1-2.116-1.448,7.132,7.132,0,0,1-1.448-2.116,6.565,6.565,0,0,1-.5-2.561,7.052,7.052,0,0,1,.5-2.617,6.228,6.228,0,0,1,1.448-2.116A7.132,7.132,0,0,1,50.18,21.41a6.565,6.565,0,0,1,2.561-.5,7.052,7.052,0,0,1,2.617.5,6.228,6.228,0,0,1,2.116,1.448,7.132,7.132,0,0,1,1.448,2.116,6.843,6.843,0,0,1,.5,2.617,6.565,6.565,0,0,1-.5,2.561,6.82,6.82,0,0,1-1.448,2.116,7.132,7.132,0,0,1-2.116,1.448,6.843,6.843,0,0,1-2.617.5,6.769,6.769,0,0,1-2.561-.5m-.835-14.253a8.809,8.809,0,0,0-2.784,1.893,8.2,8.2,0,0,0-1.893,2.839A8.871,8.871,0,0,0,44,27.646a9.074,9.074,0,0,0,.668,3.452,8.224,8.224,0,0,0,1.893,2.784,8.525,8.525,0,0,0,2.784,1.893,9.251,9.251,0,0,0,6.9,0,9.744,9.744,0,0,0,2.839-1.893A8.525,8.525,0,0,0,60.981,31.1a9.251,9.251,0,0,0,0-6.9,9.744,9.744,0,0,0-1.893-2.839,8.2,8.2,0,0,0-2.839-1.893,8.871,8.871,0,0,0-3.452-.668,7.232,7.232,0,0,0-3.452.668" transform="translate(-44 -18.785)" fill="#B3A7F5"></path></g><g transform="translate(31.801 13.392)"><path d="M48.6,24.924c0,3.4,6.124,5.679,6.124,8.685,0-3.006,6.124-5.289,6.124-8.685a6.124,6.124,0,0,0-12.248,0M57.452,24.367A2.672,2.672,0,1,1,54.779,21.695a2.71,2.71,0,0,1,2.672,2.672Z" transform="translate(-48.6 -18.8)" fill="#B3A7F5" fill-rule="evenodd"></path></g></g></svg>
+<div style="position: absolute; left: 75px; top: 610px"><span style="position: relative; display: block; width: 240px; height: 32px; font-family: 'Marcellus', serif; font-size: 26px; color: #F2ECDD"><span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; animation: s0 16s linear infinite">Breathe in</span><span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; animation: s1 16s linear infinite">Hold</span><span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; animation: s2 16s linear infinite">Breathe out</span><span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; animation: s3 16s linear infinite">Hold</span></span></div>
+<span style="position: absolute; left: 40px; right: 40px; top: 660px; text-align: center; font-size: 15px; line-height: 1.5; color: #B6BAD6">Along the square as you breathe. At each hold the second square turns in, and every other round they meet as the star.</span>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

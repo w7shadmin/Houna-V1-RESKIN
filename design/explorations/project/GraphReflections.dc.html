@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Graphs — reflections over time (Dusk)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=DM+Mono:wght@400;500&amp;family=Figtree:wght@300;400;500;600&amp;family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&amp;family=Marcellus&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font:inherit;color:inherit}
+@keyframes twinkle { 0%,100% { opacity: 0.25 } 50% { opacity: 1 } }
+@keyframes drift { 0% { transform: translate(0,0) scale(1) } 50% { transform: translate(24px,-18px) scale(1.08) } 100% { transform: translate(0,0) scale(1) } }
+@keyframes drift2 { 0% { transform: translate(0,0) scale(1.05) } 50% { transform: translate(-30px,22px) scale(0.95) } 100% { transform: translate(0,0) scale(1.05) } }
+@keyframes spin { to { transform: rotate(360deg) } }
+@keyframes spinBack { to { transform: rotate(-360deg) } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: none } }
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes glowPulse { 0%,100% { opacity: 0.55 } 50% { opacity: 1 } }
+@keyframes bars { 0%,100% { transform: scaleY(0.35) } 50% { transform: scaleY(1) } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important } }
+@keyframes lineA { from { stroke-dashoffset: 600 } to { stroke-dashoffset: 0 } } @keyframes dotA { from { opacity: 0; transform: scale(0.4) } to { opacity: 1; transform: none } }
+@keyframes lineB { from { stroke-dashoffset: 600 } to { stroke-dashoffset: 0 } } @keyframes dotB { from { opacity: 0; transform: scale(0.4) } to { opacity: 1; transform: none } }
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; box-sizing: border-box; font-family: 'Figtree', system-ui, sans-serif; background: #F5F1E8">
+
+<button type="button" onClick="{{replay}}" aria-label="Replay" style="position: absolute; right: 20px; top: 56px; width: 48px; height: 48px; border-radius: 999px; background: rgba(27,33,64,0.08); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(27,33,64,0.16); display: flex; align-items: center; justify-content: center; color: #1B2140; cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: block; flex-shrink: 0"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"></path><path d="M4.5 4.5v3.5H8"></path></svg></button>
+<div style="position: absolute; left: 24px; top: 60px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #237873; white-space: nowrap">My results · WHO-5</span>
+<span style="font-family: 'Marcellus', serif; font-size: 28px; line-height: 1.2; color: #1B2140">Your wellbeing,<br>as you've reflected it</span>
+</div>
+<svg width="390" height="620" viewBox="0 0 390 620" aria-hidden="true" style="position: absolute; left: 0; top: 0">
+<rect x="24" y="250" width="342" height="161.20000000000005" rx="14" fill="#6FD6CF" opacity="0.14"></rect>
+<rect x="24" y="411.20000000000005" width="342" height="148.79999999999995" rx="14" fill="#F2B880" opacity="0.16"></rect>
+<path d="M40.0 423.6 C50.3 419.5 81.3 400.9 102.0 398.8 C122.7 396.7 143.3 415.3 164.0 411.2 C184.7 407.1 205.3 378.1 226.0 374.0 C246.7 369.9 267.3 390.5 288.0 386.4 C308.7 382.3 339.7 355.4 350.0 349.2" fill="none" stroke="#1B2140" stroke-width="2" stroke-linecap="round" stroke-dasharray="600" style="animation: line{{x}} 1.8s ease both"></path>
+<circle cx="40.0" cy="423.6" r="5" fill="#F5F1E8" stroke="#1B2140" stroke-width="2" style="transform-origin: 40.0px 423.6px; animation: dot{{x}} 400ms ease 0.3s both"></circle><circle cx="102.0" cy="398.8" r="5" fill="#F5F1E8" stroke="#1B2140" stroke-width="2" style="transform-origin: 102.0px 398.8px; animation: dot{{x}} 400ms ease 0.55s both"></circle><circle cx="164.0" cy="411.2" r="5" fill="#F5F1E8" stroke="#1B2140" stroke-width="2" style="transform-origin: 164.0px 411.2px; animation: dot{{x}} 400ms ease 0.8s both"></circle><circle cx="226.0" cy="374.0" r="5" fill="#F5F1E8" stroke="#1B2140" stroke-width="2" style="transform-origin: 226.0px 374.0px; animation: dot{{x}} 400ms ease 1.05s both"></circle><circle cx="288.0" cy="386.4" r="5" fill="#F5F1E8" stroke="#1B2140" stroke-width="2" style="transform-origin: 288.0px 386.4px; animation: dot{{x}} 400ms ease 1.3s both"></circle><circle cx="350.0" cy="349.2" r="7" fill="#237873" stroke="#1B2140" stroke-width="2" style="transform-origin: 350.0px 349.2px; animation: dot{{x}} 400ms ease 1.55s both"></circle>
+</svg>
+<span style="position: absolute; left: 200px; top: 260px; width: 160px; text-align: right; font-size: 13px; color: #237873">Good wellbeing</span>
+<span style="position: absolute; left: 200px; top: 532px; width: 160px; text-align: right; font-size: 13px; color: #A8621F">Lower wellbeing</span>
+<span style="position: absolute; left: 300px; top: 305.2px; width: 60px; text-align: right; font-weight: 300; font-size: 26px; color: #1B2140">68%</span>
+<div style="position: absolute; left: 0; top: 574px; width: 390px"><span style="position: absolute; left: 14px; width: 52px; text-align: center; font-size: 12px; color: #646A8E; font-variant-numeric: tabular-nums">12 Jun</span><span style="position: absolute; left: 76px; width: 52px; text-align: center; font-size: 12px; color: #646A8E; font-variant-numeric: tabular-nums">3 Jul</span><span style="position: absolute; left: 138px; width: 52px; text-align: center; font-size: 12px; color: #646A8E; font-variant-numeric: tabular-nums">24 Jul</span><span style="position: absolute; left: 200px; width: 52px; text-align: center; font-size: 12px; color: #646A8E; font-variant-numeric: tabular-nums">14 Aug</span><span style="position: absolute; left: 262px; width: 52px; text-align: center; font-size: 12px; color: #646A8E; font-variant-numeric: tabular-nums">4 Sep</span><span style="position: absolute; left: 324px; width: 52px; text-align: center; font-size: 12px; color: #646A8E; font-variant-numeric: tabular-nums">25 Sep</span></div>
+<div style="position: absolute; left: 16px; right: 16px; top: 624px; padding: 16px; border-radius: 20px; background: #FFFFFF; border: 1px solid rgba(27,33,64,0.10); display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 15px; line-height: 1.5; color: #4A5078">Each point is a time you chose to reflect. A reflection, not a diagnosis; only you can see it.</span>
+</div>
+<button type="button" style="position: absolute; left: 24px; right: 24px; top: 740px; height: 56px; border-radius: 999px; border: 0; background: #237873; color: #FFFFFF; font-size: 17px; font-weight: 600; cursor: pointer">Reflect again</button>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { n: 0 };
+  }
+  renderVals() {
+    return { x: this.state.n % 2 ? 'B' : 'A', replay: () => this.setState({ n: this.state.n + 1 }) };
+  }
+}
+</script>
+</body>
+</html>

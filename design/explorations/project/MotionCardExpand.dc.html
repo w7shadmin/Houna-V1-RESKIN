@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Motion — a card grows into its page</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=DM+Mono:wght@400;500&amp;family=Figtree:wght@300;400;500;600&amp;family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&amp;family=Marcellus&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font:inherit;color:inherit}
+@keyframes twinkle { 0%,100% { opacity: 0.25 } 50% { opacity: 1 } }
+@keyframes drift { 0% { transform: translate(0,0) scale(1) } 50% { transform: translate(24px,-18px) scale(1.08) } 100% { transform: translate(0,0) scale(1) } }
+@keyframes drift2 { 0% { transform: translate(0,0) scale(1.05) } 50% { transform: translate(-30px,22px) scale(0.95) } 100% { transform: translate(0,0) scale(1.05) } }
+@keyframes spin { to { transform: rotate(360deg) } }
+@keyframes spinBack { to { transform: rotate(-360deg) } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: none } }
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes glowPulse { 0%,100% { opacity: 0.55 } 50% { opacity: 1 } }
+@keyframes bars { 0%,100% { transform: scaleY(0.35) } 50% { transform: scaleY(1) } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important } }
+
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; box-sizing: border-box; font-family: 'Figtree', system-ui, sans-serif; background: #0B1026">
+
+<div style="position: absolute; left: 24px; top: 60px; display: flex; flex-direction: column; gap: 6px; opacity: {{dim}}; transition: opacity 400ms ease"><span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #6FD6CF; white-space: nowrap">Events</span><span style="font-family: 'Marcellus', serif; font-size: 30px; color: #F2ECDD">This month</span></div>
+<div style="position: absolute; left: 16px; right: 16px; top: 150px; height: 170px; border-radius: 24px; overflow: hidden; opacity: {{dim}}; transition: opacity 400ms ease"><img src="/_blob/02b240bc044405a9bf82dd10dd8e15d0" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover"><span style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,16,38,0) 30%, rgba(11,16,38,0.85) 100%)"></span><div style="position: absolute; left: 18px; bottom: 16px; display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'DM Mono', monospace; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #B6BAD6; white-space: nowrap">Workshop · 3 Oct</span><span style="font-size: 19px; font-weight: 600; color: #FFFFFF">Breathing for sleep</span></div></div><div style="position: absolute; left: 16px; right: 16px; top: 336px; height: 170px; border-radius: 24px; overflow: hidden; opacity: {{dim}}; transition: opacity 400ms ease"><img src="/_blob/3b201c66317c934288051a9e0025d0da" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover"><span style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,16,38,0) 30%, rgba(11,16,38,0.85) 100%)"></span><div style="position: absolute; left: 18px; bottom: 16px; display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'DM Mono', monospace; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #B6BAD6; white-space: nowrap">Talk · 10 Oct</span><span style="font-size: 19px; font-weight: 600; color: #FFFFFF">Anxiety at work</span></div></div><div style="position: absolute; left: 16px; right: 16px; top: 522px; height: 170px; border-radius: 24px; overflow: hidden; opacity: {{dim}}; transition: opacity 400ms ease"><img src="/_blob/a49f303a5388a010c5898e16e992529f" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover"><span style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,16,38,0) 30%, rgba(11,16,38,0.85) 100%)"></span><div style="position: absolute; left: 18px; bottom: 16px; display: flex; flex-direction: column; gap: 4px"><span style="font-family: 'DM Mono', monospace; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #B6BAD6; white-space: nowrap">Circle · 17 Oct</span><span style="font-size: 19px; font-weight: 600; color: #FFFFFF">Grief, gently</span></div></div>
+<button type="button" onClick="{{toggle}}" aria-label="Open Breathing for sleep" style="position: absolute; left: 16px; right: 16px; top: 150px; height: 170px; border: 0; background: none; border-radius: 24px; cursor: pointer"></button>
+<div style="position: absolute; inset: 0; background: #0B1026; clip-path: {{clip}}; transition: clip-path 800ms cubic-bezier(.2,.9,.25,1); pointer-events: {{pe}}">
+<div style="position: absolute; left: 0; right: 0; top: {{imgTop}}px; height: {{imgH}}px; transition: top 800ms cubic-bezier(.2,.9,.25,1), height 800ms cubic-bezier(.2,.9,.25,1)"><img src="/_blob/02b240bc044405a9bf82dd10dd8e15d0" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover"><span style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,16,38,0) 40%, #0B1026 100%)"></span></div>
+<div style="position: absolute; left: 34px; top: 260px; display: flex; flex-direction: column; gap: 4px; opacity: {{cap}}; transition: opacity 250ms ease"><span style="font-family: 'DM Mono', monospace; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: #B6BAD6; white-space: nowrap">Workshop · 3 Oct</span><span style="font-size: 19px; font-weight: 600; color: #FFFFFF">Breathing for sleep</span></div>
+<div style="position: absolute; left: 24px; right: 24px; top: 380px; display: flex; flex-direction: column; gap: 12px; opacity: {{ui}}; transform: translateY({{uy}}px); transition: opacity 500ms ease {{ud}}, transform 600ms cubic-bezier(.2,.9,.25,1) {{ud}}">
+<span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #6FD6CF; white-space: nowrap">Workshop · 3 Oct</span>
+<span style="font-family: 'Marcellus', serif; font-size: 34px; color: #F2ECDD">Breathing for sleep</span>
+<span style="font-size: 15.5px; line-height: 1.55; color: #B6BAD6">Online · 40 min. [EVENT DESCRIPTION FROM HOUNA.ORG]</span>
+<button type="button" style="margin-top: 12px; height: 56px; border-radius: 999px; border: 0; background: #F2ECDD; color: #0B1026; font-size: 17px; font-weight: 600; cursor: pointer">Save my place</button>
+</div>
+<button type="button" onClick="{{toggle}}" aria-label="Back" style="position: absolute; left: 20px; top: 56px; width: 48px; height: 48px; border-radius: 999px; background: rgba(242,236,221,0.16); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(242,236,221,0.24); display: flex; align-items: center; justify-content: center; color: #F2ECDD; cursor: pointer; opacity: {{ui}}; transition: opacity 400ms ease {{ud}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: block; flex-shrink: 0"><path d="M15 5l-7 7 7 7"></path></svg></button>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { open: false };
+  }
+  renderVals() {
+    const o = this.state.open;
+    return {
+      clip: o ? 'inset(0px 0px 0px 0px round 0px)' : 'inset(150px 16px 524px 16px round 24px)',
+      pe: o ? 'auto' : 'none', dim: o ? 0.2 : 1, cap: o ? 0 : 1,
+      imgTop: o ? 0 : 150, imgH: o ? 380 : 170,
+      ui: o ? 1 : 0, uy: o ? 0 : 16, ud: o ? '420ms' : '0ms',
+      toggle: () => this.setState({ open: !o }),
+    };
+  }
+}
+</script>
+</body>
+</html>
