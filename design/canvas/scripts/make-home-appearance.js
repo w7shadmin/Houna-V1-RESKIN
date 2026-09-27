@@ -1,7 +1,7 @@
 // "Home — appearance": changing the theme from Home. Tapping the "houna هنا" logo cycles Sunrise →
 // Dusk → Night (the order of the day), a strip of three icons above it turning like a dial. Two Home
 // styles, both in the app while the client decides (More → Appearance → Home): "Sun & moon", where
-// Home's centre is the theme's own sun or moon alone, and a change sets it off the right edge, the
+// Home's centre is the theme's own sun or moon alone, and a change sets it, whole, past the right edge, the
 // colours crossfade over the empty sky, and the next comes in whole from beyond the left edge as they settle; and
 // "Classic", the mark in its ring, where the colours just crossfade.
 // Writes an interactive prototype and a storyboard with notes.
@@ -131,7 +131,7 @@ const CLASSIC = { colours: [60, 1000], total: 1060 };
 const css = `
 @keyframes breath{0%{transform:scale(0.95);opacity:0.35}50%{transform:scale(1.06);opacity:1}100%{transform:scale(0.95);opacity:0.35}}
 ${['A', 'B'].map((v) => `
-@keyframes leave${v}{0%{transform:translate(0,0);opacity:1}45%{transform:translate(${OUT.x * 0.45}px,${OUT.y * 0.2}px);opacity:0.95}100%{transform:translate(${OUT.x}px,${OUT.y}px);opacity:0}}
+@keyframes leave${v}{0%{transform:translate(0,0);opacity:1}45%{transform:translate(${OUT.x * 0.45}px,${OUT.y * 0.2}px);opacity:1}100%{transform:translate(${OUT.x}px,${OUT.y}px);opacity:1}}
 @keyframes enter${v}{0%{transform:translate(${-OUT.x}px,${OUT.y}px);opacity:1}55%{transform:translate(${-OUT.x * 0.45}px,${OUT.y * 0.2}px);opacity:1}100%{transform:translate(0,0);opacity:1}}
 @keyframes fadein${v}{from{opacity:0}to{opacity:1}}
 @keyframes fadeout${v}{from{opacity:1}to{opacity:0}}
@@ -267,7 +267,7 @@ function still(a, b, t) {
   return `<div style="position: relative; width: 390px; height: 844px; overflow: hidden">
 ${home(THEMES[a])}
 <div style="position: absolute; inset: 0; opacity: ${colours.toFixed(2)}">${home(THEMES[b])}</div>
-${leave < 1 ? bodyBox(BODIES[a], `transform: translate(${lx.toFixed(0)}px, ${ly.toFixed(0)}px); opacity: ${(1 - Math.max(0, leave - 0.45) / 0.55).toFixed(2)}`) : ''}
+${leave < 1 ? bodyBox(BODIES[a], `transform: translate(${lx.toFixed(0)}px, ${ly.toFixed(0)}px); opacity: 1`) : ''}
 ${enter > 0 ? bodyBox(BODIES[b], `transform: translate(${(-ex).toFixed(0)}px, ${ey.toFixed(0)}px); opacity: 1`) : ''}
 ${stripAt(cur, colours < 0.5 ? a : b)}
 </div>`;
@@ -323,7 +323,7 @@ ${css}
 <div style="display: flex; flex-direction: column; gap: 12px">
 <span style="font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.16em; color: #6FD6CF">HOUNA · HOME</span>
 <h1 style="margin: 0; font-family: 'Marcellus', serif; font-weight: 400; font-size: 64px; line-height: 1; color: #F2ECDD">Home — appearance</h1>
-<p style="margin: 0; max-width: 1000px; font-size: 17px; line-height: 1.5; color: #B6BAD6">Changing the theme from Home: tap the logo and it turns to the next, Sunrise → Dusk → Night, a strip of three icons above it turning like a dial. Two Home styles, both in the app while the client decides. In “Sun & moon”, Home’s centre is that theme’s own sun or moon, alone; on a change it sets off the right edge, the colours fade across the empty sky, and the next comes in whole from beyond the left edge as they settle. In “Classic”, the mark stays in its ring and the colours fade across. The prototype beside this board plays both (switch at the bottom).</p>
+<p style="margin: 0; max-width: 1000px; font-size: 17px; line-height: 1.5; color: #B6BAD6">Changing the theme from Home: tap the logo and it turns to the next, Sunrise → Dusk → Night, a strip of three icons above it turning like a dial. Two Home styles, both in the app while the client decides. In “Sun & moon”, Home’s centre is that theme’s own sun or moon, alone; on a change it sets, whole, past the right edge, the colours fade across the empty sky, and the next comes in whole from beyond the left edge as they settle. In “Classic”, the mark stays in its ring and the colours fade across. The prototype beside this board plays both (switch at the bottom).</p>
 </div>
 <section style="display: flex; flex-direction: column; gap: 18px">
 ${heading('THE TOGGLE · BOTH STYLES', 'The logo and its strip', 'The current theme’s icon lit in the middle; the next on the left, the last on the right. The logo is the button. English and Arabic top bars: the buttons swap sides, the strip doesn’t.')}

@@ -330,7 +330,7 @@ to the next in `APPEARANCE_OPTIONS` order). Classic is the mark in its ring,
 as above. "Sun & moon" (canvas "Home — appearance"): the mark and its ring of
 dots give way to the theme's own body, alone (`components/home/HomeBody.tsx`:
 tonight's moon, or the scene's sun at `HOME_SUN_SCALE`, in the mark's box so
-nothing round it moves). A change sets the current body off the right edge;
+nothing round it moves). A change sets the current body, whole, past the right edge;
 with the sky empty the colours crossfade, and once the old colours have nearly
 gone the next body rises in whole from beyond the left edge (`startSkyChange`). Those directions are physical (the sky
 doesn't mirror in Arabic); Reduce Motion fades the bodies in place. Home then

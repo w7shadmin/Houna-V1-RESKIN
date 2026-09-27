@@ -43,8 +43,8 @@ const run = (v: Animated.Value, duration: number, easing: (t: number) => number)
   new Promise<void>((resolve) => Animated.timing(v, { toValue: 1, duration, easing, useNativeDriver: NATIVE }).start(() => resolve()));
 
 /**
- * Starts a change of theme on Home: the current body sets off the right edge
- * along a shallow arc; with the sky empty, `switchColours` fades the new
+ * Starts a change of theme on Home: the current body sets, whole, off the
+ * right edge along a shallow arc; with the sky empty, `switchColours` fades the new
  * colours in (ThemeContext's setPreference), and the next body rises in from
  * the left as they arrive, all on the native driver. Under Reduce Motion the
  * bodies fade in place instead. Directions are physical: the sky doesn't
@@ -73,8 +73,7 @@ export function startSkyChange(
  */
 export default function HomeBody({ scheme, change, reduceMotion }: { scheme: ColorScheme; change: SkyChange | null; reduceMotion: boolean }) {
   const { width } = useWindowDimensions();
-  const out = Math.max(260, width * 0.78);
-  // Where the next body starts: wholly beyond the left edge (the box is centred on the screen).
+  // How far a body travels to be wholly off screen, either side (the box is centred on the screen).
   const beyond = width / 2 + HALO_BOX / 2;
 
   if (!change) {
@@ -87,10 +86,11 @@ export default function HomeBody({ scheme, change, reduceMotion }: { scheme: Col
 
   const travel = !reduceMotion;
   const leaving = {
-    opacity: change.leave.interpolate({ inputRange: [0, 0.45, 1], outputRange: [1, 0.95, 0] }),
+    // Whole all the way out, until it's wholly past the right edge.
+    opacity: travel ? 1 : change.leave.interpolate({ inputRange: [0, 1], outputRange: [1, 0] }),
     transform: travel
       ? [
-          { translateX: change.leave.interpolate({ inputRange: [0, 0.45, 1], outputRange: [0, out * 0.45, out] }) },
+          { translateX: change.leave.interpolate({ inputRange: [0, 0.45, 1], outputRange: [0, beyond * 0.45, beyond] }) },
           { translateY: change.leave.interpolate({ inputRange: [0, 0.45, 1], outputRange: [0, DROP * 0.2, DROP] }) },
         ]
       : [],
