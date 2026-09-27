@@ -97,12 +97,17 @@ or let the gems be the lit, 3D form of the sky-journey art.
 
 | Board | Picked | Note | App surface it joins or replaces | Size | Shipped |
 | --- | --- | --- | --- | --- | --- |
-| First run — the splash (`FirstSplash`) | 27 Sep 2026 |  | The animated splash (`components/SplashIntro.tsx`): the crescent bowl rising, the wordmark settling under it | M |  |
-| First run — one breath together (`FirstBreath`) | 27 Sep 2026 |  | New: shown once, before anything is asked; a guided breath, then Continue (persisted locally) | M |  |
+| First run — the splash (`FirstSplash`) | 27 Sep 2026 |  | The animated splash (`components/SplashIntro.tsx`): the crescent bowl rising, the wordmark settling under it | M | Built 28 Sep 2026, not switched on (`SPLASH` in `app/_layout.tsx`) |
+| First run — one breath together (`FirstBreath`) | 27 Sep 2026 |  | New: shown once, before anything is asked; a guided breath, then Continue (persisted locally) | M | 28 Sep 2026 (phase 5) |
 
-Open question for the build: the splash replaces today's animated splash
-(`SplashIntro`), and the crescent bowl is also picked as a Home body (C). If
-both ship, the bowl on the splash can hand over to the bowl on Home.
+Decided 28 Sep: the splash replaces today's (`SplashIntro`) on every launch,
+with each theme's own body rising (Night's crescent bowl, Sunrise's star-lattice
+sun, Dusk's evening sun) and the wordmark settling beneath; on "Sun & moon" it
+hands over to Home's body. The first breath, shown once, carries a small
+English · العربية switch at the top.
+
+Later on 28 Sep: the first breath approved and built; the splash is built but
+waits, with today's still playing, until it's decided.
 
 ## Build order
 

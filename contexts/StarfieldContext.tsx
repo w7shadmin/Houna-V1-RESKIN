@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Easing } from 'react-native';
+import { Animated, Easing, type View } from 'react-native';
 import { NATIVE, useReduceMotion } from '@/hooks/useCalmLoop';
 
 /** One lap of the ring's ripple, one breath (out + in), one slow turn of the ring. */
@@ -21,6 +21,7 @@ export interface MarkClock {
  * - `haloHidden`: Home's mark steps aside once the starfield has drawn its
  *   moon over it, and comes back just before the starfield leaves.
  * - `clock`: the mark's animation, running once for both copies.
+ * - `homeBody`: Home's mark or body, while Home is mounted, for the splash to hand over to.
  */
 interface StarfieldState {
   chrome: Animated.Value;
@@ -29,6 +30,7 @@ interface StarfieldState {
   haloHidden: boolean;
   setHaloHidden: (hidden: boolean) => void;
   clock: MarkClock;
+  homeBody: React.RefObject<View | null>;
 }
 
 const StarfieldContext = createContext<StarfieldState | null>(null);
@@ -38,6 +40,7 @@ export function StarfieldProvider({ children }: { children: React.ReactNode }) {
   const [chromeHidden, setChromeHidden] = useState(false);
   const [haloHidden, setHaloHidden] = useState(false);
   const clock = useRef<MarkClock>({ drift: new Animated.Value(0), turn: new Animated.Value(0), breath: new Animated.Value(0) }).current;
+  const homeBody = useRef<View>(null);
   const reduceMotion = useReduceMotion();
 
   // One continuous run (native driver, so it costs next to nothing); held still with Reduce Motion.
@@ -61,8 +64,8 @@ export function StarfieldProvider({ children }: { children: React.ReactNode }) {
   }, [reduceMotion, clock]);
 
   const value = useMemo(
-    () => ({ chrome, chromeHidden, setChromeHidden, haloHidden, setHaloHidden, clock }),
-    [chrome, chromeHidden, haloHidden, clock],
+    () => ({ chrome, chromeHidden, setChromeHidden, haloHidden, setHaloHidden, clock, homeBody }),
+    [chrome, chromeHidden, haloHidden, clock, homeBody],
   );
   return <StarfieldContext.Provider value={value}>{children}</StarfieldContext.Provider>;
 }

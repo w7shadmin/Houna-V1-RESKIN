@@ -327,4 +327,6 @@ ${sub(`${time} · ${rise}`, ar)}`;
 })();
 
 module.exports = out;
+// The bodies, for the boards that follow (phase 5's splash).
+module.exports.helpers = { bowl, starSun, duskSun, box, homeScreen, BASE };
 if (require.main === module) console.log(out.map((b) => `${b.file} ${b.w}×${b.h}${b.interactive ? ' (interactive)' : ''}`).join('\n'));

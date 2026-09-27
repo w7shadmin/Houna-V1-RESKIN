@@ -251,7 +251,8 @@ audio can only be verified in an Android dev-client build.
 needs `npx expo prebuild --clean` + reinstalling the dev client to apply,
 like `userInterfaceStyle: "automatic"`. This is Android's launch screen,
 shown the moment the icon is tapped, before the animated splash
-(`components/SplashIntro.tsx`, which is separate and unchanged by it). Its
+(`components/SplashIntro.tsx`, which is separate and unchanged by it; its
+possible successor, `BodySplash`, is under "First run"). Its
 image is the mark alone (`assets/images/splash-mark.png` teal,
 `splash-mark-dark.png` glow; never the full-bleed `icon.png`, which draws as a
 teal box), centred on a transparent square: Android scales the whole picture
@@ -389,6 +390,30 @@ the week (Monday to Monday, as the leaderboard's) and each day practised.
   days practised lit and glowing, the rest dim, never "missed", days to come
   fainter. Its moons sit above Recap's tap zones (`bodyAbove`, `box-none`), so a
   tap on a moon picks that day and anywhere else moves the story on.
+
+**First run** (phase 5, canvas "Houna — First run (phase 5)"):
+- The first breath, `app/welcome.tsx`: shown once, before anything is asked
+  (`app/index.tsx` sends a launch there until `lib/firstRun.ts` says it's been
+  seen, finished or skipped; so an existing install meets it once too). A
+  welcome, then one guided breath on 4-7-8's `OrbStage` (no word inside), timed
+  by `FIRST_BREATH` in `breathPatterns.ts` (in 4, hold 2, out 6), each line
+  said to screen readers as it arrives, then Continue to Home. Nothing is
+  counted. "Not now" skips at any moment. The English · العربية switch calls
+  `setLanguage`, so native restarts in the other language and the breath begins
+  again (the web re-renders: the breath is keyed on the language). It waits for
+  the animated splash to lift (`hooks/useIntroDone.ts`). Under Reduce Motion
+  the words come and the orb stays at rest. Strings in
+  `constants/firstRunStrings.ts` (`t.firstRun`); the Arabic breathes in the
+  first person plural, as the exercises do.
+- The splash, each theme's body (`components/splash/BodySplash.tsx`): built,
+  **not switched on** while the client decides (`SPLASH` in `app/_layout.tsx`,
+  'intro' today). The theme's body (`Body` from `HomeBody.tsx`) rises into the
+  middle, the wordmark and "Breathe · rest · return" settle beneath, about 3s;
+  on "Sun & moon" it then glides to Home's body (`homeBody`, Home's measured
+  mark or body in `StarfieldContext`) while Home's own steps aside
+  (`haloHidden`) until it lands; Classic, the first run (no Home beneath) and
+  Reduce Motion fade. When one splash is chosen, delete the other and `SPLASH`.
+  `useCalmLoop` works outside a screen for it (always "focused" there).
 
 **The sky clock** (canvas "Phase 3 — the sky clock"; a long press on Home's mark
 or body, or the screen reader's "Today's sky" action; the only entry for now, to

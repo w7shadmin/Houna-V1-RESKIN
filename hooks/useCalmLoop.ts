@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, Platform } from 'react-native';
-import { useIsFocused } from '@react-navigation/native';
+import { NavigationContext } from '@react-navigation/native';
 
 /** Animations run on the UI thread on native (web has no native driver). */
 export const NATIVE = Platform.OS !== 'web';
@@ -21,13 +21,33 @@ export function useReduceMotion() {
 }
 
 /**
+ * Whether this screen is on screen: useIsFocused, but safe outside a screen (the splash is drawn
+ * over the navigator, not in it), where it's always true.
+ */
+function useFocusedSafe() {
+  const navigation = useContext(NavigationContext);
+  const [focused, setFocused] = useState(() => navigation?.isFocused() ?? true);
+  useEffect(() => {
+    if (!navigation) return;
+    setFocused(navigation.isFocused());
+    const offFocus = navigation.addListener('focus', () => setFocused(true));
+    const offBlur = navigation.addListener('blur', () => setFocused(false));
+    return () => {
+      offFocus();
+      offBlur();
+    };
+  }, [navigation]);
+  return focused;
+}
+
+/**
  * A looping animated value for ambient motion (Home's ring, the starfield).
  * Runs only while its screen is on screen and Reduce Motion is off; otherwise
  * it holds still.
  */
 export function useCalmLoop(make: (v: Animated.Value) => Animated.CompositeAnimation) {
   const v = useRef(new Animated.Value(0)).current;
-  const focused = useIsFocused();
+  const focused = useFocusedSafe();
   const reduceMotion = useReduceMotion();
   useEffect(() => {
     if (!focused || reduceMotion) return;

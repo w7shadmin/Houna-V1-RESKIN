@@ -30,8 +30,18 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { StarfieldProvider } from '@/contexts/StarfieldContext';
 import SplashIntro from '@/components/SplashIntro';
+import BodySplash from '@/components/splash/BodySplash';
+import { IntroDoneContext } from '@/hooks/useIntroDone';
 
 SplashScreen.preventAutoHideAsync();
+
+/**
+ * Which animated splash plays at launch: 'intro', the wordmark drawn from the logo
+ * (components/SplashIntro.tsx), or 'body', each theme's body rising (components/splash/
+ * BodySplash.tsx, canvas "Phase 5 — the splash"), built and waiting on the decision. Once one
+ * is chosen, delete the other and this switch.
+ */
+const SPLASH: 'intro' | 'body' = 'intro';
 
 // Must run before anything renders — RN reads this once at native init.
 I18nManager.allowRTL(true);
@@ -55,6 +65,8 @@ function InnerLayout() {
         }}
       >
         <Stack.Screen name="index" />
+        {/* The first breath, once, before anything is asked (app/index.tsx sends a first launch there). */}
+        <Stack.Screen name="welcome" options={{ gestureEnabled: false }} />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
           name="tanafas"
@@ -143,8 +155,15 @@ export default function RootLayout() {
         <ThemeProvider>
           {/* Shared by Home, the tab bar and the Houna starfield: the handoff state and the mark's clock. */}
           <StarfieldProvider>
-            <InnerLayout />
-            {!introDone && <SplashIntro onFinish={() => setIntroDone(true)} />}
+            <IntroDoneContext.Provider value={introDone}>
+              <InnerLayout />
+            </IntroDoneContext.Provider>
+            {!introDone &&
+              (SPLASH === 'body' ? (
+                <BodySplash onFinish={() => setIntroDone(true)} />
+              ) : (
+                <SplashIntro onFinish={() => setIntroDone(true)} />
+              ))}
           </StarfieldProvider>
         </ThemeProvider>
       </AuthProvider>

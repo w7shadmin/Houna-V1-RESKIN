@@ -43,6 +43,16 @@ export const BREATH_PATTERNS: Record<'anxiety-relief' | 'steady-mind', readonly 
   ],
 };
 
+/**
+ * The first breath (`app/welcome.tsx`), shown once before anything is asked: one breath, in 4,
+ * a gentle 2 at the top, out 6. Not an exercise: nothing is counted.
+ */
+export const FIRST_BREATH: readonly BreathPhase[] = [
+  { key: 'inhale', seconds: 4, fill: 1 },
+  { key: 'hold', seconds: 2, fill: 1 },
+  { key: 'exhale', seconds: 6, fill: 0 },
+];
+
 export const SESSION_MINUTES = [1, 3, 5] as const;
 export const DEFAULT_SESSION_MINUTES = 3;
 
