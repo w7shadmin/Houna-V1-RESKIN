@@ -1,449 +1,517 @@
 {
   "v": 3,
-  "createdOnFiles": {
-    "v": 1,
-    "at": "2026-09-27T16:38:13Z"
+  "attachments": {},
+  "boards": {
+    "AccountAvatars.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Profile — celestial avatars (Dusk)",
+      "w": 390,
+      "x": 2820,
+      "y": 6516
+    },
+    "AccountGems.dc.html": {
+      "h": 844,
+      "title": "Badges — lit objects on pedestals",
+      "w": 390,
+      "x": 470,
+      "y": 6516
+    },
+    "AccountMosaic.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Badges — the khatam mosaic",
+      "w": 390,
+      "x": 940,
+      "y": 6516
+    },
+    "AccountProfile.dc.html": {
+      "h": 844,
+      "title": "Profile — the Kufic ring",
+      "w": 390,
+      "x": 0,
+      "y": 6516
+    },
+    "AccountProfileAr.dc.html": {
+      "h": 844,
+      "title": "الملف الشخصي — حلقة كوفية",
+      "w": 390,
+      "x": 3290,
+      "y": 6516
+    },
+    "AccountSky.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Progress — your sky",
+      "w": 390,
+      "x": 2350,
+      "y": 6516
+    },
+    "AccountUnlock.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Badges — the unlock moment",
+      "w": 390,
+      "x": 1410,
+      "y": 6516
+    },
+    "AccountWeekOrbit.dc.html": {
+      "h": 844,
+      "title": "Progress — the week in moons",
+      "w": 390,
+      "x": 1880,
+      "y": 6516
+    },
+    "BodyCrescentBowl.dc.html": {
+      "h": 844,
+      "title": "Home — the crescent bowl",
+      "w": 390,
+      "x": 0,
+      "y": 4068
+    },
+    "BodyGlassEclipse.dc.html": {
+      "h": 844,
+      "title": "Houna moon — glass eclipse",
+      "w": 390,
+      "x": 3290,
+      "y": 4068
+    },
+    "BodyGrainDome.dc.html": {
+      "h": 844,
+      "title": "Sunrise — grain dome",
+      "w": 390,
+      "x": 470,
+      "y": 4068
+    },
+    "BodyHilal.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Home header — hilal and the Hijri date",
+      "w": 390,
+      "x": 940,
+      "y": 4068
+    },
+    "BodyLantern.dc.html": {
+      "h": 844,
+      "title": "Ramadan — lantern moon",
+      "w": 390,
+      "x": 2820,
+      "y": 4068
+    },
+    "BodyMonthRing.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "The month of moons",
+      "w": 390,
+      "x": 1410,
+      "y": 4068
+    },
+    "BodySkyClock.dc.html": {
+      "h": 844,
+      "title": "The sky clock",
+      "w": 390,
+      "x": 2350,
+      "y": 4068
+    },
+    "BodyStarSun.dc.html": {
+      "h": 844,
+      "title": "Sunrise — the star-lattice sun",
+      "w": 390,
+      "x": 1880,
+      "y": 4068
+    },
+    "BreatheArch.dc.html": {
+      "h": 844,
+      "title": "Breathe — arch light (Sunrise)",
+      "w": 390,
+      "x": 1880,
+      "y": 2844
+    },
+    "BreatheHorizon.dc.html": {
+      "h": 844,
+      "title": "Breathe — horizon (Dusk)",
+      "w": 390,
+      "x": 2350,
+      "y": 2844
+    },
+    "BreatheLattice.dc.html": {
+      "h": 844,
+      "title": "Breathe — mashrabiya bloom",
+      "w": 390,
+      "x": 1410,
+      "y": 2844
+    },
+    "BreatheOrb.dc.html": {
+      "h": 844,
+      "title": "Breathe — glass orb, the word inside",
+      "w": 390,
+      "x": 0,
+      "y": 2844
+    },
+    "BreatheOrbit.dc.html": {
+      "h": 844,
+      "title": "Breathe — orbit dot, box breathing",
+      "w": 390,
+      "x": 470,
+      "y": 2844
+    },
+    "BreathePatternsAr.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "تنفّس — إيقاع كل تمرين",
+      "w": 390,
+      "x": 3290,
+      "y": 2844
+    },
+    "BreatheRidges.dc.html": {
+      "h": 844,
+      "title": "Breathe — ridges of breath",
+      "w": 390,
+      "x": 2820,
+      "y": 2844
+    },
+    "BreatheStar.dc.html": {
+      "h": 844,
+      "title": "Breathe — the eight-point star",
+      "w": 390,
+      "x": 940,
+      "y": 2844
+    },
+    "FirstBreath.dc.html": {
+      "h": 844,
+      "title": "First run — one breath together",
+      "w": 390,
+      "x": 940,
+      "y": 8964
+    },
+    "FirstOpening.dc.html": {
+      "h": 844,
+      "title": "First run — the opening",
+      "w": 390,
+      "x": 0,
+      "y": 8964
+    },
+    "FirstOpeningAr.dc.html": {
+      "h": 844,
+      "title": "البداية — مشهد حي",
+      "w": 390,
+      "x": 1410,
+      "y": 8964
+    },
+    "FirstSplash.dc.html": {
+      "h": 844,
+      "title": "First run — the splash",
+      "w": 390,
+      "x": 470,
+      "y": 8964
+    },
+    "GraphConstellation.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Graphs — community constellation",
+      "w": 390,
+      "x": 2350,
+      "y": 5292
+    },
+    "GraphGauge.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Graphs — the week as an arc",
+      "w": 390,
+      "x": 940,
+      "y": 5292
+    },
+    "GraphGaugeAr.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "هذا الأسبوع — مقياس",
+      "w": 390,
+      "x": 2820,
+      "y": 5292
+    },
+    "GraphMoodTide.dc.html": {
+      "h": 844,
+      "title": "Graphs — mood tide",
+      "w": 390,
+      "x": 1880,
+      "y": 5292
+    },
+    "GraphMoonCalendar.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Graphs — September by moonlight",
+      "w": 390,
+      "x": 470,
+      "y": 5292
+    },
+    "GraphReflections.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Graphs — reflections over time (Dusk)",
+      "w": 390,
+      "x": 1410,
+      "y": 5292
+    },
+    "GraphRidges.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Graphs — the month in ridges",
+      "w": 390,
+      "x": 0,
+      "y": 5292
+    },
+    "Main.dc.html": {
+      "h": 1240,
+      "title": "Houna Explorations — direction",
+      "w": 1440,
+      "x": 0,
+      "y": 0
+    },
+    "MeditateArchExpand.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Scenes — arch expands to player",
+      "w": 390,
+      "x": 940,
+      "y": 1620
+    },
+    "MeditateArches.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Scenes — arch gallery",
+      "w": 390,
+      "x": 470,
+      "y": 1620
+    },
+    "MeditateArchesAr.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "المشاهد — أقواس",
+      "w": 390,
+      "x": 3760,
+      "y": 1620
+    },
+    "MeditateCards.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Meditate — grain cards (Dusk)",
+      "w": 390,
+      "x": 2350,
+      "y": 1620
+    },
+    "MeditateEnd.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Meditate — the ring closes into a bloom",
+      "w": 390,
+      "x": 2820,
+      "y": 1620
+    },
+    "MeditateMinutes.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Meditate — minutes wheel",
+      "w": 390,
+      "x": 1410,
+      "y": 1620
+    },
+    "MeditatePlaying.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Meditate — playing, controls step aside",
+      "w": 390,
+      "x": 1880,
+      "y": 1620
+    },
+    "MeditateToday.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Today — meditate hero",
+      "w": 390,
+      "x": 0,
+      "y": 1620
+    },
+    "MeditateTodayAr.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "اليوم — تأمل",
+      "w": 390,
+      "x": 3290,
+      "y": 1620
+    },
+    "MotionCardExpand.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Motion — a card grows into its page",
+      "w": 390,
+      "x": 470,
+      "y": 7740
+    },
+    "MotionControlsAway.dc.html": {
+      "h": 844,
+      "title": "Motion — controls step aside",
+      "w": 390,
+      "x": 940,
+      "y": 7740
+    },
+    "MotionPills.dc.html": {
+      "h": 844,
+      "title": "Motion — glowing pills, three themes",
+      "w": 390,
+      "x": 1880,
+      "y": 7740
+    },
+    "MotionSheet.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Motion — a glass sheet over blur",
+      "w": 390,
+      "x": 0,
+      "y": 7740
+    },
+    "MotionTabs.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Motion — the tab glow slides",
+      "w": 390,
+      "x": 2350,
+      "y": 7740
+    },
+    "MotionWords.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Motion — words that arrive",
+      "w": 390,
+      "x": 1410,
+      "y": 7740
+    }
   },
-  "title": "Houna Explorations",
+  "createdOnFiles": {
+    "at": "2026-09-27T16:38:13Z",
+    "v": 1
+  },
+  "designSystems": [],
   "launch": {
     "view": "canvas"
   },
-  "pages": [],
   "notes": {
-    "titleMeditate": {
-      "kind": "title1",
-      "x": 0,
-      "y": 1360,
-      "text": "A · Meditation player",
-      "maxW": 4150
+    "note-ej9vyt": {
+      "text": "I like this background, to be used for other breathing activities or for dusk, etc",
+      "w": 240,
+      "x": 539,
+      "y": 2855
     },
-    "titleBreathe": {
-      "kind": "title1",
-      "x": 0,
-      "y": 2584,
-      "text": "B · Breathing player",
-      "maxW": 3680
-    },
-    "titleBodies": {
-      "kind": "title1",
-      "x": 0,
-      "y": 3808,
-      "text": "C · Suns and moons",
-      "maxW": 3680
-    },
-    "titleGraphs": {
-      "kind": "title1",
-      "x": 0,
-      "y": 5032,
-      "text": "D · Graphs",
-      "maxW": 3210
+    "picksMeditate": {
+      "fill": "green",
+      "maxH": 480,
+      "text": "Picked, 27 Sep\n\n• Today — meditate hero\n• Scenes — arch gallery\n• Meditate — minutes wheel\n• Both Arabic versions\n\nListed in design/explorations/PICKS.md",
+      "w": 360,
+      "x": 4230,
+      "y": 1620
     },
     "titleAccount": {
       "kind": "title1",
-      "x": 0,
-      "y": 6256,
+      "maxW": 3680,
       "text": "E · Account, badges and progress",
-      "maxW": 3680
-    },
-    "titleMotion": {
-      "kind": "title1",
+      "w": 240,
       "x": 0,
-      "y": 7480,
-      "text": "F · Motion and overlays",
-      "maxW": 2740
+      "y": 6256
+    },
+    "titleBodies": {
+      "kind": "title1",
+      "maxW": 3680,
+      "text": "C · Suns and moons",
+      "w": 240,
+      "x": 0,
+      "y": 3808
+    },
+    "titleBreathe": {
+      "kind": "title1",
+      "maxW": 3680,
+      "text": "B · Breathing player",
+      "w": 240,
+      "x": 0,
+      "y": 2584
     },
     "titleFirst": {
       "kind": "title1",
-      "x": 0,
-      "y": 8704,
+      "maxW": 1800,
       "text": "G · First run",
-      "maxW": 1800
-    }
-  },
-  "designSystems": [],
-  "boards": {
-    "Main.dc.html": {
+      "w": 240,
       "x": 0,
-      "y": 0,
-      "w": 1440,
-      "h": 1240,
-      "title": "Houna Explorations — direction"
+      "y": 8704
     },
-    "MeditateToday.dc.html": {
+    "titleGraphs": {
+      "kind": "title1",
+      "maxW": 3210,
+      "text": "D · Graphs",
+      "w": 240,
       "x": 0,
-      "y": 1620,
-      "w": 390,
-      "h": 844,
-      "title": "Today — meditate hero",
-      "is_interactive": true
+      "y": 5032
     },
-    "MeditateArches.dc.html": {
-      "x": 470,
-      "y": 1620,
-      "w": 390,
-      "h": 844,
-      "title": "Scenes — arch gallery",
-      "is_interactive": true
+    "titleMeditate": {
+      "kind": "title1",
+      "maxW": 4150,
+      "text": "A · Meditation player",
+      "w": 240,
+      "x": 0,
+      "y": 1360
     },
-    "MeditateArchExpand.dc.html": {
-      "x": 940,
-      "y": 1620,
-      "w": 390,
-      "h": 844,
-      "title": "Scenes — arch expands to player",
-      "is_interactive": true
+    "titleMotion": {
+      "kind": "title1",
+      "maxW": 2740,
+      "text": "F · Motion and overlays",
+      "w": 240,
+      "x": 0,
+      "y": 7480
     },
-    "MeditateMinutes.dc.html": {
-      "x": 1410,
-      "y": 1620,
-      "w": 390,
-      "h": 844,
-      "title": "Meditate — minutes wheel",
-      "is_interactive": true
-    },
-    "MeditatePlaying.dc.html": {
-      "x": 1880,
-      "y": 1620,
-      "w": 390,
-      "h": 844,
-      "title": "Meditate — playing, controls step aside",
-      "is_interactive": true
-    },
-    "MeditateCards.dc.html": {
-      "x": 2350,
-      "y": 1620,
-      "w": 390,
-      "h": 844,
-      "title": "Meditate — grain cards (Dusk)",
-      "is_interactive": true
-    },
-    "MeditateEnd.dc.html": {
-      "x": 2820,
-      "y": 1620,
-      "w": 390,
-      "h": 844,
-      "title": "Meditate — the ring closes into a bloom",
-      "is_interactive": true
-    },
-    "MeditateTodayAr.dc.html": {
-      "x": 3290,
-      "y": 1620,
-      "w": 390,
-      "h": 844,
-      "title": "اليوم — تأمل",
-      "is_interactive": true
-    },
-    "MeditateArchesAr.dc.html": {
+    "picksBreathe": {
       "x": 3760,
-      "y": 1620,
-      "w": 390,
-      "h": 844,
-      "title": "المشاهد — أقواس",
-      "is_interactive": true
-    },
-    "BreatheOrb.dc.html": {
-      "x": 0,
       "y": 2844,
-      "w": 390,
-      "h": 844,
-      "title": "Breathe — glass orb, the word inside"
+      "w": 360,
+      "maxH": 480,
+      "fill": "green",
+      "text": "Picked, 27 Sep\n\n• Breathe — glass orb, the word inside\n• Breathe — the eight-point star\n• Breathe — ridges of breath\n• The orbit board’s background (your note)\n\nListed in design/explorations/PICKS.md"
     },
-    "BreatheOrbit.dc.html": {
-      "x": 470,
-      "y": 2844,
-      "w": 390,
-      "h": 844,
-      "title": "Breathe — orbit dot, box breathing"
+    "picksBodies": {
+      "x": 3760,
+      "y": 4068,
+      "w": 360,
+      "maxH": 480,
+      "fill": "green",
+      "text": "Picked, 27 Sep\n\n• Home — the crescent bowl\n• Home header — hilal and the Hijri date\n• The month of moons\n• Sunrise — the star-lattice sun\n• The sky clock\n\nListed in design/explorations/PICKS.md"
     },
-    "BreatheStar.dc.html": {
-      "x": 940,
-      "y": 2844,
-      "w": 390,
-      "h": 844,
-      "title": "Breathe — the eight-point star"
-    },
-    "BreatheLattice.dc.html": {
-      "x": 1410,
-      "y": 2844,
-      "w": 390,
-      "h": 844,
-      "title": "Breathe — mashrabiya bloom"
-    },
-    "BreatheArch.dc.html": {
-      "x": 1880,
-      "y": 2844,
-      "w": 390,
-      "h": 844,
-      "title": "Breathe — arch light (Sunrise)"
-    },
-    "BreatheHorizon.dc.html": {
-      "x": 2350,
-      "y": 2844,
-      "w": 390,
-      "h": 844,
-      "title": "Breathe — horizon (Dusk)"
-    },
-    "BreatheRidges.dc.html": {
-      "x": 2820,
-      "y": 2844,
-      "w": 390,
-      "h": 844,
-      "title": "Breathe — ridges of breath"
-    },
-    "BreathePatternsAr.dc.html": {
+    "picksGraphs": {
       "x": 3290,
-      "y": 2844,
-      "w": 390,
-      "h": 844,
-      "title": "تنفّس — إيقاع كل تمرين",
-      "is_interactive": true
+      "y": 5292,
+      "w": 360,
+      "maxH": 480,
+      "fill": "green",
+      "text": "Picked, 27 Sep\n\n• Graphs — the month in ridges, drawn in the look of “ridges of breath”\n• Graphs — September by moonlight\n• Graphs — the week as an arc\n\nListed in design/explorations/PICKS.md"
     },
-    "BodyCrescentBowl.dc.html": {
-      "x": 0,
-      "y": 4068,
-      "w": 390,
-      "h": 844,
-      "title": "Home — the crescent bowl"
+    "picksAccount": {
+      "x": 3760,
+      "y": 6516,
+      "w": 360,
+      "maxH": 480,
+      "fill": "green",
+      "text": "Picked, 27 Sep (built after the reskin)\n\n• Profile — the Kufic ring\n• Badges — lit objects on pedestals\n• Badges — the unlock moment\n• Progress — the week in moons\n• Progress — your sky\n\nListed in design/explorations/PICKS.md"
     },
-    "BodyGrainDome.dc.html": {
-      "x": 470,
-      "y": 4068,
-      "w": 390,
-      "h": 844,
-      "title": "Sunrise — grain dome"
-    },
-    "BodyHilal.dc.html": {
-      "x": 940,
-      "y": 4068,
-      "w": 390,
-      "h": 844,
-      "title": "Home header — hilal and the Hijri date",
-      "is_interactive": true
-    },
-    "BodyMonthRing.dc.html": {
-      "x": 1410,
-      "y": 4068,
-      "w": 390,
-      "h": 844,
-      "title": "The month of moons",
-      "is_interactive": true
-    },
-    "BodyStarSun.dc.html": {
-      "x": 1880,
-      "y": 4068,
-      "w": 390,
-      "h": 844,
-      "title": "Sunrise — the star-lattice sun"
-    },
-    "BodySkyClock.dc.html": {
-      "x": 2350,
-      "y": 4068,
-      "w": 390,
-      "h": 844,
-      "title": "The sky clock"
-    },
-    "BodyLantern.dc.html": {
+    "picksMotion": {
       "x": 2820,
-      "y": 4068,
-      "w": 390,
-      "h": 844,
-      "title": "Ramadan — lantern moon"
+      "y": 7740,
+      "w": 360,
+      "maxH": 480,
+      "fill": "green",
+      "text": "Picked, 27 Sep: all six\n\n• A glass sheet over blur\n• A card grows into its page\n• Controls step aside\n• Words that arrive\n• Glowing pills\n• The tab glow slides\n\nBuilt first: the other picks reuse them."
     },
-    "BodyGlassEclipse.dc.html": {
-      "x": 3290,
-      "y": 4068,
-      "w": 390,
-      "h": 844,
-      "title": "Houna moon — glass eclipse"
-    },
-    "GraphRidges.dc.html": {
-      "x": 0,
-      "y": 5292,
-      "w": 390,
-      "h": 844,
-      "title": "Graphs — the month in ridges",
-      "is_interactive": true
-    },
-    "GraphMoonCalendar.dc.html": {
-      "x": 470,
-      "y": 5292,
-      "w": 390,
-      "h": 844,
-      "title": "Graphs — September by moonlight",
-      "is_interactive": true
-    },
-    "GraphGauge.dc.html": {
-      "x": 940,
-      "y": 5292,
-      "w": 390,
-      "h": 844,
-      "title": "Graphs — the week as an arc",
-      "is_interactive": true
-    },
-    "GraphReflections.dc.html": {
-      "x": 1410,
-      "y": 5292,
-      "w": 390,
-      "h": 844,
-      "title": "Graphs — reflections over time (Dusk)",
-      "is_interactive": true
-    },
-    "GraphMoodTide.dc.html": {
+    "picksFirst": {
       "x": 1880,
-      "y": 5292,
-      "w": 390,
-      "h": 844,
-      "title": "Graphs — mood tide"
-    },
-    "GraphConstellation.dc.html": {
-      "x": 2350,
-      "y": 5292,
-      "w": 390,
-      "h": 844,
-      "title": "Graphs — community constellation",
-      "is_interactive": true
-    },
-    "GraphGaugeAr.dc.html": {
-      "x": 2820,
-      "y": 5292,
-      "w": 390,
-      "h": 844,
-      "title": "هذا الأسبوع — مقياس",
-      "is_interactive": true
-    },
-    "AccountProfile.dc.html": {
-      "x": 0,
-      "y": 6516,
-      "w": 390,
-      "h": 844,
-      "title": "Profile — the Kufic ring"
-    },
-    "AccountGems.dc.html": {
-      "x": 470,
-      "y": 6516,
-      "w": 390,
-      "h": 844,
-      "title": "Badges — lit objects on pedestals"
-    },
-    "AccountMosaic.dc.html": {
-      "x": 940,
-      "y": 6516,
-      "w": 390,
-      "h": 844,
-      "title": "Badges — the khatam mosaic",
-      "is_interactive": true
-    },
-    "AccountUnlock.dc.html": {
-      "x": 1410,
-      "y": 6516,
-      "w": 390,
-      "h": 844,
-      "title": "Badges — the unlock moment",
-      "is_interactive": true
-    },
-    "AccountWeekOrbit.dc.html": {
-      "x": 1880,
-      "y": 6516,
-      "w": 390,
-      "h": 844,
-      "title": "Progress — the week in moons"
-    },
-    "AccountSky.dc.html": {
-      "x": 2350,
-      "y": 6516,
-      "w": 390,
-      "h": 844,
-      "title": "Progress — your sky",
-      "is_interactive": true
-    },
-    "AccountAvatars.dc.html": {
-      "x": 2820,
-      "y": 6516,
-      "w": 390,
-      "h": 844,
-      "title": "Profile — celestial avatars (Dusk)",
-      "is_interactive": true
-    },
-    "AccountProfileAr.dc.html": {
-      "x": 3290,
-      "y": 6516,
-      "w": 390,
-      "h": 844,
-      "title": "الملف الشخصي — حلقة كوفية"
-    },
-    "MotionSheet.dc.html": {
-      "x": 0,
-      "y": 7740,
-      "w": 390,
-      "h": 844,
-      "title": "Motion — a glass sheet over blur",
-      "is_interactive": true
-    },
-    "MotionCardExpand.dc.html": {
-      "x": 470,
-      "y": 7740,
-      "w": 390,
-      "h": 844,
-      "title": "Motion — a card grows into its page",
-      "is_interactive": true
-    },
-    "MotionControlsAway.dc.html": {
-      "x": 940,
-      "y": 7740,
-      "w": 390,
-      "h": 844,
-      "title": "Motion — controls step aside"
-    },
-    "MotionWords.dc.html": {
-      "x": 1410,
-      "y": 7740,
-      "w": 390,
-      "h": 844,
-      "title": "Motion — words that arrive",
-      "is_interactive": true
-    },
-    "MotionPills.dc.html": {
-      "x": 1880,
-      "y": 7740,
-      "w": 390,
-      "h": 844,
-      "title": "Motion — glowing pills, three themes"
-    },
-    "MotionTabs.dc.html": {
-      "x": 2350,
-      "y": 7740,
-      "w": 390,
-      "h": 844,
-      "title": "Motion — the tab glow slides",
-      "is_interactive": true
-    },
-    "FirstOpening.dc.html": {
-      "x": 0,
       "y": 8964,
-      "w": 390,
-      "h": 844,
-      "title": "First run — the opening"
-    },
-    "FirstSplash.dc.html": {
-      "x": 470,
-      "y": 8964,
-      "w": 390,
-      "h": 844,
-      "title": "First run — the splash"
-    },
-    "FirstBreath.dc.html": {
-      "x": 940,
-      "y": 8964,
-      "w": 390,
-      "h": 844,
-      "title": "First run — one breath together"
-    },
-    "FirstOpeningAr.dc.html": {
-      "x": 1410,
-      "y": 8964,
-      "w": 390,
-      "h": 844,
-      "title": "البداية — مشهد حي"
+      "w": 360,
+      "maxH": 480,
+      "fill": "green",
+      "text": "Picked, 27 Sep\n\n• First run — the splash\n• First run — one breath together\n\nListed in design/explorations/PICKS.md"
     }
   },
   "order": [
@@ -498,5 +566,7 @@
     "FirstSplash.dc.html",
     "FirstBreath.dc.html",
     "FirstOpeningAr.dc.html"
-  ]
+  ],
+  "pages": [],
+  "title": "Houna Explorations"
 }
