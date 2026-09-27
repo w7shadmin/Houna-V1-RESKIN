@@ -8,6 +8,7 @@ import {
   BREATH_PATTERNS,
   BREATHE_TONE,
   DEFAULT_SESSION_MINUTES,
+  GROUNDING_STEP_DEFLATE,
   RELEASE_MS,
   SESSION_MINUTES,
   TENSE_MS,
@@ -278,6 +279,8 @@ function PhasePlayer({ exercise, breath, nav }: PlayerProps) {
           breath={breath}
           trace={trace}
           showTracer={inSession}
+          // Lit through the hold at the top: the inhale has just filled it.
+          full={inSession && phases[clock.phase].key === 'hold' && phases[clock.phase].fill === 1}
         />
       }
       heading={
@@ -373,8 +376,27 @@ function GroundingPlayer({ exercise, breath, nav }: PlayerProps) {
   const [step, setStep] = useState(0);
   const log = useSessionLog('breathing', 'panic-relief');
 
-  // The orb opens to the middle circle to hold the count, and rests otherwise.
-  useEffect(() => settle(breath, status === 'running' ? 0.5 : 0), [status, breath]);
+  // The orb opens full as grounding begins, then gives a little at each step, so the steps
+  // done show in it too; it rests otherwise.
+  const OPEN_MS = 900;
+  useEffect(
+    () => settle(breath, status === 'running' ? 1 - step * GROUNDING_STEP_DEFLATE : 0, OPEN_MS),
+    [status, step, breath],
+  );
+  // Its rim lights once, briefly, as it reaches full on the first step.
+  const [full, setFull] = useState(false);
+  useEffect(() => {
+    if (status !== 'running' || step !== 0) {
+      setFull(false);
+      return;
+    }
+    const on = setTimeout(() => setFull(true), OPEN_MS);
+    const off = setTimeout(() => setFull(false), OPEN_MS + 700);
+    return () => {
+      clearTimeout(on);
+      clearTimeout(off);
+    };
+  }, [status, step]);
 
   const begin = () => {
     setStep(0);
@@ -410,6 +432,7 @@ function GroundingPlayer({ exercise, breath, nav }: PlayerProps) {
           tone={tone}
           breath={breath}
           progress={running ? (step + 1) / steps.length : status === 'complete' ? 1 : undefined}
+          full={full}
           // The mark sits in the orb; the step's count is in the prompt beneath.
         />
       }
@@ -595,7 +618,8 @@ function TensionPlayer({ exercise, breath, nav }: PlayerProps) {
       stage={
         // The same lit orb as the other exercises; the count sits on it in ink, as the play icon does on its light button.
         // The mark sits in the orb; the countdown joins the Tense / Release label.
-        <BreathStage shape="ring" tone={tone} breath={breath} />
+        // Lit briefly as each tense begins: the release has just filled the orb (or, first time, it's just opened).
+        <BreathStage shape="ring" tone={tone} breath={breath} full={inSession && isTense && elapsed >= 400 && elapsed < 1100} />
       }
       heading={
         inSession ? (

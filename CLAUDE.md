@@ -338,8 +338,19 @@ passes `body=1` to the scene, and the scene (`fromBody` from `useSceneFrame`)
 starts with that body whole instead of turning the mark into it. When one
 style is chosen, delete the other and the setting.
 
-**Theme changes crossfade** (from Home's logo, More and Profile alike):
-`setPreference` captures the screen (`react-native-view-shot`'s
+**Sunrise's accent, three ways, while it's decided** (More → Appearance →
+Sunrise accent, shown in Sunrise only; `SunriseAccent` in `constants/theme.ts`,
+persisted as `houna-sunrise-accent`, Dark until changed): `dark`, Dark
+Turquoise throughout as designed; `mixed`, the logo turquoise where there's no
+text (the raised Tanafas button, the glow tone's icons) and Dark Turquoise for
+text and anything carrying white text; `turquoise`, the logo turquoise
+throughout, which falls short of contrast minimums (2.6:1 on the ground, 2.8:1
+under white text). `ThemeContext` picks `sunriseAccentColors[sunriseAccent]`
+for Sunrise. When one is chosen, keep it as `sunriseColors` and delete the
+rest and the setting.
+
+**Theme changes crossfade** (from Home's logo, More and Profile alike, and
+the Sunrise accent): `ThemeContext`'s `crossfade` captures the screen (`react-native-view-shot`'s
 `captureScreen`), lays the picture over the whole app, switches the colours
 underneath once it's drawn, then fades it out over `THEME_FADE_MS`; it
 resolves once the new colours are in place. The module is native, so a dev
@@ -355,6 +366,11 @@ glassy orb that inflates and deflates (box breathing: a square of dots
 around a rounded-square orb), with the Houna mark pressed into its middle
 (one even shape a shade deeper than the orb, scaling with it: `components/ui/PressedMark.tsx`, the
 one pressed mark the orbs, the suns and the moon share); the screen glow breathes with it.
+While the player says the orb is `full`, its rim and the mark are lit in the tone's colour
+(`BreathStage`'s `full`): through the hold at the top of a breath (4-7-8, box), briefly as
+each tense begins after a release, and briefly as grounding's orb opens full; grounding's
+orb then gives a little at each step (`GROUNDING_STEP_DEFLATE`). The players say when, rather
+than the stage watching `breath`: a native-driven value reports back unevenly near the top.
 The dots move on Home's clock (`StarfieldContext`), rippling like its ring;
 a ring also turns (not while grounding lights it, never the square, whose
 corners the bead follows), and none take Home's 5s breath, which would

@@ -46,6 +46,12 @@ export const BREATH_PATTERNS: Record<'anxiety-relief' | 'steady-mind', readonly 
 export const SESSION_MINUTES = [1, 3, 5] as const;
 export const DEFAULT_SESSION_MINUTES = 3;
 
+/**
+ * Panic relief grounding: the orb opens full as it begins, then gives this much
+ * (of its 0–1 fill) at each step, so the five steps end at 0.4.
+ */
+export const GROUNDING_STEP_DEFLATE = 0.15;
+
 /** Progressive muscle relaxation: each group is tensed, then released. */
 export const TENSE_MS = 5000;
 export const RELEASE_MS = 7000;

@@ -1,10 +1,11 @@
-import React, { useMemo } from 'react';
-import { Animated, Platform, StyleSheet, View } from 'react-native';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { Animated, Easing, Platform, StyleSheet, View } from 'react-native';
 import Svg, { Circle, Rect } from 'react-native-svg';
 import { useTheme } from '@/contexts/ThemeContext';
 import { alpha, flatten } from '@/constants/theme';
 import Orb from '@/components/ui/Orb';
 import PressedMark from '@/components/ui/PressedMark';
+import HounaMark from '@/components/HounaMark';
 import { useStarfield } from '@/contexts/StarfieldContext';
 import { WAVE_STEPS, wave } from '@/hooks/useCalmLoop';
 import type { IconTileTone } from '@/components/ui/IconTile';
@@ -24,6 +25,8 @@ const REST = 74 / ORB;
 const MARK = 64;
 /** The hairline "middle" outline. */
 const MIDDLE = 137;
+/** The rim that flashes as the orb reaches full size: its width in the orb's full-size frame. */
+const RIM = 2.5;
 
 export type StageShape = 'ring' | 'square';
 
@@ -37,6 +40,8 @@ interface BreathStageProps {
   showTracer?: boolean;
   /** Light the dots up to this fraction, clockwise from the top (grounding steps). */
   progress?: number;
+  /** The orb is full: its rim lights, and stays lit while this holds (a breath held at the top). */
+  full?: boolean;
   /** Centred over the orb (a count, in ink). */
   children?: React.ReactNode;
 }
@@ -44,9 +49,11 @@ interface BreathStageProps {
 /**
  * The Breathe stage from the canvas: a ring (or, for box breathing, a
  * square) of dots graded in size and light, a hairline middle outline, and a
- * lit orb that inflates and deflates with `breath`.
+ * lit orb that inflates and deflates with `breath`. While the player says
+ * the orb is `full`, its rim and the Houna mark in it are lit: they light
+ * as the orb fills, hold through a held breath, and fade as the orb lets go.
  */
-export function BreathStage({ shape, tone, breath, trace, showTracer, progress, children }: BreathStageProps) {
+export function BreathStage({ shape, tone, breath, trace, showTracer, progress, full = false, children }: BreathStageProps) {
   const { colors } = useTheme();
   const fg = colors.tones[tone].fg;
   // The canvas ring pairs Houna glow with dusk; the other tones keep to their own colour.
@@ -68,6 +75,7 @@ export function BreathStage({ shape, tone, breath, trace, showTracer, progress, 
   const turns = shape === 'ring' && progress === undefined;
 
   const scale = breath.interpolate({ inputRange: [0, 1], outputRange: [REST, 1] });
+  const rim = useRimLight(full);
   // Glass rather than solid: the same lit sphere (highlight at the top left, the tone deepening
   // to the rim), but translucent, so the sky and the dots show faintly through it.
   const stops: [string, number][] = [
@@ -108,11 +116,43 @@ export function BreathStage({ shape, tone, breath, trace, showTracer, progress, 
         />
         {/* Inside the breathing scale, so the mark grows and shrinks as one with the shape. */}
         <PressedMark size={MARK} surface={fg} />
+        {/* The mark lit with the rim: drawn solid and faded as one layer, as the pressed mark is. */}
+        <Animated.View style={[styles.centre, { opacity: rim }]} pointerEvents="none" needsOffscreenAlphaCompositing>
+          <HounaMark size={MARK} color={fg} />
+        </Animated.View>
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            styles.rim,
+            {
+              borderRadius: shape === 'square' ? ORB * 0.22 : ORB / 2,
+              borderColor: fg,
+              boxShadow: `0 0 16px ${alpha(fg, 0.8)}`,
+              opacity: rim,
+            },
+          ]}
+        />
       </Animated.View>
       {shape === 'square' && trace && showTracer && <Tracer trace={trace} color={fg} />}
       {!!children && <View style={styles.centre}>{children}</View>}
     </View>
   );
+}
+
+/** The rim's light: up quickly as the orb is full, down more slowly as it lets go. */
+function useRimLight(full: boolean) {
+  const light = useRef(new Animated.Value(full ? 1 : 0)).current;
+  useEffect(() => {
+    const anim = Animated.timing(light, {
+      toValue: full ? 1 : 0,
+      duration: full ? 150 : 500,
+      easing: full ? Easing.out(Easing.quad) : Easing.in(Easing.quad),
+      useNativeDriver: NATIVE_DRIVER,
+    });
+    anim.start();
+    return () => anim.stop();
+  }, [full, light]);
+  return light;
 }
 
 /**
@@ -202,6 +242,10 @@ const styles = StyleSheet.create({
   },
   dot: {
     position: 'absolute',
+  },
+  rim: {
+    ...StyleSheet.absoluteFillObject,
+    borderWidth: RIM,
   },
   tracer: {
     width: 12,
