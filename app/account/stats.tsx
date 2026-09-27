@@ -79,7 +79,7 @@ export default function StatsScreen() {
       <View style={[styles.streakCard, { backgroundColor: colors.tones.glow.bg, borderColor: colors.tones.glow.border }]}>
         <View style={styles.streakMain}>
           <Text style={label}>{s.currentStreak}</Text>
-          <Text style={[styles.streakNumber, isRTL && styles.streakNumberArabic, { color: colors.text, fontFamily: fonts.display }]}>
+          <Text style={[styles.streakNumber, isRTL && styles.streakNumberArabic, { color: colors.text, fontFamily: fonts.numeral }]}>
             {streak ? num(streak.current) : '—'}
           </Text>
           {!!streak && <Text style={[styles.streakDays, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{daysText(streak.current)}</Text>}
@@ -87,7 +87,7 @@ export default function StatsScreen() {
         <View style={[styles.streakDivider, { backgroundColor: colors.tones.glow.border }]} />
         <View style={styles.streakSide}>
           <Text style={label}>{s.longestStreak}</Text>
-          <Text style={[styles.longestNumber, isRTL && styles.longestNumberArabic, { color: colors.text, fontFamily: fonts.display }]}>
+          <Text style={[styles.longestNumber, isRTL && styles.longestNumberArabic, { color: colors.text, fontFamily: fonts.numeral }]}>
             {streak ? num(streak.longest) : '—'}
           </Text>
         </View>
@@ -146,7 +146,7 @@ export default function StatsScreen() {
                     isYou && { backgroundColor: colors.tones.glow.bg },
                   ]}
                 >
-                  <Text style={[styles.rank, { color: i < 3 ? colors.primary : colors.textTertiary, fontFamily: fonts.display }]}>{num(i + 1)}</Text>
+                  <Text style={[styles.rank, { color: i < 3 ? colors.primary : colors.textTertiary, fontFamily: fonts.numeral }]}>{num(i + 1)}</Text>
                   <Text numberOfLines={1} style={[styles.boardName, { color: colors.text, fontFamily: isYou ? fonts.semiBold : fonts.medium }]}>
                     {row.username}
                     {isYou ? ` · ${s.you}` : ''}

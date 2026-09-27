@@ -166,7 +166,7 @@ export default function RecapScreen() {
     </Text>
   );
   const bigNumber = (n: number) => (
-    <Text style={[styles.big, isRTL && styles.bigArabic, { color: colors.text, fontFamily: fonts.display }]}>{num(n)}</Text>
+    <Text style={[styles.big, isRTL && styles.bigArabic, { color: colors.text, fontFamily: fonts.numeral }]}>{num(n)}</Text>
   );
   const unit = (text: string) => <Text style={[styles.unit, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{text}</Text>;
   const cardBg = isNight ? alpha(N.moonlight, 0.07) : colors.surface;

@@ -9,6 +9,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import {
+  Figtree_300Light,
   Figtree_400Regular,
   Figtree_500Medium,
   Figtree_600SemiBold,
@@ -100,6 +101,7 @@ export default function RootLayout() {
   const [introDone, setIntroDone] = useState(false);
 
   const [fontsLoaded, fontError] = useFonts({
+    Figtree_300Light,
     Figtree_400Regular,
     Figtree_500Medium,
     Figtree_600SemiBold,

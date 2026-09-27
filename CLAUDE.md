@@ -215,7 +215,10 @@ Content caps at 430px (`layout.maxContentWidth`).
 **Fonts** (`latinFontFamily` / `arabicFontFamily`, via `useLanguage().fonts`):
 Figtree body + Marcellus display + DM Mono tracked-caps labels for Latin;
 IBM Plex Sans Arabic body + Amiri display for Arabic, whose labels are
-untracked Plex (`fonts.labelTracked` is false).
+untracked Plex (`fonts.labelTracked` is false). Numbers that stand alone
+(Home's count, Stats' streaks and ranks, Recap's big number) use
+`fonts.numeral`: Figtree Light in Latin, since Marcellus' 1 reads as an I;
+Amiri Bold in Arabic, as before (canvas "Numbers — four faces").
 
 **8-point grid**: sizes, gaps and paddings are multiples of 8, with 4 and
 12 (`grid(0.5)`, `grid(1.5)`) for tight inner spacing — `grid(n)` /
@@ -266,7 +269,17 @@ delete `palette`.
 `components/account/AccountKit.tsx`: `AccountScreen` (back button, tracked
 eyebrow, display title), `Field`, `FormMessage`, `OrDivider`, `SwitchLink`,
 `SettingsGroup`/`SettingsRow` and `ThemedSwitch`. Use these for any new
-account or settings screen.
+account or settings screen. `app/account/username.tsx` is both the one-time
+claim at sign-up and, once a name exists, the rename (Your Alias → Username;
+`AuthContext.changeUsername`, an update under `profiles_update_own`). Nothing
+else stores a copy of the name: Voices and the leaderboard read it from
+`profiles`. Availability is case-insensitive, so a change of case only is
+allowed as the person's own name. Renames are limited to two in any 30 days,
+in the database, not the app: a trigger on `profiles` logs each change to
+`username_changes` (RLS on, no policies) and refuses a third with
+`username_change_limit`; `get_username_change_allowance()` tells the screen
+how many are left and when the next frees up. Claiming at sign-up doesn't
+count.
 
 **Houna starfield** (Night only): tapping Home's mark fades Home's chrome
 and the tab bar (`contexts/StarfieldContext.tsx`, one shared `chrome`

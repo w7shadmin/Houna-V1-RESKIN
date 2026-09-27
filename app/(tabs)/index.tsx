@@ -320,7 +320,7 @@ export default function HomeScreen() {
 
           {current ? (
             <View style={styles.countRow}>
-              <Text style={[styles.count, isRTL && styles.countArabic, { color: accent, fontFamily: fonts.display }]}>
+              <Text style={[styles.count, isRTL && styles.countArabic, { color: accent, fontFamily: fonts.numeral }]}>
                 {num(current.totalPeople)}
               </Text>
               <View style={styles.countText}>

@@ -616,8 +616,10 @@ export interface FontFamily {
   medium: string;
   semiBold: string;
   bold: string;
-  /** Headlines and large numerals. */
+  /** Headlines. */
   display: string;
+  /** Numbers that stand alone (Home's count, streaks, ranks, Recap's big number). */
+  numeral: string;
   /** Small labels, eyebrows, chips. */
   label: string;
   /** Unemphasised label (unselected chips). */
@@ -632,6 +634,8 @@ export const latinFontFamily: FontFamily = {
   semiBold: 'Figtree_600SemiBold',
   bold: 'Figtree_600SemiBold',
   display: 'Marcellus_400Regular',
+  // Marcellus' 1 reads as an I (canvas "Numbers — four faces", option A).
+  numeral: 'Figtree_300Light',
   label: 'DMMono_500Medium',
   labelRegular: 'DMMono_400Regular',
   labelTracked: true,
@@ -643,6 +647,7 @@ export const arabicFontFamily: FontFamily = {
   semiBold: 'IBMPlexSansArabic_600SemiBold',
   bold: 'IBMPlexSansArabic_600SemiBold',
   display: 'Amiri_700Bold',
+  numeral: 'Amiri_700Bold',
   label: 'IBMPlexSansArabic_500Medium',
   labelRegular: 'IBMPlexSansArabic_500Medium',
   labelTracked: false,
