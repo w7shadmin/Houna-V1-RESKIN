@@ -2,7 +2,7 @@
 // Dusk → Night (the order of the day), a strip of three icons above it turning like a dial. Two Home
 // styles, both in the app while the client decides (More → Appearance → Home): "Sun & moon", where
 // Home's centre is the theme's own sun or moon alone, and a change sets it off the right edge, the
-// colours crossfade over the empty sky, and the next rises in from the left as they arrive; and
+// colours crossfade over the empty sky, and the next comes in whole from beyond the left edge as they settle; and
 // "Classic", the mark in its ring, where the colours just crossfade.
 // Writes an interactive prototype and a storyboard with notes.
 const fs = require('fs');
@@ -126,13 +126,13 @@ const bodyBox = (inner, style) => `<div style="position: absolute; left: ${CX - 
 // the new colours fade in under it (1000 ms); the next body rises from the left over 1500 ms, landing
 // just after they've settled. Classic: the colours fade at once, the mark stays.
 const OUT = { x: 300, y: 72 }; // off the edge, a little lower: setting / rising
-const TIMING = { total: 2900, leave: [0, 1300], colours: [1400, 1000], enter: [1400, 1500], strip: [0, 400] };
+const TIMING = { total: 3500, leave: [0, 1300], colours: [1400, 1000], enter: [2100, 1400], strip: [0, 400] };
 const CLASSIC = { colours: [60, 1000], total: 1060 };
 const css = `
 @keyframes breath{0%{transform:scale(0.95);opacity:0.35}50%{transform:scale(1.06);opacity:1}100%{transform:scale(0.95);opacity:0.35}}
 ${['A', 'B'].map((v) => `
 @keyframes leave${v}{0%{transform:translate(0,0);opacity:1}45%{transform:translate(${OUT.x * 0.45}px,${OUT.y * 0.2}px);opacity:0.95}100%{transform:translate(${OUT.x}px,${OUT.y}px);opacity:0}}
-@keyframes enter${v}{0%{transform:translate(${-OUT.x}px,${OUT.y}px);opacity:0}55%{transform:translate(${-OUT.x * 0.45}px,${OUT.y * 0.2}px);opacity:0.95}100%{transform:translate(0,0);opacity:1}}
+@keyframes enter${v}{0%{transform:translate(${-OUT.x}px,${OUT.y}px);opacity:1}55%{transform:translate(${-OUT.x * 0.45}px,${OUT.y * 0.2}px);opacity:1}100%{transform:translate(0,0);opacity:1}}
 @keyframes fadein${v}{from{opacity:0}to{opacity:1}}
 @keyframes fadeout${v}{from{opacity:1}to{opacity:0}}
 @keyframes stripin${v}{from{opacity:0}to{opacity:0.55}}`).join('')}
@@ -187,7 +187,7 @@ class Component extends DCLogic {
     const { cur, prev, n, sky } = this.state;
     const v = n % 2 ? 'A' : 'B';
     const vals = {};
-    // Sun & moon: the body sets; the colours fade over the empty sky; the next rises as they arrive.
+    // Sun & moon: the body sets; the colours fade over the empty sky; the next comes in whole from the left.
     // Classic: the colours just fade.
     const fade = sky ? T.colours : C.colours;
     for (let k = 0; k < 3; k++) {
@@ -268,7 +268,7 @@ function still(a, b, t) {
 ${home(THEMES[a])}
 <div style="position: absolute; inset: 0; opacity: ${colours.toFixed(2)}">${home(THEMES[b])}</div>
 ${leave < 1 ? bodyBox(BODIES[a], `transform: translate(${lx.toFixed(0)}px, ${ly.toFixed(0)}px); opacity: ${(1 - Math.max(0, leave - 0.45) / 0.55).toFixed(2)}`) : ''}
-${enter > 0 ? bodyBox(BODIES[b], `transform: translate(${(-ex).toFixed(0)}px, ${ey.toFixed(0)}px); opacity: ${Math.min(1, enter / 0.55).toFixed(2)}`) : ''}
+${enter > 0 ? bodyBox(BODIES[b], `transform: translate(${(-ex).toFixed(0)}px, ${ey.toFixed(0)}px); opacity: 1`) : ''}
 ${stripAt(cur, colours < 0.5 ? a : b)}
 </div>`;
 }
@@ -287,7 +287,7 @@ const phone = (inner) => `<div style="width: ${390 * S}px; height: ${844 * S}px;
 const topBar = (k, rtl) => `<div style="position: relative; width: 390px; height: 84px; overflow: hidden; border-radius: 18px; box-shadow: 0 0 0 1px rgba(242,236,221,0.10)">${home(THEMES[k], { rtl })}${stripAt(k)}</div>`;
 const caption = (n, t, note) => `<div style="display: flex; align-items: baseline; gap: 8px"><span style="font-family: 'DM Mono', monospace; font-size: 12px; color: #6FD6CF">${n}</span><span style="font-size: 15px; font-weight: 600; color: #F2ECDD">${t}</span></div>${note ? `<span style="font-size: 13px; line-height: 1.5; color: #B6BAD6">${note}</span>` : ''}`;
 const heading = (eyebrow, title, body) => `<div style="display: flex; flex-direction: column; gap: 6px; max-width: 1100px"><span style="font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.16em; color: #6FD6CF">${eyebrow}</span><span style="font-family: 'Marcellus', serif; font-size: 32px; color: #F2ECDD">${title}</span>${body ? `<span style="font-size: 15px; line-height: 1.55; color: #B6BAD6">${body}</span>` : ''}</div>`;
-const TIMES = [[0, 'Tap'], [900, 'Setting'], [1900, 'Colours fading, the next rising'], [2900, 'Settled']];
+const TIMES = [[0, 'Tap'], [900, 'Setting'], [2300, 'Rising, whole, from the left'], [3500, 'Settled']];
 const CLASSIC_TIMES = [[0, 'Tap'], [400, 'Fading'], [700, 'Fading'], [1060, 'Settled']];
 const row = (times, frame) => `<div style="display: flex; gap: 28px">${times.map(([t, label], i) => `<div style="display: flex; flex-direction: column; gap: 10px; width: ${390 * S}px">${phone(frame(t))}${caption(i + 1, label, `${t} ms`)}</div>`).join('')}</div>`;
 const transitionRow = (a, b) => row(TIMES, (t) => still(a, b, t));
@@ -297,7 +297,7 @@ const NOTES = [
   ['Two Home styles, for now', 'Both are in the app while the client decides: More → Appearance → Home, “Sun & moon” or “Classic”. Both have the logo toggle; only Home’s centre differs. When one is chosen, the other and the setting go.'],
   ['The sky doesn’t mirror', 'The sun and moon always travel left → right, setting off the right edge and rising in from the left, in Arabic too. The strip moves the same way: the next theme waits on the left.'],
   ['A true crossfade', 'The whole screen fades from the old colours to the new, tab bar and all: a picture of the screen is laid over it, the colours switch underneath, and the picture fades away over a second. Profile and More’s Appearance choices fade the same way.'],
-  ['Timing (Sun & moon)', 'The strip turns at once (400 ms). The body sets over 1.3 s; with the sky empty, the colours fade over 1 s; the next body rises over 1.5 s, landing just after they’ve settled. About 3 s in all; the logo waits till it’s done.'],
+  ['Timing (Sun & moon)', 'The strip turns at once (400 ms). The body sets over 1.3 s; with the sky empty, the colours fade over 1 s; 0.7 s into that fade, with the old colours nearly gone, the next body comes in whole from beyond the left edge over 1.4 s. About 3.5 s in all; the logo waits till it’s done.'],
   ['The body is the scene’s', 'Sun & moon shows the same sun or moon its scene does (tonight’s real moon at Night), alone, with no ring of dots; tapping it opens the scene with nothing to transform: the body just carries on.'],
   ['Reduce Motion, haptics, access', 'Reduce Motion: the bodies fade in place, no travel. A light haptic tick on each tap. The logo is a button: “Appearance: Night. Double-tap for Sunrise.”'],
 ];
@@ -323,7 +323,7 @@ ${css}
 <div style="display: flex; flex-direction: column; gap: 12px">
 <span style="font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.16em; color: #6FD6CF">HOUNA · HOME</span>
 <h1 style="margin: 0; font-family: 'Marcellus', serif; font-weight: 400; font-size: 64px; line-height: 1; color: #F2ECDD">Home — appearance</h1>
-<p style="margin: 0; max-width: 1000px; font-size: 17px; line-height: 1.5; color: #B6BAD6">Changing the theme from Home: tap the logo and it turns to the next, Sunrise → Dusk → Night, a strip of three icons above it turning like a dial. Two Home styles, both in the app while the client decides. In “Sun & moon”, Home’s centre is that theme’s own sun or moon, alone; on a change it sets off the right edge, the colours fade across the empty sky, and the next rises in from the left as they arrive. In “Classic”, the mark stays in its ring and the colours fade across. The prototype beside this board plays both (switch at the bottom).</p>
+<p style="margin: 0; max-width: 1000px; font-size: 17px; line-height: 1.5; color: #B6BAD6">Changing the theme from Home: tap the logo and it turns to the next, Sunrise → Dusk → Night, a strip of three icons above it turning like a dial. Two Home styles, both in the app while the client decides. In “Sun & moon”, Home’s centre is that theme’s own sun or moon, alone; on a change it sets off the right edge, the colours fade across the empty sky, and the next comes in whole from beyond the left edge as they settle. In “Classic”, the mark stays in its ring and the colours fade across. The prototype beside this board plays both (switch at the bottom).</p>
 </div>
 <section style="display: flex; flex-direction: column; gap: 18px">
 ${heading('THE TOGGLE · BOTH STYLES', 'The logo and its strip', 'The current theme’s icon lit in the middle; the next on the left, the last on the right. The logo is the button. English and Arabic top bars: the buttons swap sides, the strip doesn’t.')}

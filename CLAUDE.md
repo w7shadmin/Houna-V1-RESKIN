@@ -331,8 +331,8 @@ as above. "Sun & moon" (canvas "Home — appearance"): the mark and its ring of
 dots give way to the theme's own body, alone (`components/home/HomeBody.tsx`:
 tonight's moon, or the scene's sun at `HOME_SUN_SCALE`, in the mark's box so
 nothing round it moves). A change sets the current body off the right edge;
-with the sky empty the colours crossfade, and the next body rises in from the
-left as they arrive (`startSkyChange`). Those directions are physical (the sky
+with the sky empty the colours crossfade, and once the old colours have nearly
+gone the next body rises in whole from beyond the left edge (`startSkyChange`). Those directions are physical (the sky
 doesn't mirror in Arabic); Reduce Motion fades the bodies in place. Home then
 passes `body=1` to the scene, and the scene (`fromBody` from `useSceneFrame`)
 starts with that body whole instead of turning the mark into it. When one

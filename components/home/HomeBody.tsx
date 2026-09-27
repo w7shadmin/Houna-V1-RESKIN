@@ -32,11 +32,12 @@ export interface SkyChange {
 const DROP = 72;
 /**
  * The body's timing (ms): it sets over LEAVE; the colours then fade over
- * THEME_FADE_MS (1000) as the next rises over ENTER, arriving just after
- * they've settled.
+ * THEME_FADE_MS; ENTER_DELAY into that fade, with the old colours nearly gone,
+ * the next comes in over ENTER, whole, from beyond the left edge.
  */
 const LEAVE = 1300;
-const ENTER = 1500;
+const ENTER_DELAY = 700;
+const ENTER = 1400;
 
 const run = (v: Animated.Value, duration: number, easing: (t: number) => number) =>
   new Promise<void>((resolve) => Animated.timing(v, { toValue: 1, duration, easing, useNativeDriver: NATIVE }).start(() => resolve()));
@@ -60,6 +61,7 @@ export function startSkyChange(
   const enter = new Animated.Value(0);
   const done = run(leave, reduceMotion ? 300 : LEAVE, Easing.bezier(0.45, 0, 0.75, 0.45))
     .then(switchColours)
+    .then(() => (reduceMotion ? undefined : new Promise((wait) => setTimeout(wait, ENTER_DELAY))))
     .then(() => run(enter, reduceMotion ? 600 : ENTER, Easing.bezier(0.2, 0.6, 0.3, 1)));
   return { change: { from, to, leave, enter }, done };
 }
@@ -72,6 +74,8 @@ export function startSkyChange(
 export default function HomeBody({ scheme, change, reduceMotion }: { scheme: ColorScheme; change: SkyChange | null; reduceMotion: boolean }) {
   const { width } = useWindowDimensions();
   const out = Math.max(260, width * 0.78);
+  // Where the next body starts: wholly beyond the left edge (the box is centred on the screen).
+  const beyond = width / 2 + HALO_BOX / 2;
 
   if (!change) {
     return (
@@ -92,10 +96,11 @@ export default function HomeBody({ scheme, change, reduceMotion }: { scheme: Col
       : [],
   };
   const arriving = {
-    opacity: change.enter.interpolate({ inputRange: [0, 0.55, 1], outputRange: [0, 0.95, 1] }),
+    // Whole all the way in: it's off screen until it rises past the left edge.
+    opacity: travel ? 1 : change.enter,
     transform: travel
       ? [
-          { translateX: change.enter.interpolate({ inputRange: [0, 0.55, 1], outputRange: [-out, -out * 0.45, 0] }) },
+          { translateX: change.enter.interpolate({ inputRange: [0, 0.55, 1], outputRange: [-beyond, -beyond * 0.45, 0] }) },
           { translateY: change.enter.interpolate({ inputRange: [0, 0.55, 1], outputRange: [DROP, DROP * 0.2, 0] }) },
         ]
       : [],
