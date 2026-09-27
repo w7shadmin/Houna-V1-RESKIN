@@ -1,30 +1,25 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, ActivityIndicator, Share, StyleSheet } from 'react-native';
+import { View, Text, ActivityIndicator, Pressable, Share, StyleSheet, useWindowDimensions } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { Award } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
 import { AccountScreen, FormMessage } from '@/components/account/AccountKit';
 import { GroupLabel } from '@/components/directory/ProfileKit';
 import Button from '@/components/ui/Button';
 import Chip from '@/components/ui/Chip';
-import IconTile from '@/components/ui/IconTile';
+import { DirectionalIcon } from '@/components/ui/CanvasIcon';
+import BadgeGem from '@/components/badges/BadgeGem';
+import WeekMoons from '@/components/stats/WeekMoons';
 import WeekArc from '@/components/stats/WeekArc';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { grid, radius } from '@/constants/theme';
+import { grid, layout, radius } from '@/constants/theme';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
-import {
-  getMyStreak,
-  checkAndAwardBadges,
-  getMyEarnedBadgeCodes,
-  getLeaderboard,
-  BADGE_THRESHOLDS,
-  badgeCodeForThreshold,
-  type StreakInfo,
-  type LeaderboardRow,
-} from '@/lib/streaks';
+import { getMyStreak, getMyBadges, getLeaderboard, type StreakInfo, type LeaderboardRow } from '@/lib/streaks';
+import { BADGE_ORDER } from '@/lib/badges';
+import { useBadgeCheck } from '@/hooks/useBadgeCheck';
 import { sessionsBetween } from '@/lib/sessionLog';
-import { minutesByGroup, weekBounds, type PracticeGroup } from '@/lib/practice';
+import { dayKey, minutesByGroup, weekBounds, type PracticeGroup } from '@/lib/practice';
 
 type Period = 'week' | 'all';
 
@@ -32,6 +27,8 @@ export default function StatsScreen() {
   const { colors } = useTheme();
   const { t, isRTL, fonts } = useLanguage();
   const { session, profile } = useAuth();
+  const { width } = useWindowDimensions();
+  const router = useRouter();
   const s = t.account.stats;
 
   const [streak, setStreak] = useState<StreakInfo | null>(null);
@@ -40,18 +37,17 @@ export default function StatsScreen() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardRow[]>([]);
   const [loadingBoard, setLoadingBoard] = useState(true);
   // The week's minutes by part, and last week's, from the phone's own session log.
-  const [week, setWeek] = useState<{ parts: Record<PracticeGroup, number>; last: number } | null>(null);
+  const [week, setWeek] = useState<{ parts: Record<PracticeGroup, number>; last: number; days: boolean[]; monday: Date } | null>(null);
 
   const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
-  const daysText = (n: number) => arabicPlural(n, s.days).replace('{n}', num(n));
 
   const loadStreak = useCallback(async () => {
     if (!session) return;
-    const info = await getMyStreak();
-    setStreak(info);
-    await checkAndAwardBadges(session.user.id, info.current);
-    setEarnedBadges(await getMyEarnedBadgeCodes());
+    setStreak(await getMyStreak());
+    setEarnedBadges(new Set((await getMyBadges()).keys()));
   }, [session]);
+  // New badges arrive with the unlock moment, and the row here follows.
+  useBadgeCheck(loadStreak);
 
   useFocusEffect(
     useCallback(() => {
@@ -68,7 +64,9 @@ export default function StatsScreen() {
           if (!alive) return;
           const thisWeek = all.filter((x) => x.startedAt >= from.getTime());
           const last = minutesByGroup(all.filter((x) => x.startedAt < from.getTime()));
-          setWeek({ parts: minutesByGroup(thisWeek), last: Object.values(last).reduce((a, b) => a + b, 0) });
+          const practised = new Set(thisWeek.map((x) => dayKey(new Date(x.startedAt))));
+          const days = Array.from({ length: 7 }, (_, i) => practised.has(dayKey(new Date(from.getFullYear(), from.getMonth(), from.getDate() + i))));
+          setWeek({ parts: minutesByGroup(thisWeek), last: Object.values(last).reduce((a, b) => a + b, 0), days, monday: from });
         })
         .catch(() => {});
       return () => {
@@ -101,50 +99,44 @@ export default function StatsScreen() {
     <AccountScreen title={s.title} subtitle={s.subtitle}>
       {week && <WeekArc week={week.parts} lastWeek={week.last} />}
 
-      <View style={[styles.streakCard, { backgroundColor: colors.tones.glow.bg, borderColor: colors.tones.glow.border }]}>
-        <View style={styles.streakMain}>
-          <Text style={label}>{s.currentStreak}</Text>
-          <Text style={[styles.streakNumber, isRTL && styles.streakNumberArabic, { color: colors.text, fontFamily: fonts.numeral }]}>
-            {streak ? num(streak.current) : '—'}
-          </Text>
-          {!!streak && <Text style={[styles.streakDays, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{daysText(streak.current)}</Text>}
-        </View>
-        <View style={[styles.streakDivider, { backgroundColor: colors.tones.glow.border }]} />
-        <View style={styles.streakSide}>
-          <Text style={label}>{s.longestStreak}</Text>
-          <Text style={[styles.longestNumber, isRTL && styles.longestNumberArabic, { color: colors.text, fontFamily: fonts.numeral }]}>
-            {streak ? num(streak.longest) : '—'}
-          </Text>
-        </View>
-      </View>
-
+      {/* The streak as the week in moons (canvas "Phase 6 — Stats: the week in moons"). */}
+      {week && streak && (
+        <WeekMoons
+          streak={streak.current}
+          practised={week.days}
+          monday={week.monday}
+          today={(new Date().getDay() + 6) % 7}
+          width={Math.min(width, layout.maxContentWidth) - layout.screenPadding * 2}
+        />
+      )}
       {!!streak && streak.current === 0 && <FormMessage message={s.noStreakYet} tone="muted" />}
+      <View style={[styles.line, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <Text style={label}>{s.longestStreak}</Text>
+        <Text style={[styles.longestNumber, isRTL && styles.longestNumberArabic, { color: colors.text, fontFamily: fonts.numeral }]}>
+          {streak ? num(streak.longest) : '—'}
+        </Text>
+      </View>
       {!!streak && streak.current > 0 && (
         <View style={styles.shareRow}>
           <Button variant="secondary" label={s.share} onPress={handleShare} />
         </View>
       )}
 
-      <View style={styles.section}>
-        <GroupLabel>{s.badgesTitle}</GroupLabel>
-        <View style={styles.badges}>
-          {BADGE_THRESHOLDS.map((days) => {
-            const earned = earnedBadges.has(badgeCodeForThreshold(days));
-            return (
-              <View key={days} style={[styles.badge, !earned && styles.badgeLocked]}>
-                <IconTile
-                  size={46}
-                  tone={earned ? 'glow' : 'dusk'}
-                  renderIcon={(c, size) => <Award size={size} color={earned ? c : colors.textTertiary} strokeWidth={1.6} />}
-                />
-                <Text numberOfLines={1} style={[styles.badgeLabel, { color: earned ? colors.text : colors.textTertiary, fontFamily: fonts.medium }]}>
-                  {arabicPlural(days, s.badgeName).replace('{n}', num(days))}
-                </Text>
-              </View>
-            );
-          })}
-        </View>
-      </View>
+      {/* The gems held, opening the badges page. */}
+      <Pressable
+        accessibilityRole="link"
+        onPress={() => router.push('/account/badges')}
+        style={({ pressed }) => [styles.line, { backgroundColor: colors.card, borderColor: colors.border }, pressed && { opacity: 0.85 }]}
+      >
+        {BADGE_ORDER.filter((c) => earnedBadges.has(c)).map((c) => (
+          <BadgeGem key={c} code={c} size={26} />
+        ))}
+        <Text style={[styles.badgesLabel, { color: colors.text, fontFamily: fonts.medium }]}>{t.badges.title}</Text>
+        <Text style={[styles.note, { color: colors.textTertiary, fontFamily: fonts.regular }]}>
+          {t.badges.count.replace('{n}', num(BADGE_ORDER.filter((c) => earnedBadges.has(c)).length)).replace('{m}', num(BADGE_ORDER.length))}
+        </Text>
+        <DirectionalIcon isRTL={isRTL} name="chevron" size={18} color={colors.textTertiary} />
+      </Pressable>
 
       <View style={styles.section}>
         <GroupLabel>{s.leaderboardTitle}</GroupLabel>
@@ -196,34 +188,19 @@ const styles = StyleSheet.create({
   labelArabic: {
     fontSize: 13,
   },
-  streakCard: {
+  line: {
     flexDirection: 'row',
-    alignItems: 'stretch',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: grid(1.5),
+    minHeight: grid(8),
+    paddingHorizontal: grid(2),
     borderWidth: 1,
-    borderRadius: radius.cardLg,
-    padding: grid(3),
-    gap: grid(3),
+    borderRadius: radius.card,
   },
-  streakMain: {
+  badgesLabel: {
     flex: 1,
-    gap: grid(0.5),
-  },
-  streakNumber: {
-    fontSize: 64,
-    lineHeight: 72,
-  },
-  streakNumberArabic: {
-    lineHeight: 96,
-  },
-  streakDays: {
     fontSize: 15,
-  },
-  streakDivider: {
-    width: 1,
-  },
-  streakSide: {
-    minWidth: grid(9),
-    gap: grid(0.5),
   },
   longestNumber: {
     fontSize: 32,
@@ -238,20 +215,6 @@ const styles = StyleSheet.create({
   section: {
     gap: grid(1.5),
     marginTop: grid(1),
-  },
-  badges: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  badge: {
-    alignItems: 'center',
-    gap: grid(1),
-  },
-  badgeLocked: {
-    opacity: 0.55,
-  },
-  badgeLabel: {
-    fontSize: 12.5,
   },
   note: {
     fontSize: 14,

@@ -43,3 +43,31 @@ test('each day practised has its minutes and what it mostly was; quiet days are 
   assert.deepEqual(days.get('2026-09-16'), { minutes: 1, mostly: 'panicRelief' });
   assert.equal(days.has('2026-09-17'), false);
 });
+
+test('the month: its bounds and each day’s minutes by part', async () => {
+  const { monthBounds, minutesByDayAndGroup } = await import('./practice.ts');
+  const { from, to, days } = monthBounds(new Date(2026, 8, 27, 20));
+  assert.equal(days, 30);
+  assert.equal(from.getDate(), 1);
+  assert.equal(to.getMonth(), 9);
+  const at = (d: number, h = 9) => new Date(2026, 8, d, h).getTime();
+  const log = [
+    { id: 'a', kind: 'breathing' as const, exercise: 'steady-mind', startedAt: at(1), durationSeconds: 90 },
+    { id: 'b', kind: 'breathing' as const, exercise: 'steady-mind', startedAt: at(1, 22), durationSeconds: 30 },
+    { id: 'c', kind: 'meditation' as const, exercise: 'fire', startedAt: at(27), durationSeconds: 600 },
+    { id: 'd', kind: 'meditation' as const, exercise: 'fire', startedAt: new Date(2026, 9, 1, 9).getTime(), durationSeconds: 600 },
+  ];
+  const byDay = minutesByDayAndGroup(log, from, days);
+  assert.equal(byDay.length, 30);
+  assert.equal(byDay[0].steadyMind, 2);
+  assert.equal(byDay[26].meditation, 10);
+  assert.equal(byDay.reduce((a, d) => a + d.meditation, 0), 10);
+});
+
+test('smoothing stops at today', async () => {
+  const { smoothed } = await import('./practice.ts');
+  const out = smoothed([7, 0, 0, 0, 0, 0, 0, 7, 7], 7, 3);
+  assert.equal(out[0], 3.5);
+  assert.equal(out[7], 3.5);
+  assert.equal(out[8], 0);
+});

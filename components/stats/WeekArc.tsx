@@ -7,6 +7,7 @@ import { alpha, grid, radius } from '@/constants/theme';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { PRACTICE_GROUPS, type PracticeGroup } from '@/lib/practice';
 import { useReduceMotion } from '@/hooks/useCalmLoop';
+import { practiceColours } from './practiceColours';
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
@@ -53,14 +54,7 @@ export default function WeekArc({ week, lastWeek }: WeekArcProps) {
   const reduceMotion = useReduceMotion();
   const draw = useRef(new Animated.Value(0)).current;
 
-  const colour: Record<PracticeGroup, string> = {
-    anxietyRelief: colors.tones.glow.fg,
-    steadyMind: colors.tones.dusk.fg,
-    panicRelief: colors.tones.dawn.fg,
-    tensionRelease: colors.tones.bloom.fg,
-    meditation: colors.text,
-    tanafas: alpha(colors.text, 0.5),
-  };
+  const colour = practiceColours(colors);
   const total = PRACTICE_GROUPS.reduce((sum, g) => sum + week[g], 0);
   const parts = PRACTICE_GROUPS.filter((g) => week[g] > 0);
 

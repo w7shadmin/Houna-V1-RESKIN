@@ -20,6 +20,7 @@ export default function AccountLayout() {
       <Stack.Screen name="profile" />
       <Stack.Screen name="notifications" />
       <Stack.Screen name="stats" />
+      <Stack.Screen name="badges" />
     </Stack>
   );
 }

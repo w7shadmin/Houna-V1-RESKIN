@@ -234,4 +234,5 @@ ${bigNum(10, 44, T.text, ar)}
 })();
 
 module.exports = out;
+module.exports.data = { SEPT, EX, EX_AR, exColours, THEMES };
 if (require.main === module) console.log(out.map((b) => `${b.file} ${b.w}×${b.h}${b.interactive ? ' (interactive)' : ''}`).join('\n'));

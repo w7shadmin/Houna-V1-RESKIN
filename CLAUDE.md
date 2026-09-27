@@ -415,6 +415,42 @@ the week (Monday to Monday, as the leaderboard's) and each day practised.
   Reduce Motion fade. When one splash is chosen, delete the other and `SPLASH`.
   `useCalmLoop` works outside a screen for it (always "focused" there).
 
+**Account & badges** (phase 6, canvas "Houna — Account & badges (phase 6)"; the
+Explorations' section E with the held Profile & badges plan):
+- Profile (`app/profile.tsx`): the Kufic ring (`components/profile/KuficRing.tsx`),
+  هُنا · نتنفّس معًا turning slowly round the theme's own body (its disc, the mark
+  pressed in) or the person's photo. The ring is one baked outline
+  (`constants/kuficRing.ts`, from `design/canvas/scripts/make-kufic-ring.js`: HarfBuzz
+  shapes Amiri Bold and sets each glyph on the circle), because react-native-svg's
+  textPath doesn't join Arabic. Then, for an Alias: three numbers (the phone's
+  practice streak, sessions this month, badges) and the badges card (gems held,
+  the next streak badge unlit with the days to go), opening `app/account/badges.tsx`.
+  For everyone, from the phone's own log (`hooks/useMonthPractice.ts`): Your sky
+  (`components/profile/YourSky.tsx`, a star per day practised this month, placed by
+  its date so it keeps its place, joined in order, the newest pulsing; whole in
+  `app/your-sky.tsx`, tap a star for its day) and Your month in breath
+  (`components/profile/MonthRidges.tsx`: minutes by part of practice as ridges, a
+  seven-day average through today, `smoothed` in `lib/practice.ts`). Then My
+  results, Recap and Stats as rows, and the settings. Both graphs run from the
+  right in Arabic (physical offsets, `direction: 'ltr'` on native).
+- The badges (`lib/badges.ts`, tested): five streak badges (3, 7, 14, 30, 100 days,
+  a journey through the day) and four for exploring (the first session, all four
+  breathing exercises, all four scenes, the sunrise + dusk + starfield visits), from
+  the server streak and the on-device log. Aliases only: `badges_earned` keeps
+  them. `hooks/useBadgeCheck.ts` awards what's due when Home, Profile, Stats or the
+  badges page come into focus (so a badge arrives on returning from a session;
+  never while the splash is up; one check at a time) and opens the unlock moment,
+  `app/badge.tsx` (a transparent modal: the screen behind blurred, the gem rising
+  into its light with sparks, the words arriving, "Lovely" to the next or out;
+  still under Reduce Motion). Each is drawn by `components/badges/BadgeGem.tsx`:
+  its sky in a sphere of glass lit in its own colour; locked, the same greyed.
+  "Held by N% of Houna" comes from `get_badge_shares()` (SECURITY DEFINER, counts
+  over `profiles`, never names; migration `20260928120000_badge_shares.sql`).
+- Stats: the streak card is now the week in moons (`components/stats/WeekMoons.tsx`:
+  the streak large over this week's real moons, lit on days practised, today
+  ringed, days to come faint, never "missed"), the longest beneath, and a badges
+  row opening the badges page. Part colours are shared (`practiceColours`).
+
 **The sky clock** (canvas "Phase 3 — the sky clock"; a long press on Home's mark
 or body, or the screen reader's "Today's sky" action; the only entry for now, to
 settle with the others): `app/sky.tsx`, a scene of its own over Home. One sky
@@ -554,8 +590,8 @@ Society's (Eshraq) standardised version, scored as its permission-free 0–24
 total with no cut-off (the weighted cut-offs need NYU's permission). Licences:
 PHQ/GAD free (Pfizer); ASRS-5 free as a plain total, NYU licence for cut-offs
 or commercial use; PCL-5 public domain; WHO-5 CC BY-NC-SA (non-commercial, with
-WHO's translation disclaimer). Profile shows multi-trait reflections only: a
-screener's score stays on its results screen.
+WHO's translation disclaimer). Profile shows no scores at all (shared phones):
+every result is one tap away in My results (`app/results.tsx`).
 
 **Directory pages** are all in the canvas language now: list pages use
 `components/directory/PageHeader.tsx`; the professional / organization /

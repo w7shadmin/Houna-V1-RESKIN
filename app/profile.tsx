@@ -1,92 +1,132 @@
 import React, { useCallback, useState } from 'react';
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { useFocusEffect, useRouter, type Href } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
+import Svg, { Polygon } from 'react-native-svg';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { APPEARANCE_OPTIONS, useTheme, type AppearancePreference } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { alpha, layout, nightPalette } from '@/constants/theme';
+import { alpha, layout, type ColorScheme } from '@/constants/theme';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { getCountryName } from '@/lib/countries';
-import { exportAndShareJournal, formatEntryDateShort, localDateString } from '@/lib/journal';
-import { computeStreak } from '@/lib/streaks';
+import { exportAndShareJournal } from '@/lib/journal';
+import { computeStreak, getMyBadges, getMyStreak } from '@/lib/streaks';
 import { sessionDays } from '@/lib/sessionLog';
-import { listResults, type StoredResult } from '@/lib/psychometrics/results';
-import { getTest } from '@/constants/psychometrics';
+import { listResults } from '@/lib/psychometrics/results';
+import { BADGE_ORDER, nextStreakBadge } from '@/lib/badges';
+import { star8Points } from '@/lib/khatam';
 import { resolveImageUrl } from '@/lib/hounaApi';
 import Button from '@/components/ui/Button';
 import IconButton from '@/components/ui/IconButton';
-import IconTile from '@/components/ui/IconTile';
 import Orb from '@/components/ui/Orb';
-import CanvasIcon, { DirectionalIcon } from '@/components/ui/CanvasIcon';
+import PressedMark from '@/components/ui/PressedMark';
+import MoonGlyph from '@/components/ui/MoonGlyph';
+import ScreenGlow from '@/components/ui/ScreenGlow';
+import { DirectionalIcon } from '@/components/ui/CanvasIcon';
 import HounaMark from '@/components/HounaMark';
-import RadarChart from '@/components/discover/RadarChart';
+import NightStars from '@/components/home/NightStars';
+import BadgeGem from '@/components/badges/BadgeGem';
+import KuficRing from '@/components/profile/KuficRing';
+import YourSky from '@/components/profile/YourSky';
+import MonthRidges from '@/components/profile/MonthRidges';
+import { useMonthPractice } from '@/hooks/useMonthPractice';
+import { useBadgeCheck } from '@/hooks/useBadgeCheck';
+
+/** The body at the ring's centre: the theme's own sun or moon, as a lit disc with the mark pressed in (pressed-kit's discs). */
+const DISC: Record<ColorScheme, { stops: [string, number][]; surface: string; glow: string }> = {
+  sunrise: { stops: [['#FFF9F1', 0], ['#FFE9D3', 0.52], ['#FBC8A3', 0.82], ['#F9A980', 1]], surface: '#FBC8A3', glow: '#F9A980' },
+  day: { stops: [['#FFF3E4', 0], ['#FFD9B3', 0.5], ['#F5B08A', 0.8], ['#E4826A', 1]], surface: '#F5B08A', glow: '#EC8C6E' },
+  night: { stops: [['#D9FAF6', 0], ['#6FD6CF', 0.55], ['#2E8F8A', 1]], surface: '#6FD6CF', glow: '#6FD6CF' },
+};
+const AVATAR = 108;
 
 /**
- * Profile (FEATURES_BRIEF §7, canvas "Profile"), opened from Home's
- * top-right button. Members see their identity, the recap card, their
- * latest self-reflection traits and practice streak; Guests get a
- * claim-an-alias card instead (the recap card too — Recap works on-device
- * for everyone). Settings live here: language, appearance, notifications,
- * community map, journal export, sign out.
+ * Profile (canvas "Phase 6 — Profile: the Kufic ring"), opened from Home's top-right button. The
+ * ring reads هُنا · نتنفّس معًا, "here · we breathe together", turning slowly round the theme's own
+ * body with the mark pressed in (or the person's photo). Then, for an Alias: three numbers (the
+ * practice streak, sessions this month, badges) and the badges held, lit in their gems, the next
+ * one waiting unlit. For everyone, from the phone's own log: Your sky (a star for each day
+ * practised this month) and Your month in breath (the month's minutes as ridges). Then My results,
+ * Recap and Stats, one tap away, and the settings: language, appearance, notifications, journal
+ * export, sign out. Guests keep the claim-an-alias card in place of the name, numbers and badges.
  */
 export default function ProfileScreen() {
-  const { colors } = useTheme();
+  const { colors, scheme, isNight } = useTheme();
   const router = useRouter();
+  const { width } = useWindowDimensions();
   const { t, fonts, isRTL, language, setLanguage } = useLanguage();
   const { profile, signOut, isGuest, needsUsername } = useAuth();
   const p = t.profile;
+  const b = t.badges;
   const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
 
-  const [latest, setLatest] = useState<StoredResult | null>(null);
   const [streak, setStreak] = useState(0);
+  const [serverStreak, setServerStreak] = useState(0);
+  const [held, setHeld] = useState<Map<string, string> | null>(null);
+  const [resultCount, setResultCount] = useState(0);
   const [exportFailed, setExportFailed] = useState(false);
+  const month = useMonthPractice();
 
+  const loadBadges = useCallback(() => {
+    if (!profile) return;
+    getMyBadges().then(setHeld).catch(() => {});
+    getMyStreak()
+      .then((s) => setServerStreak(s.current))
+      .catch(() => {});
+  }, [profile]);
   useFocusEffect(
     useCallback(() => {
       let alive = true;
-      // The latest multi-trait reflection: a screener's score (mood, anxiety…) stays on its own results screen.
-      listResults()
-        .then((rs) => alive && setLatest(rs.find((r) => (getTest(r.testId)?.traits.length ?? 0) >= 3) ?? null))
-        .catch(() => {});
       sessionDays()
         .then((days) => alive && setStreak(computeStreak(days).current))
         .catch(() => {});
+      listResults()
+        .then((rs) => alive && setResultCount(rs.length))
+        .catch(() => {});
+      loadBadges();
       return () => {
         alive = false;
       };
-    }, []),
+    }, [loadBadges]),
   );
+  useBadgeCheck(loadBadges);
 
-  const month = t.journal.dateNames.monthsLong[new Date().getMonth()];
+  const monthName = t.journal.dateNames.monthsLong[new Date().getMonth()];
   const back = () => (router.canGoBack() ? router.back() : router.replace('/(tabs)'));
   const go = (href: Href) => () => router.push(href);
-
   const onExport = () => {
     setExportFailed(false);
     exportAndShareJournal().catch(() => setExportFailed(true));
   };
 
+  const country = profile?.country ? getCountryName(profile.country, language) : null;
+  const since = profile ? p.since.replace('{month}', t.journal.dateNames.monthsLong[new Date(profile.created_at).getMonth()]) : '';
+  const avatar = resolveImageUrl(profile?.avatar_url ?? null);
+  const disc = DISC[scheme];
+  const earned = BADGE_ORDER.filter((c) => held?.has(c));
+  const next = held ? nextStreakBadge(held, serverStreak) : null;
+  // The cards' inner width, for the sky and the ridges.
+  const inner = Math.min(width, layout.maxContentWidth) - layout.screenPadding * 2 - 2 * 16 - 2;
   const latin = fonts.labelTracked;
   const eyebrow = (text: string, color: string) => (
-    <Text
-      style={[
-        latin ? styles.eyebrowLatin : styles.eyebrowArabic,
-        { color, fontFamily: latin ? fonts.labelRegular : fonts.label },
-      ]}
-    >
-      {text}
-    </Text>
+    <Text style={[latin ? styles.eyebrowLatin : styles.eyebrowArabic, { color, fontFamily: latin ? fonts.labelRegular : fonts.label }]}>{text}</Text>
   );
-
-  const test = latest ? getTest(latest.testId) : undefined;
-  const country = profile?.country ? getCountryName(profile.country, language) : null;
-  const avatar = resolveImageUrl(profile?.avatar_url ?? null);
+  const card = { backgroundColor: colors.card, borderColor: colors.border };
+  const stat = (glyph: React.ReactNode, value: number, label: string) => (
+    <View style={styles.stat}>
+      <View style={styles.statGlyph}>{glyph}</View>
+      <Text style={[styles.statNumber, isRTL && styles.statNumberArabic, { color: colors.text, fontFamily: fonts.numeral }]}>{num(value)}</Text>
+      {eyebrow(label, colors.textTertiary)}
+    </View>
+  );
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <View style={styles.top} pointerEvents="none">
+          {isNight && <NightStars />}
+          <ScreenGlow color={alpha(disc.glow, isNight ? 0.2 : 0.18)} rx={70} ry={50} cy={42} />
+        </View>
         <View style={styles.header}>
           <IconButton
             variant="subtle"
@@ -94,61 +134,72 @@ export default function ProfileScreen() {
             onPress={back}
             renderIcon={(c) => <DirectionalIcon isRTL={isRTL} name="back" size={20} strokeWidth={1.8} color={c} />}
           />
-          <Text accessibilityRole="header" style={[styles.headerTitle, { color: colors.text, fontFamily: fonts.semiBold }]}>
-            {p.title}
-          </Text>
-          <View style={styles.headerSpacer} />
         </View>
 
-        {profile ? (
-          <View style={styles.identity}>
-            <View style={[styles.avatarRing, { boxShadow: `0 0 0 4px ${colors.background}, 0 0 0 5px ${alpha(colors.tones.glow.hue, 0.5)}` }]}>
+        <View style={styles.identity}>
+          <KuficRing color={isNight ? alpha(colors.text, 0.72) : alpha(colors.primary, 0.78)}>
+            <View style={[styles.avatar, { boxShadow: `0 0 36px ${alpha(disc.glow, 0.5)}` }]}>
               {avatar ? (
-                <Image source={{ uri: avatar }} style={styles.avatarImage} />
+                <Image source={{ uri: avatar }} style={styles.avatarImage} accessibilityIgnoresInvertColors />
               ) : (
                 <>
-                  <Orb size={92} fx={0.3} fy={0.25} stops={[['#D9FAF6', 0], [nightPalette.hounaGlow, 0.55], ['#2E8F8A', 1]]} />
-                  <View style={StyleSheet.absoluteFill}>
-                    <Text style={[styles.avatarInitial, { color: nightPalette.midnight, fontFamily: fonts.display }]}>
-                      {profile.username.slice(0, 1).toUpperCase()}
-                    </Text>
-                  </View>
+                  <Orb size={AVATAR} fx={0.5} fy={0.45} stops={disc.stops} />
+                  <PressedMark size={56} surface={disc.surface} />
                 </>
               )}
             </View>
-            <Text style={[styles.username, { color: colors.text, fontFamily: fonts.display }]}>{profile.username}</Text>
-            <View style={styles.countryRow}>
-              {country && (
-                <Text style={[styles.country, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{country} ·</Text>
-              )}
-              <Pressable accessibilityRole="link" onPress={go('/account/profile')} hitSlop={8}>
-                <Text style={[styles.country, { color: colors.primary, fontFamily: fonts.medium }]}>
-                  {country ? p.edit : p.addCountry}
+          </KuficRing>
+          {profile && (
+            <>
+              <Text accessibilityRole="header" style={[styles.username, { color: colors.text, fontFamily: fonts.display }]}>
+                {profile.username}
+              </Text>
+              <View style={styles.countryRow}>
+                <Text style={[styles.country, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
+                  {country ? `${country} · ${since}` : since}
                 </Text>
-              </Pressable>
-            </View>
+                <Pressable accessibilityRole="link" onPress={go('/account/profile')} hitSlop={8}>
+                  <Text style={[styles.country, { color: colors.primary, fontFamily: fonts.medium }]}>{country ? p.edit : p.addCountry}</Text>
+                </Pressable>
+              </View>
+            </>
+          )}
+        </View>
+
+        {profile ? (
+          <View style={styles.stats}>
+            {stat(<MoonGlyph date={new Date()} size={26} lit={colors.tones.dawn.fg} dark={alpha(colors.tones.dawn.fg, 0.14)} minFraction={0.3} />, streak, p.numbers.streak)}
+            {stat(
+              <View style={[styles.statOrb, { backgroundColor: alpha(colors.tones.glow.hue, 0.7), boxShadow: `0 0 10px ${alpha(colors.tones.glow.hue, 0.55)}` }]}>
+                <View style={styles.statOrbShine} />
+              </View>,
+              month?.sessions.length ?? 0,
+              p.numbers.month,
+            )}
+            {stat(
+              <Svg width={28} height={28}>
+                <Polygon points={star8Points(14, 14, 13)} fill={colors.tones.dusk.fg} />
+              </Svg>,
+              earned.length,
+              p.numbers.badges,
+            )}
           </View>
         ) : needsUsername ? (
           // Signed in, alias not claimed yet — finish setup (was on More's account card).
           <Pressable
             accessibilityRole="link"
             onPress={go('/account/username')}
-            style={({ pressed }) => [styles.guest, { backgroundColor: colors.card, borderColor: colors.border }, pressed && styles.pressed]}
+            style={({ pressed }) => [styles.guest, card, pressed && styles.pressed]}
           >
-            <HounaMark size={64} />
+            <HounaMark size={48} />
             <Text style={[styles.guestTitle, isRTL && styles.guestTitleArabic, { color: colors.text, fontFamily: fonts.display }]}>
               {t.account.more.finishSetupTitle}
             </Text>
-            <Text style={[styles.guestBody, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-              {t.account.more.finishSetupBody}
-            </Text>
+            <Text style={[styles.guestBody, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{t.account.more.finishSetupBody}</Text>
           </Pressable>
         ) : (
-          <View style={[styles.guest, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <HounaMark size={64} />
-            <Text style={[styles.guestTitle, isRTL && styles.guestTitleArabic, { color: colors.text, fontFamily: fonts.display }]}>
-              {p.guest.title}
-            </Text>
+          <View style={[styles.guest, card]}>
+            <Text style={[styles.guestTitle, isRTL && styles.guestTitleArabic, { color: colors.text, fontFamily: fonts.display }]}>{p.guest.title}</Text>
             <Text style={[styles.guestBody, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{p.guest.body}</Text>
             <View style={styles.guestButtons}>
               <Button label={p.guest.signIn} variant="secondary" onPress={go('/account/sign-in')} />
@@ -157,76 +208,106 @@ export default function ProfileScreen() {
           </View>
         )}
 
-        {/* Recap — everyone: it's built from this phone's own log. */}
+        {/* The badges held (kept by Houna, so an Alias's), lit in their gems; the next one waiting. */}
+        {profile && held && (
+          <Pressable
+            accessibilityRole="link"
+            accessibilityLabel={`${b.title}, ${b.count.replace('{n}', num(earned.length)).replace('{m}', num(BADGE_ORDER.length))}`}
+            onPress={go('/account/badges')}
+            style={({ pressed }) => [styles.card, card, pressed && styles.pressed]}
+          >
+            <View style={styles.cardHead}>
+              {eyebrow(b.title, colors.primary)}
+              <View style={styles.cardHeadEnd}>
+                <Text style={[styles.cardMeta, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
+                  {`${b.count.replace('{n}', num(earned.length)).replace('{m}', num(BADGE_ORDER.length))} · ${p.badgesCard.seeAll}`}
+                </Text>
+                <DirectionalIcon isRTL={isRTL} name="chevron" size={16} color={colors.textTertiary} />
+              </View>
+            </View>
+            {earned.length > 0 ? (
+              <View style={styles.gems}>
+                {earned.slice(0, 4).map((c) => (
+                  <View key={c} style={styles.gem}>
+                    <BadgeGem code={c} size={52} />
+                    <Text numberOfLines={1} style={[styles.gemName, { color: colors.text, fontFamily: fonts.regular }]}>{b.names[c]}</Text>
+                  </View>
+                ))}
+              </View>
+            ) : (
+              <Text style={[styles.cardNote, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{b.empty}</Text>
+            )}
+            {next && (
+              <>
+                <View style={[styles.rule, { backgroundColor: colors.border }]} />
+                <View style={styles.next}>
+                  <BadgeGem code={next.code} size={30} locked />
+                  <View>
+                    <Text style={[styles.nextLabel, { color: colors.textTertiary, fontFamily: fonts.regular }]}>{b.next}</Text>
+                    <Text style={[styles.nextLine, { color: colors.text, fontFamily: fonts.regular }]}>
+                      {`${b.names[next.code]} · ${arabicPlural(next.remaining, b.remaining).replace('{n}', num(next.remaining))}`}
+                    </Text>
+                  </View>
+                </View>
+              </>
+            )}
+          </Pressable>
+        )}
+
+        {/* Your sky: everyone, from the phone's own log. */}
         <Pressable
           accessibilityRole="link"
-          onPress={go('/recap')}
-          style={({ pressed }) => [
-            styles.recap,
-            { backgroundColor: colors.sheet, borderColor: colors.tones.dusk.border },
-            pressed && styles.pressed,
-          ]}
+          accessibilityLabel={p.sky.open.replace(
+            '{n}',
+            month && month.practised.length > 0 ? arabicPlural(month.practised.length, p.sky.stars).replace('{n}', num(month.practised.length)) : p.sky.empty,
+          )}
+          onPress={go('/your-sky')}
+          style={({ pressed }) => [styles.card, card, styles.skyCard, pressed && styles.pressed]}
         >
-          <RecapGlow />
-          <View style={styles.recapText}>
-            {eyebrow(p.recap.eyebrow.replace('{month}', month), colors.text)}
-            <Text style={[styles.recapTitle, isRTL && styles.recapTitleArabic, { color: colors.text, fontFamily: fonts.display }]}>
-              {p.recap.title}
-            </Text>
+          {isNight && (
+            <View style={StyleSheet.absoluteFill} pointerEvents="none">
+              <NightStars />
+            </View>
+          )}
+          <View style={styles.cardHead}>
+            {eyebrow(p.sky.eyebrow.replace('{month}', monthName), colors.primary)}
+            <DirectionalIcon isRTL={isRTL} name="chevron" size={16} color={colors.textTertiary} />
           </View>
-          <View style={[styles.recapGo, { backgroundColor: colors.action }]}>
-            <DirectionalIcon isRTL={isRTL} name="arrow" size={20} strokeWidth={1.8} color={colors.onAction} />
-          </View>
+          <Text style={[styles.cardTitle, isRTL && styles.cardTitleArabic, { color: colors.text, fontFamily: fonts.display }]}>
+            {month && month.practised.length > 0 ? arabicPlural(month.practised.length, p.sky.stars).replace('{n}', num(month.practised.length)) : p.sky.empty}
+          </Text>
+          {month && <YourSky dates={month.practised.map((d) => d.date)} days={month.days} width={inner} height={140} isRTL={isRTL} />}
         </Pressable>
 
-        {profile && latest && test && (
-          <View style={[styles.card, styles.traits, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <RadarChart
-              compact
-              width={120}
-              color={colors.tones.dusk.fg}
-              axes={test.traits
-                .filter((tr) => latest.scores[tr.key])
-                .map((tr) => ({ label: tr.label[language], value: latest.scores[tr.key].normalised0to1 }))}
-            />
-            <View style={styles.cardText}>
-              {eyebrow(p.traits.eyebrow, colors.tones.dusk.text)}
-              <Text style={[styles.cardTitle, { color: colors.text, fontFamily: fonts.semiBold }]}>
-                {p.traits.from.replace('{test}', test.title[language])}
-              </Text>
-              <Text style={[styles.cardNote, { color: colors.textTertiary, fontFamily: fonts.regular }]}>
-                {p.traits.taken.replace(
-                  '{date}',
-                  formatEntryDateShort(localDateString(new Date(latest.takenAt)), t.journal.dateNames, num),
-                )}
-              </Text>
-              <Pressable
-                accessibilityRole="link"
-                hitSlop={8}
-                onPress={go({ pathname: '/tanafas/discover/result/[resultId]', params: { resultId: latest.id } })}
-              >
-                <Text style={[styles.cardLink, { color: colors.tones.dusk.text, fontFamily: fonts.semiBold }]}>{p.traits.view}</Text>
-              </Pressable>
-            </View>
-          </View>
-        )}
+        {/* Your month in breath: the month's minutes by part, as ridges. */}
+        <View
+          style={[styles.card, card]}
+          accessible
+          accessibilityLabel={`${p.breath.title}. ${p.breath.a11y.replace('{month}', monthName).replace('{n}', `${num(month?.minutes ?? 0)} ${arabicPlural(month?.minutes ?? 0, t.account.stats.week.unit)}`)}`}
+        >
+          {eyebrow(monthName, colors.primary)}
+          <Text style={[styles.cardTitle, isRTL && styles.cardTitleArabic, { color: colors.text, fontFamily: fonts.display }]}>{p.breath.title}</Text>
+          {month && month.sessions.length > 0 ? (
+            <>
+              <View style={styles.minutes}>
+                <Text style={[styles.minutesNumber, isRTL && styles.minutesNumberArabic, { color: colors.text, fontFamily: fonts.numeral }]}>{num(month.minutes)}</Text>
+                <Text style={[styles.cardNote, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{arabicPlural(month.minutes, t.account.stats.week.unit)}</Text>
+              </View>
+              <MonthRidges byDayAndGroup={month.byDayAndGroup} today={month.today} width={inner} height={118} />
+            </>
+          ) : (
+            <Text style={[styles.cardNote, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{p.breath.empty}</Text>
+          )}
+        </View>
 
-        {profile && (
-          <View style={[styles.card, styles.streak, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <IconTile size={46} renderIcon={(c) => <CanvasIcon name="tanafas" size={22} strokeWidth={1.6} color={c} />} />
-            <View style={styles.cardText}>
-              <Text style={[styles.cardTitle, { color: colors.text, fontFamily: fonts.semiBold }]}>
-                {streak > 0 ? arabicPlural(streak, p.streak.title).replace('{n}', num(streak)) : p.streak.none}
-              </Text>
-              <Text style={[styles.cardNote, { color: colors.textTertiary, fontFamily: fonts.regular }]}>{p.streak.note}</Text>
-            </View>
-            <Pressable accessibilityRole="link" onPress={go('/account/stats')} hitSlop={8}>
-              <Text style={[styles.streakLink, { color: colors.primary, fontFamily: fonts.medium }]}>{p.streak.stats}</Text>
-            </Pressable>
-          </View>
-        )}
+        {/* One tap away: My results (never on this page itself, for shared phones), Recap, Stats. */}
+        <View style={[styles.settings, card]}>
+          <LinkRow label={p.rows.results} detail={resultCount > 0 ? num(resultCount) : undefined} onPress={go('/results')} />
+          <LinkRow label={p.rows.recap.replace('{month}', monthName)} onPress={go('/recap')} last={!profile} />
+          {profile && <LinkRow label={p.rows.stats} onPress={go('/account/stats')} last />}
+        </View>
 
-        <View style={[styles.settings, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <View style={[styles.settings, card]}>
           <SettingRow label={p.settings.language}>
             <Segmented
               label={p.settings.language}
@@ -244,9 +325,7 @@ export default function ProfileScreen() {
           <LinkRow label={p.settings.exportJournal} onPress={onExport} last />
         </View>
         {exportFailed && (
-          <Text style={[styles.cardNote, { color: colors.accent, fontFamily: fonts.regular, textAlign: 'center' }]}>
-            {p.settings.exportError}
-          </Text>
+          <Text style={[styles.cardNote, { color: colors.accent, fontFamily: fonts.regular, textAlign: 'center' }]}>{p.settings.exportError}</Text>
         )}
 
         {!isGuest && (
@@ -257,7 +336,6 @@ export default function ProfileScreen() {
       </ScrollView>
     </SafeAreaView>
   );
-
 }
 
 function SettingRow({ label, children }: { label: string; children: React.ReactNode }) {
@@ -287,7 +365,7 @@ function AppearanceRow() {
   );
 }
 
-function LinkRow({ label, onPress, last }: { label: string; onPress: () => void; last?: boolean }) {
+function LinkRow({ label, detail, onPress, last }: { label: string; detail?: string; onPress: () => void; last?: boolean }) {
   const { colors } = useTheme();
   const { fonts, isRTL } = useLanguage();
   return (
@@ -302,6 +380,7 @@ function LinkRow({ label, onPress, last }: { label: string; onPress: () => void;
       ]}
     >
       <Text style={[styles.rowLabel, { color: colors.text, fontFamily: fonts.medium }]}>{label}</Text>
+      {!!detail && <Text style={[styles.rowDetail, { color: colors.textTertiary, fontFamily: fonts.regular }]}>{detail}</Text>}
       <DirectionalIcon isRTL={isRTL} name="chevron" size={18} color={colors.textTertiary} />
     </Pressable>
   );
@@ -348,28 +427,6 @@ function Segmented({
   );
 }
 
-/** Recap card glows: Dusk from the top end corner, Houna glow from the bottom start (canvas). */
-function RecapGlow() {
-  const { colors } = useTheme();
-  return (
-    <View pointerEvents="none" style={StyleSheet.absoluteFill}>
-      <Svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
-        <Defs>
-          <RadialGradient id="recapDusk" gradientUnits="userSpaceOnUse" cx={90} cy={0} rx={90} ry={120} fx={90} fy={0}>
-            <Stop offset="0" stopColor={colors.tones.dusk.hue} stopOpacity={0.55} />
-            <Stop offset="0.6" stopColor={colors.tones.dusk.hue} stopOpacity={0} />
-          </RadialGradient>
-          <RadialGradient id="recapGlow" gradientUnits="userSpaceOnUse" cx={0} cy={100} rx={80} ry={110} fx={0} fy={100}>
-            <Stop offset="0" stopColor={colors.tones.glow.hue} stopOpacity={0.4} />
-            <Stop offset="0.6" stopColor={colors.tones.glow.hue} stopOpacity={0} />
-          </RadialGradient>
-        </Defs>
-        <Rect x={0} y={0} width={100} height={100} fill="url(#recapDusk)" />
-        <Rect x={0} y={0} width={100} height={100} fill="url(#recapGlow)" />
-      </Svg>
-    </View>
-  );
-}
 
 const styles = StyleSheet.create({
   safe: {
@@ -381,50 +438,86 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     padding: layout.screenPadding,
     paddingBottom: 40,
-    gap: 24,
+    gap: 16,
+  },
+  top: {
+    position: 'absolute',
+    left: -layout.screenPadding,
+    right: -layout.screenPadding,
+    top: 0,
+    height: 420,
+    overflow: 'hidden',
   },
   header: {
     flexDirection: 'row',
+    height: 48,
     alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  headerTitle: {
-    fontSize: 16,
-  },
-  headerSpacer: {
-    width: 44,
-    height: 44,
   },
   identity: {
     alignItems: 'center',
-    gap: 12,
+    gap: 4,
+    marginTop: -24,
   },
-  avatarRing: {
-    width: 92,
-    height: 92,
-    borderRadius: 46,
+  avatar: {
+    width: AVATAR,
+    height: AVATAR,
+    borderRadius: AVATAR / 2,
     overflow: 'hidden',
   },
   avatarImage: {
-    width: 92,
-    height: 92,
-  },
-  avatarInitial: {
-    fontSize: 34,
-    lineHeight: 92,
-    textAlign: 'center',
+    width: AVATAR,
+    height: AVATAR,
   },
   username: {
-    fontSize: 28,
-    lineHeight: 36,
+    marginTop: 4,
+    fontSize: 32,
+    lineHeight: 40,
   },
   countryRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
+    columnGap: 8,
   },
   country: {
     fontSize: 14,
+  },
+  stats: {
+    flexDirection: 'row',
+    paddingVertical: 8,
+  },
+  stat: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 8,
+  },
+  statGlyph: {
+    height: 28,
+    justifyContent: 'center',
+  },
+  statOrb: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    overflow: 'hidden',
+  },
+  statOrbShine: {
+    position: 'absolute',
+    left: 5,
+    top: 4,
+    width: 10,
+    height: 8,
+    borderRadius: 5,
+    backgroundColor: 'rgba(255,255,255,0.8)',
+  },
+  statNumber: {
+    fontSize: 32,
+    lineHeight: 36,
+  },
+  statNumberArabic: {
+    fontSize: 28,
+    lineHeight: 40,
   },
   guest: {
     alignItems: 'center',
@@ -451,72 +544,91 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
   },
-  recap: {
-    minHeight: 120,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-    padding: 16,
-    borderRadius: 24,
-    borderWidth: 1,
-    overflow: 'hidden',
-  },
-  recapText: {
-    flex: 1,
-    gap: 8,
-  },
-  recapTitle: {
-    fontSize: 25,
-    lineHeight: 25 * 1.15,
-  },
-  recapTitleArabic: {
-    lineHeight: 38,
-  },
-  recapGo: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   eyebrowLatin: {
-    fontSize: 11.5,
-    letterSpacing: 11.5 * 0.16,
+    fontSize: 11,
+    letterSpacing: 11 * 0.16,
     textTransform: 'uppercase',
   },
   eyebrowArabic: {
     fontSize: 13,
   },
   card: {
-    flexDirection: 'row',
-    alignItems: 'center',
     padding: 16,
+    gap: 8,
     borderRadius: 22,
     borderWidth: 1,
+    overflow: 'hidden',
   },
-  traits: {
-    gap: 16,
+  skyCard: {
+    gap: 8,
   },
-  streak: {
-    gap: 16,
+  cardHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  cardText: {
-    flex: 1,
+  cardHeadEnd: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: 4,
   },
+  cardMeta: {
+    fontSize: 13.5,
+  },
   cardTitle: {
-    fontSize: 15.5,
+    fontSize: 22,
+    lineHeight: 28,
+  },
+  cardTitleArabic: {
+    lineHeight: 38,
   },
   cardNote: {
     fontSize: 13,
     lineHeight: 18,
   },
-  cardLink: {
-    marginTop: 4,
+  gems: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingTop: 16,
+    paddingHorizontal: 4,
+  },
+  gem: {
+    width: 72,
+    alignItems: 'center',
+    gap: 10,
+  },
+  gemName: {
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  rule: {
+    height: 1,
+    marginVertical: 6,
+  },
+  next: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  nextLabel: {
+    fontSize: 11,
+  },
+  nextLine: {
     fontSize: 14,
   },
-  streakLink: {
-    fontSize: 14,
+  minutes: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 6,
+    marginBottom: 8,
+  },
+  minutesNumber: {
+    fontSize: 30,
+    lineHeight: 34,
+  },
+  minutesNumberArabic: {
+    fontSize: 26,
+    lineHeight: 38,
   },
   settings: {
     borderRadius: 22,
@@ -538,7 +650,11 @@ const styles = StyleSheet.create({
     minHeight: 56,
   },
   rowLabel: {
+    flex: 1,
     fontSize: 15,
+  },
+  rowDetail: {
+    fontSize: 13.5,
   },
   segmented: {
     flexDirection: 'row',

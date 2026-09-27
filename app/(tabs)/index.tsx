@@ -24,6 +24,7 @@ import Card from '@/components/ui/Card';
 import IconButton from '@/components/ui/IconButton';
 import CanvasIcon from '@/components/ui/CanvasIcon';
 import NightStars from '@/components/home/NightStars';
+import { useBadgeCheck } from '@/hooks/useBadgeCheck';
 
 /** Canvas: the period (and its line) advances every 4.5s until someone picks one. */
 const ROTATE_MS = 4500;
@@ -56,6 +57,8 @@ export default function HomeScreen() {
   const { t, isRTL, fonts } = useLanguage();
   const router = useRouter();
   const h = t.home;
+  // A badge earned in a session arrives as Home comes back into view.
+  useBadgeCheck();
   const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
 
   const [period, setPeriod] = useState(0);

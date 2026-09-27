@@ -16,6 +16,49 @@
       "x": 14382,
       "y": 0
     },
+    "Badges.dc.html": {
+      "h": 1186,
+      "title": "Badges — nine skies",
+      "w": 1376,
+      "x": 6068,
+      "y": 11600
+    },
+    "BodiesDate.dc.html": {
+      "h": 984,
+      "title": "Phase 3 — Home: the Hijri date",
+      "w": 1760,
+      "x": 1410,
+      "y": 19380
+    },
+    "BodiesMonth.dc.html": {
+      "h": 984,
+      "is_interactive": true,
+      "title": "Phase 3 — the month of moons",
+      "w": 1760,
+      "x": 3250,
+      "y": 19380
+    },
+    "BodiesNight.dc.html": {
+      "h": 984,
+      "title": "Phase 3 — Night: the crescent bowl",
+      "w": 1330,
+      "x": 0,
+      "y": 19380
+    },
+    "BodiesSky.dc.html": {
+      "h": 984,
+      "title": "Phase 3 — the sky clock",
+      "w": 1330,
+      "x": 6070,
+      "y": 19380
+    },
+    "BodiesStarSun.dc.html": {
+      "h": 984,
+      "title": "Phase 3 — Sunrise: the star-lattice sun",
+      "w": 900,
+      "x": 5090,
+      "y": 19380
+    },
     "Breathe.dc.html": {
       "h": 844,
       "is_interactive": true,
@@ -111,6 +154,64 @@
       "x": 7470,
       "y": 2420
     },
+    "Eclipses.dc.html": {
+      "h": 3340,
+      "title": "Houna eclipses — lunar, solar, annular",
+      "w": 1784,
+      "x": 6424,
+      "y": 7200
+    },
+    "FirstBreathP5.dc.html": {
+      "h": 984,
+      "title": "Phase 5 — one breath together, once",
+      "w": 1760,
+      "x": 1840,
+      "y": 22108
+    },
+    "FirstSplashP5.dc.html": {
+      "h": 984,
+      "title": "Phase 5 — the splash, each theme’s body",
+      "w": 1760,
+      "x": 0,
+      "y": 22108
+    },
+    "GraphsMonthGlow.dc.html": {
+      "h": 984,
+      "title": "Phase 4 — the month of moons, nights practised",
+      "w": 1330,
+      "x": 3680,
+      "y": 20744
+    },
+    "GraphsMoonlight.dc.html": {
+      "h": 984,
+      "is_interactive": true,
+      "title": "Phase 4 — Recap: the month by moonlight",
+      "w": 1760,
+      "x": 0,
+      "y": 20744
+    },
+    "GraphsWeekArc.dc.html": {
+      "h": 984,
+      "title": "Phase 4 — Stats: the week as an arc",
+      "w": 1760,
+      "x": 1840,
+      "y": 20744
+    },
+    "HomeAppearance.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Home — appearance (tap the logo)",
+      "w": 390,
+      "x": 0,
+      "y": 11600
+    },
+    "HomeAppearanceStory.dc.html": {
+      "h": 4682,
+      "title": "Home — appearance, storyboard",
+      "w": 1354,
+      "x": 470,
+      "y": 11600
+    },
     "HomeAr.dc.html": {
       "h": 844,
       "is_interactive": true,
@@ -142,6 +243,13 @@
       "w": 390,
       "x": 1360,
       "y": 2420
+    },
+    "HomeFit.dc.html": {
+      "h": 1207,
+      "title": "Home — one screen",
+      "w": 1784,
+      "x": 7524,
+      "y": 11600
     },
     "HomeMorning.dc.html": {
       "h": 844,
@@ -180,6 +288,21 @@
       "x": 1360,
       "y": 0
     },
+    "MeditateFlow.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Meditate — cover flow (tap a side cover)",
+      "w": 390,
+      "x": 2100,
+      "y": 11600
+    },
+    "MeditateFlowStory.dc.html": {
+      "h": 2874,
+      "title": "Meditate — cover flow, storyboard",
+      "w": 1148,
+      "x": 2570,
+      "y": 11600
+    },
     "MoodStates.dc.html": {
       "h": 560,
       "title": "Houna bloom — mood states",
@@ -214,6 +337,117 @@
       "w": 1468,
       "x": 4876,
       "y": 7200
+    },
+    "MotionPhaseCard.dc.html": {
+      "h": 960,
+      "is_interactive": true,
+      "title": "Motion — an event card grows into its page",
+      "w": 1330,
+      "x": 1410,
+      "y": 16700
+    },
+    "MotionPhaseControls.dc.html": {
+      "h": 960,
+      "title": "Motion — controls step aside during practice",
+      "w": 1330,
+      "x": 2820,
+      "y": 16700
+    },
+    "MotionPhasePill.dc.html": {
+      "h": 960,
+      "title": "Motion — one glowing pill per screen",
+      "w": 1330,
+      "x": 5640,
+      "y": 16700
+    },
+    "MotionPhaseSheet.dc.html": {
+      "h": 960,
+      "is_interactive": true,
+      "title": "Motion — the check-in as a glass sheet",
+      "w": 1330,
+      "x": 0,
+      "y": 16700
+    },
+    "MotionPhaseTabs.dc.html": {
+      "h": 960,
+      "is_interactive": true,
+      "title": "Motion — the Tanafas tabs, three styles",
+      "w": 1330,
+      "x": 7050,
+      "y": 16700
+    },
+    "MotionPhaseWords.dc.html": {
+      "h": 960,
+      "is_interactive": true,
+      "title": "Motion — Home’s line arrives",
+      "w": 1330,
+      "x": 4230,
+      "y": 16700
+    },
+    "MyResults.dc.html": {
+      "h": 844,
+      "title": "My results",
+      "w": 390,
+      "x": 4370,
+      "y": 11600
+    },
+    "Numbers.dc.html": {
+      "h": 1486,
+      "title": "Numbers — four faces",
+      "w": 1724,
+      "x": 9468,
+      "y": 11600
+    },
+    "PlayersArabic.dc.html": {
+      "h": 960,
+      "title": "Players — Arabic hero and scenes (Night)",
+      "w": 900,
+      "x": 8460,
+      "y": 18040
+    },
+    "PlayersBackdrop.dc.html": {
+      "h": 960,
+      "title": "Players — the dawn backdrop for breathing sessions",
+      "w": 1330,
+      "x": 7050,
+      "y": 18040
+    },
+    "PlayersHero.dc.html": {
+      "h": 960,
+      "title": "Players — the Meditate tab as a hero",
+      "w": 1330,
+      "x": 0,
+      "y": 18040
+    },
+    "PlayersMinutes.dc.html": {
+      "h": 960,
+      "is_interactive": true,
+      "title": "Players — choosing a length (minutes wheel)",
+      "w": 1330,
+      "x": 2820,
+      "y": 18040
+    },
+    "PlayersOrb.dc.html": {
+      "h": 960,
+      "title": "Players — 4-7-8 with the glass orb",
+      "w": 1330,
+      "x": 4230,
+      "y": 18040
+    },
+    "PlayersScenes.dc.html": {
+      "h": 960,
+      "is_interactive": true,
+      "title": "Players — choosing a scene (arches, glass sheet)",
+      "w": 1330,
+      "x": 1410,
+      "y": 18040
+    },
+    "PlayersStar.dc.html": {
+      "h": 960,
+      "title": "Players — box breathing with the star",
+      "w": 1330,
+      "x": 5640,
+      "y": 18040
     },
     "PressedLogo.dc.html": {
       "h": 1720,
@@ -270,6 +504,21 @@
       "x": 6060,
       "y": 4840
     },
+    "ProfileRevamp.dc.html": {
+      "h": 1320,
+      "is_interactive": true,
+      "title": "Profile — revamp (tap a badge)",
+      "w": 390,
+      "x": 3900,
+      "y": 11600
+    },
+    "ProfileStory.dc.html": {
+      "h": 1513,
+      "title": "Profile — storyboard & notes",
+      "w": 1148,
+      "x": 4840,
+      "y": 11600
+    },
     "Recap.dc.html": {
       "h": 844,
       "is_interactive": true,
@@ -317,6 +566,13 @@
       "w": 390,
       "x": 4650,
       "y": 4840
+    },
+    "SearchPhase3.dc.html": {
+      "h": 1640,
+      "title": "Directory search — phase 3",
+      "w": 1808,
+      "x": 0,
+      "y": 9500
     },
     "Starfield.dc.html": {
       "h": 844,
@@ -473,261 +729,55 @@
       "x": 5590,
       "y": 4840
     },
-    "SearchPhase3.dc.html": {
-      "h": 1640,
-      "title": "Directory search — phase 3",
-      "w": 1808,
+    "ProfileP6.dc.html": {
+      "h": 1740,
+      "title": "Phase 6 — Profile: the Kufic ring",
+      "w": 2190,
       "x": 0,
-      "y": 9500
+      "y": 23472
     },
-    "Eclipses.dc.html": {
-      "h": 3340,
-      "title": "Houna eclipses — lunar, solar, annular",
-      "w": 1784,
-      "x": 6424,
-      "y": 7200
-    },
-    "HomeAppearance.dc.html": {
-      "h": 844,
-      "is_interactive": true,
-      "title": "Home — appearance (tap the logo)",
-      "w": 390,
-      "x": 0,
-      "y": 11600
-    },
-    "HomeAppearanceStory.dc.html": {
-      "h": 4682,
-      "title": "Home — appearance, storyboard",
-      "w": 1354,
-      "x": 470,
-      "y": 11600
-    },
-    "MeditateFlow.dc.html": {
-      "h": 844,
-      "is_interactive": true,
-      "title": "Meditate — cover flow (tap a side cover)",
-      "w": 390,
-      "x": 2100,
-      "y": 11600
-    },
-    "MeditateFlowStory.dc.html": {
-      "h": 2874,
-      "title": "Meditate — cover flow, storyboard",
-      "w": 1148,
-      "x": 2570,
-      "y": 11600
-    },
-    "ProfileRevamp.dc.html": {
-      "h": 1320,
-      "is_interactive": true,
-      "title": "Profile — revamp (tap a badge)",
-      "w": 390,
-      "x": 3900,
-      "y": 11600
-    },
-    "MyResults.dc.html": {
-      "h": 844,
-      "title": "My results",
-      "w": 390,
-      "x": 4370,
-      "y": 11600
-    },
-    "ProfileStory.dc.html": {
-      "h": 1513,
-      "title": "Profile — storyboard & notes",
-      "w": 1148,
-      "x": 4840,
-      "y": 11600
-    },
-    "Badges.dc.html": {
-      "h": 1186,
-      "title": "Badges — nine skies",
-      "w": 1376,
-      "x": 6068,
-      "y": 11600
-    },
-    "HomeFit.dc.html": {
-      "h": 1207,
-      "title": "Home — one screen",
-      "w": 1784,
-      "x": 7524,
-      "y": 11600
-    },
-    "Numbers.dc.html": {
-      "h": 1486,
-      "title": "Numbers — four faces",
-      "w": 1724,
-      "x": 9468,
-      "y": 11600
-    },
-    "MotionPhaseSheet.dc.html": {
-      "h": 960,
-      "is_interactive": true,
-      "title": "Motion — the check-in as a glass sheet",
-      "w": 1330,
-      "x": 0,
-      "y": 16700
-    },
-    "MotionPhaseCard.dc.html": {
-      "h": 960,
-      "is_interactive": true,
-      "title": "Motion — an event card grows into its page",
-      "w": 1330,
-      "x": 1410,
-      "y": 16700
-    },
-    "MotionPhaseControls.dc.html": {
-      "h": 960,
-      "title": "Motion — controls step aside during practice",
-      "w": 1330,
-      "x": 2820,
-      "y": 16700
-    },
-    "MotionPhaseWords.dc.html": {
-      "h": 960,
-      "is_interactive": true,
-      "title": "Motion — Home’s line arrives",
-      "w": 1330,
-      "x": 4230,
-      "y": 16700
-    },
-    "MotionPhasePill.dc.html": {
-      "h": 960,
-      "title": "Motion — one glowing pill per screen",
-      "w": 1330,
-      "x": 5640,
-      "y": 16700
-    },
-    "MotionPhaseTabs.dc.html": {
-      "h": 960,
-      "is_interactive": true,
-      "title": "Motion — the Tanafas tabs, three styles",
-      "w": 1330,
-      "x": 7050,
-      "y": 16700
-    },
-    "PlayersHero.dc.html": {
-      "h": 960,
-      "title": "Players — the Meditate tab as a hero",
-      "w": 1330,
-      "x": 0,
-      "y": 18040
-    },
-    "PlayersScenes.dc.html": {
-      "h": 960,
-      "is_interactive": true,
-      "title": "Players — choosing a scene (arches, glass sheet)",
-      "w": 1330,
-      "x": 1410,
-      "y": 18040
-    },
-    "PlayersMinutes.dc.html": {
-      "h": 960,
-      "is_interactive": true,
-      "title": "Players — choosing a length (minutes wheel)",
-      "w": 1330,
-      "x": 2820,
-      "y": 18040
-    },
-    "PlayersOrb.dc.html": {
-      "h": 960,
-      "title": "Players — 4-7-8 with the glass orb",
-      "w": 1330,
-      "x": 4230,
-      "y": 18040
-    },
-    "PlayersStar.dc.html": {
-      "h": 960,
-      "title": "Players — box breathing with the star",
-      "w": 1330,
-      "x": 5640,
-      "y": 18040
-    },
-    "PlayersBackdrop.dc.html": {
-      "h": 960,
-      "title": "Players — the dawn backdrop for breathing sessions",
-      "w": 1330,
-      "x": 7050,
-      "y": 18040
-    },
-    "PlayersArabic.dc.html": {
-      "h": 960,
-      "title": "Players — Arabic hero and scenes (Night)",
-      "w": 900,
-      "x": 8460,
-      "y": 18040
-    },
-    "BodiesNight.dc.html": {
+    "BadgesP6.dc.html": {
       "h": 984,
-      "title": "Phase 3 — Night: the crescent bowl",
-      "w": 1330,
-      "x": 0,
-      "y": 19380
-    },
-    "BodiesDate.dc.html": {
-      "h": 984,
-      "title": "Phase 3 — Home: the Hijri date",
+      "title": "Phase 6 — Badges: skies inside gems",
       "w": 1760,
-      "x": 1410,
-      "y": 19380
+      "x": 2270,
+      "y": 23472
     },
-    "BodiesMonth.dc.html": {
+    "GemsP6.dc.html": {
+      "h": 1130,
+      "title": "Phase 6 — nine skies, set in gems",
+      "w": 1436,
+      "x": 4110,
+      "y": 23472
+    },
+    "UnlockP6.dc.html": {
       "h": 984,
       "is_interactive": true,
-      "title": "Phase 3 — the month of moons",
+      "title": "Phase 6 — the unlock moment",
       "w": 1760,
-      "x": 3250,
-      "y": 19380
+      "x": 5626,
+      "y": 23472
     },
-    "BodiesStarSun.dc.html": {
+    "StreakP6.dc.html": {
       "h": 984,
-      "title": "Phase 3 — Sunrise: the star-lattice sun",
-      "w": 900,
-      "x": 5090,
-      "y": 19380
-    },
-    "BodiesSky.dc.html": {
-      "h": 984,
-      "title": "Phase 3 — the sky clock",
-      "w": 1330,
-      "x": 6070,
-      "y": 19380
-    },
-    "GraphsMoonlight.dc.html": {
-      "h": 984,
-      "is_interactive": true,
-      "title": "Phase 4 — Recap: the month by moonlight",
+      "title": "Phase 6 — Stats: the week in moons",
       "w": 1760,
-      "x": 0,
-      "y": 20744
+      "x": 7466,
+      "y": 23472
     },
-    "GraphsWeekArc.dc.html": {
+    "SkyP6.dc.html": {
       "h": 984,
-      "title": "Phase 4 — Stats: the week as an arc",
+      "title": "Phase 6 — Your sky",
       "w": 1760,
-      "x": 1840,
-      "y": 20744
+      "x": 9306,
+      "y": 23472
     },
-    "GraphsMonthGlow.dc.html": {
+    "ResultsP6.dc.html": {
       "h": 984,
-      "title": "Phase 4 — the month of moons, nights practised",
-      "w": 1330,
-      "x": 3680,
-      "y": 20744
-    },
-    "FirstSplashP5.dc.html": {
-      "h": 984,
-      "title": "Phase 5 — the splash, each theme’s body",
+      "title": "Phase 6 — My results",
       "w": 1760,
-      "x": 0,
-      "y": 22108
-    },
-    "FirstBreathP5.dc.html": {
-      "h": 984,
-      "title": "Phase 5 — one breath together, once",
-      "w": 1760,
-      "x": 1840,
-      "y": 22108
+      "x": 11146,
+      "y": 23472
     }
   },
   "createdOnFiles": {
@@ -747,6 +797,14 @@
       "x": 0,
       "y": -300
     },
+    "titleBodiesPhase": {
+      "kind": "title1",
+      "maxW": 7400,
+      "text": "Houna — Home: suns and moons (phase 3)",
+      "w": 240,
+      "x": 0,
+      "y": 19120
+    },
     "titleDay": {
       "kind": "title1",
       "maxW": 8000,
@@ -754,38 +812,6 @@
       "w": 240,
       "x": 0,
       "y": 2120
-    },
-    "titleIcons": {
-      "kind": "title1",
-      "maxW": 6760,
-      "text": "Houna — Icons & app icon",
-      "w": 240,
-      "x": 8942,
-      "y": -300
-    },
-    "titleMorning": {
-      "kind": "title1",
-      "maxW": 8000,
-      "text": "Houna — Sunrise",
-      "w": 240,
-      "x": 0,
-      "y": 4540
-    },
-    "titlePressed": {
-      "kind": "title1",
-      "maxW": 6344,
-      "text": "Houna — Pressed logo (alternative)",
-      "w": 240,
-      "x": 0,
-      "y": 6900
-    },
-    "titleSearch": {
-      "kind": "title1",
-      "maxW": 1808,
-      "text": "Houna — Directory search",
-      "w": 240,
-      "x": 0,
-      "y": 9200
     },
     "titleEclipses": {
       "kind": "title1",
@@ -795,61 +821,13 @@
       "x": 6424,
       "y": 6900
     },
-    "titleHomeAppearance": {
+    "titleFirstRunPhase": {
       "kind": "title1",
-      "maxW": 1824,
-      "text": "Houna — Home appearance",
+      "maxW": 3600,
+      "text": "Houna — First run (phase 5)",
       "w": 240,
       "x": 0,
-      "y": 11300
-    },
-    "titleMeditate": {
-      "kind": "title1",
-      "maxW": 1618,
-      "text": "Houna — Meditate",
-      "w": 240,
-      "x": 2100,
-      "y": 11300
-    },
-    "titleProfile": {
-      "kind": "title1",
-      "maxW": 5408,
-      "text": "Houna — Profile & badges",
-      "w": 240,
-      "x": 3900,
-      "y": 11300
-    },
-    "titleNumbers": {
-      "kind": "title1",
-      "maxW": 1724,
-      "text": "Houna — Numbers",
-      "w": 240,
-      "x": 9468,
-      "y": 11300
-    },
-    "titleMotionPhase": {
-      "kind": "title1",
-      "maxW": 8380,
-      "text": "Houna — Motion (phase 1)",
-      "w": 240,
-      "x": 0,
-      "y": 16440
-    },
-    "titlePlayersPhase": {
-      "kind": "title1",
-      "maxW": 9360,
-      "text": "Houna — Players (phase 2)",
-      "w": 240,
-      "x": 0,
-      "y": 17780
-    },
-    "titleBodiesPhase": {
-      "kind": "title1",
-      "maxW": 7400,
-      "text": "Houna — Home: suns and moons (phase 3)",
-      "w": 240,
-      "x": 0,
-      "y": 19120
+      "y": 21848
     },
     "titleGraphsPhase": {
       "kind": "title1",
@@ -859,13 +837,93 @@
       "x": 0,
       "y": 20484
     },
-    "titleFirstRunPhase": {
+    "titleHomeAppearance": {
       "kind": "title1",
-      "maxW": 3600,
-      "text": "Houna — First run (phase 5)",
+      "maxW": 1824,
+      "text": "Houna — Home appearance",
       "w": 240,
       "x": 0,
-      "y": 21848
+      "y": 11300
+    },
+    "titleIcons": {
+      "kind": "title1",
+      "maxW": 6760,
+      "text": "Houna — Icons & app icon",
+      "w": 240,
+      "x": 8942,
+      "y": -300
+    },
+    "titleMeditate": {
+      "kind": "title1",
+      "maxW": 1618,
+      "text": "Houna — Meditate",
+      "w": 240,
+      "x": 2100,
+      "y": 11300
+    },
+    "titleMorning": {
+      "kind": "title1",
+      "maxW": 8000,
+      "text": "Houna — Sunrise",
+      "w": 240,
+      "x": 0,
+      "y": 4540
+    },
+    "titleMotionPhase": {
+      "kind": "title1",
+      "maxW": 8000,
+      "text": "Houna — Motion (phase 1)",
+      "w": 240,
+      "x": 0,
+      "y": 16440
+    },
+    "titleNumbers": {
+      "kind": "title1",
+      "maxW": 1724,
+      "text": "Houna — Numbers",
+      "w": 240,
+      "x": 9468,
+      "y": 11300
+    },
+    "titlePlayersPhase": {
+      "kind": "title1",
+      "maxW": 8000,
+      "text": "Houna — Players (phase 2)",
+      "w": 240,
+      "x": 0,
+      "y": 17780
+    },
+    "titlePressed": {
+      "kind": "title1",
+      "maxW": 6344,
+      "text": "Houna — Pressed logo (alternative)",
+      "w": 240,
+      "x": 0,
+      "y": 6900
+    },
+    "titleProfile": {
+      "kind": "title1",
+      "maxW": 5408,
+      "text": "Houna — Profile & badges",
+      "w": 240,
+      "x": 3900,
+      "y": 11300
+    },
+    "titleSearch": {
+      "kind": "title1",
+      "maxW": 1808,
+      "text": "Houna — Directory search",
+      "w": 240,
+      "x": 0,
+      "y": 9200
+    },
+    "titleAccountPhase": {
+      "kind": "title1",
+      "maxW": 12906,
+      "text": "Houna — Account & badges (phase 6)",
+      "w": 240,
+      "x": 0,
+      "y": 23212
     }
   },
   "order": [
@@ -964,7 +1022,14 @@
     "GraphsWeekArc.dc.html",
     "GraphsMonthGlow.dc.html",
     "FirstSplashP5.dc.html",
-    "FirstBreathP5.dc.html"
+    "FirstBreathP5.dc.html",
+    "ProfileP6.dc.html",
+    "BadgesP6.dc.html",
+    "GemsP6.dc.html",
+    "UnlockP6.dc.html",
+    "StreakP6.dc.html",
+    "SkyP6.dc.html",
+    "ResultsP6.dc.html"
   ],
   "pages": [],
   "title": "Houna Redesign"

@@ -104,6 +104,14 @@ export const accountStrings = {
         many: '{n} days',
       },
       noStreakYet: 'Try a breathing or meditation session to start one.',
+      // The week in moons (canvas "Phase 6 — Stats: the week in moons").
+      inARow: { one: 'day in a row', few: 'days in a row' },
+      moonsLine: 'This week’s moons. Each one lit is a day you practised.',
+      moonsA11y: '{n}. This week: {days}.',
+      practised: 'practised',
+      rest: 'a rest',
+      weekdays: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
+      weekdayNames: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
       badgesTitle: 'Badges',
       badgeName: {
         one: '{n} day',
@@ -250,6 +258,13 @@ export const accountStrings = {
         many: '{n} يومًا',
       },
       noStreakYet: 'جرّب جلسة تنفس أو تأمل لتبدأ سلسلتك.',
+      inARow: { one: 'يوم متتالٍ', two: 'يومان متتاليان', few: 'أيام متتالية', many: 'يومًا متتاليًا' },
+      moonsLine: 'أقمار هذا الأسبوع. كل قمر مضيء يوم ممارسة.',
+      moonsA11y: '{n}. هذا الأسبوع: {days}.',
+      practised: 'يوم ممارسة',
+      rest: 'راحة',
+      weekdays: ['ن', 'ث', 'ر', 'خ', 'ج', 'س', 'ح'],
+      weekdayNames: ['الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت', 'الأحد'],
       badgesTitle: 'الشارات',
       badgeName: {
         one: 'يوم واحد',

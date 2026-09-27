@@ -212,6 +212,11 @@ function dayMonth(day: string, month: string, names: DateNames): string {
   return names.dayFirst ? `${day} ${month}` : `${month} ${day}`;
 }
 
+/** e.g. "18 September" / "September 18": a day and its month, in the language's order. */
+export function formatDayMonth(d: Date, names: DateNames, num: (n: number) => string): string {
+  return dayMonth(num(d.getDate()), names.monthsLong[d.getMonth()], names);
+}
+
 function parseLocalDate(dateStr: string): Date {
   return new Date(dateStr + 'T00:00:00');
 }

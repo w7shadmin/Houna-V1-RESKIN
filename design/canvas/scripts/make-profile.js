@@ -321,3 +321,4 @@ const fit = `<div style="width: ${fitW}px; box-sizing: border-box; padding: 64px
 </div></div>`;
 fs.writeFileSync(P + 'HomeFit.dc.html', page('Home — one screen', fit, fitW, 1207));
 console.log('ProfileRevamp, Badges, MyResults, ProfileStory written');
+module.exports = { art, BADGES, EARNED };

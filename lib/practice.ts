@@ -69,3 +69,40 @@ export function practiceByDay(sessions: LoggedSession[]): Map<string, DayPractic
   }
   return out;
 }
+
+/** The month `now` is in: its first day, the first of the next, and how many days it has. */
+export function monthBounds(now: Date): { from: Date; to: Date; days: number } {
+  const from = new Date(now.getFullYear(), now.getMonth(), 1);
+  const to = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  return { from, to, days: new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate() };
+}
+
+/**
+ * Minutes in each part of practice on each day of a month (index 0 is the 1st), for the month in
+ * ridges. Seconds are added up first, as minutesByGroup does, then shown as fractional minutes.
+ */
+export function minutesByDayAndGroup(sessions: LoggedSession[], from: Date, days: number): Record<PracticeGroup, number>[] {
+  const out = Array.from({ length: days }, () => Object.fromEntries(PRACTICE_GROUPS.map((g) => [g, 0])) as Record<PracticeGroup, number>);
+  for (const s of sessions) {
+    const d = new Date(s.startedAt);
+    const i = Math.round((new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() - from.getTime()) / 86400000);
+    if (i >= 0 && i < days) out[i][practiceGroup(s)] += s.durationSeconds / 60;
+  }
+  return out;
+}
+
+/**
+ * A centred moving average over `window` days, through day `through` (0-based, today) only: the
+ * ridges swell with the weeks rather than spiking day to day, and the days to come stay empty.
+ */
+export function smoothed(values: number[], through: number, window = 7): number[] {
+  const half = Math.floor(window / 2);
+  return values.map((_, i) => {
+    if (i > through) return 0;
+    const lo = Math.max(0, i - half);
+    const hi = Math.min(through, i + half);
+    let sum = 0;
+    for (let k = lo; k <= hi; k++) sum += values[k];
+    return sum / (hi - lo + 1);
+  });
+}

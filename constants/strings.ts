@@ -21,6 +21,7 @@ import { discoverStrings } from './discoverStrings';
 import { recapStrings } from './recapStrings';
 import { profileStrings } from './profileStrings';
 import { firstRunStrings } from './firstRunStrings';
+import { badgeStrings, resultsStrings } from './badgeStrings';
 
 export type Language = 'en' | 'ar';
 
@@ -59,6 +60,8 @@ export const strings = {
     discover: discoverStrings.en,
     recap: recapStrings.en,
     firstRun: firstRunStrings.en,
+    badges: badgeStrings.en,
+    results: resultsStrings.en,
     profile: profileStrings.en,
     directory: directoryStrings.en,
     events: eventsStrings.en,
@@ -124,6 +127,8 @@ export const strings = {
     discover: discoverStrings.ar,
     recap: recapStrings.ar,
     firstRun: firstRunStrings.ar,
+    badges: badgeStrings.ar,
+    results: resultsStrings.ar,
     profile: profileStrings.ar,
     directory: directoryStrings.ar,
     events: eventsStrings.ar,

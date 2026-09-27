@@ -107,7 +107,14 @@ function InnerLayout() {
           name="month"
           options={{ presentation: 'transparentModal', animation: 'none', contentStyle: { backgroundColor: 'transparent' } }}
         />
+        {/* A badge just earned: the gem rises over whatever screen was open (useBadgeCheck). */}
+        <Stack.Screen
+          name="badge"
+          options={{ presentation: 'transparentModal', animation: 'none', gestureEnabled: false, contentStyle: { backgroundColor: 'transparent' } }}
+        />
         <Stack.Screen name="profile" />
+        <Stack.Screen name="your-sky" />
+        <Stack.Screen name="results" />
         <Stack.Screen name="crisis" />
         <Stack.Screen name="about" />
         <Stack.Screen name="get-involved" />

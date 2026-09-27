@@ -1,5 +1,7 @@
 import { supabase } from './supabase';
 import { localDateString } from './journal';
+import { qualifyingBadges, type BadgeCode } from './badges';
+import type { LoggedSession } from './sessionLog';
 
 /**
  * Streaks/leaderboard (Segment 5 of the accounts roadmap) — reads the same
@@ -16,13 +18,6 @@ import { localDateString } from './journal';
 export interface StreakInfo {
   current: number;
   longest: number;
-}
-
-export const BADGE_THRESHOLDS = [3, 7, 14, 30, 100] as const;
-export type BadgeThreshold = (typeof BADGE_THRESHOLDS)[number];
-
-export function badgeCodeForThreshold(days: BadgeThreshold): string {
-  return `streak_${days}`;
 }
 
 function addDays(dateStr: string, delta: number): string {
@@ -67,22 +62,31 @@ export async function getMyStreak(): Promise<StreakInfo> {
 }
 
 /**
- * Awards any streak badges the current streak newly qualifies for.
- * `UNIQUE (user_id, badge_code)` makes the insert naturally idempotent —
- * safe to call every time the streak is recomputed, not just once.
+ * Awards every badge the practice now qualifies for (lib/badges.ts: the streak, and what's been
+ * tried, from the phone's own session log) and returns the ones that are new, for the unlock
+ * moment. `UNIQUE (user_id, badge_code)` keeps a repeat insert harmless.
  */
-export async function checkAndAwardBadges(userId: string, currentStreak: number): Promise<BadgeThreshold[]> {
-  const earned = BADGE_THRESHOLDS.filter((days) => currentStreak >= days);
-  if (earned.length === 0) return [];
-
-  const rows = earned.map((days) => ({ user_id: userId, badge_code: badgeCodeForThreshold(days) }));
-  await supabase.from('badges_earned').upsert(rows, { onConflict: 'user_id,badge_code', ignoreDuplicates: true });
-  return earned;
+export async function awardBadges(userId: string, currentStreak: number, sessions: Pick<LoggedSession, 'kind' | 'exercise'>[]): Promise<BadgeCode[]> {
+  const held = await getMyBadges();
+  const due = qualifyingBadges(currentStreak, sessions).filter((code) => !held.has(code));
+  if (due.length === 0) return [];
+  const { error } = await supabase
+    .from('badges_earned')
+    .upsert(due.map((code) => ({ user_id: userId, badge_code: code })), { onConflict: 'user_id,badge_code', ignoreDuplicates: true });
+  return error ? [] : due;
 }
 
-export async function getMyEarnedBadgeCodes(): Promise<Set<string>> {
-  const { data } = await supabase.from('badges_earned').select('badge_code');
-  return new Set((data ?? []).map((row) => row.badge_code));
+/** The badges held, each with when it was earned (ISO). */
+export async function getMyBadges(): Promise<Map<string, string>> {
+  const { data } = await supabase.from('badges_earned').select('badge_code, earned_at');
+  return new Map((data ?? []).map((row) => [row.badge_code as string, row.earned_at as string]));
+}
+
+/** Each badge's share of Houna's Aliases, as a whole percentage (get_badge_shares: counts only, no names). */
+export async function getBadgeShares(): Promise<Record<string, number>> {
+  const { data, error } = await supabase.rpc('get_badge_shares');
+  if (error || !data) return {};
+  return Object.fromEntries((data as { badge_code: string; share: number }[]).map((r) => [r.badge_code, r.share]));
 }
 
 export interface LeaderboardRow {
