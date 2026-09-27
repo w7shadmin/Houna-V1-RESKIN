@@ -1,8 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Animated, Easing, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { StatusBar } from 'expo-status-bar';
+import * as NavigationBar from 'expo-navigation-bar';
+import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets, type EdgeInsets } from 'react-native-safe-area-context';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { alpha, layout } from '@/constants/theme';
@@ -39,7 +42,7 @@ const TEST_TONES: IconTileTone[] = ['dusk', 'glow', 'dawn'];
  * scene (`tab` + `exercise` / `scene` params); otherwise it opens on Breathe.
  */
 export default function TanafasHubScreen() {
-  const { colors } = useTheme();
+  const { colors, isNight } = useTheme();
   const router = useRouter();
   const { t, fonts, isRTL } = useLanguage();
   const h = t.discover.hub;
@@ -60,7 +63,13 @@ export default function TanafasHubScreen() {
   const away = useControlsAway(tab === 'breathe' && sessionActive);
   // Behind a breathing session, running or paused, the dawn backdrop fades in.
   const [inSession, setInSession] = useState(false);
-  const ground = useSessionGround(tab === 'breathe' && inSession);
+  const breathing = tab === 'breathe' && inSession;
+  const ground = useSessionGround(breathing);
+  // A session is truly full screen: the system bars go, the screen stays awake, and the header
+  // keeps only its icons (the tabs would end the session anyway).
+  useFullScreen(breathing);
+  const tabsShown = useFade(!breathing);
+  const insets = useSteadyInsets();
 
   const exercise = BREATHE_ORDER[breatheIndex];
   const scene = MEDITATION_SCENES[sceneIndex];
@@ -78,7 +87,8 @@ export default function TanafasHubScreen() {
   const close = () => (router.canGoBack() ? router.back() : router.replace('/(tabs)'));
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'bottom']}
+    <View
+      style={[styles.safe, { backgroundColor: colors.background, paddingTop: insets.top, paddingBottom: insets.bottom }]}
       // A touch or click anywhere brings stepped-aside controls back; returning false leaves it for whatever is under it.
       onStartShouldSetResponderCapture={() => {
         away.wake();
@@ -101,12 +111,19 @@ export default function TanafasHubScreen() {
             onPress={close}
             renderIcon={(c) => <CanvasIcon name="close" size={18} strokeWidth={1.8} color={c} />}
           />
-          <GlowTabs
-            accessibilityLabel={h.tabsLabel}
-            items={(['breathe', 'meditate', 'discover'] as Tab[]).map((key) => ({ key, label: h.tabs[key] }))}
-            value={tab}
-            onChange={switchTab}
-          />
+          <Animated.View
+            style={{ opacity: tabsShown }}
+            pointerEvents={breathing ? 'none' : 'auto'}
+            accessibilityElementsHidden={breathing}
+            importantForAccessibility={breathing ? 'no-hide-descendants' : 'auto'}
+          >
+            <GlowTabs
+              accessibilityLabel={h.tabsLabel}
+              items={(['breathe', 'meditate', 'discover'] as Tab[]).map((key) => ({ key, label: h.tabs[key] }))}
+              value={tab}
+              onChange={switchTab}
+            />
+          </Animated.View>
           <IconButton
             variant="subtle"
             accessibilityLabel={h.journal}
@@ -164,8 +181,51 @@ export default function TanafasHubScreen() {
           }}
         />
       </GlassSheet>
-    </SafeAreaView>
+      <StatusBar hidden={breathing} style={isNight ? 'light' : 'dark'} />
+    </View>
   );
+}
+
+/**
+ * The safe-area insets, held at the largest seen: hiding the system bars for a session would
+ * otherwise shrink them to nothing and jump the whole layout up and down.
+ */
+function useSteadyInsets(): EdgeInsets {
+  const insets = useSafeAreaInsets();
+  const most = useRef(insets);
+  most.current = {
+    top: Math.max(most.current.top, insets.top),
+    bottom: Math.max(most.current.bottom, insets.bottom),
+    left: Math.max(most.current.left, insets.left),
+    right: Math.max(most.current.right, insets.right),
+  };
+  return most.current;
+}
+
+/** Hides Android's navigation bar and keeps the screen awake while `on` (the status bar is the StatusBar element's). */
+function useFullScreen(on: boolean) {
+  useEffect(() => {
+    if (!on) return;
+    const tag = 'tanafas-breathe';
+    activateKeepAwakeAsync(tag).catch(() => {});
+    if (Platform.OS === 'android') NavigationBar.setVisibilityAsync('hidden').catch(() => {});
+    return () => {
+      deactivateKeepAwake(tag).catch(() => {});
+      if (Platform.OS === 'android') NavigationBar.setVisibilityAsync('visible').catch(() => {});
+    };
+  }, [on]);
+}
+
+/** 1 when shown, 0 when not, faded between; instant under Reduce Motion. */
+function useFade(shown: boolean) {
+  const v = useRef(new Animated.Value(shown ? 1 : 0)).current;
+  const reduceMotion = useReduceMotion();
+  useEffect(() => {
+    const anim = Animated.timing(v, { toValue: shown ? 1 : 0, duration: reduceMotion ? 0 : 400, easing: Easing.inOut(Easing.quad), useNativeDriver: NATIVE });
+    anim.start();
+    return () => anim.stop();
+  }, [shown, v, reduceMotion]);
+  return v;
 }
 
 /** The session backdrop's opacity: in over a breath's length as a session begins, out as it ends. */

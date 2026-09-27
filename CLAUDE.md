@@ -380,9 +380,12 @@ canvas "Houna — Motion (phase 1)"):
   (`beforeRemove`).
 - Event cards grow into their page: a card measures its photo
   (`measureInWindow`) and passes it as params; `events/[slug].tsx`, a
-  transparent modal, flies the photo to its cover (JS-driven layout on a
-  `direction: 'ltr'` layer, native only), fades its ground up round it and
-  shrinks back on Back. Without params, or with Reduce Motion, it just fades.
+  transparent modal, flies the photo to its cover (layout animated with
+  Reanimated on the UI thread, so the page loading underneath can't stutter it;
+  on a `direction: 'ltr'` layer, native only), fades its ground up round it and
+  shrinks back on Back. The flyer and cover keep the card's own photo (`img`),
+  already loaded, so nothing swaps mid-flight. Without params, or with Reduce
+  Motion, it just fades.
 - Controls step aside during practice: `hooks/useControlsAway.ts` (after 3s of
   stillness; a touch brings them back; never while a screen reader is on,
   checked on native only because react-native-web always reports one; no fade
@@ -406,8 +409,9 @@ canvas "Houna — Motion (phase 1)"):
 tiles, round button). Pressing play on a breathing exercise keeps the
 layout and fades each slot over to the session (round, phase, time left).
 Each exercise has its stage (`BreatheStages.tsx`; canvas "Houna — Players
-(phase 2)"). 4-7-8's is `OrbStage`: a large glass orb alone, no dots or
-mark, with the phase word inside it, a halo breathing with it (kept within
+(phase 2)"). 4-7-8's is `OrbStage`: a large glass orb, no dots, the Houna
+mark pressed into it (lit with the rim, as the others'), which rises as a
+session starts to make room for the phase word beneath it, a halo breathing with it (kept within
 the stage, or a short screen's scroll view cuts it straight) and motes rising
 past it, all the motes from one minute-long loop (`sawtooth`); its title and
 round sit beneath, and each phase is announced to screen readers
@@ -432,7 +436,11 @@ relaxation's countdown in its Tense / Release label. Tones: 4-7-8 glow, box
 dusk, five senses dawn, muscle relaxation bloom (a fourth tone, the mood palette's rose, so neighbours in the carousel never share a colour).
 While any breathing session is on, running or paused, the hub lays the
 orbit board's fall of light behind it (`colors.sessionGround`, midnight or
-the theme's ground down to dawn; `BreathePlayer` reports `onInSession`).
+the theme's ground down to dawn; `BreathePlayer` reports `onInSession`), and
+goes truly full screen: the status and navigation bars hide, the screen stays
+awake, and the header keeps only its icons (the tabs fade: switching would end
+the session). The hub pads by `useSteadyInsets`, the largest insets seen, so
+hiding the bars doesn't jump the layout.
 
 **Meditate hero** (canvas "Players — the Meditate tab as a hero"): the hub's
 Meditate tab is `components/tanafas/MeditateHero.tsx`: the chosen scene's
