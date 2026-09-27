@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -7,6 +7,8 @@ import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { currentHijri, hijriMonthDays } from '@/lib/hijri';
 import { SYNODIC_DAYS, moonPhase } from '@/lib/moonPhase';
 import { formatEntryDateLong } from '@/lib/journal';
+import { sessionsBetween } from '@/lib/sessionLog';
+import { dayKey, practiceByDay, type DayPractice } from '@/lib/practice';
 import MoonGlyph from '@/components/ui/MoonGlyph';
 
 const R = 118;
@@ -18,7 +20,8 @@ const BOX = 2 * R + CELL;
  * in its real phase, round a ring from the 1st at the top, clockwise (counter-clockwise in
  * Arabic, as the text runs). Tap one to see its phase and date in the middle; tonight keeps a
  * faint ring. Below, the days to the next new moon. The moons take the four tones and the ink
- * in turn through the month.
+ * in turn through the month; the nights practised glow softly behind (canvas "Phase 4 — the
+ * month of moons, nights practised"), and tapping one says how many minutes.
  */
 export default function MonthRing() {
   const { colors } = useTheme();
@@ -31,10 +34,24 @@ export default function MonthRing() {
   const days = useMemo(() => hijriMonthDays(today.date), [today.date.getTime()]); // eslint-disable-line react-hooks/exhaustive-deps
   const tonight = today.hijri.day - 1;
   const [picked, setPicked] = useState(tonight);
+  // The nights practised, from the phone's own session log.
+  const [practised, setPractised] = useState<Map<string, DayPractice>>(new Map());
+  useEffect(() => {
+    let alive = true;
+    const first = days[0].date;
+    const end = days[days.length - 1].date;
+    sessionsBetween(new Date(first.getFullYear(), first.getMonth(), first.getDate()), new Date(end.getFullYear(), end.getMonth(), end.getDate() + 1))
+      .then((logged) => alive && setPractised(practiceByDay(logged)))
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, [days]);
   const tones = [colors.tones.dusk.fg, colors.tones.glow.fg, colors.text, colors.tones.dawn.fg, colors.tones.bloom.fg];
 
   const sel = days[Math.min(picked, days.length - 1)];
   const selPhase = moonPhase(sel.date);
+  const selPractice = practised.get(dayKey(sel.date));
   const age = moonPhase(now).age;
   const toNew = age < 0.5 || age > SYNODIC_DAYS - 0.5 ? 0 : Math.round(SYNODIC_DAYS - age);
   const latin = fonts.labelTracked;
@@ -48,6 +65,7 @@ export default function MonthRing() {
           const x = (isRTL ? -1 : 1) * R * Math.cos(a);
           const y = R * Math.sin(a);
           const on = k === picked;
+          const glows = practised.has(dayKey(d.date));
           return (
             <Pressable
               key={k}
@@ -58,6 +76,7 @@ export default function MonthRing() {
               hitSlop={2}
               style={[styles.cell, { transform: [{ translateX: x }, { translateY: y }] }]}
             >
+              {glows && <View style={[styles.glow, { backgroundColor: alpha(colors.tones.glow.hue, 0.18), boxShadow: `0 0 12px ${alpha(colors.tones.glow.hue, 0.6)}` }]} />}
               <View
                 style={[
                   StyleSheet.absoluteFill,
@@ -82,6 +101,14 @@ export default function MonthRing() {
           <Text style={[styles.greg, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
             {formatEntryDateLong(sel.date, t.journal.dateNames, num)}
           </Text>
+          {!!selPractice && (
+            <View style={styles.practisedRow}>
+              <View style={[styles.practisedDot, { backgroundColor: colors.tones.glow.hue, boxShadow: `0 0 8px ${colors.tones.glow.hue}` }]} />
+              <Text style={[styles.practised, { color: colors.tones.glow.text, fontFamily: fonts.medium }]}>
+                {arabicPlural(selPractice.minutes, m.practised).replace('{n}', num(selPractice.minutes))}
+              </Text>
+            </View>
+          )}
         </View>
       </View>
 
@@ -126,6 +153,25 @@ const styles = StyleSheet.create({
   ringMark: {
     borderRadius: CELL / 2,
     borderWidth: 1.5,
+  },
+  glow: {
+    position: 'absolute',
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+  },
+  practisedRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  practisedDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+  },
+  practised: {
+    fontSize: 13.5,
   },
   centre: {
     width: 180,

@@ -36,6 +36,7 @@ export const homeStrings = {
       },
       note: 'Every night of the Hijri month in its phase. Tap one to see it; tonight has the ring.',
       close: 'Close the month',
+      practised: { one: '{n} minute practised', few: '{n} minutes practised' },
     },
     // The sky clock (long-press Home's sun or moon): the day from first light to now, then the hour.
     sky: {
@@ -209,6 +210,7 @@ export const homeStrings = {
       },
       note: 'كل ليالي الشهر الهجري بأطوارها. المس ليلة لتراها؛ الليلة محاطة بحلقة.',
       close: 'إغلاق الشهر',
+      practised: { one: 'دقيقة واحدة من التمرّن', two: 'دقيقتان من التمرّن', few: '{n} دقائق من التمرّن', many: '{n} دقيقة من التمرّن' },
     },
     sky: {
       open: 'سماء اليوم',

@@ -7,6 +7,7 @@ import { GroupLabel } from '@/components/directory/ProfileKit';
 import Button from '@/components/ui/Button';
 import Chip from '@/components/ui/Chip';
 import IconTile from '@/components/ui/IconTile';
+import WeekArc from '@/components/stats/WeekArc';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -22,6 +23,8 @@ import {
   type StreakInfo,
   type LeaderboardRow,
 } from '@/lib/streaks';
+import { sessionsBetween } from '@/lib/sessionLog';
+import { minutesByGroup, weekBounds, type PracticeGroup } from '@/lib/practice';
 
 type Period = 'week' | 'all';
 
@@ -36,6 +39,8 @@ export default function StatsScreen() {
   const [period, setPeriod] = useState<Period>('week');
   const [leaderboard, setLeaderboard] = useState<LeaderboardRow[]>([]);
   const [loadingBoard, setLoadingBoard] = useState(true);
+  // The week's minutes by part, and last week's, from the phone's own session log.
+  const [week, setWeek] = useState<{ parts: Record<PracticeGroup, number>; last: number } | null>(null);
 
   const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
   const daysText = (n: number) => arabicPlural(n, s.days).replace('{n}', num(n));
@@ -52,6 +57,24 @@ export default function StatsScreen() {
     useCallback(() => {
       loadStreak();
     }, [loadStreak]),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      let alive = true;
+      const { from, to, lastFrom } = weekBounds(new Date());
+      sessionsBetween(lastFrom, to)
+        .then((all) => {
+          if (!alive) return;
+          const thisWeek = all.filter((x) => x.startedAt >= from.getTime());
+          const last = minutesByGroup(all.filter((x) => x.startedAt < from.getTime()));
+          setWeek({ parts: minutesByGroup(thisWeek), last: Object.values(last).reduce((a, b) => a + b, 0) });
+        })
+        .catch(() => {});
+      return () => {
+        alive = false;
+      };
+    }, []),
   );
 
   useFocusEffect(
@@ -76,6 +99,8 @@ export default function StatsScreen() {
 
   return (
     <AccountScreen title={s.title} subtitle={s.subtitle}>
+      {week && <WeekArc week={week.parts} lastWeek={week.last} />}
+
       <View style={[styles.streakCard, { backgroundColor: colors.tones.glow.bg, borderColor: colors.tones.glow.border }]}>
         <View style={styles.streakMain}>
           <Text style={label}>{s.currentStreak}</Text>

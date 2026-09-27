@@ -36,7 +36,7 @@ relaxation keep today's stages. The ridges are a profile graph, not a stage.
 | --- | --- | --- | --- | --- | --- |
 | Home — the crescent bowl (`BodyCrescentBowl`) | 27 Sep 2026 |  | A Home body (`components/home/HomeBody.tsx`): the dawn-gradient crescent cup with the mark resting in it | M | 27 Sep 2026 (phase 3) |
 | Home header — hilal and the Hijri date (`BodyHilal`) | 27 Sep 2026 |  | Home's header: tonight's moon named in the Hijri calendar (Umm al-Qura via `Intl`), the hilal on the evening a month begins; reuses `lib/moonPhase.ts` | M | 27 Sep 2026 (phase 3) |
-| The month of moons (`BodyMonthRing`) | 27 Sep 2026 |  | New: the Hijri month's nights in their real phases, tap a night; could open from the Home header, or join the Graphs moon calendar | M | 27 Sep 2026 (phase 3): from Home’s date; the practised-night glow waits for Graphs |
+| The month of moons (`BodyMonthRing`) | 27 Sep 2026 |  | New: the Hijri month's nights in their real phases, tap a night; could open from the Home header, or join the Graphs moon calendar | M | 27 Sep 2026 (phase 3): from Home’s date; practised nights glow since phase 4 |
 | Sunrise — the star-lattice sun (`BodyStarSun`) | 27 Sep 2026 |  | Sunrise's sun: turning eight-point stars round `SunDisc` (`components/sunrise/`), Home and/or the Sunrise scene | M | 27 Sep 2026 (phase 3) |
 | The sky clock (`BodySkyClock`) | 27 Sep 2026 |  | New: one sky from dawn to night with the bodies crossing | M | 27 Sep 2026 (phase 3): long press on Home’s body for now |
 
@@ -56,9 +56,14 @@ Decided 27 Sep:
 | Board | Picked | Note | App surface it joins or replaces | Size | Shipped |
 | --- | --- | --- | --- | --- | --- |
 | Graphs — the month in ridges (`GraphRidges`) | 27 Sep 2026 | "Take the graph you made for ridges of breath and add it": draw these ridges in the Breathe ridges' look (tall translucent tone ridges, screen-blended, faint grid, labelled layers). Lives on the user's profile (decided 27 Sep) | The user's profile: minutes per exercise over the month, with today's line (built with section E, after the reskin) | M |  |
-| Graphs — September by moonlight (`GraphMoonCalendar`) | 27 Sep 2026 |  | Stats or Recap: the month as real moons, practised days lit, the rest dim (no "missed"); pairs with the month of moons (C) | M |  |
-| Graphs — the week as an arc (`GraphGauge`) | 27 Sep 2026 |  | Stats (`app/account/stats.tsx`): the week's minutes as a large Figtree Light numeral on an arc segmented by exercise; the Arabic board (`GraphGaugeAr`) shows its RTL | M |  |
+| Graphs — September by moonlight (`GraphMoonCalendar`) | 27 Sep 2026 |  | Stats or Recap: the month as real moons, practised days lit, the rest dim (no "missed"); pairs with the month of moons (C) | M || 28 Sep 2026 (phase 4): a Recap slide |
+| Graphs — the week as an arc (`GraphGauge`) | 27 Sep 2026 |  | Stats (`app/account/stats.tsx`): the week's minutes as a large Figtree Light numeral on an arc segmented by exercise; the Arabic board (`GraphGaugeAr`) shows its RTL | M || 28 Sep 2026 (phase 4): opens Stats |
 | Breathe — ridges of breath (`BreatheRidges`), as a graph | 27 Sep 2026 | Also picked in B as a breathing stage | Its ridge style carried into the graphs above | with the ridges graph |  |
+
+Decided 28 Sep: the moon calendar is a Recap slide (the month's story, so
+Guests get it too, from the on-device log); the week's arc opens Stats, above
+the streak; and the nights practised glow in Home's month of moons (C), a tap
+saying how many minutes. The ridges wait for the profile (E).
 
 ## E · Account, badges and progress (built after the reskin)
 

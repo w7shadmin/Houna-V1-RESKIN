@@ -62,6 +62,15 @@ export const tanafasStrings = {
         many: 'You completed {n} rounds',
       },
     },
+    // The parts of practice, short, as the graphs name them (lib/practice.ts).
+    practiceGroups: {
+      anxietyRelief: '4-7-8',
+      steadyMind: 'Box breathing',
+      panicRelief: 'Five senses',
+      tensionRelease: 'Muscle relaxation',
+      meditation: 'Meditation',
+      tanafas: 'Tanafas',
+    },
     exercises: {
       anxietyRelief: {
         title: 'Anxiety Relief Breathing',
@@ -183,6 +192,15 @@ export const tanafasStrings = {
         few: 'أكملت {n} جولات',
         many: 'أكملت {n} جولة',
       },
+    },
+    // The parts of practice, short, as the graphs name them (lib/practice.ts).
+    practiceGroups: {
+      anxietyRelief: '٤-٧-٨',
+      steadyMind: 'التنفّس المربّع',
+      panicRelief: 'الحواس الخمس',
+      tensionRelease: 'الاسترخاء العضلي',
+      meditation: 'التأمل',
+      tanafas: 'تنفّس',
     },
     exercises: {
       anxietyRelief: {

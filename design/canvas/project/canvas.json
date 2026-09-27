@@ -692,6 +692,28 @@
       "w": 1330,
       "x": 6070,
       "y": 19380
+    },
+    "GraphsMoonlight.dc.html": {
+      "h": 984,
+      "is_interactive": true,
+      "title": "Phase 4 — Recap: the month by moonlight",
+      "w": 1760,
+      "x": 0,
+      "y": 20744
+    },
+    "GraphsWeekArc.dc.html": {
+      "h": 984,
+      "title": "Phase 4 — Stats: the week as an arc",
+      "w": 1760,
+      "x": 1840,
+      "y": 20744
+    },
+    "GraphsMonthGlow.dc.html": {
+      "h": 984,
+      "title": "Phase 4 — the month of moons, nights practised",
+      "w": 1330,
+      "x": 3680,
+      "y": 20744
     }
   },
   "createdOnFiles": {
@@ -814,6 +836,14 @@
       "w": 240,
       "x": 0,
       "y": 19120
+    },
+    "titleGraphsPhase": {
+      "kind": "title1",
+      "maxW": 5010,
+      "text": "Houna — Graphs (phase 4)",
+      "w": 240,
+      "x": 0,
+      "y": 20484
     }
   },
   "order": [
@@ -907,7 +937,10 @@
     "BodiesDate.dc.html",
     "BodiesMonth.dc.html",
     "BodiesStarSun.dc.html",
-    "BodiesSky.dc.html"
+    "BodiesSky.dc.html",
+    "GraphsMoonlight.dc.html",
+    "GraphsWeekArc.dc.html",
+    "GraphsMonthGlow.dc.html"
   ],
   "pages": [],
   "title": "Houna Redesign"

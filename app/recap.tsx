@@ -10,17 +10,18 @@ import { alpha, dayPalette, layout, nightPalette, sunrisePalette } from '@/const
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { loadEntries, type MoodTag } from '@/lib/journal';
 import { MOOD_STYLE } from '@/constants/moods';
-import { sessionsBetween } from '@/lib/sessionLog';
+import { sessionsBetween, type LoggedSession } from '@/lib/sessionLog';
 import { computeRecap, periodBounds, type Recap, type RecapPeriod } from '@/lib/recap/compute';
 import { fetchCommunityActivity, type CommunityActivity } from '@/lib/communityActivity';
 import HounaMark from '@/components/HounaMark';
+import MoonCalendar from '@/components/recap/MoonCalendar';
 import Orb from '@/components/ui/Orb';
 import ScreenGlow from '@/components/ui/ScreenGlow';
 import Button from '@/components/ui/Button';
 import IconButton from '@/components/ui/IconButton';
 import CanvasIcon from '@/components/ui/CanvasIcon';
 
-type SlideKey = 'intro' | 'breathing' | 'meditation' | 'journal' | 'moods' | 'community' | 'share';
+type SlideKey = 'intro' | 'breathing' | 'meditation' | 'moonlight' | 'journal' | 'moods' | 'community' | 'share';
 
 /* ──────────────── Canvas values ("Recap (tap through)", Night + Day) ──────────────── */
 
@@ -41,6 +42,8 @@ const SLIDE_STYLE: Record<
   intro: { night: N.midnight, day: dayPalette.daybreak, sunrise: S.mist, glows: [{ c: 'teal', a: 0.3, rx: 80, ry: 50, cx: 50, cy: 38 }] },
   breathing: { night: '#0E1E38', day: '#DCF0ED', sunrise: '#DCF0ED', glows: [{ c: 'teal', a: 0.4, rx: 90, ry: 60, cx: 50, cy: 30 }] },
   meditation: { night: N.nightfall, day: '#FBF8F2', sunrise: S.sheet, glows: [{ c: 'dusk', a: 0.4, rx: 90, ry: 60, cx: 50, cy: 30 }] },
+  // The month by moonlight (canvas "Phase 4 — Recap: the month by moonlight").
+  moonlight: { night: N.midnight, day: dayPalette.daybreak, sunrise: S.mist, glows: [{ c: 'dusk', a: 0.3, rx: 90, ry: 50, cx: 50, cy: 30 }] },
   journal: { night: N.midnight, day: dayPalette.daybreak, sunrise: S.mist, glows: [{ c: 'dawn', a: 0.32, rx: 90, ry: 60, cx: 50, cy: 30 }] },
   moods: {
     night: '#10173A',
@@ -92,6 +95,7 @@ export default function RecapScreen() {
   const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
 
   const [recap, setRecap] = useState<Recap | null>(null);
+  const [sessions, setSessions] = useState<LoggedSession[]>([]);
   const [community, setCommunity] = useState<CommunityActivity | null>(null);
   const [index, setIndex] = useState(0);
 
@@ -100,7 +104,10 @@ export default function RecapScreen() {
 
   useEffect(() => {
     Promise.all([sessionsBetween(from, to), loadEntries()])
-      .then(([sessions, entries]) => setRecap(computeRecap(sessions, entries, from, to)))
+      .then(([logged, entries]) => {
+        setSessions(logged);
+        setRecap(computeRecap(logged, entries, from, to));
+      })
       .catch(() => setRecap(computeRecap([], [], from, to)));
     // The community RPC only covers up to a month.
     if (period === 'month') fetchCommunityActivity('month').then(setCommunity);
@@ -111,12 +118,14 @@ export default function RecapScreen() {
     const list: SlideKey[] = ['intro'];
     if (recap.breathingMinutes > 0) list.push('breathing');
     if (recap.meditationMinutes > 0) list.push('meditation');
+    // The month's calendar of moons, when there's practice to light it (a year is too long for one).
+    if (period === 'month' && recap.breathingMinutes + recap.meditationMinutes > 0) list.push('moonlight');
     if (recap.journalDays > 0) list.push('journal');
     if (recap.moods.length > 0) list.push('moods');
     if (community && community.totalPeople > 0 && list.length > 1) list.push('community');
     if (list.length > 1) list.push('share');
     return list;
-  }, [recap, community]);
+  }, [recap, community, period]);
 
   const slide = slides[Math.min(index, slides.length - 1)];
   const last = index >= slides.length - 1;
@@ -219,6 +228,8 @@ export default function RecapScreen() {
         {fav && factCard(r.meditation.favourite, fav)}
       </>
     );
+  } else if (slide === 'moonlight') {
+    body = <MoonCalendar month={from} sessions={sessions} />;
   } else if (slide === 'journal' && recap) {
     body = (
       <>
@@ -306,7 +317,12 @@ export default function RecapScreen() {
           </View>
         </View>
 
-        <View style={styles.body} accessibilityLiveRegion="polite">
+        {/* The moonlight slide's moons sit above the story's tap zones (taps elsewhere still move it on). */}
+        <View
+          style={[styles.body, slide === 'moonlight' && styles.bodyAbove]}
+          pointerEvents={slide === 'moonlight' ? 'box-none' : 'auto'}
+          accessibilityLiveRegion="polite"
+        >
           {body}
         </View>
 
@@ -418,6 +434,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 16,
+  },
+  bodyAbove: {
+    zIndex: 1,
   },
   eyebrowLatin: {
     fontSize: 12,

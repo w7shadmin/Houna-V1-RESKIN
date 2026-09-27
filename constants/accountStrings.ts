@@ -86,8 +86,15 @@ export const accountStrings = {
       cancel: 'Cancel',
     },
     stats: {
-      title: 'Your streak',
-      subtitle: 'Days with a breathing or meditation session. Mood check-ins never count — they are just for you.',
+      title: 'Your practice',
+      subtitle: 'Your breathing and meditation. Mood check-ins never count — they are just for you.',
+      // The week as an arc (canvas "Phase 4 — Stats: the week as an arc"), from the phone's own log.
+      week: {
+        eyebrow: 'This week',
+        unit: { one: 'minute', few: 'minutes' },
+        lastWeek: 'Last week',
+        a11y: 'This week: {n}. Last week: {m}.',
+      },
       currentStreak: 'Current streak',
       longestStreak: 'Longest',
       days: {
@@ -226,8 +233,14 @@ export const accountStrings = {
       cancel: 'إلغاء',
     },
     stats: {
-      title: 'سلسلتك',
-      subtitle: 'الأيام التي مارست فيها جلسة تنفس أو تأمل. تسجيل المزاج لا يُحتسب أبدًا — فهو لك وحدك.',
+      title: 'ممارستك',
+      subtitle: 'تنفّسك وتأمّلك. تسجيل المزاج لا يُحتسب أبدًا — فهو لك وحدك.',
+      week: {
+        eyebrow: 'هذا الأسبوع',
+        unit: { one: 'دقيقة', two: 'دقيقتان', few: 'دقائق', many: 'دقيقة' },
+        lastWeek: 'الأسبوع الماضي',
+        a11y: 'هذا الأسبوع: {n}. الأسبوع الماضي: {m}.',
+      },
       currentStreak: 'السلسلة الحالية',
       longestStreak: 'الأطول',
       days: {

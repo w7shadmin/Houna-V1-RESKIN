@@ -15,6 +15,18 @@ export const recapStrings = {
       body: 'A look back at the moments you made for yourself.',
       empty: 'Nothing to look back on yet — this recap fills in as you breathe, meditate and journal.',
     },
+    // The month by moonlight (canvas "Phase 4 — Recap: the month by moonlight"): no "missed", ever.
+    moonlight: {
+      eyebrow: 'By moonlight',
+      title: '{month} by moonlight',
+      body: 'Each night’s real moon. The ones you practised glow; the rest simply rest.',
+      weekdays: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
+      minutes: { one: '{n} minute', few: '{n} minutes' },
+      practised: '{date} · {minutes}, mostly {what}',
+      quiet: '{date} · a quiet day',
+      toCome: '{date} · still to come',
+      note: 'No streak to lose here: a dark moon is just a night off.',
+    },
     breathing: {
       eyebrow: 'Breathing',
       unit: { one: 'minute spent breathing', few: 'minutes spent breathing' },
@@ -63,6 +75,17 @@ export const recapStrings = {
       title: { month: 'شهرك، بهدوء', year: 'عامك، بهدوء' },
       body: 'نظرة إلى الوراء على اللحظات التي منحتها لنفسك.',
       empty: 'لا شيء لنستعيده بعد — يمتلئ هذا الملخّص كلما تنفّست وتأمّلت وكتبت.',
+    },
+    moonlight: {
+      eyebrow: 'على ضوء القمر',
+      title: '{month} على ضوء القمر',
+      body: 'قمر كل ليلة كما كان. الليالي التي تمرّنت فيها تتوهّج، والباقي يستريح.',
+      weekdays: ['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س'],
+      minutes: { one: 'دقيقة واحدة', two: 'دقيقتان', few: '{n} دقائق', many: '{n} دقيقة' },
+      practised: '{date} · {minutes}، أكثرها {what}',
+      quiet: '{date} · يوم هادئ',
+      toCome: '{date} · لم يأتِ بعد',
+      note: 'لا سلسلة تخسرها هنا: القمر المعتم ليلة راحة فحسب.',
     },
     breathing: {
       eyebrow: 'التنفّس',

@@ -370,7 +370,25 @@ begins the date shows the hilal, glowing, and the new month. Tapping it opens
 `app/month.tsx`, a `GlassSheet` over Home (transparent modal; Back waits for the
 sheet to sink, `onHidden`) holding `MonthRing`: every night of the month in its
 phase round a ring from the 1st (counter-clockwise in Arabic), tap one for its
-phase and date, tonight faintly ringed, and the days to the next new moon.
+phase and date, tonight faintly ringed, and the days to the next new moon. The
+nights practised glow softly behind their moons, and a tap on one says its minutes.
+
+**Graphs** (phase 4, canvas "Houna — Graphs (phase 4)"), all from the phone's own
+session log (`lib/sessionLog.ts`: breathing and meditation only, so mood never
+counts) through `lib/practice.ts` (tested): the parts of practice
+(`PRACTICE_GROUPS`: the four exercises in their tones, meditation, and `tanafas`,
+Home's sky visits; short names in `t.tanafas.practiceGroups`), minutes by part,
+the week (Monday to Monday, as the leaderboard's) and each day practised.
+- Stats (`app/account/stats.tsx`, titled "Your practice") opens with
+  `components/stats/WeekArc.tsx`: this week's minutes large on an arc split by
+  part (meditation in ink, Tanafas in half-ink), drawn once as it opens (JS-driven:
+  SVG strokes can't take the native driver), last week beneath with no arrow or
+  verdict, then the parts. Mirrored in Arabic, so it fills from the right.
+- Recap's month has a moonlight slide after meditation, when there's practice
+  (`components/recap/MoonCalendar.tsx`): the month's nights as real moons, the
+  days practised lit and glowing, the rest dim, never "missed", days to come
+  fainter. Its moons sit above Recap's tap zones (`bodyAbove`, `box-none`), so a
+  tap on a moon picks that day and anywhere else moves the story on.
 
 **The sky clock** (canvas "Phase 3 — the sky clock"; a long press on Home's mark
 or body, or the screen reader's "Today's sky" action; the only entry for now, to
