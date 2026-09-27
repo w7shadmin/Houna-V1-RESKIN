@@ -605,6 +605,57 @@
       "w": 1330,
       "x": 7050,
       "y": 16700
+    },
+    "PlayersHero.dc.html": {
+      "h": 960,
+      "title": "Players — the Meditate tab as a hero",
+      "w": 1330,
+      "x": 0,
+      "y": 18040
+    },
+    "PlayersScenes.dc.html": {
+      "h": 960,
+      "is_interactive": true,
+      "title": "Players — choosing a scene (arches, glass sheet)",
+      "w": 1330,
+      "x": 1410,
+      "y": 18040
+    },
+    "PlayersMinutes.dc.html": {
+      "h": 960,
+      "is_interactive": true,
+      "title": "Players — choosing a length (minutes wheel)",
+      "w": 1330,
+      "x": 2820,
+      "y": 18040
+    },
+    "PlayersOrb.dc.html": {
+      "h": 960,
+      "title": "Players — 4-7-8 with the glass orb",
+      "w": 1330,
+      "x": 4230,
+      "y": 18040
+    },
+    "PlayersStar.dc.html": {
+      "h": 960,
+      "title": "Players — box breathing with the star",
+      "w": 1330,
+      "x": 5640,
+      "y": 18040
+    },
+    "PlayersBackdrop.dc.html": {
+      "h": 960,
+      "title": "Players — the dawn backdrop for breathing sessions",
+      "w": 1330,
+      "x": 7050,
+      "y": 18040
+    },
+    "PlayersArabic.dc.html": {
+      "h": 960,
+      "title": "Players — Arabic hero and scenes (Night)",
+      "w": 900,
+      "x": 8460,
+      "y": 18040
     }
   },
   "createdOnFiles": {
@@ -711,6 +762,14 @@
       "w": 240,
       "x": 0,
       "y": 16440
+    },
+    "titlePlayersPhase": {
+      "kind": "title1",
+      "maxW": 9360,
+      "text": "Houna — Players (phase 2)",
+      "w": 240,
+      "x": 0,
+      "y": 17780
     }
   },
   "order": [
@@ -792,7 +851,14 @@
     "MotionPhaseControls.dc.html",
     "MotionPhaseWords.dc.html",
     "MotionPhasePill.dc.html",
-    "MotionPhaseTabs.dc.html"
+    "MotionPhaseTabs.dc.html",
+    "PlayersHero.dc.html",
+    "PlayersScenes.dc.html",
+    "PlayersMinutes.dc.html",
+    "PlayersOrb.dc.html",
+    "PlayersStar.dc.html",
+    "PlayersBackdrop.dc.html",
+    "PlayersArabic.dc.html"
   ],
   "pages": [],
   "title": "Houna Redesign"

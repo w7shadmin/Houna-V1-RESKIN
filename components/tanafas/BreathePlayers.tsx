@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
+import { AccessibilityInfo, Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Check, RotateCcw } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -22,7 +22,7 @@ import { useSessionLog } from '@/hooks/useSessionLog';
 import { sessionEndAlert } from '@/lib/sessionEndAlert';
 import CanvasIcon, { DirectionalIcon } from '@/components/ui/CanvasIcon';
 import type { IconTileTone } from '@/components/ui/IconTile';
-import { BreathStage, NATIVE_DRIVER } from './BreatheStages';
+import { BreathStage, NATIVE_DRIVER, OrbStage, StarStage } from './BreatheStages';
 import PlayerFrame, {
   Body,
   FadeIn,
@@ -56,9 +56,11 @@ interface PlayerProps {
   onSessionActive?: (active: boolean) => void;
   /** The step-aside state for the player's info and controls (`useControlsAway`, owned by the hub). */
   away?: { opacity: Animated.Value; interactive: boolean };
+  /** Told when a session begins or ends, running or paused, so the hub can lay the session backdrop behind it. */
+  onInSession?: (inSession: boolean) => void;
 }
 
-/** Reports whether a session is running on its own; false again when it stops or the player goes. */
+/** Reports a session state to the hub; false again when it stops or the player goes. */
 function useReportActive(active: boolean, onSessionActive?: (active: boolean) => void) {
   useEffect(() => {
     onSessionActive?.(active);
@@ -246,7 +248,41 @@ function useBreathCycle(exercise: BreatheKey, phases: readonly BreathPhase[], mi
   };
 }
 
-function PhasePlayer({ exercise, breath, nav, onSessionActive, away }: PlayerProps) {
+/**
+ * Box breathing's star: `turn` counts the holds so far (0 → 4, then round again), easing up by one
+ * through each hold and resting between them. At rest before a session it sits at 2, the star.
+ */
+function useHoldTurns(status: Status, clock: Clock, phases: readonly BreathPhase[], turn: Animated.Value) {
+  const last = useRef(2);
+  useEffect(() => {
+    if (status === 'paused') return;
+    const go = (toValue: number, duration: number, easing = Easing.inOut(Easing.sin)) => {
+      last.current = toValue;
+      return Animated.timing(turn, { toValue, duration, easing, useNativeDriver: NATIVE_DRIVER });
+    };
+    if (status !== 'running') {
+      const anim = go(2, 900);
+      anim.start();
+      return () => anim.stop();
+    }
+    const perRound = phases.filter((p) => p.key === 'hold').length;
+    const before = ((clock.round - 1) * perRound + phases.slice(0, clock.phase).filter((p) => p.key === 'hold').length) % 4;
+    // A full turn (90°) looks the same as none: start the next lap from 0 unseen.
+    if (last.current >= 4 && before === 0) {
+      turn.setValue(0);
+      last.current = 0;
+    }
+    const p = phases[clock.phase];
+    const remaining = Math.max(p.seconds - clock.inPhase, 0) * 1000;
+    const anim = p.key === 'hold' ? go(before + 1, remaining) : go(before, Math.min(700, remaining));
+    anim.start();
+    return () => anim.stop();
+    // Keyed on the phase/round, not the ticking clock.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, clock.phase, clock.round]);
+}
+
+function PhasePlayer({ exercise, breath, nav, onSessionActive, onInSession, away }: PlayerProps) {
   const { colors } = useTheme();
   const { t, fonts } = useLanguage();
   const s = t.tanafas.session;
@@ -260,11 +296,22 @@ function PhasePlayer({ exercise, breath, nav, onSessionActive, away }: PlayerPro
 
   const [minutes, setMinutes] = useState(DEFAULT_SESSION_MINUTES);
   const trace = useRef(new Animated.Value(0)).current;
+  const turn = useRef(new Animated.Value(2)).current;
   const cycle = useBreathCycle(exercise, phases, minutes, breath, trace);
   const { status, clock } = cycle;
   const inSession = status === 'running' || status === 'paused';
   const mode = inSession ? 'session' : status;
   useReportActive(status === 'running', onSessionActive);
+  useReportActive(inSession, onInSession);
+  useHoldTurns(status, clock, phases, turn);
+  // 4-7-8 breathes a glass orb with the phase inside it; box breathing traces the star.
+  const orb = exercise === 'anxiety-relief';
+  const phaseNow = phaseLabel(phases[clock.phase]);
+  // The phase is drawn, not read out: say each one to a screen reader as it comes.
+  useEffect(() => {
+    if (status === 'running') AccessibilityInfo.announceForAccessibility(phaseNow);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, clock.phase, clock.round]);
 
   const clockText = `${num(Math.floor(cycle.secondsLeft / 60))}:${num(cycle.secondsLeft % 60).padStart(2, num(0))}`;
   const roundsDone = Math.max(clock.round - 1, 1);
@@ -287,21 +334,28 @@ function PhasePlayer({ exercise, breath, nav, onSessionActive, away }: PlayerPro
       nav={status === 'idle' ? nav : null}
       away={away}
       stage={
-        <BreathStage
-          shape={exercise === 'steady-mind' ? 'square' : 'ring'}
-          tone={tone}
-          breath={breath}
-          trace={trace}
-          showTracer={inSession}
-          // Lit through the hold at the top: the inhale has just filled it.
-          full={inSession && phases[clock.phase].key === 'hold' && phases[clock.phase].fill === 1}
-        />
+        orb ? (
+          <OrbStage
+            tone={tone}
+            breath={breath}
+            // Lit through the hold at the top: the inhale has just filled it.
+            full={inSession && phases[clock.phase].key === 'hold' && phases[clock.phase].fill === 1}
+            word={inSession ? phaseNow : undefined}
+          />
+        ) : (
+          <StarStage tone={tone} trace={trace} turn={turn} showTracer={inSession} />
+        )
       }
       heading={
         inSession ? (
-          <FadeIn key={`${clock.round}-${clock.phase}`}>
-            <Heading>{phaseLabel(phases[clock.phase])}</Heading>
-          </FadeIn>
+          orb ? (
+            // The phase is in the orb; the exercise's name sits beneath it.
+            <Heading>{e.title}</Heading>
+          ) : (
+            <FadeIn key={`${clock.round}-${clock.phase}`}>
+              <Heading>{phaseNow}</Heading>
+            </FadeIn>
+          )
         ) : status === 'complete' ? (
           <Heading>{s.wellDone}</Heading>
         ) : (
@@ -310,7 +364,10 @@ function PhasePlayer({ exercise, breath, nav, onSessionActive, away }: PlayerPro
       }
       label={
         inSession ? (
-          <TrackedLabel color={accentText}>{`${s.round} ${num(clock.round)} ${s.ofTotal} ${num(cycle.totalRounds)}`}</TrackedLabel>
+          <>
+            {!orb && <Body>{e.title}</Body>}
+            <TrackedLabel color={accentText}>{`${s.round} ${num(clock.round)} ${s.ofTotal} ${num(cycle.totalRounds)}`}</TrackedLabel>
+          </>
         ) : status === 'complete' ? (
           <TrackedLabel color={accentText}>{arabicPlural(roundsDone, s.roundsDone).replace('{n}', num(roundsDone))}</TrackedLabel>
         ) : (
@@ -318,15 +375,7 @@ function PhasePlayer({ exercise, breath, nav, onSessionActive, away }: PlayerPro
         )
       }
       body={
-        inSession ? (
-          <View style={styles.phaseRow}>
-            {phases.map((p, i) => (
-              <TrackedLabel key={i} active={i === clock.phase}>
-                {phaseLabel(p)}
-              </TrackedLabel>
-            ))}
-          </View>
-        ) : status === 'complete' ? (
+        inSession ? null : status === 'complete' ? (
           <Body>{e.completionBody}</Body>
         ) : (
           idle.body
@@ -374,7 +423,7 @@ function PhasePlayer({ exercise, breath, nav, onSessionActive, away }: PlayerPro
 
 /* ──────────────── Five-senses grounding (5-4-3-2-1) ──────────────── */
 
-function GroundingPlayer({ exercise, breath, nav }: PlayerProps) {
+function GroundingPlayer({ exercise, breath, nav, onInSession }: PlayerProps) {
   const { colors } = useTheme();
   const { t, fonts, isRTL } = useLanguage();
   const s = t.tanafas.session;
@@ -435,6 +484,7 @@ function GroundingPlayer({ exercise, breath, nav }: PlayerProps) {
   const current = steps[step];
   const isLast = step === steps.length - 1;
   const running = status === 'running';
+  useReportActive(running, onInSession);
 
   return (
     <PlayerFrame
@@ -442,7 +492,6 @@ function GroundingPlayer({ exercise, breath, nav }: PlayerProps) {
       nav={status === 'idle' ? nav : null}
       stage={
         <BreathStage
-          shape="ring"
           tone={tone}
           breath={breath}
           progress={running ? (step + 1) / steps.length : status === 'complete' ? 1 : undefined}
@@ -537,7 +586,7 @@ function GroundingPlayer({ exercise, breath, nav }: PlayerProps) {
 
 /* ──────────────── Progressive muscle relaxation ──────────────── */
 
-function TensionPlayer({ exercise, breath, nav, onSessionActive, away }: PlayerProps) {
+function TensionPlayer({ exercise, breath, nav, onSessionActive, onInSession, away }: PlayerProps) {
   const { colors } = useTheme();
   const { t, fonts, isRTL } = useLanguage();
   const s = t.tanafas.session;
@@ -625,6 +674,7 @@ function TensionPlayer({ exercise, breath, nav, onSessionActive, away }: PlayerP
   const current = groups[group];
   const secondsLeft = Math.max(Math.ceil((duration - elapsed) / 1000), 0);
   useReportActive(status === 'running', onSessionActive);
+  useReportActive(inSession, onInSession);
 
   return (
     <PlayerFrame
@@ -635,7 +685,7 @@ function TensionPlayer({ exercise, breath, nav, onSessionActive, away }: PlayerP
         // The same lit orb as the other exercises; the count sits on it in ink, as the play icon does on its light button.
         // The mark sits in the orb; the countdown joins the Tense / Release label.
         // Lit briefly as each tense begins: the release has just filled the orb (or, first time, it's just opened).
-        <BreathStage shape="ring" tone={tone} breath={breath} full={inSession && isTense && elapsed >= 400 && elapsed < 1100} />
+        <BreathStage tone={tone} breath={breath} full={inSession && isTense && elapsed >= 400 && elapsed < 1100} />
       }
       heading={
         inSession ? (
@@ -725,13 +775,6 @@ function TensionPlayer({ exercise, breath, nav, onSessionActive, away }: PlayerP
 }
 
 const styles = StyleSheet.create({
-  phaseRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: 12,
-    paddingTop: 4,
-  },
   steps: {
     flexDirection: 'row',
     alignItems: 'center',

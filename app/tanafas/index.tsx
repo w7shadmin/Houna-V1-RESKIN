@@ -1,11 +1,12 @@
-import React, { useRef, useState } from 'react';
-import { Animated, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Animated, Easing, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { alpha, layout } from '@/constants/theme';
-import { BREATHE_ORDER, BREATHE_TONE, DEFAULT_MEDITATION_MINUTES, MEDITATION_MINUTES } from '@/constants/breathPatterns';
+import { BREATHE_ORDER, BREATHE_TONE, DEFAULT_MEDITATION_MINUTES } from '@/constants/breathPatterns';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { MEDITATION_SCENES, SCENE_ORBS, type SceneId } from '@/components/meditation/scenes';
 import { TESTS } from '@/constants/psychometrics';
@@ -15,10 +16,13 @@ import Card from '@/components/ui/Card';
 import ScreenGlow from '@/components/ui/ScreenGlow';
 import CanvasIcon, { DirectionalIcon } from '@/components/ui/CanvasIcon';
 import BreathePlayer, { toneGlow } from '@/components/tanafas/BreathePlayers';
-import PlayerFrame, { Body, Heading, InfoTiles, LengthTile, MainButton, SideSpacer, Tag, Tile } from '@/components/tanafas/PlayerFrame';
-import SceneStage from '@/components/tanafas/SceneStage';
 import GlowTabs from '@/components/ui/GlowTabs';
+import GlassSheet from '@/components/ui/GlassSheet';
+import MeditateHero from '@/components/tanafas/MeditateHero';
+import ScenePicker from '@/components/tanafas/ScenePicker';
+import MinutesWheel from '@/components/tanafas/MinutesWheel';
 import { useControlsAway } from '@/hooks/useControlsAway';
+import { NATIVE, useReduceMotion } from '@/hooks/useCalmLoop';
 
 type Tab = 'breathe' | 'meditate' | 'discover';
 
@@ -47,11 +51,16 @@ export default function TanafasHubScreen() {
   const [sceneIndex, setSceneIndex] = useState(() => Math.max(0, MEDITATION_SCENES.findIndex((sc) => sc.id === params.scene)));
   // Meditation length, chosen here so the player can open straight into the session.
   const [meditateMinutes, setMeditateMinutes] = useState<number | null>(DEFAULT_MEDITATION_MINUTES);
+  // The Meditate hero's glass sheets: choosing a scene, or a length.
+  const [sheet, setSheet] = useState<'scene' | 'length' | null>(null);
   // How full the breathing orb is (0 rest → 1); the screen glow breathes with it.
   const breath = useRef(new Animated.Value(0)).current;
   // While a breathing session runs on its own, the header and the player's controls step aside.
   const [sessionActive, setSessionActive] = useState(false);
   const away = useControlsAway(tab === 'breathe' && sessionActive);
+  // Behind a breathing session, running or paused, the dawn backdrop fades in.
+  const [inSession, setInSession] = useState(false);
+  const ground = useSessionGround(tab === 'breathe' && inSession);
 
   const exercise = BREATHE_ORDER[breatheIndex];
   const scene = MEDITATION_SCENES[sceneIndex];
@@ -78,6 +87,9 @@ export default function TanafasHubScreen() {
     >
       <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { opacity: tab === 'breathe' ? glowOpacity : 1 }]}>
         <ScreenGlow color={glow} rx={70} ry={38} cy={30} />
+      </Animated.View>
+      <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { opacity: ground }]}>
+        <LinearGradient colors={colors.sessionGround.colors} locations={colors.sessionGround.locations} style={StyleSheet.absoluteFill} />
       </Animated.View>
 
       <View style={styles.inner}>
@@ -110,6 +122,7 @@ export default function TanafasHubScreen() {
             key={exercise}
             exercise={exercise}
             onSessionActive={setSessionActive}
+            onInSession={setInSession}
             away={away}
             breath={breath}
             nav={{
@@ -120,51 +133,56 @@ export default function TanafasHubScreen() {
             }}
           />
         ) : (
-          <PlayerFrame
-            mode={scene.id}
-            nav={{
-              count: MEDITATION_SCENES.length,
-              index: sceneIndex,
-              onPrev: () => setSceneIndex((i) => cycle(i, MEDITATION_SCENES.length, -1)),
-              onNext: () => setSceneIndex((i) => cycle(i, MEDITATION_SCENES.length, 1)),
-            }}
-            stage={<SceneStage scene={scene} />}
-            heading={<Heading>{scenesText[scene.id].name}</Heading>}
-            label={<Tag label={h.ambientScene} tone="glow" />}
-            body={<Body>{scenesText[scene.id].description}</Body>}
-            info={
-              <InfoTiles>
-                <LengthTile
-                  label={h.duration}
-                  options={MEDITATION_MINUTES}
-                  value={meditateMinutes}
-                  onChange={setMeditateMinutes}
-                  unit={t.tanafas.session.minPlural}
-                  optionLabel={(m) =>
-                    m === null ? h.noLimit : `${isRTL ? arabicNumber(m) : m} ${arabicPlural(m, t.tanafas.meditation.player.min)}`
-                  }
-                  accent={sceneOrb.c}
-                />
-                <Tile label={h.video}>{scene.video ? h.on : h.off}</Tile>
-              </InfoTiles>
-            }
-            controls={
-              <>
-                <SideSpacer />
-                <MainButton
-                  label={`${h.begin} — ${scenesText[scene.id].name}`}
-                  glow={glow}
-                  onPress={() => router.push({ pathname: '/tanafas/meditation/[scene]', params: { scene: scene.id, minutes: meditateMinutes === null ? 'none' : String(meditateMinutes) } })}
-                  renderIcon={(c) => <CanvasIcon name="play" size={28} color={c} />}
-                />
-                <SideSpacer />
-              </>
+          <MeditateHero
+            scene={scene}
+            minutes={meditateMinutes}
+            onScene={() => setSheet('scene')}
+            onLength={() => setSheet('length')}
+            onBegin={() =>
+              router.push({ pathname: '/tanafas/meditation/[scene]', params: { scene: scene.id, minutes: meditateMinutes === null ? 'none' : String(meditateMinutes) } })
             }
           />
         )}
       </View>
+
+      {/* The Meditate hero's choices, as glass sheets over the hub. */}
+      <GlassSheet visible={sheet === 'scene'} onClose={() => setSheet(null)} eyebrow={h.scene} title={h.chooseSceneTitle} closeLabel={t.checkIn.close}>
+        <ScenePicker
+          value={sceneIndex}
+          onChoose={(i) => {
+            setSceneIndex(i);
+            setSheet(null);
+          }}
+        />
+      </GlassSheet>
+      <GlassSheet visible={sheet === 'length'} onClose={() => setSheet(null)} eyebrow={h.length} title={h.lengthTitle} closeLabel={t.checkIn.close}>
+        <MinutesWheel
+          value={meditateMinutes}
+          onDone={(m) => {
+            setMeditateMinutes(m);
+            setSheet(null);
+          }}
+        />
+      </GlassSheet>
     </SafeAreaView>
   );
+}
+
+/** The session backdrop's opacity: in over a breath's length as a session begins, out as it ends. */
+function useSessionGround(on: boolean) {
+  const v = useRef(new Animated.Value(0)).current;
+  const reduceMotion = useReduceMotion();
+  useEffect(() => {
+    const anim = Animated.timing(v, {
+      toValue: on ? 1 : 0,
+      duration: reduceMotion ? 0 : on ? 2400 : 900,
+      easing: Easing.inOut(Easing.sin),
+      useNativeDriver: NATIVE,
+    });
+    anim.start();
+    return () => anim.stop();
+  }, [on, v, reduceMotion]);
+  return v;
 }
 
 function DiscoverPanel() {
@@ -260,6 +278,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 8,
+    // Above the Meditate hero's sky, which reaches up behind it.
+    zIndex: 2,
   },
   stage: {
     width: 250,

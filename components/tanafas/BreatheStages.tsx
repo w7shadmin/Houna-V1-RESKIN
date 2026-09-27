@@ -1,13 +1,15 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { Animated, Easing, Platform, StyleSheet, View } from 'react-native';
-import Svg, { Circle, Rect } from 'react-native-svg';
+import { Animated, Easing, Platform, StyleSheet, Text, View } from 'react-native';
+import Svg, { Circle, Defs, Polygon, RadialGradient, Stop } from 'react-native-svg';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { stopProps } from '@/lib/svgStop';
 import { alpha, flatten } from '@/constants/theme';
 import Orb from '@/components/ui/Orb';
 import PressedMark from '@/components/ui/PressedMark';
 import HounaMark from '@/components/HounaMark';
 import { useStarfield } from '@/contexts/StarfieldContext';
-import { WAVE_STEPS, wave } from '@/hooks/useCalmLoop';
+import { WAVE_STEPS, useCalmLoop, wave } from '@/hooks/useCalmLoop';
 import type { IconTileTone } from '@/components/ui/IconTile';
 
 /** Animations on the stage and the screen glow stay on the UI thread on native. */
@@ -15,7 +17,7 @@ export const NATIVE_DRIVER = Platform.OS !== 'web';
 
 const SIZE = 250;
 const C = SIZE / 2;
-/** Radius of the ring of dots; half-side of the square of dots. */
+/** Radius of the ring of dots. */
 const R = 110;
 const DOTS = 28;
 /** The orb is drawn at full size and scaled down: at rest it's the canvas's 74px pearl. */
@@ -28,16 +30,10 @@ const MIDDLE = 137;
 /** The rim that flashes as the orb reaches full size: its width in the orb's full-size frame. */
 const RIM = 2.5;
 
-export type StageShape = 'ring' | 'square';
-
 interface BreathStageProps {
-  shape: StageShape;
   tone: IconTileTone;
   /** 0 at rest → 1 filling the ring. Shared with the hub's screen glow. */
   breath: Animated.Value;
-  /** Box breathing: 0 → 4 around the square, one side per phase. */
-  trace?: Animated.Value;
-  showTracer?: boolean;
   /** Light the dots up to this fraction, clockwise from the top (grounding steps). */
   progress?: number;
   /** The orb is full: its rim lights, and stays lit while this holds (a breath held at the top). */
@@ -47,13 +43,13 @@ interface BreathStageProps {
 }
 
 /**
- * The Breathe stage from the canvas: a ring (or, for box breathing, a
- * square) of dots graded in size and light, a hairline middle outline, and a
+ * The Breathe stage from the canvas (grounding, muscle relaxation): a ring of
+ * dots graded in size and light, a hairline middle outline, and a
  * lit orb that inflates and deflates with `breath`. While the player says
  * the orb is `full`, its rim and the Houna mark in it are lit: they light
  * as the orb fills, hold through a held breath, and fade as the orb lets go.
  */
-export function BreathStage({ shape, tone, breath, trace, showTracer, progress, full = false, children }: BreathStageProps) {
+export function BreathStage({ tone, breath, progress, full = false, children }: BreathStageProps) {
   const { colors } = useTheme();
   const fg = colors.tones[tone].fg;
   // The canvas ring pairs Houna glow with dusk; the other tones keep to their own colour.
@@ -66,13 +62,12 @@ export function BreathStage({ shape, tone, breath, trace, showTracer, progress, 
         const lit = progress !== undefined && (k + 0.5) / DOTS <= progress;
         const s = lit ? 7 : 3 + 4 * Math.sin(tt * Math.PI);
         const o = lit ? 1 : (0.2 + 0.8 * Math.sin(tt * Math.PI)) * (progress !== undefined ? 0.4 : 1);
-        return { ...position(shape, tt), tt, s, o, c: lit || k < DOTS / 2 ? fg : partner };
+        return { ...position(tt), tt, s, o, c: lit || k < DOTS / 2 ? fg : partner };
       }),
-    [shape, progress, fg, partner],
+    [progress, fg, partner],
   );
-  // The ring turns as Home's does, but not while grounding lights it from the top, and never
-  // the square, whose corners the box-breathing bead follows.
-  const turns = shape === 'ring' && progress === undefined;
+  // The ring turns as Home's does, but not while grounding lights it from the top.
+  const turns = progress === undefined;
 
   const scale = breath.interpolate({ inputRange: [0, 1], outputRange: [REST, 1] });
   const rim = useRimLight(full);
@@ -88,27 +83,11 @@ export function BreathStage({ shape, tone, breath, trace, showTracer, progress, 
     <View style={styles.stage} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       <DriftingDots dots={dots} turns={turns} />
       <Svg width={SIZE} height={SIZE} style={StyleSheet.absoluteFill}>
-        {shape === 'ring' ? (
-          <Circle cx={C - 0.5} cy={C - 0.5} r={MIDDLE / 2} fill="none" stroke={colors.text} strokeOpacity={0.14} strokeWidth={1} />
-        ) : (
-          <Rect
-            x={C - MIDDLE / 2}
-            y={C - MIDDLE / 2}
-            width={MIDDLE}
-            height={MIDDLE}
-            rx={28}
-            fill="none"
-            stroke={colors.text}
-            strokeOpacity={0.14}
-            strokeWidth={1}
-          />
-        )}
+        <Circle cx={C - 0.5} cy={C - 0.5} r={MIDDLE / 2} fill="none" stroke={colors.text} strokeOpacity={0.14} strokeWidth={1} />
       </Svg>
       <Animated.View style={{ transform: [{ scale }] }}>
         <Orb
           size={ORB}
-          // Box breathing breathes a rounded square, echoing its square of dots.
-          radius={shape === 'square' ? ORB * 0.22 : undefined}
           fx={0.34}
           fy={0.3}
           stops={stops}
@@ -125,7 +104,7 @@ export function BreathStage({ shape, tone, breath, trace, showTracer, progress, 
           style={[
             styles.rim,
             {
-              borderRadius: shape === 'square' ? ORB * 0.22 : ORB / 2,
+              borderRadius: ORB / 2,
               borderColor: fg,
               boxShadow: `0 0 16px ${alpha(fg, 0.8)}`,
               opacity: rim,
@@ -133,8 +112,236 @@ export function BreathStage({ shape, tone, breath, trace, showTracer, progress, 
           ]}
         />
       </Animated.View>
-      {shape === 'square' && trace && showTracer && <Tracer trace={trace} color={fg} />}
       {!!children && <View style={styles.centre}>{children}</View>}
+    </View>
+  );
+}
+
+/* ──────────────── 4-7-8: the glass orb ──────────────── */
+
+/** The glass orb's full size, and its size at rest as a fraction of that. */
+const GLASS = 240;
+const GLASS_REST = 0.6;
+
+interface OrbStageProps {
+  tone: IconTileTone;
+  /** 0 at rest → 1 full. Shared with the hub's screen glow. */
+  breath: Animated.Value;
+  /** The orb is full (the hold at the top): its rim lights. */
+  full?: boolean;
+  /** The phase, written inside the orb (shown only during a session). */
+  word?: string;
+}
+
+/**
+ * 4-7-8's stage (canvas "Players — 4-7-8 with the glass orb"): a large glass orb alone, no dots
+ * and no mark, filling and emptying with `breath`, the phase word inside it, a soft halo that
+ * breathes with it, and motes drifting up past it. Its rim lights through the hold, as the
+ * other stages' orbs do.
+ */
+export function OrbStage({ tone, breath, full = false, word }: OrbStageProps) {
+  const { colors, isNight } = useTheme();
+  const { fonts, isRTL } = useLanguage();
+  const fg = colors.tones[tone].fg;
+  const hue = colors.tones[tone].hue;
+  const scale = breath.interpolate({ inputRange: [0, 1], outputRange: [GLASS_REST, 1] });
+  // Never past the stage's edge, where a short screen's scroll view would cut it straight.
+  const haloScale = breath.interpolate({ inputRange: [0, 1], outputRange: [0.75, 1] });
+  const haloOpacity = breath.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0.9] });
+  const rim = useRimLight(full);
+  // Clear glass: a white highlight up and to the left, the tone faint through the middle and
+  // deepening a little at the edge. Brighter by day, where the ground is pale.
+  const stops: [string, number][] = [
+    [alpha('#FFFFFF', isNight ? 0.32 : 0.85), 0],
+    [alpha(hue, 0.16), 0.45],
+    [alpha(hue, 0.26), 1],
+  ];
+
+  return (
+    <View style={styles.stage} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+      <Motes color={alpha(hue, 0.7)} />
+      <Animated.View pointerEvents="none" style={[styles.halo, { opacity: haloOpacity, transform: [{ scale: haloScale }] }]}>
+        <Svg width={SIZE} height={SIZE}>
+          <Defs>
+            <RadialGradient id="orbHalo" cx="50%" cy="50%" r="50%">
+              <Stop offset={0} {...stopProps(alpha(hue, 0.32))} />
+              <Stop offset={1} {...stopProps(alpha(hue, 0))} />
+            </RadialGradient>
+          </Defs>
+          <Circle cx={C} cy={C} r={C} fill="url(#orbHalo)" />
+        </Svg>
+      </Animated.View>
+      <Animated.View style={{ transform: [{ scale }] }}>
+        <Orb size={GLASS} fx={0.35} fy={0.3} stops={stops} glow={`0 0 40px ${alpha(hue, 0.25)}`} />
+        <View pointerEvents="none" style={[styles.glassEdge, { borderColor: alpha(hue, 0.45) }]} />
+        <Animated.View
+          pointerEvents="none"
+          style={[styles.glassEdge, styles.glassRim, { borderColor: fg, boxShadow: `0 0 16px ${alpha(fg, 0.8)}`, opacity: rim }]}
+        />
+      </Animated.View>
+      {!!word && (
+        <View style={styles.centre} pointerEvents="none">
+          <ArrivingWord key={word}>
+            <Text
+              style={[
+                isRTL ? styles.wordArabic : styles.word,
+                { color: isNight ? '#FFFFFF' : colors.text, fontFamily: isRTL ? fonts.regular : fonts.numeral },
+              ]}
+            >
+              {word}
+            </Text>
+          </ArrivingWord>
+        </View>
+      )}
+    </View>
+  );
+}
+
+/** Fades its child in as it mounts: key it on what it shows. */
+function ArrivingWord({ children }: { children: React.ReactNode }) {
+  const v = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    const anim = Animated.timing(v, { toValue: 1, duration: 450, easing: Easing.out(Easing.quad), useNativeDriver: NATIVE_DRIVER });
+    anim.start();
+    return () => anim.stop();
+  }, [v]);
+  return <Animated.View style={{ opacity: v }}>{children}</Animated.View>;
+}
+
+/** The motes drifting up past the orb. */
+const MOTES = Array.from({ length: 12 }, (_, i) => ({
+  // Spread across the stage and a little beyond it, low down.
+  x: ((i * 53 + 23) % 330) - 165,
+  y: 60 + ((i * 97) % 90),
+  size: 1.5 + (i % 3),
+  // Rises per minute (so 12–20s each) and where in its rise it starts.
+  laps: [5, 4, 3, 4, 5][i % 5],
+  offset: (i * 0.37) % 1,
+}));
+const MOTE_RISE = 240;
+
+/**
+ * Motes rising and fading, all from one minute-long loop: each mote's rise is a sawtooth of it,
+ * so they run natively from a single value. Still under Reduce Motion (useCalmLoop).
+ */
+function Motes({ color }: { color: string }) {
+  const clock = useCalmLoop((v) =>
+    Animated.loop(Animated.timing(v, { toValue: 1, duration: 60000, easing: Easing.linear, useNativeDriver: NATIVE_DRIVER })),
+  );
+  const motes = useMemo(
+    () =>
+      MOTES.map((m) => {
+        const rise = clock.interpolate(sawtooth(m.laps, m.offset));
+        return {
+          ...m,
+          translateY: rise.interpolate({ inputRange: [0, 1], outputRange: [m.y, m.y - MOTE_RISE] }),
+          opacity: rise.interpolate({ inputRange: [0, 0.15, 1], outputRange: [0, 0.7, 0] }),
+        };
+      }),
+    [clock],
+  );
+  return (
+    <View style={styles.centre} pointerEvents="none">
+      {motes.map((m, k) => (
+        <Animated.View
+          key={k}
+          style={[
+            styles.dot,
+            {
+              width: m.size,
+              height: m.size,
+              borderRadius: m.size / 2,
+              backgroundColor: color,
+              opacity: m.opacity,
+              transform: [{ translateX: m.x }, { translateY: m.translateY }],
+            },
+          ]}
+        />
+      ))}
+    </View>
+  );
+}
+
+/** Interpolation for frac(laps · t + offset) as t runs 0 → 1: a rise that starts over `laps` times. */
+function sawtooth(laps: number, offset: number) {
+  const inputRange = [0];
+  const outputRange = [offset];
+  for (let j = 1; j <= laps; j++) {
+    const t = (j - offset) / laps;
+    if (t <= 0 || t >= 1) continue;
+    inputRange.push(t - 1e-4, t);
+    outputRange.push(1, 0);
+  }
+  inputRange.push(1);
+  outputRange.push(offset);
+  return { inputRange, outputRange };
+}
+
+/* ──────────────── Box breathing: the star ──────────────── */
+
+/** The squares' half-diagonal; the bead runs round the squares' sides. */
+const STAR_R = 112;
+const STAR_HALF = STAR_R / Math.SQRT2;
+
+/** The eight-point star (khatam: two squares) centred on the stage, outer radius r. */
+function star8(r: number) {
+  const inner = (r * Math.cos(Math.PI / 4)) / Math.cos(Math.PI / 8);
+  return Array.from({ length: 16 }, (_, i) => {
+    const a = ((i * 22.5 - 90) * Math.PI) / 180;
+    const rr = i % 2 ? inner : r;
+    return `${(C + rr * Math.cos(a)).toFixed(2)},${(C + rr * Math.sin(a)).toFixed(2)}`;
+  }).join(' ');
+}
+const STAR = star8(STAR_R);
+const SQUARE = [
+  [-1, -1],
+  [1, -1],
+  [1, 1],
+  [-1, 1],
+]
+  .map(([x, y]) => `${(C + x * STAR_HALF).toFixed(2)},${(C + y * STAR_HALF).toFixed(2)}`)
+  .join(' ');
+
+interface StarStageProps {
+  tone: IconTileTone;
+  /** 0 → 4 around the square, one side per phase. */
+  trace: Animated.Value;
+  showTracer?: boolean;
+  /** Holds so far, 0 → 4: the second square turns 22.5° through each hold, and at 2 they make the star. */
+  turn: Animated.Value;
+}
+
+/**
+ * Box breathing's stage (canvas "Players — box breathing with the star"): the light traces a
+ * square, one side a phase; a second square in the tone turns in by 22.5° through each hold, and
+ * every other round the two meet as the eight-point star, which lights. The mark sits in the middle.
+ */
+export function StarStage({ tone, trace, showTracer, turn }: StarStageProps) {
+  const { colors, isNight } = useTheme();
+  const fg = colors.tones[tone].fg;
+  const hue = colors.tones[tone].hue;
+  const rotate = turn.interpolate({ inputRange: [0, 4], outputRange: ['0deg', '90deg'] });
+  const starOpacity = turn.interpolate({ inputRange: [1.5, 2, 2.5], outputRange: [0, 0.9, 0], extrapolate: 'clamp' });
+
+  return (
+    <View style={styles.stage} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+      <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { opacity: starOpacity }]}>
+        <Svg width={SIZE} height={SIZE}>
+          <Polygon points={STAR} fill={alpha(hue, 0.2)} stroke={fg} strokeWidth={1.5} strokeLinejoin="round" />
+        </Svg>
+      </Animated.View>
+      <Svg width={SIZE} height={SIZE} style={StyleSheet.absoluteFill}>
+        <Polygon points={SQUARE} fill="none" stroke={colors.text} strokeOpacity={0.4} strokeWidth={1.2} />
+      </Svg>
+      <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { transform: [{ rotate }] }]}>
+        <Svg width={SIZE} height={SIZE}>
+          <Polygon points={SQUARE} fill="none" stroke={fg} strokeOpacity={0.85} strokeWidth={1.2} />
+        </Svg>
+      </Animated.View>
+      <View style={[styles.centre, styles.starMark]} pointerEvents="none">
+        <HounaMark size={40} color={fg} />
+      </View>
+      {showTracer && <Tracer trace={trace} color={isNight ? '#FFFFFF' : fg} glow={hue} half={STAR_HALF} />}
     </View>
   );
 }
@@ -198,34 +405,27 @@ function DriftingDots({ dots, turns }: { dots: { cx: number; cy: number; tt: num
   );
 }
 
-/** A bright bead travelling the square of dots — one side per box-breathing phase. */
-function Tracer({ trace, color }: { trace: Animated.Value; color: string }) {
+/** A bright bead travelling a square — one side per box-breathing phase. */
+function Tracer({ trace, color, glow, half }: { trace: Animated.Value; color: string; glow: string; half: number }) {
   // Offsets from the centre, not start/left, so it draws the same in either direction.
-  const translateX = trace.interpolate({ inputRange: [0, 1, 2, 3, 4], outputRange: [-R, R, R, -R, -R] });
-  const translateY = trace.interpolate({ inputRange: [0, 1, 2, 3, 4], outputRange: [-R, -R, R, R, -R] });
+  const translateX = trace.interpolate({ inputRange: [0, 1, 2, 3, 4], outputRange: [-half, half, half, -half, -half] });
+  const translateY = trace.interpolate({ inputRange: [0, 1, 2, 3, 4], outputRange: [-half, -half, half, half, -half] });
   return (
     <View style={styles.centre} pointerEvents="none">
       <Animated.View
         style={[
           styles.tracer,
-          { backgroundColor: color, boxShadow: `0 0 14px ${alpha(color, 0.9)}`, transform: [{ translateX }, { translateY }] },
+          { backgroundColor: color, boxShadow: `0 0 14px ${alpha(glow, 0.9)}`, transform: [{ translateX }, { translateY }] },
         ]}
       />
     </View>
   );
 }
 
-/** Clockwise from the top: the ring from 12 o'clock, the square from its top-left corner. */
-function position(shape: StageShape, tt: number) {
-  if (shape === 'ring') {
-    const a = tt * Math.PI * 2 - Math.PI / 2;
-    return { cx: C + R * Math.cos(a), cy: C + R * Math.sin(a) };
-  }
-  const side = Math.floor(tt * 4);
-  const f = tt * 4 - side;
-  const along = -R + 2 * R * f;
-  const [x, y] = side === 0 ? [along, -R] : side === 1 ? [R, along] : side === 2 ? [-along, R] : [-R, -along];
-  return { cx: C + x, cy: C + y };
+/** Clockwise round the ring from 12 o'clock. */
+function position(tt: number) {
+  const a = tt * Math.PI * 2 - Math.PI / 2;
+  return { cx: C + R * Math.cos(a), cy: C + R * Math.sin(a) };
 }
 
 const styles = StyleSheet.create({
@@ -251,5 +451,28 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
+  },
+  halo: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  glassEdge: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: GLASS / 2,
+    borderWidth: 1,
+  },
+  glassRim: {
+    borderWidth: RIM,
+  },
+  word: {
+    fontSize: 30,
+    textAlign: 'center',
+  },
+  wordArabic: {
+    fontSize: 28,
+    lineHeight: 44,
+    textAlign: 'center',
+  },
+  starMark: {
+    opacity: 0.8,
   },
 });

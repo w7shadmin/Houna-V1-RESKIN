@@ -312,6 +312,12 @@ export interface ColorTokens {
   /** Stage behind a topic animation (search topic card), and its sky glow. */
   topicStage: string;
   topicGlow: string;
+
+  /**
+   * Behind a breathing session, running or paused (canvas "Players — the dawn backdrop"): the
+   * orbit board's fall of light, top to bottom, ending in dawn under the controls.
+   */
+  sessionGround: { colors: readonly [string, string, ...string[]]; locations: readonly [number, number, ...number[]] };
 }
 
 const N = nightPalette;
@@ -394,6 +400,8 @@ export const nightColors: ColorTokens = {
 
   topicStage: '#10173A',
   topicGlow: '#86A9F0',
+
+  sessionGround: { colors: [N.midnight, '#1E2350', '#4A3E73', '#A77A7A', N.dawn], locations: [0, 0.42, 0.7, 0.9, 1] },
 };
 
 export const dayColors: ColorTokens = {
@@ -464,6 +472,8 @@ export const dayColors: ColorTokens = {
 
   topicStage: D.paleFill,
   topicGlow: '#86A9F0',
+
+  sessionGround: { colors: [D.daybreak, '#EFE3EE', '#E8C9D6', '#F2C9A8', N.dawn], locations: [0, 0.42, 0.7, 0.9, 1] },
 };
 
 const S = sunrisePalette;
@@ -554,6 +564,8 @@ function sunriseColorsWith(accent: SunriseAccent): ColorTokens {
 
     topicStage: S.paleFill,
     topicGlow: '#5FB08E',
+
+    sessionGround: { colors: [S.mist, '#E7F0F3', '#F3DCD8', '#F9C8AE', '#F9A980'], locations: [0, 0.4, 0.72, 0.9, 1] },
   };
 }
 

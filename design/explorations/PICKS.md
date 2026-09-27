@@ -9,28 +9,26 @@ day or less, M a few days, L a week or more. Tick "Shipped" when it lands.
 
 | Board | Picked | Note | App surface it joins or replaces | Size | Shipped |
 | --- | --- | --- | --- | --- | --- |
-| Today — meditate hero (`MeditateToday`) | 27 Sep 2026 |  | New: a "today" hero with a crossfading sky and sliding tab glow; where it lives (Tanafas hub landing, or Home) to be decided at build time | L |  |
-| Scenes — arch gallery (`MeditateArches`) | 27 Sep 2026 |  | Replaces the Meditate carousel's scene choice (`components/tanafas/PlayerFrame.tsx`, `SceneStage.tsx`); arch-clipped photos via `react-native-svg` | M |  |
-| Meditate — minutes wheel (`MeditateMinutes`) | 27 Sep 2026 |  | Replaces the length chips on the hub (`MEDITATION_MINUTES`: 5 · 10 · 20 · no limit) | S |  |
-| اليوم — تأمل (`MeditateTodayAr`) | 27 Sep 2026 |  | Arabic of the Today hero | with the hero |  |
-| المشاهد — أقواس (`MeditateArchesAr`) | 27 Sep 2026 |  | Arabic of the arch gallery | with the gallery |  |
+| Today — meditate hero (`MeditateToday`) | 27 Sep 2026 | Lives at the top of the Tanafas hub (decided 27 Sep) | The Tanafas hub's Meditate tab: the chosen scene's sky drifting behind a large title and a glowing play ring | L | 27 Sep 2026 (phase 2) |
+| Scenes — arch gallery (`MeditateArches`) | 27 Sep 2026 |  | Replaces the Meditate carousel's scene choice (`components/tanafas/PlayerFrame.tsx`, `SceneStage.tsx`, now deleted); arch-clipped photos via `react-native-svg` | M | 27 Sep 2026 (phase 2) |
+| Meditate — minutes wheel (`MeditateMinutes`) | 27 Sep 2026 |  | Replaces the length chips on the hub (`MEDITATION_MINUTES`: 5 · 10 · 20 · no limit) | S | 27 Sep 2026 (phase 2) |
+| اليوم — تأمل (`MeditateTodayAr`) | 27 Sep 2026 |  | Arabic of the Today hero | with the hero | 27 Sep 2026 (phase 2) |
+| المشاهد — أقواس (`MeditateArchesAr`) | 27 Sep 2026 |  | Arabic of the arch gallery | with the gallery | 27 Sep 2026 (phase 2) |
 
-Open question for the build: the Today hero, the arch gallery and the
-minutes wheel together make a new meditate flow (hero → choose a scene in its
-arch → choose minutes → play). Confirm that order when this section is built.
+Decided: the hero sits at the top of the Tanafas hub; the arch gallery and the
+minutes wheel open from it (hero → scene → minutes → play).
 
 ## B · Breathing player
 
 | Board | Picked | Note | App surface it joins or replaces | Size | Shipped |
 | --- | --- | --- | --- | --- | --- |
-| Breathe — glass orb, the word inside (`BreatheOrb`) | 27 Sep 2026 |  | A breathing stage beside `components/tanafas/BreatheStages.tsx`: the phase word inside the orb, drifting motes | M |  |
-| Breathe — the eight-point star (`BreatheStar`) | 27 Sep 2026 |  | Box breathing's stage (Steady mind): the breath traced on a square, the second square turning in at each hold | M |  |
-| Breathe — ridges of breath (`BreatheRidges`) | 27 Sep 2026 |  | A breathing stage: each breath leaves a ridge in the tone colours | M |  |
-| Breathe — orbit dot, box breathing (`BreatheOrbit`): background only | 27 Sep 2026 | Canvas note: "I like this background, to be used for other breathing activities or for dusk, etc" | The Midnight → violet → rose → dawn ground, for breathing sessions and/or the Dusk theme | S |  |
+| Breathe — glass orb, the word inside (`BreatheOrb`) | 27 Sep 2026 | 4-7-8's stage (decided 27 Sep) | A breathing stage beside `components/tanafas/BreatheStages.tsx`: the phase word inside the orb, drifting motes | M | 27 Sep 2026 (phase 2) |
+| Breathe — the eight-point star (`BreatheStar`) | 27 Sep 2026 |  | Box breathing's stage (Steady mind): the breath traced on a square, the second square turning in at each hold | M | 27 Sep 2026 (phase 2) |
+| Breathe — ridges of breath (`BreatheRidges`) | 27 Sep 2026 | Not an exercise stage: a graph on the user's profile instead (decided 27 Sep) | Moves to the profile (section E, after the reskin), with the ridges graph (D) | — |  |
+| Breathe — orbit dot, box breathing (`BreatheOrbit`): background only | 27 Sep 2026 | Canvas note: "I like this background, to be used for other breathing activities or for dusk, etc" | The Midnight → violet → rose → dawn ground, for breathing sessions and/or the Dusk theme | S | 27 Sep 2026 (phase 2): behind every breathing session, all three themes |
 
-Open question for the build: the orb and the ridges were both drawn for 4-7-8.
-Decide which exercise each stage belongs to (the star suits box breathing),
-or offer them as a choice per exercise.
+Decided: 4-7-8 gets the orb, box breathing the star; grounding and muscle
+relaxation keep today's stages. The ridges are a profile graph, not a stage.
 
 ## C · Suns and moons
 
@@ -55,7 +53,7 @@ Open questions for the build:
 
 | Board | Picked | Note | App surface it joins or replaces | Size | Shipped |
 | --- | --- | --- | --- | --- | --- |
-| Graphs — the month in ridges (`GraphRidges`) | 27 Sep 2026 | "Take the graph you made for ridges of breath and add it": draw these ridges in the Breathe ridges' look (tall translucent tone ridges, screen-blended, faint grid, labelled layers) | Recap / Stats: minutes per exercise over the month, with today's line | M |  |
+| Graphs — the month in ridges (`GraphRidges`) | 27 Sep 2026 | "Take the graph you made for ridges of breath and add it": draw these ridges in the Breathe ridges' look (tall translucent tone ridges, screen-blended, faint grid, labelled layers). Lives on the user's profile (decided 27 Sep) | The user's profile: minutes per exercise over the month, with today's line (built with section E, after the reskin) | M |  |
 | Graphs — September by moonlight (`GraphMoonCalendar`) | 27 Sep 2026 |  | Stats or Recap: the month as real moons, practised days lit, the rest dim (no "missed"); pairs with the month of moons (C) | M |  |
 | Graphs — the week as an arc (`GraphGauge`) | 27 Sep 2026 |  | Stats (`app/account/stats.tsx`): the week's minutes as a large Figtree Light numeral on an arc segmented by exercise; the Arabic board (`GraphGaugeAr`) shows its RTL | M |  |
 | Breathe — ridges of breath (`BreatheRidges`), as a graph | 27 Sep 2026 | Also picked in B as a breathing stage | Its ridge style carried into the graphs above | with the ridges graph |  |

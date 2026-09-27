@@ -401,30 +401,49 @@ canvas "Houna — Motion (phase 1)"):
 - The Tanafas tabs are `components/ui/GlowTabs.tsx`: a glow springs under the
   chosen tab, placed by measured physical offsets.
 
-**Tanafas player**: the Breathe and Meditate carousels share
+**Tanafas player**: the Breathe carousel is
 `components/tanafas/PlayerFrame.tsx` (stage, title row, tag, description,
 tiles, round button). Pressing play on a breathing exercise keeps the
 layout and fades each slot over to the session (round, phase, time left).
-The stage (`BreatheStages.tsx`) is a ring of dots around a translucent,
-glassy orb that inflates and deflates (box breathing: a square of dots
-around a rounded-square orb), with the Houna mark pressed into its middle
+Each exercise has its stage (`BreatheStages.tsx`; canvas "Houna — Players
+(phase 2)"). 4-7-8's is `OrbStage`: a large glass orb alone, no dots or
+mark, with the phase word inside it, a halo breathing with it (kept within
+the stage, or a short screen's scroll view cuts it straight) and motes rising
+past it, all the motes from one minute-long loop (`sawtooth`); its title and
+round sit beneath, and each phase is announced to screen readers
+(`announceForAccessibility`). Box breathing's is `StarStage`: a bead traces
+a square, one side a phase; a second square turns 22.5° through each hold
+(`useHoldTurns` counts them, 0 → 4 then round again unseen), and at two the
+squares make the eight-point star, which lights; it rests as the star.
+Grounding and muscle relaxation keep `BreathStage`: a ring of dots around a translucent,
+glassy orb that inflates and deflates, with the Houna mark pressed into its middle
 (one even shape a shade deeper than the orb, scaling with it: `components/ui/PressedMark.tsx`, the
 one pressed mark the orbs, the suns and the moon share); the screen glow breathes with it.
 While the player says the orb is `full`, its rim and the mark are lit in the tone's colour
-(`BreathStage`'s `full`): through the hold at the top of a breath (4-7-8, box), briefly as
+(`full`; 4-7-8's orb lights its rim the same way): through the hold at the top of 4-7-8, briefly as
 each tense begins after a release, and briefly as grounding's orb opens full; grounding's
 orb then gives a little at each step (`GROUNDING_STEP_DEFLATE`). The players say when, rather
 than the stage watching `breath`: a native-driven value reports back unevenly near the top.
 The dots move on Home's clock (`StarfieldContext`), rippling like its ring;
-a ring also turns (not while grounding lights it, never the square, whose
-corners the bead follows), and none take Home's 5s breath, which would
-fight the exercise's own pace.
+a ring also turns (not while grounding lights it), and none take Home's
+5s breath, which would fight the exercise's own pace.
 Nothing is drawn over the orb: grounding's count is in its prompt, muscle
 relaxation's countdown in its Tense / Release label. Tones: 4-7-8 glow, box
-dusk, five senses dawn, muscle relaxation bloom (a fourth tone, the mood palette's rose, so neighbours in the carousel never share a colour). Meditate's stage
-(`SceneStage.tsx`) plays the scene's footage muted inside its orb, cropped
-to `videoFocus` in `components/meditation/scenes.ts`; the plain orb shows
-for scenes without footage.
+dusk, five senses dawn, muscle relaxation bloom (a fourth tone, the mood palette's rose, so neighbours in the carousel never share a colour).
+While any breathing session is on, running or paused, the hub lays the
+orbit board's fall of light behind it (`colors.sessionGround`, midnight or
+the theme's ground down to dawn; `BreathePlayer` reports `onInSession`).
+
+**Meditate hero** (canvas "Players — the Meditate tab as a hero"): the hub's
+Meditate tab is `components/tanafas/MeditateHero.tsx`: the chosen scene's
+still, blurred and slowly drifting behind today's date (Gregorian, then Hijri
+from `lib/hijri.ts`: Umm al-Qura via `Intl`, left out where the calendar is
+missing), a line to sit with (`sceneLines`), and a glowing play ring that
+opens the full-screen player. Its Scene and Length rows open
+`components/ui/GlassSheet.tsx` (the check-in's glass, for choices made in
+place): `ScenePicker` (the scenes in mihrab arches, photos clipped by
+`react-native-svg`) and `MinutesWheel`. On the web preview a click outside
+the app's frame dismisses the hub modal (`GO_BACK`): that's the preview.
 
 **Discover questionnaires** (phase one: short, free screeners with Arabic
 versions; longer or restricted ones wait for phase two, with professionals on
