@@ -17,6 +17,8 @@ import { useStarfield } from '@/contexts/StarfieldContext';
 import { NATIVE, useReduceMotion } from '@/hooks/useCalmLoop';
 import AppearanceToggle, { STRIP_TURN_MS } from '@/components/home/AppearanceToggle';
 import HomeBody, { startSkyChange, type SkyChange } from '@/components/home/HomeBody';
+import HijriDate from '@/components/home/HijriDate';
+import { BOWL_MARK, BOWL_MARK_DROP } from '@/components/home/CrescentBowl';
 import MoodBloom, { HOME_BLOOM } from '@/components/mood/MoodBloom';
 import Card from '@/components/ui/Card';
 import IconButton from '@/components/ui/IconButton';
@@ -38,7 +40,10 @@ const ROTATE_MS = 4500;
  * "Classic", as above; and "Sun & moon" (canvas "Home — appearance"), where
  * the theme's own sun or moon stands alone in place of the mark and its ring:
  * a change sets it off the right edge, then the next rises in from the left
- * as the new colours arrive.
+ * as the new colours arrive. Night's body there is the crescent bowl, the mark resting in it.
+ *
+ * Under the logo, the Hijri date (tonight's moon beside it) opens the month of moons; a long
+ * press on the mark or body opens the sky clock (canvas "Phase 3").
  */
 export default function HomeScreen() {
   const { colors, isNight, scheme, preference, setPreference, homeStyle } = useTheme();
@@ -123,8 +128,18 @@ export default function HomeScreen() {
     Animated.timing(sf.chrome, { toValue: 0, duration: 450, easing: Easing.out(Easing.quad), useNativeDriver: NATIVE }).start(() => {
       haloRef.current?.measureInWindow((x, y, w, hgt) => {
         // The scene draws its moon or sun over this exact spot, then hides this mark (haloHidden).
-        // "Sun & moon": Home already shows the scene's body, so the scene starts with it whole.
-        router.push({ pathname: scene, params: { x: String(x + w / 2), y: String(y + hgt / 2), ...(sky ? { body: '1' } : {}) } });
+        // "Sun & moon": Home already shows the scene's body, so the scene starts with it whole;
+        // but Night's is the crescent bowl, whose cup has faded with the chrome: the mark resting
+        // in it lifts out, at its own size, and becomes the moon as Classic's does.
+        const bowl = sky && isNight;
+        router.push({
+          pathname: scene,
+          params: {
+            x: String(x + w / 2),
+            y: String(y + hgt / 2 + (bowl ? BOWL_MARK_DROP : 0)),
+            ...(bowl ? { mark: String(BOWL_MARK) } : sky ? { body: '1' } : {}),
+          },
+        });
       });
     });
   };
@@ -171,6 +186,13 @@ export default function HomeScreen() {
       setChange(null);
       setTurningTo(null);
     });
+  };
+
+  // The sky clock: a long press on the mark or body (or the screen reader's action).
+  const openSky = () => {
+    if (away.current) return;
+    if (Platform.OS !== 'web') Haptics.selectionAsync().catch(() => {});
+    router.push('/sky');
   };
 
   const pickPeriod = (i: number) => {
@@ -229,14 +251,27 @@ export default function HomeScreen() {
           />
         </Animated.View>
 
+        {/* The Hijri date, tonight's moon beside it: opens the month of moons. */}
+        <Animated.View style={[styles.hijri, chrome.style]} pointerEvents={chrome.pointerEvents}>
+          <HijriDate background={solid(colors.control)} />
+        </Animated.View>
+
         {/* Mark, "You're not alone", rotating line */}
         <View style={styles.hero}>
           {/* The mark opens this theme's scene: the starfield, the sunrise or the dusk. */}
-          <Pressable onPress={openScene} accessibilityRole="button" accessibilityLabel={sceneLabel}>
+          <Pressable
+            onPress={openScene}
+            onLongPress={openSky}
+            delayLongPress={450}
+            accessibilityRole="button"
+            accessibilityLabel={sceneLabel}
+            accessibilityActions={[{ name: 'longpress', label: h.sky.open }]}
+            onAccessibilityAction={(e) => e.nativeEvent.actionName === 'longpress' && openSky()}
+          >
             <View ref={haloRef} collapsable={false} style={starfield?.haloHidden && styles.hidden}>
               {/* Day: the logo's deeper teal, a little stronger — the pale Night glow vanishes on Daybreak. */}
               {sky ? (
-                <HomeBody scheme={scheme} change={change} reduceMotion={reduceMotion} />
+                <HomeBody scheme={scheme} change={change} reduceMotion={reduceMotion} cupOpacity={starfield?.chrome} />
               ) : (
                 <MarkHalo
                   accent={accent}
@@ -482,6 +517,11 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
+  },
+  hijri: {
+    alignItems: 'center',
+    // The body's box is mostly sky at the top: let the date sit into it a little.
+    marginBottom: -8,
   },
   hero: {
     alignItems: 'center',

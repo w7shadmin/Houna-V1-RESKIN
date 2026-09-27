@@ -656,6 +656,42 @@
       "w": 900,
       "x": 8460,
       "y": 18040
+    },
+    "BodiesNight.dc.html": {
+      "h": 984,
+      "title": "Phase 3 — Night: the crescent bowl",
+      "w": 1330,
+      "x": 0,
+      "y": 19380
+    },
+    "BodiesDate.dc.html": {
+      "h": 984,
+      "title": "Phase 3 — Home: the Hijri date",
+      "w": 1760,
+      "x": 1410,
+      "y": 19380
+    },
+    "BodiesMonth.dc.html": {
+      "h": 984,
+      "is_interactive": true,
+      "title": "Phase 3 — the month of moons",
+      "w": 1760,
+      "x": 3250,
+      "y": 19380
+    },
+    "BodiesStarSun.dc.html": {
+      "h": 984,
+      "title": "Phase 3 — Sunrise: the star-lattice sun",
+      "w": 900,
+      "x": 5090,
+      "y": 19380
+    },
+    "BodiesSky.dc.html": {
+      "h": 984,
+      "title": "Phase 3 — the sky clock",
+      "w": 1330,
+      "x": 6070,
+      "y": 19380
     }
   },
   "createdOnFiles": {
@@ -770,6 +806,14 @@
       "w": 240,
       "x": 0,
       "y": 17780
+    },
+    "titleBodiesPhase": {
+      "kind": "title1",
+      "maxW": 7400,
+      "text": "Houna — Home: suns and moons (phase 3)",
+      "w": 240,
+      "x": 0,
+      "y": 19120
     }
   },
   "order": [
@@ -858,7 +902,12 @@
     "PlayersOrb.dc.html",
     "PlayersStar.dc.html",
     "PlayersBackdrop.dc.html",
-    "PlayersArabic.dc.html"
+    "PlayersArabic.dc.html",
+    "BodiesNight.dc.html",
+    "BodiesDate.dc.html",
+    "BodiesMonth.dc.html",
+    "BodiesStarSun.dc.html",
+    "BodiesSky.dc.html"
   ],
   "pages": [],
   "title": "Houna Redesign"

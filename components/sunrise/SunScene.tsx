@@ -13,7 +13,7 @@ import { stopProps } from '@/lib/svgStop';
 import { useBreathingVisit, useImmersiveScene, useSceneFrame } from '@/hooks/useBreathingScene';
 import MarkHalo, { HALO_BOX } from '@/components/starfield/MarkHalo';
 import ShootingStars from '@/components/starfield/ShootingStars';
-import SunDisc from './SunDisc';
+import SunDisc, { HOME_LATTICE } from './SunDisc';
 import { HOME_SUN_SCALE } from '@/components/home/HomeBody';
 import FirstStars from './FirstStars';
 
@@ -254,7 +254,7 @@ export default function SunScene({ scene, session, closeLabel }: SunSceneProps) 
             >
               {fromBody ? (
                 <View style={{ transform: [{ scale: HOME_SUN_SCALE }] }}>
-                  <SunDisc form={sun} scene={scene} />
+                  <SunDisc form={sun} scene={scene} latticeScale={HOME_LATTICE} />
                 </View>
               ) : (
                 <HomeMark />

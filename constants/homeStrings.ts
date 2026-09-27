@@ -9,6 +9,44 @@
 
 export const homeStrings = {
   en: {
+    // The Hijri date under the logo (tonight's moon beside it), which opens the month of moons.
+    hijri: {
+      months: ['Muharram', 'Safar', 'Rabiʻ I', 'Rabiʻ II', 'Jumada I', 'Jumada II', 'Rajab', 'Shaʻban', 'Ramadan', 'Shawwal', 'Dhuʻl-Qiʻdah', 'Dhuʻl-Hijjah'],
+      phases: {
+        new: 'New moon',
+        waxingCrescent: 'Waxing crescent',
+        firstQuarter: 'First quarter',
+        waxingGibbous: 'Waxing gibbous',
+        full: 'Full moon',
+        waningGibbous: 'Waning gibbous',
+        lastQuarter: 'Last quarter',
+        waningCrescent: 'Waning crescent',
+      },
+      // The evening a month begins: the first thin crescent, seen at sunset.
+      hilal: 'The new crescent',
+      open: '{date}, {phase}. Shows the month.',
+    },
+    month: {
+      eyebrow: 'The month',
+      tonight: 'Tonight',
+      newMoonIn: {
+        zero: 'New moon tonight',
+        one: 'New moon in {n} day',
+        few: 'New moon in {n} days',
+      },
+      note: 'Every night of the Hijri month in its phase. Tap one to see it; tonight has the ring.',
+      close: 'Close the month',
+    },
+    // The sky clock (long-press Home's sun or moon): the day from first light to now, then the hour.
+    sky: {
+      open: "Today's sky",
+      close: 'Back to Home',
+      parts: { dawn: 'Dawn', day: 'Day', dusk: 'Dusk', night: 'Night' },
+      sunrise: 'Sunrise {t}',
+      sunset: 'Sunset {t}',
+      am: 'AM',
+      pm: 'PM',
+    },
     // The Houna starfield: only its accessibility labels; the scene's one visible word is "Tanafas".
     starfield: {
       open: 'Breathe under the stars',
@@ -144,6 +182,43 @@ export const homeStrings = {
     },
   },
   ar: {
+    hijri: {
+      months: ['محرم', 'صفر', 'ربيع الأول', 'ربيع الآخر', 'جمادى الأولى', 'جمادى الآخرة', 'رجب', 'شعبان', 'رمضان', 'شوال', 'ذو القعدة', 'ذو الحجة'],
+      phases: {
+        new: 'محاق',
+        waxingCrescent: 'هلال متزايد',
+        firstQuarter: 'تربيع أول',
+        waxingGibbous: 'أحدب متزايد',
+        full: 'بدر',
+        waningGibbous: 'أحدب متناقص',
+        lastQuarter: 'تربيع أخير',
+        waningCrescent: 'هلال متناقص',
+      },
+      hilal: 'الهلال',
+      open: '{date}، {phase}. يعرض الشهر.',
+    },
+    month: {
+      eyebrow: 'الشهر',
+      tonight: 'الليلة',
+      newMoonIn: {
+        zero: 'المحاق الليلة',
+        one: 'المحاق بعد يوم واحد',
+        two: 'المحاق بعد يومين',
+        few: 'المحاق بعد {n} أيام',
+        many: 'المحاق بعد {n} يوماً',
+      },
+      note: 'كل ليالي الشهر الهجري بأطوارها. المس ليلة لتراها؛ الليلة محاطة بحلقة.',
+      close: 'إغلاق الشهر',
+    },
+    sky: {
+      open: 'سماء اليوم',
+      close: 'العودة إلى الرئيسية',
+      parts: { dawn: 'الفجر', day: 'النهار', dusk: 'الغروب', night: 'الليل' },
+      sunrise: 'الشروق {t}',
+      sunset: 'الغروب {t}',
+      am: 'ص',
+      pm: 'م',
+    },
     starfield: {
       open: 'تنفّس تحت النجوم',
       close: 'العودة إلى الرئيسية',

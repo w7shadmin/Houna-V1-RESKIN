@@ -320,8 +320,10 @@ Dusk `glide`s: the mark glides down as the moon does to where that sun settles
 Sunrise `rise`s (canvas "Houna sunrise — from below"): the mark fades where it
 is, a `horizon` glow gathers along the bottom edge, and the sun comes up through
 it from below the screen, a touch larger while low, and sinks back on the way
-out. Either way, a small sun (`SunDisc`: pale-gold with short turning
-rays; amber with none; the mark pressed into it) as the second sky takes over (morning; violet dusk,
+out. Either way, a small sun (`SunDisc`: pale-gold, its rays a star
+lattice, four eight-point stars from `lib/khatam.ts` turning in pairs opposite
+ways, 90s and 120s a lap, drawn closer on Home by `HOME_LATTICE`; amber with no
+rays; the mark pressed into it) as the second sky takes over (morning; violet dusk,
 where `FirstStars` then come out, drifting slowly left to right at the pace of
 the starfield's turning sky, with the starfield's `ShootingStars` now and
 then). The disc and mark stay still; the edge
@@ -332,7 +334,9 @@ Recap. Every theme's mark now opens a scene. All three share
 keep-awake / hidden bars / Back); keep one animation per value inside a
 parallel, or stopping one stops all. The web preview may only paint frames
 on demand, so JS-driven animations there can look stuck mid-way; that's the
-preview, not the scene.
+preview, not the scene. A long-running web dev server can stall sending the
+compressed bundle (the page stays blank with no error, though `curl` without
+`Accept-Encoding` gets it at once): restart the server.
 
 **Two Home styles, both kept while the client decides** (More → Appearance →
 Home: "Sun & moon" · "Classic"; `HomeStyle` in `contexts/ThemeContext.tsx`,
@@ -342,14 +346,44 @@ strip of sun · setting sun · moon above it, the current one lit, tapping moves
 to the next in `APPEARANCE_OPTIONS` order). Classic is the mark in its ring,
 as above. "Sun & moon" (canvas "Home — appearance"): the mark and its ring of
 dots give way to the theme's own body, alone (`components/home/HomeBody.tsx`:
-tonight's moon, or the scene's sun at `HOME_SUN_SCALE`, in the mark's box so
-nothing round it moves). A change sets the current body, whole, past the right edge;
+the scene's sun at `HOME_SUN_SCALE`, or Night's crescent bowl, in the mark's box so
+nothing round it moves). The bowl (`components/home/CrescentBowl.tsx`, canvas
+"Phase 3 — Night: the crescent bowl", `crescentBowl` in `theme.ts`) is a dawn-lit
+cup with the mark resting in its hollow, floating on the 5s breath; tapping it,
+its cup fades with Home's chrome (`cupOpacity`) and Home hands the starfield the
+mark itself (its spot, and `mark`, its size), which grows as it rises and becomes
+the moon, as Classic's does. A change sets the current body, whole, past the right edge;
 with the sky empty the colours crossfade, and once the old colours have nearly
 gone the next body rises in whole from beyond the left edge (`startSkyChange`). Those directions are physical (the sky
 doesn't mirror in Arabic); Reduce Motion fades the bodies in place. Home then
-passes `body=1` to the scene, and the scene (`fromBody` from `useSceneFrame`)
+passes `body=1` to the scene (Night's bowl aside), and the scene (`fromBody` from `useSceneFrame`)
 starts with that body whole instead of turning the mark into it. When one
 style is chosen, delete the other and the setting.
+
+**Home's Hijri date and the month of moons** (canvas "Phase 3 — Home: the Hijri
+date" / "the month of moons"): under the logo, `components/home/HijriDate.tsx`
+shows tonight's moon (`MoonGlyph`, real phase), the Hijri date and the phase's
+name. `lib/hijri.ts` counts (Umm al-Qura through `Intl`, the tabular calendar,
+within two days, where the engine lacks it; names in `t.home.hijri`); the Hijri
+day turns at sunset, taken as 6 pm (`currentHijri`), and on the evening a month
+begins the date shows the hilal, glowing, and the new month. Tapping it opens
+`app/month.tsx`, a `GlassSheet` over Home (transparent modal; Back waits for the
+sheet to sink, `onHidden`) holding `MonthRing`: every night of the month in its
+phase round a ring from the 1st (counter-clockwise in Arabic), tap one for its
+phase and date, tonight faintly ringed, and the days to the next new moon.
+
+**The sky clock** (canvas "Phase 3 — the sky clock"; a long press on Home's mark
+or body, or the screen reader's "Today's sky" action; the only entry for now, to
+settle with the others): `app/sky.tsx`, a scene of its own over Home. One sky
+through the day (Sunrise's pre-dawn and morning skies, Dusk's violet evening,
+the night) with the sun and tonight's moon crossing over the hills, from
+`lib/skyClock.ts` (the sun for the Gulf's latitude, solar noon from the phone's
+clock and time zone, the moon trailing by its age: offline, no location). It
+plays the day from first light to now in 20s (sampled tables driving native
+interpolations), then holds at the hour, moving every 30s; the words are the
+part of the day, the time and the next sunrise or sunset. It never changes the
+theme. Tap anywhere or Back to leave; counted as a `sky` session, titled Tanafas
+in Recap.
 
 **Sunrise's accent, three ways, while it's decided** (More → Appearance →
 Sunrise accent, shown in Sunrise only; `SunriseAccent` in `constants/theme.ts`,

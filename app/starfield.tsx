@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Platform, Pressable, StyleSheet, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import Svg, { Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -15,6 +15,8 @@ import ShootingStars from '@/components/starfield/ShootingStars';
 
 /** The moonglow in the sky round the moon. */
 const GLOW = 420;
+/** Home's mark, as MarkHalo draws it. */
+const HOME_MARK = 70;
 
 /**
  * The Houna starfield (Night only, opened by tapping Home's mark). Everything
@@ -37,6 +39,9 @@ export default function StarfieldScreen() {
   const { clock, setHaloHidden } = starfield;
   const reduceMotion = useReduceMotion();
   const { rootRef, frame, onLayout, from, to, fromBody } = useSceneFrame();
+  // Home's crescent bowl hands over a smaller mark (`mark`, its size): it grows as it rises.
+  const { mark } = useLocalSearchParams<{ mark?: string }>();
+  const startScale = Number(mark) > 0 ? Number(mark) / HOME_MARK : 1;
   const sky = useRef(new Animated.Value(0)).current;
   const glide = useRef(new Animated.Value(0)).current;
   const word = useRef(new Animated.Value(0)).current;
@@ -125,6 +130,7 @@ export default function StarfieldScreen() {
                 transform: [
                   { translateX: glide.interpolate({ inputRange: [0, 1], outputRange: [from.x - HALO_BOX / 2, to.x - HALO_BOX / 2] }) },
                   { translateY: glide.interpolate({ inputRange: [0, 1], outputRange: [from.y - HALO_BOX / 2, to.y - HALO_BOX / 2] }) },
+                  ...(startScale !== 1 ? [{ scale: glide.interpolate({ inputRange: [0, 1], outputRange: [startScale, 1] }) }] : []),
                 ],
               },
             ]}

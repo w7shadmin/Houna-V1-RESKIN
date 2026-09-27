@@ -34,20 +34,22 @@ relaxation keep today's stages. The ridges are a profile graph, not a stage.
 
 | Board | Picked | Note | App surface it joins or replaces | Size | Shipped |
 | --- | --- | --- | --- | --- | --- |
-| Home — the crescent bowl (`BodyCrescentBowl`) | 27 Sep 2026 |  | A Home body (`components/home/HomeBody.tsx`): the dawn-gradient crescent cup with the mark resting in it | M |  |
-| Home header — hilal and the Hijri date (`BodyHilal`) | 27 Sep 2026 |  | Home's header: tonight's moon named in the Hijri calendar (Umm al-Qura via `Intl`), the hilal on the evening a month begins; reuses `lib/moonPhase.ts` | M |  |
-| The month of moons (`BodyMonthRing`) | 27 Sep 2026 |  | New: the Hijri month's nights in their real phases, tap a night; could open from the Home header, or join the Graphs moon calendar | M |  |
-| Sunrise — the star-lattice sun (`BodyStarSun`) | 27 Sep 2026 |  | Sunrise's sun: turning eight-point stars round `SunDisc` (`components/sunrise/`), Home and/or the Sunrise scene | M |  |
-| The sky clock (`BodySkyClock`) | 27 Sep 2026 |  | New: one sky from dawn to night with the bodies crossing | M |  |
+| Home — the crescent bowl (`BodyCrescentBowl`) | 27 Sep 2026 |  | A Home body (`components/home/HomeBody.tsx`): the dawn-gradient crescent cup with the mark resting in it | M | 27 Sep 2026 (phase 3) |
+| Home header — hilal and the Hijri date (`BodyHilal`) | 27 Sep 2026 |  | Home's header: tonight's moon named in the Hijri calendar (Umm al-Qura via `Intl`), the hilal on the evening a month begins; reuses `lib/moonPhase.ts` | M | 27 Sep 2026 (phase 3) |
+| The month of moons (`BodyMonthRing`) | 27 Sep 2026 |  | New: the Hijri month's nights in their real phases, tap a night; could open from the Home header, or join the Graphs moon calendar | M | 27 Sep 2026 (phase 3): from Home’s date; the practised-night glow waits for Graphs |
+| Sunrise — the star-lattice sun (`BodyStarSun`) | 27 Sep 2026 |  | Sunrise's sun: turning eight-point stars round `SunDisc` (`components/sunrise/`), Home and/or the Sunrise scene | M | 27 Sep 2026 (phase 3) |
+| The sky clock (`BodySkyClock`) | 27 Sep 2026 |  | New: one sky from dawn to night with the bodies crossing | M | 27 Sep 2026 (phase 3): long press on Home’s body for now |
 
-Open questions for the build:
-- The crescent bowl and the star-lattice sun both change Home's body. Decide
-  whether each replaces today's (the bowl for Night's moon? the star sun for
-  Sunrise's sun?) or joins as an option, like the Home styles.
-- The sky clock follows the hour, but the theme is the person's own pick (no
-  "follow the phone", CLAUDE.md). Decide where it lives: a scene of its own
-  (like the starfield), a loading or intro moment, or an opt-in Home style
-  that never overrides their chosen theme.
+Decided 27 Sep:
+- The crescent bowl is Night's Home body ("Sun & moon" style), in place of
+  tonight's moon there; the real-phase moon stays in the starfield, which the
+  mark, lifting out of the cup, becomes on the way.
+- The star-lattice sun is Sunrise's sun everywhere: Home and the Houna
+  sunrise scene.
+- The sky clock is a scene of its own, like the starfield, counted as a
+  Tanafas visit; it never changes the chosen theme.
+- The month of moons opens from Home's Hijri date (the hilal pick), as a
+  glass sheet.
 
 ## D · Graphs
 

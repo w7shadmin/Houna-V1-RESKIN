@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { Animated, Easing, StyleSheet, View, useWindowDimensions } from 'react-native';
-import SunDisc from '@/components/sunrise/SunDisc';
-import MoonDisc from '@/components/starfield/MoonDisc';
+import SunDisc, { HOME_LATTICE } from '@/components/sunrise/SunDisc';
+import CrescentBowl from '@/components/home/CrescentBowl';
 import { HALO_BOX } from '@/components/starfield/MarkHalo';
 import { duskScene, sunriseScene, type ColorScheme } from '@/constants/theme';
 import { NATIVE } from '@/hooks/useCalmLoop';
@@ -9,13 +9,19 @@ import { NATIVE } from '@/hooks/useCalmLoop';
 /** Home's sun is a little smaller than its scene's settled one (0.9), to sit inside the ring. */
 export const HOME_SUN_SCALE = 0.8;
 
-/** A theme's own body, still and whole: Sunrise's sun, Dusk's evening sun, Night's moon in tonight's phase. */
-export function Body({ scheme }: { scheme: ColorScheme }) {
+type Opacity = Animated.Value | Animated.AnimatedInterpolation<number>;
+
+/**
+ * A theme's own body, still and whole: Sunrise's sun (its star lattice drawn close), Dusk's
+ * evening sun, Night's crescent bowl with the mark resting in it. `cupOpacity` fades the bowl's
+ * cup (not its mark) with Home's chrome as the starfield opens.
+ */
+export function Body({ scheme, cupOpacity }: { scheme: ColorScheme; cupOpacity?: Opacity }) {
   const whole = useRef(new Animated.Value(1)).current;
-  if (scheme === 'night') return <MoonDisc form={whole} />;
+  if (scheme === 'night') return <CrescentBowl cupOpacity={cupOpacity} />;
   return (
     <View style={{ transform: [{ scale: HOME_SUN_SCALE }] }}>
-      <SunDisc form={whole} scene={scheme === 'sunrise' ? sunriseScene : duskScene} />
+      <SunDisc form={whole} scene={scheme === 'sunrise' ? sunriseScene : duskScene} latticeScale={HOME_LATTICE} />
     </View>
   );
 }
@@ -71,7 +77,17 @@ export function startSkyChange(
  * dots), in the mark's box so nothing round it moves, and during a change the two
  * bodies crossing (see startSkyChange).
  */
-export default function HomeBody({ scheme, change, reduceMotion }: { scheme: ColorScheme; change: SkyChange | null; reduceMotion: boolean }) {
+export default function HomeBody({
+  scheme,
+  change,
+  reduceMotion,
+  cupOpacity,
+}: {
+  scheme: ColorScheme;
+  change: SkyChange | null;
+  reduceMotion: boolean;
+  cupOpacity?: Opacity;
+}) {
   const { width } = useWindowDimensions();
   // How far a body travels to be wholly off screen, either side (the box is centred on the screen).
   const beyond = width / 2 + HALO_BOX / 2;
@@ -79,7 +95,7 @@ export default function HomeBody({ scheme, change, reduceMotion }: { scheme: Col
   if (!change) {
     return (
       <View style={styles.box} pointerEvents="none">
-        <Body scheme={scheme} />
+        <Body scheme={scheme} cupOpacity={cupOpacity} />
       </View>
     );
   }

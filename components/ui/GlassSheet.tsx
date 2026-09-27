@@ -20,6 +20,8 @@ interface GlassSheetProps {
   /** Spoken name of the backdrop that closes it. */
   closeLabel: string;
   children: React.ReactNode;
+  /** Called once the sheet has sunk away after `visible` went false (a route can leave then). */
+  onHidden?: () => void;
 }
 
 /**
@@ -28,7 +30,7 @@ interface GlassSheetProps {
  * back when closed or when the backdrop is tapped. For choices made in place, like the
  * Meditate hero's scene and length; the check-in is its own route with the same look.
  */
-export default function GlassSheet({ visible, onClose, eyebrow, title, closeLabel, children }: GlassSheetProps) {
+export default function GlassSheet({ visible, onClose, eyebrow, title, closeLabel, children, onHidden }: GlassSheetProps) {
   const { colors, isNight } = useTheme();
   const { fonts, isRTL } = useLanguage();
   const insets = useSafeAreaInsets();
@@ -47,9 +49,13 @@ export default function GlassSheet({ visible, onClose, eyebrow, title, closeLabe
       useNativeDriver: NATIVE,
     });
     anim.start(({ finished }) => {
-      if (finished && !visible) setMounted(false);
+      if (finished && !visible) {
+        setMounted(false);
+        onHidden?.();
+      }
     });
     return () => anim.stop();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, enter, reduceMotion]);
 
   if (!mounted) return null;

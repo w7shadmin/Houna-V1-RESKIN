@@ -6,7 +6,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { alpha } from '@/constants/theme';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { formatEntryDateLong } from '@/lib/journal';
-import { hijriDate } from '@/lib/hijri';
+import { currentHijri, formatHijri } from '@/lib/hijri';
 import { SCENE_ORBS, type MeditationScene, type SceneId } from '@/components/meditation/scenes';
 import CanvasIcon, { DirectionalIcon } from '@/components/ui/CanvasIcon';
 import { NATIVE, useCalmLoop } from '@/hooks/useCalmLoop';
@@ -27,7 +27,7 @@ interface MeditateHeroProps {
  */
 export default function MeditateHero({ scene, minutes, onScene, onLength, onBegin }: MeditateHeroProps) {
   const { colors, isNight } = useTheme();
-  const { t, fonts, isRTL, language } = useLanguage();
+  const { t, fonts, isRTL } = useLanguage();
   const h = t.discover.hub;
   const names = t.tanafas.meditation.scenes;
   const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
@@ -42,7 +42,8 @@ export default function MeditateHero({ scene, minutes, onScene, onLength, onBegi
   const scale = move.interpolate({ inputRange: [0, 1], outputRange: [1.05, 1.12] });
 
   const now = new Date();
-  const hijri = hijriDate(now, language);
+  // The Hijri day turns at sunset, as on Home.
+  const hijri = formatHijri(currentHijri(now).hijri, t.home.hijri.months, num);
   const length =
     minutes === null ? h.noLimit : `${num(minutes)} ${arabicPlural(minutes, t.tanafas.meditation.player.min)}`;
   const ink = colors.text;

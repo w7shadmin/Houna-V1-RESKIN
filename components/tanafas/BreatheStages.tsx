@@ -4,6 +4,7 @@ import Svg, { Circle, Defs, Polygon, RadialGradient, Stop } from 'react-native-s
 import { useTheme } from '@/contexts/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { stopProps } from '@/lib/svgStop';
+import { star8Points } from '@/lib/khatam';
 import { alpha, flatten } from '@/constants/theme';
 import Orb from '@/components/ui/Orb';
 import PressedMark from '@/components/ui/PressedMark';
@@ -310,16 +311,7 @@ function sawtooth(laps: number, offset: number) {
 const STAR_R = 112;
 const STAR_HALF = STAR_R / Math.SQRT2;
 
-/** The eight-point star (khatam: two squares) centred on the stage, outer radius r. */
-function star8(r: number) {
-  const inner = (r * Math.cos(Math.PI / 4)) / Math.cos(Math.PI / 8);
-  return Array.from({ length: 16 }, (_, i) => {
-    const a = ((i * 22.5 - 90) * Math.PI) / 180;
-    const rr = i % 2 ? inner : r;
-    return `${(C + rr * Math.cos(a)).toFixed(2)},${(C + rr * Math.sin(a)).toFixed(2)}`;
-  }).join(' ');
-}
-const STAR = star8(STAR_R);
+const STAR = star8Points(C, C, STAR_R);
 const SQUARE = [
   [-1, -1],
   [1, -1],

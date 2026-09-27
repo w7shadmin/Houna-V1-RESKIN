@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
-import { Animated, StyleSheet, View } from 'react-native';
-import Svg, { Circle, Defs, Path, RadialGradient, Stop } from 'react-native-svg';
+import { Animated, Easing, StyleSheet, View } from 'react-native';
+import Svg, { Circle, Defs, Path, Polygon, RadialGradient, Stop } from 'react-native-svg';
 import PressedMark from '@/components/ui/PressedMark';
 import Orb from '@/components/ui/Orb';
 import { HALO_BOX } from '@/components/starfield/MarkHalo';
@@ -8,6 +8,8 @@ import EdgeHalo from '@/components/starfield/EdgeHalo';
 import { useStarfield } from '@/contexts/StarfieldContext';
 import { alpha, type SunScene } from '@/constants/theme';
 import { stopProps } from '@/lib/svgStop';
+import { star8Points } from '@/lib/khatam';
+import { NATIVE, useCalmLoop } from '@/hooks/useCalmLoop';
 
 /** The disc (the canvas's 132px in the mark's 190px box) and the mark held in it. */
 const DISC = 132;
@@ -25,11 +27,29 @@ const GLOW = 420;
 /** Where the halo's layers overlap, their light adds up to this at the disc's edge. */
 const HALO_STRENGTH = 0.6;
 
+/**
+ * The star lattice (canvas "Phase 3 — Sunrise: the star-lattice sun"): four eight-point stars,
+ * radii in disc radii, in two pairs turning opposite ways, a lap in 90s and 120s.
+ */
+const LATTICE_STARS = [
+  { r: 3.08, rot: 0, width: 1, deep: true, opacity: 0.35, pair: 0 },
+  { r: 2.46, rot: 22.5, width: 1, deep: false, opacity: 0.5, pair: 0 },
+  { r: 3.77, rot: 11.25, width: 0.8, deep: true, opacity: 0.2, pair: 1 },
+  { r: 1.92, rot: 0, width: 1.2, deep: false, opacity: 0.6, pair: 1 },
+];
+const LATTICE = Math.ceil(3.77 * DISC) + 8;
+/** One loop of six minutes: four laps one way (90s), three the other (120s). */
+const LATTICE_LOOP_MS = 360_000;
+/** On Home the lattice draws in closer round the sun, clear of the logo and the date. */
+export const HOME_LATTICE = 0.64;
+
 interface SunDiscProps {
   /** 0 → 1: from nothing to the full sun (the disc, its halo, rays and glow). */
   form: Animated.Value | Animated.AnimatedInterpolation<number>;
   /** Its colours, and whether it has rays (Sunrise's does; Dusk's evening sun is a glow). */
   scene: SunScene;
+  /** How far out the star lattice reaches (1 in the scene; `HOME_LATTICE` on Home). */
+  latticeScale?: number;
 }
 
 /**
@@ -42,7 +62,7 @@ interface SunDiscProps {
  * fade on the out-breath; behind, a wide, faint sunglow breathing with them.
  * Drawn in the mark's own 190px box, so it can take the mark's place exactly.
  */
-export default function SunDisc({ form, scene }: SunDiscProps) {
+export default function SunDisc({ form, scene, latticeScale = 1 }: SunDiscProps) {
   const { breath, turn } = useStarfield()!.clock;
 
   // The moon's breath: most of the light ebbs away on the out-breath.
@@ -76,8 +96,10 @@ export default function SunDisc({ form, scene }: SunDiscProps) {
         </Svg>
       </Animated.View>
 
+      {scene.lattice && <Lattice colors={scene.lattice} form={form} scale={latticeScale} />}
+
       <Animated.View style={[styles.breathing, { opacity: haloOpacity, transform: [{ scale: haloScale }] }]}>
-        {scene.rays && (
+        {scene.rays && !scene.lattice && (
         <Animated.View style={[styles.rays, { transform: [{ rotate: rayTurn }] }]}>
           <Svg width={RAYS} height={RAYS}>
             <Defs>
@@ -106,7 +128,42 @@ export default function SunDisc({ form, scene }: SunDiscProps) {
   );
 }
 
+/** Sunrise's rays, woven: the stars turning slowly, their light easing a little with the breath. */
+function Lattice({ colors, form, scale }: { colors: { deep: string; light: string }; form: SunDiscProps['form']; scale: number }) {
+  const { breath } = useStarfield()!.clock;
+  const lap = useCalmLoop((v) => Animated.loop(Animated.timing(v, { toValue: 1, duration: LATTICE_LOOP_MS, easing: Easing.linear, useNativeDriver: NATIVE })));
+  const turns = [lap.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '1440deg'] }), lap.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '-1080deg'] })];
+  const opacity = Animated.multiply(form, breath.interpolate({ inputRange: [0, 1], outputRange: [0.65, 1] }));
+  const c = LATTICE / 2;
+  return (
+    <Animated.View style={[styles.lattice, { opacity, transform: [{ scale }] }]}>
+      {turns.map((rotate, pair) => (
+        <Animated.View key={pair} style={[StyleSheet.absoluteFill, { transform: [{ rotate }] }]}>
+          <Svg width={LATTICE} height={LATTICE}>
+            {LATTICE_STARS.filter((st) => st.pair === pair).map((st, k) => (
+              <Polygon
+                key={k}
+                points={star8Points(c, c, (st.r * DISC) / 2, st.rot)}
+                fill="none"
+                stroke={st.deep ? colors.deep : colors.light}
+                strokeOpacity={st.opacity}
+                // Drawn in, the lines would thin: keep them about as fine as in the scene.
+                strokeWidth={st.width / Math.sqrt(scale)}
+              />
+            ))}
+          </Svg>
+        </Animated.View>
+      ))}
+    </Animated.View>
+  );
+}
+
 const styles = StyleSheet.create({
+  lattice: {
+    position: 'absolute',
+    width: LATTICE,
+    height: LATTICE,
+  },
   box: {
     width: HALO_BOX,
     height: HALO_BOX,

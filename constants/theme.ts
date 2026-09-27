@@ -99,8 +99,13 @@ export interface SunScene {
   /** The halo at the disc's edge, and the wide sunglow behind. */
   halo: string;
   glow: string;
-  /** Short turning rays, or none (an evening sun is a glow). */
+  /** Short turning rays, or none (an evening sun is a glow). Left for `lattice` where it has one. */
   rays: string | null;
+  /**
+   * Rays woven from four eight-point stars turning in pairs, opposite ways (canvas "Phase 3 —
+   * Sunrise: the star-lattice sun"): the deeper line and the light one. Takes the place of `rays`.
+   */
+  lattice: { deep: string; light: string } | null;
   /** The disc's surface, the mark is pressed into (a shade deeper, as the breathing orbs'). */
   surface: string;
   /** The one word, "Tanafas". */
@@ -123,6 +128,15 @@ export interface SunScene {
 }
 
 /** Sunrise: pre-dawn warming to morning; a pale-gold sun with short turning rays. */
+/**
+ * Night's Home body in "Sun & moon" (canvas "Phase 3 — Night: the crescent bowl"): a crescent
+ * cup lit like dawn, centre (low) to rim, and the glow it gives off.
+ */
+export const crescentBowl = {
+  stops: [['#FFD9A0', 0], [nightPalette.dawn, 0.55], ['#E4826A', 1]] as [string, number][],
+  glow: nightPalette.dawn,
+};
+
 export const sunriseScene: SunScene = {
   skyA: { colors: ['#274A5E', '#4F7A86', '#C99A8A', '#F2B38F'], locations: [0, 0.42, 0.8, 1] },
   skyB: { colors: ['#A9DDE0', '#DDF1EF', '#FCE7D8', '#FBC9A6'], locations: [0, 0.38, 0.74, 1] },
@@ -130,6 +144,7 @@ export const sunriseScene: SunScene = {
   halo: sunrisePalette.peach,
   glow: sunrisePalette.peach,
   rays: '#FFDEBE',
+  lattice: { deep: sunrisePalette.coral, light: sunrisePalette.peach },
   surface: '#FBC8A3',
   word: sunrisePalette.grey80,
   settle: 0.42,
@@ -152,6 +167,7 @@ export const duskScene: SunScene = {
   halo: '#EC8C6E',
   glow: '#F2A078',
   rays: null,
+  lattice: null,
   surface: '#F5B08A',
   word: dayPalette.ink,
   settle: 0.55,
