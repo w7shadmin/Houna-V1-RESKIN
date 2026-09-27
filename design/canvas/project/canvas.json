@@ -501,6 +501,21 @@
       "w": 1354,
       "x": 470,
       "y": 11600
+    },
+    "MeditateFlow.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Meditate — cover flow (tap a side cover)",
+      "w": 390,
+      "x": 2100,
+      "y": 11600
+    },
+    "MeditateFlowStory.dc.html": {
+      "h": 2874,
+      "title": "Meditate — cover flow, storyboard",
+      "w": 1148,
+      "x": 2570,
+      "y": 11600
     }
   },
   "createdOnFiles": {
@@ -575,6 +590,14 @@
       "w": 240,
       "x": 0,
       "y": 11300
+    },
+    "titleMeditate": {
+      "kind": "title1",
+      "maxW": 1618,
+      "text": "Houna — Meditate",
+      "w": 240,
+      "x": 2100,
+      "y": 11300
     }
   },
   "order": [
@@ -642,7 +665,9 @@
     "SearchPhase3.dc.html",
     "Eclipses.dc.html",
     "HomeAppearance.dc.html",
-    "HomeAppearanceStory.dc.html"
+    "HomeAppearanceStory.dc.html",
+    "MeditateFlow.dc.html",
+    "MeditateFlowStory.dc.html"
   ],
   "pages": [],
   "title": "Houna Redesign"
