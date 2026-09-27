@@ -56,8 +56,8 @@ Decided 27 Sep:
 | Board | Picked | Note | App surface it joins or replaces | Size | Shipped |
 | --- | --- | --- | --- | --- | --- |
 | Graphs — the month in ridges (`GraphRidges`) | 27 Sep 2026 | "Take the graph you made for ridges of breath and add it": draw these ridges in the Breathe ridges' look (tall translucent tone ridges, screen-blended, faint grid, labelled layers). Lives on the user's profile (decided 27 Sep) | The user's profile: minutes per exercise over the month, with today's line (built with section E, after the reskin) | M |  |
-| Graphs — September by moonlight (`GraphMoonCalendar`) | 27 Sep 2026 |  | Stats or Recap: the month as real moons, practised days lit, the rest dim (no "missed"); pairs with the month of moons (C) | M || 28 Sep 2026 (phase 4): a Recap slide |
-| Graphs — the week as an arc (`GraphGauge`) | 27 Sep 2026 |  | Stats (`app/account/stats.tsx`): the week's minutes as a large Figtree Light numeral on an arc segmented by exercise; the Arabic board (`GraphGaugeAr`) shows its RTL | M || 28 Sep 2026 (phase 4): opens Stats |
+| Graphs — September by moonlight (`GraphMoonCalendar`) | 27 Sep 2026 |  | Stats or Recap: the month as real moons, practised days lit, the rest dim (no "missed"); pairs with the month of moons (C) | M | 28 Sep 2026 (phase 4): a Recap slide |
+| Graphs — the week as an arc (`GraphGauge`) | 27 Sep 2026 |  | Stats (`app/account/stats.tsx`): the week's minutes as a large Figtree Light numeral on an arc segmented by exercise; the Arabic board (`GraphGaugeAr`) shows its RTL | M | 28 Sep 2026 (phase 4): opens Stats |
 | Breathe — ridges of breath (`BreatheRidges`), as a graph | 27 Sep 2026 | Also picked in B as a breathing stage | Its ridge style carried into the graphs above | with the ridges graph |  |
 
 Decided 28 Sep: the moon calendar is a Recap slide (the month's story, so
