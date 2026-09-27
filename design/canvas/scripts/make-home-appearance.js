@@ -236,7 +236,7 @@ class Component extends DCLogic {
 </body>
 </html>
 `;
-fs.writeFileSync(P + 'HomeAppearance.dc.html', prototype);
+if (require.main === module) fs.writeFileSync(P + 'HomeAppearance.dc.html', prototype);
 
 /* ── Board B: the storyboard ── */
 const ease = (x) => x * x * (3 - 2 * x);
@@ -367,5 +367,8 @@ class Component extends DCLogic {
 </body>
 </html>
 `;
-fs.writeFileSync(P + 'HomeAppearanceStory.dc.html', story);
-console.log('HomeAppearance.dc.html', (prototype.length / 1024).toFixed(0) + 'KB · HomeAppearanceStory.dc.html', (story.length / 1024).toFixed(0) + 'KB · width', W);
+if (require.main === module) fs.writeFileSync(P + 'HomeAppearanceStory.dc.html', story);
+if (require.main === module) console.log('HomeAppearance.dc.html', (prototype.length / 1024).toFixed(0) + 'KB · HomeAppearanceStory.dc.html', (story.length / 1024).toFixed(0) + 'KB · width', W);
+
+// Home's chrome and the three themes' tokens, for other boards (make-profile.js).
+module.exports = { THEMES, home };

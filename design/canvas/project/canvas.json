@@ -516,6 +516,49 @@
       "w": 1148,
       "x": 2570,
       "y": 11600
+    },
+    "ProfileRevamp.dc.html": {
+      "h": 1320,
+      "is_interactive": true,
+      "title": "Profile — revamp (tap a badge)",
+      "w": 390,
+      "x": 3900,
+      "y": 11600
+    },
+    "MyResults.dc.html": {
+      "h": 844,
+      "title": "My results",
+      "w": 390,
+      "x": 4370,
+      "y": 11600
+    },
+    "ProfileStory.dc.html": {
+      "h": 1513,
+      "title": "Profile — storyboard & notes",
+      "w": 1148,
+      "x": 4840,
+      "y": 11600
+    },
+    "Badges.dc.html": {
+      "h": 1186,
+      "title": "Badges — nine skies",
+      "w": 1376,
+      "x": 6068,
+      "y": 11600
+    },
+    "HomeFit.dc.html": {
+      "h": 1207,
+      "title": "Home — one screen",
+      "w": 1784,
+      "x": 7524,
+      "y": 11600
+    },
+    "Numbers.dc.html": {
+      "h": 1486,
+      "title": "Numbers — four faces",
+      "w": 1724,
+      "x": 9468,
+      "y": 11600
     }
   },
   "createdOnFiles": {
@@ -598,6 +641,22 @@
       "w": 240,
       "x": 2100,
       "y": 11300
+    },
+    "titleProfile": {
+      "kind": "title1",
+      "maxW": 5408,
+      "text": "Houna — Profile & badges",
+      "w": 240,
+      "x": 3900,
+      "y": 11300
+    },
+    "titleNumbers": {
+      "kind": "title1",
+      "maxW": 1724,
+      "text": "Houna — Numbers",
+      "w": 240,
+      "x": 9468,
+      "y": 11300
     }
   },
   "order": [
@@ -667,7 +726,13 @@
     "HomeAppearance.dc.html",
     "HomeAppearanceStory.dc.html",
     "MeditateFlow.dc.html",
-    "MeditateFlowStory.dc.html"
+    "MeditateFlowStory.dc.html",
+    "ProfileRevamp.dc.html",
+    "MyResults.dc.html",
+    "ProfileStory.dc.html",
+    "Badges.dc.html",
+    "HomeFit.dc.html",
+    "Numbers.dc.html"
   ],
   "pages": [],
   "title": "Houna Redesign"
