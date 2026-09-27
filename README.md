@@ -1,3 +1,3 @@
 # MVP-HounaApp
 
-[![Open in Bolt](https://bolt.new/static/open-in-bolt.svg)](https://bolt.new/~/sb1-2qmippd5)
+Houna — a bilingual (Arabic/English) mental wellness app, built with Expo / React Native and Supabase.
