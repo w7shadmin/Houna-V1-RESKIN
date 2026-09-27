@@ -20,6 +20,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import type { Language } from '@/constants/strings';
 import { spacing, typography, radius, shadows, latinFontFamily, arabicFontFamily } from '@/constants/theme';
 import { APPEARANCE_OPTIONS, HOME_STYLES, useTheme } from '@/contexts/ThemeContext';
+import { SUNRISE_ACCENTS } from '@/constants/theme';
 
 interface MenuItem {
   icon: LucideIcon;
@@ -28,7 +29,7 @@ interface MenuItem {
 }
 
 export default function MoreScreen() {
-  const { colors, preference, setPreference, homeStyle, setHomeStyle } = useTheme();
+  const { colors, preference, setPreference, homeStyle, setHomeStyle, sunriseAccent, setSunriseAccent } = useTheme();
   const { language, setLanguage, t, fonts, isRTL } = useLanguage();
   const router = useRouter();
 
@@ -199,6 +200,46 @@ export default function MoreScreen() {
             })}
           </View>
         </View>
+
+        {/* Sunrise accent — shown in Sunrise, while it's decided (constants/theme.ts SunriseAccent). */}
+        {preference === 'sunrise' && (
+          <View style={styles.languageSection}>
+            <Text style={[styles.sectionLabel, { color: colors.textTertiary, fontFamily: fonts.semiBold }]}>
+              {t.profile.settings.sunriseAccent.toUpperCase()}
+            </Text>
+            <View
+              accessibilityRole="radiogroup"
+              accessibilityLabel={t.profile.settings.sunriseAccent}
+              style={[styles.languageSwitcher, { backgroundColor: colors.surface, borderColor: colors.border }]}
+            >
+              {SUNRISE_ACCENTS.map((option) => {
+                const active = option === sunriseAccent;
+                return (
+                  <Pressable
+                    key={option}
+                    accessibilityRole="radio"
+                    aria-checked={active}
+                    onPress={() => setSunriseAccent(option)}
+                    style={({ pressed }) => [
+                      styles.languageOption,
+                      active && { backgroundColor: colors.primary },
+                      pressed && !active && { backgroundColor: colors.cardPressed },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.languageOptionText,
+                        { color: active ? colors.onPrimary : colors.textSecondary, fontFamily: fonts.semiBold },
+                      ]}
+                    >
+                      {t.profile.settings.sunriseAccentOptions[option]}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
+        )}
 
         {/* Menu items */}
         <View

@@ -37,6 +37,9 @@ export const profileStrings = {
       // Both Home styles kept while the client decides (ThemeContext HomeStyle).
       homeStyle: 'Home',
       homeStyleOptions: { sky: 'Sun & moon', classic: 'Classic' },
+      // Sunrise's accent while it's decided (constants/theme.ts SunriseAccent).
+      sunriseAccent: 'Sunrise accent',
+      sunriseAccentOptions: { dark: 'Dark', mixed: 'Mixed', turquoise: 'Turquoise' },
       notifications: 'Notifications',
       communityMap: 'Community map',
       exportJournal: 'Export my journal',
@@ -82,6 +85,8 @@ export const profileStrings = {
       appearanceOptions: { sunrise: 'الشروق', day: 'الغسق', night: 'ليلي' },
       homeStyle: 'الرئيسية',
       homeStyleOptions: { sky: 'الشمس والقمر', classic: 'الكلاسيكي' },
+      sunriseAccent: 'لون الشروق',
+      sunriseAccentOptions: { dark: 'داكن', mixed: 'مختلط', turquoise: 'فيروزي' },
       notifications: 'الإشعارات',
       communityMap: 'خريطة المجتمع',
       exportJournal: 'تصدير يومياتي',

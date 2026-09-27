@@ -468,73 +468,101 @@ export const dayColors: ColorTokens = {
 
 const S = sunrisePalette;
 
-export const sunriseColors: ColorTokens = {
-  background: S.mist,
-  surface: S.paper,
-  card: S.paper,
-  cardPressed: alpha(S.charcoal, 0.06),
-  inputBackground: S.paper,
+/**
+ * Sunrise's accent, three ways, while it's decided (More → Appearance →
+ * Sunrise accent; ThemeContext's `sunriseAccent`):
+ * - `dark`: Dark Turquoise throughout, as designed.
+ * - `mixed`: the logo's turquoise where there's no text (the raised Tanafas
+ *   button, the glow tone's icons); Dark Turquoise for text and anything with
+ *   white text on it (accent text, buttons, the active tab), which stays readable.
+ * - `turquoise`: the logo's turquoise throughout. It's light: 2.6:1 on the
+ *   ground and 2.8:1 under white text, short of the 4.5:1 text and 3:1 icon
+ *   minimums that Dark Turquoise (6.2–6.7:1) meets.
+ * When one is chosen, keep its colours in `sunriseColors` and delete the rest.
+ */
+export type SunriseAccent = 'dark' | 'mixed' | 'turquoise';
+export const SUNRISE_ACCENTS: readonly SunriseAccent[] = ['dark', 'mixed', 'turquoise'];
 
-  text: S.charcoal,
-  textSecondary: S.grey80,
-  textTertiary: S.stone,
-  placeholder: S.stone,
+function sunriseColorsWith(accent: SunriseAccent): ColorTokens {
+  /** Text, and fills that carry white text. */
+  const ink = accent === 'turquoise' ? S.turquoise : S.darkTurquoise;
+  /** Fills and icons with no text. */
+  const brand = accent === 'dark' ? S.darkTurquoise : S.turquoise;
+  return {
+    background: S.mist,
+    surface: S.paper,
+    card: S.paper,
+    cardPressed: alpha(S.charcoal, 0.06),
+    inputBackground: S.paper,
 
-  border: alpha(S.charcoal, 0.1),
-  borderLight: alpha(S.charcoal, 0.08),
-  borderControl: alpha(S.charcoal, 0.12),
-  borderControlStrong: alpha(S.charcoal, 0.14),
-  borderStrong: alpha(S.charcoal, 0.16),
+    text: S.charcoal,
+    textSecondary: S.grey80,
+    textTertiary: S.stone,
+    placeholder: S.stone,
 
-  control: S.paper,
-  controlStrong: S.paper,
+    border: alpha(S.charcoal, 0.1),
+    borderLight: alpha(S.charcoal, 0.08),
+    borderControl: alpha(S.charcoal, 0.12),
+    borderControlStrong: alpha(S.charcoal, 0.14),
+    borderStrong: alpha(S.charcoal, 0.16),
 
-  primary: S.darkTurquoise,
-  onPrimary: S.paper,
-  primaryLightest: alpha(S.turquoise, 0.12),
+    control: S.paper,
+    controlStrong: S.paper,
 
-  action: S.darkTurquoise,
-  onAction: S.paper,
+    primary: ink,
+    onPrimary: S.paper,
+    primaryLightest: alpha(S.turquoise, 0.12),
 
-  accent: S.coralText,
-  onAccent: S.paper,
+    action: ink,
+    onAction: S.paper,
 
-  // Tile fills and borders in the brand's light hues; icons in the deepened ones.
-  tones: {
-    glow: { fg: S.darkTurquoise, text: S.darkTurquoise, hue: S.turquoise, bg: alpha(S.turquoise, 0.12), border: alpha(S.turquoise, 0.28) },
-    dawn: { fg: S.coral, text: S.coralText, hue: S.peach, bg: alpha(S.peach, 0.12), border: alpha(S.peach, 0.28) },
-    dusk: { fg: S.sky, text: S.skyText, hue: S.lightCyan, bg: alpha(S.lightCyan, 0.12), border: alpha(S.lightCyan, 0.3) },
-    bloom: { fg: S.raspberryDeep, text: S.raspberryDeep, hue: S.raspberry, bg: alpha(S.raspberry, 0.12), border: alpha(S.raspberry, 0.3) },
-  },
+    accent: S.coralText,
+    onAccent: S.paper,
 
-  crisis: { bg: alpha(S.peach, 0.08), border: alpha(S.peach, 0.4), borderSoft: alpha(S.peach, 0.35), icon: S.coral },
-  danger: '#C2503F',
-  onDanger: '#FFFFFF',
+    // Tile fills and borders in the brand's light hues; icons in the deepened ones.
+    tones: {
+      glow: { fg: brand, text: ink, hue: S.turquoise, bg: alpha(S.turquoise, 0.12), border: alpha(S.turquoise, 0.28) },
+      dawn: { fg: S.coral, text: S.coralText, hue: S.peach, bg: alpha(S.peach, 0.12), border: alpha(S.peach, 0.28) },
+      dusk: { fg: S.sky, text: S.skyText, hue: S.lightCyan, bg: alpha(S.lightCyan, 0.12), border: alpha(S.lightCyan, 0.3) },
+      bloom: { fg: S.raspberryDeep, text: S.raspberryDeep, hue: S.raspberry, bg: alpha(S.raspberry, 0.12), border: alpha(S.raspberry, 0.3) },
+    },
 
-  tabBarBackground: S.paper,
-  tabBarBorder: alpha(S.charcoal, 0.08),
-  tabBarActive: S.darkTurquoise,
-  tabBarInactive: S.stone,
-  tabBarRaised: S.darkTurquoise,
-  onTabBarRaised: S.paper,
-  tabBarRaisedRing: S.mist,
+    crisis: { bg: alpha(S.peach, 0.08), border: alpha(S.peach, 0.4), borderSoft: alpha(S.peach, 0.35), icon: S.coral },
+    danger: '#C2503F',
+    onDanger: '#FFFFFF',
 
-  glow: S.turquoise,
+    tabBarBackground: S.paper,
+    tabBarBorder: alpha(S.charcoal, 0.08),
+    tabBarActive: ink,
+    tabBarInactive: S.stone,
+    tabBarRaised: brand,
+    onTabBarRaised: S.paper,
+    tabBarRaisedRing: S.mist,
 
-  // The official logo artwork's own teal and grey.
-  logo: { primary: S.turquoise, secondary: '#525052' },
+    glow: S.turquoise,
 
-  mapDot: alpha(S.charcoal, 0.3),
-  mapLand: alpha(S.charcoal, 0.1),
+    // The official logo artwork's own teal and grey.
+    logo: { primary: S.turquoise, secondary: '#525052' },
 
-  sheet: S.sheet,
-  scrim: S.scrim,
-  faint: alpha(S.charcoal, 0.25),
-  ringIdle: alpha(S.charcoal, 0.35),
+    mapDot: alpha(S.charcoal, 0.3),
+    mapLand: alpha(S.charcoal, 0.1),
 
-  topicStage: S.paleFill,
-  topicGlow: '#5FB08E',
+    sheet: S.sheet,
+    scrim: S.scrim,
+    faint: alpha(S.charcoal, 0.25),
+    ringIdle: alpha(S.charcoal, 0.35),
+
+    topicStage: S.paleFill,
+    topicGlow: '#5FB08E',
+  };
+}
+
+export const sunriseAccentColors: Record<SunriseAccent, ColorTokens> = {
+  dark: sunriseColorsWith('dark'),
+  mixed: sunriseColorsWith('mixed'),
+  turquoise: sunriseColorsWith('turquoise'),
 };
+export const sunriseColors: ColorTokens = sunriseAccentColors.dark;
 
 export const themeColors: Record<ColorScheme, ColorTokens> = {
   night: nightColors,

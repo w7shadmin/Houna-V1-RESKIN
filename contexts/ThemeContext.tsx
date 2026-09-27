@@ -9,7 +9,7 @@ import React, {
 } from 'react';
 import { Animated, Easing, Platform, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { themeColors, type ColorScheme, type ColorTokens } from '@/constants/theme';
+import { SUNRISE_ACCENTS, sunriseAccentColors, themeColors, type ColorScheme, type ColorTokens, type SunriseAccent } from '@/constants/theme';
 import { NATIVE } from '@/hooks/useCalmLoop';
 
 /** How long the old colours take to fade into the new (a change of theme). */
@@ -67,6 +67,9 @@ interface ThemeContextValue {
   setPreference: (next: AppearancePreference) => Promise<void>;
   homeStyle: HomeStyle;
   setHomeStyle: (next: HomeStyle) => void;
+  /** Sunrise's accent while it's decided (constants/theme.ts SunriseAccent); crossfades like a theme change. */
+  sunriseAccent: SunriseAccent;
+  setSunriseAccent: (next: SunriseAccent) => Promise<void>;
 }
 
 /* ──────────────────── Context ──────────────────── */
@@ -75,6 +78,7 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 const STORAGE_KEY = 'houna-appearance';
 const HOME_STYLE_KEY = 'houna-home-style';
+const SUNRISE_ACCENT_KEY = 'houna-sunrise-accent';
 
 function isPreference(v: unknown): v is AppearancePreference {
   return v === 'night' || v === 'day' || v === 'sunrise';
@@ -85,15 +89,17 @@ function isPreference(v: unknown): v is AppearancePreference {
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [preference, setPreferenceState] = useState<AppearancePreference>('night');
   const [homeStyle, setHomeStyleState] = useState<HomeStyle>('sky');
+  const [sunriseAccent, setSunriseAccentState] = useState<SunriseAccent>('dark');
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
-    AsyncStorage.multiGet([STORAGE_KEY, HOME_STYLE_KEY])
-      .then(([[, stored], [, style]]) => {
+    AsyncStorage.multiGet([STORAGE_KEY, HOME_STYLE_KEY, SUNRISE_ACCENT_KEY])
+      .then(([[, stored], [, style], [, accent]]) => {
         if (cancelled) return;
         if (isPreference(stored)) setPreferenceState(stored);
         if (style === 'sky' || style === 'classic') setHomeStyleState(style);
+        if (SUNRISE_ACCENTS.includes(accent as SunriseAccent)) setSunriseAccentState(accent as SunriseAccent);
       })
       .finally(() => {
         if (!cancelled) setLoaded(true);
@@ -103,20 +109,19 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
-  // A change of theme crossfades: a picture of the screen goes up over everything, the
+  // A change of colours crossfades: a picture of the screen goes up over everything, the
   // colours switch underneath it, and once they're drawn the picture fades away.
   const [veil, setVeil] = useState<{ uri: string; opacity: Animated.Value } | null>(null);
-  /** The theme waiting for the picture to be on screen, and who to tell once it's switched. */
-  const pending = useRef<{ next: AppearancePreference; switched: () => void } | null>(null);
+  /** The change waiting for the picture to be on screen, and who to tell once it's made. */
+  const pending = useRef<{ apply: () => void; switched: () => void } | null>(null);
   const fading = useRef(false);
+  /** Counts changes made under the picture, so the fade starts once each is drawn. */
+  const [switches, setSwitches] = useState(0);
 
-  const setPreference = useCallback((next: AppearancePreference) => {
-    AsyncStorage.setItem(STORAGE_KEY, next).catch(() => {
-      /* non-fatal — worst case the preference doesn't persist */
-    });
+  const crossfade = useCallback((apply: () => void) => {
     const shot = Platform.OS === 'web' || fading.current ? null : loadViewShot();
     if (!shot) {
-      setPreferenceState(next);
+      apply();
       return Promise.resolve();
     }
     fading.current = true;
@@ -125,23 +130,42 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       .then(
         (uri) =>
           new Promise<void>((switched) => {
-            pending.current = { next, switched };
+            pending.current = { apply, switched };
             setVeil({ uri, opacity: new Animated.Value(1) });
           }),
       )
       .catch(() => {
         fading.current = false;
-        setPreferenceState(next);
+        apply();
       });
   }, []);
 
-  // The picture is loaded: give it a frame to be drawn, then switch the colours under it.
+  const setPreference = useCallback(
+    (next: AppearancePreference) => {
+      AsyncStorage.setItem(STORAGE_KEY, next).catch(() => {
+        /* non-fatal — worst case the preference doesn't persist */
+      });
+      return crossfade(() => setPreferenceState(next));
+    },
+    [crossfade],
+  );
+
+  const setSunriseAccent = useCallback(
+    (next: SunriseAccent) => {
+      AsyncStorage.setItem(SUNRISE_ACCENT_KEY, next).catch(() => {});
+      return crossfade(() => setSunriseAccentState(next));
+    },
+    [crossfade],
+  );
+
+  // The picture is loaded: give it a frame to be drawn, then change the colours under it.
   const onVeilLoad = useCallback(() => {
     const p = pending.current;
     if (!p) return;
     pending.current = null;
     requestAnimationFrame(() => {
-      setPreferenceState(p.next);
+      p.apply();
+      setSwitches((n) => n + 1);
       p.switched();
     });
   }, []);
@@ -157,9 +181,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       }),
     );
     return () => cancelAnimationFrame(frame);
-    // Runs when the theme has switched under the picture.
+    // Runs when the colours have changed under the picture.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [preference]);
+  }, [switches]);
 
   const setHomeStyle = useCallback((next: HomeStyle) => {
     setHomeStyleState(next);
@@ -167,11 +191,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const scheme: ColorScheme = preference;
-  const tokens = themeColors[scheme];
+  const tokens = scheme === 'sunrise' ? sunriseAccentColors[sunriseAccent] : themeColors[scheme];
 
   const value = useMemo<ThemeContextValue>(
-    () => ({ scheme, isNight: scheme === 'night', colors: tokens, preference, setPreference, homeStyle, setHomeStyle }),
-    [scheme, tokens, preference, setPreference, homeStyle, setHomeStyle],
+    () => ({ scheme, isNight: scheme === 'night', colors: tokens, preference, setPreference, homeStyle, setHomeStyle, sunriseAccent, setSunriseAccent }),
+    [scheme, tokens, preference, setPreference, homeStyle, setHomeStyle, sunriseAccent, setSunriseAccent],
   );
 
   if (!loaded) return null;
