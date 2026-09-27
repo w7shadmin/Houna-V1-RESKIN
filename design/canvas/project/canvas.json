@@ -559,6 +559,52 @@
       "w": 1724,
       "x": 9468,
       "y": 11600
+    },
+    "MotionPhaseSheet.dc.html": {
+      "h": 960,
+      "is_interactive": true,
+      "title": "Motion — the check-in as a glass sheet",
+      "w": 1330,
+      "x": 0,
+      "y": 16700
+    },
+    "MotionPhaseCard.dc.html": {
+      "h": 960,
+      "is_interactive": true,
+      "title": "Motion — an event card grows into its page",
+      "w": 1330,
+      "x": 1410,
+      "y": 16700
+    },
+    "MotionPhaseControls.dc.html": {
+      "h": 960,
+      "title": "Motion — controls step aside during practice",
+      "w": 1330,
+      "x": 2820,
+      "y": 16700
+    },
+    "MotionPhaseWords.dc.html": {
+      "h": 960,
+      "is_interactive": true,
+      "title": "Motion — Home’s line arrives",
+      "w": 1330,
+      "x": 4230,
+      "y": 16700
+    },
+    "MotionPhasePill.dc.html": {
+      "h": 960,
+      "title": "Motion — one glowing pill per screen",
+      "w": 1330,
+      "x": 5640,
+      "y": 16700
+    },
+    "MotionPhaseTabs.dc.html": {
+      "h": 960,
+      "is_interactive": true,
+      "title": "Motion — the Tanafas tabs, three styles",
+      "w": 1330,
+      "x": 7050,
+      "y": 16700
     }
   },
   "createdOnFiles": {
@@ -657,6 +703,14 @@
       "w": 240,
       "x": 9468,
       "y": 11300
+    },
+    "titleMotionPhase": {
+      "kind": "title1",
+      "maxW": 8380,
+      "text": "Houna — Motion (phase 1)",
+      "w": 240,
+      "x": 0,
+      "y": 16440
     }
   },
   "order": [
@@ -732,7 +786,13 @@
     "ProfileStory.dc.html",
     "Badges.dc.html",
     "HomeFit.dc.html",
-    "Numbers.dc.html"
+    "Numbers.dc.html",
+    "MotionPhaseSheet.dc.html",
+    "MotionPhaseCard.dc.html",
+    "MotionPhaseControls.dc.html",
+    "MotionPhaseWords.dc.html",
+    "MotionPhasePill.dc.html",
+    "MotionPhaseTabs.dc.html"
   ],
   "pages": [],
   "title": "Houna Redesign"

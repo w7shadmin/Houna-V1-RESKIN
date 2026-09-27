@@ -174,7 +174,7 @@ button{font:inherit;color:inherit}
  * One artboard. `body` is the root element's inner markup; the root is w×h, fixed, as the format
  * requires. `logic` is the Component body (defaults to an empty renderVals).
  */
-function board(file, { title, lang = 'en', w = 390, h = 844, css = '', root = '', body, logic, props = {} }) {
+function board(file, { title, lang = 'en', w = 390, h = 844, css = '', root = '', body, logic, props = {}, dir: outDir = OUT }) {
   const dir = lang === 'ar' ? ' dir="rtl"' : '';
   const html = `<!doctype html>
 <html lang="${lang}"${dir}>
@@ -205,7 +205,7 @@ ${logic || `class Component extends DCLogic {
 </body>
 </html>
 `;
-  fs.writeFileSync(path.join(OUT, file), html);
+  fs.writeFileSync(path.join(outDir, file), html);
   return { file, title, w, h, interactive: !!logic };
 }
 
