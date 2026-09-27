@@ -370,6 +370,37 @@ resolves once the new colours are in place. The module is native, so a dev
 client built before it was added (or the web) just switches at once: it's
 loaded lazily, because its import throws when the native side is missing.
 
+**Motion** (phase 1 of the Explorations picks, `design/explorations/PICKS.md`;
+canvas "Houna — Motion (phase 1)"):
+- The mood check-in is a glass sheet: `app/check-in.tsx` is a transparent
+  modal (`app/_layout.tsx`), so the screen behind stays, softened by
+  `expo-blur` (Android uses `experimentalBlurMethod="dimezisBlurView"`) and
+  dimmed. The sheet rises on one `enter` value, its parts (`Arrive`) fading up
+  in turn on it, and sinks back on close, save, a tap outside or Back
+  (`beforeRemove`).
+- Event cards grow into their page: a card measures its photo
+  (`measureInWindow`) and passes it as params; `events/[slug].tsx`, a
+  transparent modal, flies the photo to its cover (JS-driven layout on a
+  `direction: 'ltr'` layer, native only), fades its ground up round it and
+  shrinks back on Back. Without params, or with Reduce Motion, it just fades.
+- Controls step aside during practice: `hooks/useControlsAway.ts` (after 3s of
+  stillness; a touch brings them back; never while a screen reader is on,
+  checked on native only because react-native-web always reports one; no fade
+  under Reduce Motion). The meditation player uses it, and so do the Tanafas
+  hub's timed and muscle-relaxation sessions: `BreathePlayer` reports
+  `onSessionActive`, and the hub passes `away` on to `PlayerFrame`. Grounding
+  needs taps, so its controls never hide. The hub wakes on any touch or click
+  (`onStartShouldSetResponderCapture` returning false).
+- Words that arrive: `components/ui/ArrivingText.tsx`, Latin letter by
+  letter, Arabic word by word because its letters join; screen readers get
+  the whole line, and it holds still under Reduce Motion. Used for Home's
+  rotating line.
+- One glowing pill per screen, for the step that matters: `Button`
+  `variant="glow"`, a turning ring of the four tones (`expo-linear-gradient`)
+  over a pulsing haze. Used on Discover's Begin.
+- The Tanafas tabs are `components/ui/GlowTabs.tsx`: a glow springs under the
+  chosen tab, placed by measured physical offsets.
+
 **Tanafas player**: the Breathe and Meditate carousels share
 `components/tanafas/PlayerFrame.tsx` (stage, title row, tag, description,
 tiles, round button). Pressing play on a breathing exercise keeps the

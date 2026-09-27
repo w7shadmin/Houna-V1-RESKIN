@@ -105,7 +105,7 @@ export default function TestScreen() {
               <Text style={[styles.disclaimerText, { color: colors.text, fontFamily: fonts.regular }]}>{s.disclaimer}</Text>
             </View>
             <View style={styles.footer}>
-              <Button label={s.begin} onPress={() => setStep(0)} block style={styles.primary} />
+              <Button variant="glow" label={s.begin} onPress={() => setStep(0)} block style={styles.primary} />
             </View>
           </>
         ) : (

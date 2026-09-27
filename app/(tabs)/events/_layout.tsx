@@ -13,7 +13,8 @@ export default function EventsLayout() {
       }}
     >
       <Stack.Screen name="index" />
-      <Stack.Screen name="[slug]" />
+      {/* An event grows from its card over the list ([slug].tsx draws its own ground and motion). */}
+      <Stack.Screen name="[slug]" options={{ presentation: 'transparentModal', animation: 'none', contentStyle: { backgroundColor: 'transparent' } }} />
       <Stack.Screen name="speakers/[slug]" />
     </Stack>
   );

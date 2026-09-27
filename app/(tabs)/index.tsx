@@ -11,6 +11,7 @@ import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { getTodayEntry } from '@/lib/journal';
 import { ACTIVITY_PERIODS, fetchCommunityActivity, type CommunityActivity } from '@/lib/communityActivity';
 import { CommunityDotMap } from '@/components/community/WorldMap';
+import ArrivingText from '@/components/ui/ArrivingText';
 import MarkHalo from '@/components/starfield/MarkHalo';
 import { useStarfield } from '@/contexts/StarfieldContext';
 import { NATIVE, useReduceMotion } from '@/hooks/useCalmLoop';
@@ -259,15 +260,15 @@ export default function HomeScreen() {
               {h.hero.badge}
             </Text>
           </View>
-          <Text
-            accessibilityLiveRegion={autoRotate ? 'none' : 'polite'}
-            style={[
-              isRTL ? styles.lineArabic : styles.lineLatin,
-              { color: colors.text, fontFamily: fonts.display },
-            ]}
-          >
-            {h.lines[period]}
-          </Text>
+          {/* Each line arrives: letter by letter in English, word by word in Arabic. */}
+          <View accessibilityLiveRegion={autoRotate ? 'none' : 'polite'} style={styles.lineBox}>
+            <ArrivingText
+              isRTL={isRTL}
+              style={[isRTL ? styles.lineArabic : styles.lineLatin, { color: colors.text, fontFamily: fonts.display }]}
+            >
+              {h.lines[period]}
+            </ArrivingText>
+          </View>
           </Animated.View>
         </View>
 
@@ -514,19 +515,18 @@ const styles = StyleSheet.create({
   notAloneArabic: {
     fontSize: 14,
   },
-  lineLatin: {
+  lineBox: {
     minHeight: 50,
     maxWidth: 320,
+    justifyContent: 'center',
+  },
+  lineLatin: {
     fontSize: 20,
     lineHeight: 25,
-    textAlign: 'center',
   },
   lineArabic: {
-    minHeight: 50,
-    maxWidth: 320,
     fontSize: 22,
     lineHeight: 32,
-    textAlign: 'center',
   },
   community: {
     gap: 12,

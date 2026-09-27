@@ -46,9 +46,14 @@ interface PlayerFrameProps {
   controls: React.ReactNode;
   /** Changing it fades the text, info and controls over to the new state. */
   mode: string;
+  /**
+   * During a running session the info and controls can step aside (`useControlsAway`):
+   * their opacity, and whether they still take touches. The stage and the phase stay.
+   */
+  away?: { opacity: Animated.Value; interactive: boolean };
 }
 
-export default function PlayerFrame({ stage, heading, label, body, nav, info, controls, mode }: PlayerFrameProps) {
+export default function PlayerFrame({ stage, heading, label, body, nav, info, controls, mode, away }: PlayerFrameProps) {
   const { colors } = useTheme();
   const { t, isRTL } = useLanguage();
   const h = t.discover.hub;
@@ -107,12 +112,15 @@ export default function PlayerFrame({ stage, heading, label, body, nav, info, co
         </View>
       </ScrollView>
 
-      <View style={styles.bottom}>
+      <Animated.View
+        style={[styles.bottom, away && { opacity: away.opacity }]}
+        pointerEvents={away && !away.interactive ? 'none' : 'auto'}
+      >
         <FadeIn key={`i-${mode}`} style={styles.info}>
           {info}
         </FadeIn>
         <View style={styles.controls}>{controls}</View>
-      </View>
+      </Animated.View>
     </View>
   );
 }

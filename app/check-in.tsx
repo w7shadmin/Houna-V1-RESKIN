@@ -1,16 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
+  Animated,
+  Easing,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
+  useWindowDimensions,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useNavigation, useRouter } from 'expo-router';
+import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { layout } from '@/constants/theme';
+import { alpha, layout } from '@/constants/theme';
+import { NATIVE, useReduceMotion } from '@/hooks/useCalmLoop';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { currentMood, getTodayEntry, logMoodForToday, localDateString, type MoodTag } from '@/lib/journal';
 import { pingMoodAndGetCount } from '@/lib/moodPings';
@@ -26,19 +32,74 @@ import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
 /** Neutral — the starting point when today has no mood yet (never presume "calm"). */
 const DEFAULT_INDEX = BLOOM_ORDER.indexOf('neutral');
 
+const IN_MS = 700;
+const OUT_MS = 380;
+/** The sheet's settle: fast out of the gate, a long soft landing. */
+const SETTLE = Easing.bezier(0.2, 0.9, 0.25, 1);
+
+/**
+ * One part of the sheet arriving: it fades up a little after the one before, riding the
+ * sheet's own entrance, so on the way out they leave together with it.
+ */
+function Arrive({ enter, index, children }: { enter: Animated.Value; index: number; children: React.ReactNode }) {
+  const from = 0.3 + index * 0.1;
+  const to = Math.min(from + 0.4, 1);
+  return (
+    <Animated.View
+      style={{
+        opacity: enter.interpolate({ inputRange: [0, from, to], outputRange: [0, 0, 1], extrapolate: 'clamp' }),
+        transform: [{ translateY: enter.interpolate({ inputRange: [0, from, to], outputRange: [18, 18, 0], extrapolate: 'clamp' }) }],
+      }}
+    >
+      {children}
+    </Animated.View>
+  );
+}
+
 /**
  * Houna bloom mood check-in (FEATURES_BRIEF §2), opened from Home's
  * top-left button. The slider snaps across the seven moods (`MOOD_ORDER`,
  * heavy → light) and Save calls `logMoodForToday`; older entries with a
  * retired mood keep it, and open here at its place on today's scale. No streaks, counts of your own, or pressure — the
  * only number shown is how many others felt the same today.
+ *
+ * It's a glass sheet (canvas "Motion — the check-in as a glass sheet"): the screen that
+ * opened it stays in view, softened and dimmed, and the frosted sheet rises over it, its
+ * parts arriving one after another. Tapping outside, closing or saving sinks it back.
  */
 export default function CheckInScreen() {
-  const { colors } = useTheme();
+  const { colors, isNight } = useTheme();
   const { t, fonts, isRTL } = useLanguage();
   const router = useRouter();
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+  const { height } = useWindowDimensions();
+  const reduceMotion = useReduceMotion();
   const s = t.checkIn;
+
+  // 0 → 1: the backdrop softens and the sheet rises; back to 0 on the way out.
+  const enter = useRef(new Animated.Value(0)).current;
+  const leaving = useRef(false);
+  useEffect(() => {
+    Animated.timing(enter, { toValue: 1, duration: reduceMotion ? 0 : IN_MS, easing: SETTLE, useNativeDriver: NATIVE }).start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const sinkThen = (then: () => void) => {
+    if (leaving.current) return;
+    leaving.current = true;
+    Animated.timing(enter, { toValue: 0, duration: reduceMotion ? 0 : OUT_MS, easing: Easing.in(Easing.cubic), useNativeDriver: NATIVE }).start(() => then());
+  };
+  // Back gestures and the hardware back button sink it too, rather than cutting it away.
+  useEffect(
+    () =>
+      navigation.addListener('beforeRemove', (e) => {
+        if (leaving.current) return;
+        e.preventDefault();
+        sinkThen(() => navigation.dispatch(e.data.action));
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [navigation],
+  );
 
   const [index, setIndex] = useState(DEFAULT_INDEX);
   const [note, setNote] = useState('');
@@ -81,7 +142,7 @@ export default function CheckInScreen() {
     };
   }, [mood, savedMood]);
 
-  const close = () => (router.canGoBack() ? router.back() : router.replace('/(tabs)'));
+  const close = () => sinkThen(() => (router.canGoBack() ? router.back() : router.replace('/(tabs)')));
 
   const save = async () => {
     setSaving(true);
@@ -110,16 +171,34 @@ export default function CheckInScreen() {
   // The note sits near the end of the sheet: scroll to the end so it and Save clear the keyboard.
   const keyboard = useKeyboardScroll('end');
 
+  const sheetY = enter.interpolate({ inputRange: [0, 1], outputRange: [height, 0] });
+  const blurTint = isNight ? 'dark' : 'light';
+
   return (
-    <View style={[styles.scrim, { backgroundColor: colors.scrim, paddingTop: Math.max(insets.top + 8, 28) }]}>
+    <View style={styles.root}>
+      {/* The screen behind, softened and dimmed; tapping it closes. */}
+      <Animated.View style={[StyleSheet.absoluteFill, { opacity: enter }]}>
+        <BlurView intensity={isNight ? 30 : 24} tint={blurTint} experimentalBlurMethod="dimezisBlurView" style={StyleSheet.absoluteFill} />
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={s.close}
+          onPress={close}
+          style={[StyleSheet.absoluteFill, { backgroundColor: isNight ? alpha(colors.background, 0.45) : alpha(colors.text, 0.16) }]}
+        />
+      </Animated.View>
+      <View style={[styles.scrim, { paddingTop: Math.max(insets.top + 56, 76) }]} pointerEvents="box-none">
       <KeyboardSafeView>
-        <View style={[styles.sheet, { backgroundColor: colors.sheet, borderColor: colors.borderLight }]}>
+        <Animated.View style={[styles.sheet, { borderColor: colors.borderLight, transform: [{ translateY: sheetY }] }]}>
+          {/* Frosted glass: the blurred screen through a wash of the sheet colour. */}
+          <BlurView intensity={isNight ? 40 : 34} tint={blurTint} experimentalBlurMethod="dimezisBlurView" style={StyleSheet.absoluteFill} />
+          <View style={[StyleSheet.absoluteFill, { backgroundColor: alpha(colors.sheet, isNight ? 0.8 : 0.76) }]} />
           <ScrollView
             ref={keyboard.scrollRef}
             {...keyboard.scrollProps}
             contentContainerStyle={[styles.content, { paddingBottom: 36 + insets.bottom }]}
             keyboardShouldPersistTaps="handled"
           >
+            <Arrive enter={enter} index={0}>
             <View style={styles.header}>
               <View style={[styles.grabber, { backgroundColor: colors.faint }]} />
               <View style={styles.closeRow}>
@@ -136,7 +215,9 @@ export default function CheckInScreen() {
                 {s.title}
               </Text>
             </View>
+            </Arrive>
 
+            <Arrive enter={enter} index={1}>
             <View style={styles.figure}>
               <BreathingBloom mood={mood} size={250} />
               <Text
@@ -146,7 +227,9 @@ export default function CheckInScreen() {
                 {moodLabel}
               </Text>
             </View>
+            </Arrive>
 
+            <Arrive enter={enter} index={2}>
             <MoodSlider
               value={index}
               steps={BLOOM_ORDER.length}
@@ -156,7 +239,9 @@ export default function CheckInScreen() {
               heavierLabel={s.heavier}
               lighterLabel={s.lighter}
             />
+            </Arrive>
 
+            <Arrive enter={enter} index={3}>
             <View style={styles.notAlone}>
               {notAlone && (
                 <>
@@ -199,7 +284,9 @@ export default function CheckInScreen() {
                 ]}
               />
             </View>
+            </Arrive>
 
+            <Arrive enter={enter} index={4}>
             <View style={styles.footer}>
               <Button label={s.save} onPress={save} loading={saving} block style={styles.saveButton} />
               <Text
@@ -208,14 +295,19 @@ export default function CheckInScreen() {
                 {error ? s.saveError : s.savedPrivately}
               </Text>
             </View>
+            </Arrive>
           </ScrollView>
-        </View>
+        </Animated.View>
       </KeyboardSafeView>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
   scrim: {
     flex: 1,
   },

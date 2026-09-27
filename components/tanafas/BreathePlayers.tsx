@@ -52,6 +52,18 @@ interface PlayerProps {
   /** The orb's fill, shared with the hub's screen glow so the whole screen breathes. */
   breath: Animated.Value;
   nav: CarouselNav;
+  /** Told when a session starts or stops running on its own (timed, muscle relaxation), so the hub's controls can step aside. */
+  onSessionActive?: (active: boolean) => void;
+  /** The step-aside state for the player's info and controls (`useControlsAway`, owned by the hub). */
+  away?: { opacity: Animated.Value; interactive: boolean };
+}
+
+/** Reports whether a session is running on its own; false again when it stops or the player goes. */
+function useReportActive(active: boolean, onSessionActive?: (active: boolean) => void) {
+  useEffect(() => {
+    onSessionActive?.(active);
+  }, [active, onSessionActive]);
+  useEffect(() => () => onSessionActive?.(false), [onSessionActive]);
 }
 
 export default function BreathePlayer(props: PlayerProps) {
@@ -234,7 +246,7 @@ function useBreathCycle(exercise: BreatheKey, phases: readonly BreathPhase[], mi
   };
 }
 
-function PhasePlayer({ exercise, breath, nav }: PlayerProps) {
+function PhasePlayer({ exercise, breath, nav, onSessionActive, away }: PlayerProps) {
   const { colors } = useTheme();
   const { t, fonts } = useLanguage();
   const s = t.tanafas.session;
@@ -252,6 +264,7 @@ function PhasePlayer({ exercise, breath, nav }: PlayerProps) {
   const { status, clock } = cycle;
   const inSession = status === 'running' || status === 'paused';
   const mode = inSession ? 'session' : status;
+  useReportActive(status === 'running', onSessionActive);
 
   const clockText = `${num(Math.floor(cycle.secondsLeft / 60))}:${num(cycle.secondsLeft % 60).padStart(2, num(0))}`;
   const roundsDone = Math.max(clock.round - 1, 1);
@@ -272,6 +285,7 @@ function PhasePlayer({ exercise, breath, nav }: PlayerProps) {
     <PlayerFrame
       mode={mode}
       nav={status === 'idle' ? nav : null}
+      away={away}
       stage={
         <BreathStage
           shape={exercise === 'steady-mind' ? 'square' : 'ring'}
@@ -523,7 +537,7 @@ function GroundingPlayer({ exercise, breath, nav }: PlayerProps) {
 
 /* ──────────────── Progressive muscle relaxation ──────────────── */
 
-function TensionPlayer({ exercise, breath, nav }: PlayerProps) {
+function TensionPlayer({ exercise, breath, nav, onSessionActive, away }: PlayerProps) {
   const { colors } = useTheme();
   const { t, fonts, isRTL } = useLanguage();
   const s = t.tanafas.session;
@@ -610,11 +624,13 @@ function TensionPlayer({ exercise, breath, nav }: PlayerProps) {
   const isFinal = group === groups.length - 1 && !isTense;
   const current = groups[group];
   const secondsLeft = Math.max(Math.ceil((duration - elapsed) / 1000), 0);
+  useReportActive(status === 'running', onSessionActive);
 
   return (
     <PlayerFrame
       mode={inSession ? 'session' : status}
       nav={status === 'idle' ? nav : null}
+      away={away}
       stage={
         // The same lit orb as the other exercises; the count sits on it in ink, as the play icon does on its light button.
         // The mark sits in the orb; the countdown joins the Tense / Release label.

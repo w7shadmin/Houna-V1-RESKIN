@@ -60,9 +60,11 @@ function InnerLayout() {
           name="tanafas"
           options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
         />
+        {/* The check-in is a glass sheet over whatever opened it: the screen behind softens and
+            dims, and the sheet rises itself (app/check-in.tsx), so no transition of its own. */}
         <Stack.Screen
           name="check-in"
-          options={{ presentation: 'fullScreenModal', animation: 'slide_from_bottom' }}
+          options={{ presentation: 'transparentModal', animation: 'none', contentStyle: { backgroundColor: 'transparent' } }}
         />
         <Stack.Screen
           name="recap"

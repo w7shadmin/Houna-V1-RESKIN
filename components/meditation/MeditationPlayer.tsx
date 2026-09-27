@@ -23,6 +23,7 @@ import { arabicNumber } from '@/lib/arabicNumerals';
 import { pingActivity, recordTanafasSession } from '@/lib/usageTracking';
 import { logSession } from '@/lib/sessionLog';
 import { sessionEndAlert } from '@/lib/sessionEndAlert';
+import { useControlsAway } from '@/hooks/useControlsAway';
 import AmbientVisual from './AmbientVisual';
 import type { MeditationScene } from './scenes';
 
@@ -33,10 +34,6 @@ import type { MeditationScene } from './scenes';
  */
 const FOCUS = { midnight: nightPalette.midnight, moonlight: nightPalette.moonlight };
 
-/** How long the player's UI stays visible without interaction before fading out, while actively playing. */
-const CONTROLS_IDLE_MS = 3000;
-const CONTROLS_FADE_IN_MS = 200;
-const CONTROLS_FADE_OUT_MS = 400;
 const TICK_MS = 1000;
 /** Ambient audio fades out over the last few seconds instead of cutting abruptly at completion. */
 const FADE_OUT_SECONDS = 5;
@@ -296,60 +293,14 @@ export default function MeditationPlayer({
   }, [audioPlayer, scene.audio]);
   releaseLockScreenRef.current = releaseLockScreen;
 
-  // Auto-hide the header/timer/controls while actively playing, so the
-  // ambient scene is unobstructed — matches ordinary video-player UX. Stays
-  // fully visible whenever not actively playing (choosing a session, paused,
-  // complete), since the user needs those controls reachable then.
-  const controlsOpacity = useRef(new Animated.Value(1)).current;
-  const [controlsInteractive, setControlsInteractive] = useState(true);
-  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const clearHideTimer = useCallback(() => {
-    if (hideTimerRef.current) {
-      clearTimeout(hideTimerRef.current);
-      hideTimerRef.current = null;
-    }
-  }, []);
-
-  const showControls = useCallback(() => {
-    clearHideTimer();
-    setControlsInteractive(true);
-    Animated.timing(controlsOpacity, {
-      toValue: 1,
-      duration: CONTROLS_FADE_IN_MS,
-      useNativeDriver: true,
-    }).start();
-  }, [clearHideTimer, controlsOpacity]);
-
-  const scheduleHide = useCallback(() => {
-    clearHideTimer();
-    hideTimerRef.current = setTimeout(() => {
-      Animated.timing(controlsOpacity, {
-        toValue: 0,
-        duration: CONTROLS_FADE_OUT_MS,
-        useNativeDriver: true,
-      }).start(({ finished }) => {
-        if (finished) setControlsInteractive(false);
-      });
-    }, CONTROLS_IDLE_MS);
-  }, [clearHideTimer, controlsOpacity]);
-
-  useEffect(() => {
-    if (isActive) {
-      showControls();
-      scheduleHide();
-    } else {
-      clearHideTimer();
-      showControls();
-    }
-    return clearHideTimer;
-  }, [isActive, showControls, scheduleHide, clearHideTimer]);
-
-  const handleScreenTap = () => {
-    if (!isActive) return;
-    showControls();
-    scheduleHide();
-  };
+  // The header, timer and controls step aside while actively playing, so the
+  // ambient scene is unobstructed, and come back at a touch; they stay whenever
+  // not actively playing (choosing, paused, complete). Shared with the breathing
+  // sessions (hooks/useControlsAway.ts).
+  const controls = useControlsAway(isActive);
+  const controlsOpacity = controls.opacity;
+  const controlsInteractive = controls.interactive;
+  const handleScreenTap = controls.wake;
 
   useEffect(() => {
     // No explicit pause here: useAudioPlayer releases its native player on

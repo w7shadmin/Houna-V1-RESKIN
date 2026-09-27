@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View, Text, Image, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -141,7 +141,15 @@ export default function EventsListScreen() {
             <EventCard
               key={`${event.slug}-${i}`}
               event={event}
-              onPress={() => router.push({ pathname: '/events/[slug]', params: { slug: event.slug } })}
+              onPress={(from) =>
+                router.push({
+                  pathname: '/events/[slug]',
+                  // Where the card's photo is, so the event page can grow from it (canvas "Motion — an event card grows into its page").
+                  params: from
+                    ? { slug: event.slug, x: String(from.x), y: String(from.y), w: String(from.w), h: String(from.h), img: from.img }
+                    : { slug: event.slug },
+                })
+              }
             />
           ))}
           {shown.length === 0 && (
@@ -170,7 +178,11 @@ export default function EventsListScreen() {
   );
 }
 
-function EventCard({ event, onPress }: { event: EventItem; onPress: () => void }) {
+/** The card's photo on screen, measured when it's tapped. */
+type CardPhoto = { x: number; y: number; w: number; h: number; img: string };
+
+function EventCard({ event, onPress }: { event: EventItem; onPress: (from: CardPhoto | null) => void }) {
+  const photoRef = useRef<View>(null);
   const { colors } = useTheme();
   const { t, fonts, isRTL } = useLanguage();
   const s = t.events.list;
@@ -180,14 +192,20 @@ function EventCard({ event, onPress }: { event: EventItem; onPress: () => void }
     ? formatEventDate(event.date, { monthsLong: t.journal.dateNames.monthsLong, am: s.am, pm: s.pm }, num)
     : '';
 
+  const open = () => {
+    const node = photoRef.current;
+    if (!node || !uri) return onPress(null);
+    node.measureInWindow((x, y, w, h) => onPress(w > 0 ? { x, y, w, h, img: uri } : null));
+  };
+
   return (
     <Pressable
-      onPress={onPress}
+      onPress={open}
       accessibilityRole="link"
       accessibilityLabel={event.title}
       style={({ pressed }) => [styles.card, { backgroundColor: colors.card, borderColor: colors.border }, pressed && styles.pressedCard]}
     >
-      <View style={[styles.cardImage, { backgroundColor: colors.control }]}>
+      <View ref={photoRef} collapsable={false} style={[styles.cardImage, { backgroundColor: colors.control }]}>
         {!!uri && <Image source={{ uri }} style={styles.fill} resizeMode="cover" />}
         <View style={styles.cardPills}>
           <EventPills event={event} />

@@ -81,12 +81,12 @@ or let the gems be the lit, 3D form of the sky-journey art.
 
 | Board | Picked | Note | App surface it joins or replaces | Size | Shipped |
 | --- | --- | --- | --- | --- | --- |
-| Motion — a glass sheet over blur (`MotionSheet`) | 27 Sep 2026 |  | A `GlassSheet` primitive in `components/ui/` (`expo-blur` + Reanimated): the mood check-in and other sheets rise over a softened, dimmed screen; items arrive staggered | M |  |
-| Motion — a card grows into its page (`MotionCardExpand`) | 27 Sep 2026 |  | A shared-element expand for cards → their page (events, directory, the arch → player in A) | L |  |
-| Motion — controls step aside (`MotionControlsAway`) | 27 Sep 2026 |  | A hook beside `hooks/useCalmLoop.ts`: controls fade after 3 s of stillness during practice, a touch brings them back; Reduce Motion aware | S |  |
-| Motion — words that arrive (`MotionWords`) | 27 Sep 2026 |  | A text primitive: Latin letter by letter, Arabic word by word (its letters join) | S |  |
-| Motion — glowing pills, three themes (`MotionPills`) | 27 Sep 2026 |  | A `Button.tsx` variant: the tone-gradient ring and soft glow; pressed state dims, one change (the pressed-state convention) | S |  |
-| Motion — the tab glow slides (`MotionTabs`) | 27 Sep 2026 |  | The tab and segmented controls: the glow (Open), line and pill styles, one chosen at build time | S |  |
+| Motion — a glass sheet over blur (`MotionSheet`) | 27 Sep 2026 | Keep the Houna bloom orbs and the slider | A `GlassSheet` primitive in `components/ui/` (`expo-blur` + Animated): the mood check-in and other sheets rise over a softened, dimmed screen; items arrive staggered | M | 27 Sep 2026 |
+| Motion — a card grows into its page (`MotionCardExpand`) | 27 Sep 2026 |  | A shared-element expand for cards → their page (events, directory, the arch → player in A) | L | 27 Sep 2026 |
+| Motion — controls step aside (`MotionControlsAway`) | 27 Sep 2026 |  | A hook beside `hooks/useCalmLoop.ts`: controls fade after 3 s of stillness during practice, a touch brings them back; Reduce Motion aware | S | 27 Sep 2026 |
+| Motion — words that arrive (`MotionWords`) | 27 Sep 2026 |  | A text primitive: Latin letter by letter, Arabic word by word (its letters join) | S | 27 Sep 2026 |
+| Motion — glowing pills, three themes (`MotionPills`) | 27 Sep 2026 |  | A `Button.tsx` variant: the tone-gradient ring and soft glow; pressed state dims, one change (the pressed-state convention) | S | 27 Sep 2026 |
+| Motion — the tab glow slides (`MotionTabs`) | 27 Sep 2026 | Glow style chosen | The tab and segmented controls: the glow (Open), line and pill styles, one chosen at build time | S | 27 Sep 2026 |
 
 ## G · First run
 

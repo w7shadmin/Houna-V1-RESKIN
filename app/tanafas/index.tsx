@@ -17,6 +17,8 @@ import CanvasIcon, { DirectionalIcon } from '@/components/ui/CanvasIcon';
 import BreathePlayer, { toneGlow } from '@/components/tanafas/BreathePlayers';
 import PlayerFrame, { Body, Heading, InfoTiles, LengthTile, MainButton, SideSpacer, Tag, Tile } from '@/components/tanafas/PlayerFrame';
 import SceneStage from '@/components/tanafas/SceneStage';
+import GlowTabs from '@/components/ui/GlowTabs';
+import { useControlsAway } from '@/hooks/useControlsAway';
 
 type Tab = 'breathe' | 'meditate' | 'discover';
 
@@ -47,6 +49,9 @@ export default function TanafasHubScreen() {
   const [meditateMinutes, setMeditateMinutes] = useState<number | null>(DEFAULT_MEDITATION_MINUTES);
   // How full the breathing orb is (0 rest → 1); the screen glow breathes with it.
   const breath = useRef(new Animated.Value(0)).current;
+  // While a breathing session runs on its own, the header and the player's controls step aside.
+  const [sessionActive, setSessionActive] = useState(false);
+  const away = useControlsAway(tab === 'breathe' && sessionActive);
 
   const exercise = BREATHE_ORDER[breatheIndex];
   const scene = MEDITATION_SCENES[sceneIndex];
@@ -64,50 +69,39 @@ export default function TanafasHubScreen() {
   const close = () => (router.canGoBack() ? router.back() : router.replace('/(tabs)'));
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'bottom']}
+      // A touch or click anywhere brings stepped-aside controls back; returning false leaves it for whatever is under it.
+      onStartShouldSetResponderCapture={() => {
+        away.wake();
+        return false;
+      }}
+    >
       <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { opacity: tab === 'breathe' ? glowOpacity : 1 }]}>
         <ScreenGlow color={glow} rx={70} ry={38} cy={30} />
       </Animated.View>
 
       <View style={styles.inner}>
-        {/* Header: close · tabs · journal */}
-        <View style={styles.header}>
+        {/* Header: close · tabs · journal (steps aside during a breathing session) */}
+        <Animated.View style={[styles.header, { opacity: away.opacity }]} pointerEvents={away.interactive ? 'auto' : 'none'}>
           <IconButton
             variant="subtle"
             accessibilityLabel={h.close}
             onPress={close}
             renderIcon={(c) => <CanvasIcon name="close" size={18} strokeWidth={1.8} color={c} />}
           />
-          <View accessibilityRole="tablist" accessibilityLabel={h.tabsLabel} style={styles.tabs}>
-            {(['breathe', 'meditate', 'discover'] as Tab[]).map((key) => {
-              const selected = tab === key;
-              return (
-                <Pressable
-                  key={key}
-                  accessibilityRole="tab"
-                  aria-selected={selected}
-                  onPress={() => switchTab(key)}
-                  style={[styles.tab, { borderBottomColor: selected ? colors.primary : 'transparent' }]}
-                >
-                  <Text
-                    style={[
-                      styles.tabText,
-                      { color: selected ? colors.text : colors.textTertiary, fontFamily: fonts.semiBold },
-                    ]}
-                  >
-                    {h.tabs[key]}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
+          <GlowTabs
+            accessibilityLabel={h.tabsLabel}
+            items={(['breathe', 'meditate', 'discover'] as Tab[]).map((key) => ({ key, label: h.tabs[key] }))}
+            value={tab}
+            onChange={switchTab}
+          />
           <IconButton
             variant="subtle"
             accessibilityLabel={h.journal}
             onPress={() => router.push('/tanafas/journal')}
             renderIcon={(c) => <CanvasIcon name="journal" size={20} color={c} />}
           />
-        </View>
+        </Animated.View>
 
         {tab === 'discover' ? (
           <DiscoverPanel />
@@ -115,6 +109,8 @@ export default function TanafasHubScreen() {
           <BreathePlayer
             key={exercise}
             exercise={exercise}
+            onSessionActive={setSessionActive}
+            away={away}
             breath={breath}
             nav={{
               count: BREATHE_ORDER.length,
@@ -264,19 +260,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 8,
-  },
-  tabs: {
-    flexDirection: 'row',
-    gap: 16,
-  },
-  tab: {
-    height: 44,
-    paddingHorizontal: 4,
-    justifyContent: 'center',
-    borderBottomWidth: 2,
-  },
-  tabText: {
-    fontSize: 15,
   },
   stage: {
     width: 250,
