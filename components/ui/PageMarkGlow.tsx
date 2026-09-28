@@ -12,12 +12,12 @@ const BOX = 420;
 const UNIT = 20.6 / MARK;
 const PAD = ((BOX - MARK) / 2) * UNIT;
 const VIEWBOX = `${17 - PAD} ${5.4 - PAD} ${BOX * UNIT} ${BOX * UNIT}`;
-/** The blur: about 22px, in the mark's units. */
-const BLUR = 22 * UNIT;
+/** The blur: about 10px, in the mark's units (at 22 the shape was lost, only a cloud). */
+const BLUR = 10 * UNIT;
 
 /**
- * The mark as a soft cloud of the glow colour behind a plain page's header (Design studies "E4"):
- * no outline, felt more than seen, so pages without art of their own (the Directory, Events) still
+ * The mark as a soft glow of the glow colour behind a plain page's header (Design studies "E4"),
+ * with the mark itself faintly over it so the shape reads (a cloud alone went unseen), so pages without art of their own (the Directory, Events) still
  * carry Houna. Fixed behind the content, never scrolling, and never in the way of touches.
  */
 export default function PageMarkGlow() {
@@ -31,8 +31,9 @@ export default function PageMarkGlow() {
           </Filter>
         </Defs>
         <G filter="url(#pageMarkGlow)">
-          <HounaMarkShape fill={alpha(colors.tones.glow.hue, isNight ? 0.35 : 0.4)} />
+          <HounaMarkShape fill={alpha(colors.tones.glow.hue, isNight ? 0.3 : 0.36)} />
         </G>
+        <HounaMarkShape fill={alpha(colors.tones.glow.hue, isNight ? 0.1 : 0.14)} />
       </Svg>
     </View>
   );

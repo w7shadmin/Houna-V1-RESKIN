@@ -100,6 +100,20 @@
       "w": 3050,
       "h": 1034,
       "title": "G · More Dusk suns, in the Tanafas scene"
+    },
+    "G-dusk-combo-home.dc.html": {
+      "x": 0,
+      "y": 15594,
+      "w": 1760,
+      "h": 1034,
+      "title": "G · G13 + G7 on Home"
+    },
+    "G-dusk-combo-scene.dc.html": {
+      "x": 0,
+      "y": 16748,
+      "w": 1760,
+      "h": 1034,
+      "title": "G · G13 + G7 in the Tanafas scene"
     }
   },
   "order": [
@@ -115,7 +129,9 @@
     "G-dusk-home.dc.html",
     "G-dusk-scene.dc.html",
     "G-dusk-home-2.dc.html",
-    "G-dusk-scene-2.dc.html"
+    "G-dusk-scene-2.dc.html",
+    "G-dusk-combo-home.dc.html",
+    "G-dusk-combo-scene.dc.html"
   ],
   "notes": {
     "row1": {
@@ -172,6 +188,14 @@
       "x": 0,
       "y": 10478,
       "maxW": 3050,
+      "w": 240
+    },
+    "row12": {
+      "kind": "title1",
+      "text": "G · G13 + G7: the ring of light and the Kufic words",
+      "x": 0,
+      "y": 15354,
+      "maxW": 2000,
       "w": 240
     }
   },

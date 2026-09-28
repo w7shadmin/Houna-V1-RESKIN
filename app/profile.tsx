@@ -26,8 +26,6 @@ import { DirectionalIcon } from '@/components/ui/CanvasIcon';
 import HounaMark from '@/components/HounaMark';
 import NightStars from '@/components/home/NightStars';
 import BadgeGem from '@/components/badges/BadgeGem';
-import KuficRing from '@/components/profile/KuficRing';
-import { KUFIC_RING } from '@/constants/kuficRing';
 import YourSky from '@/components/profile/YourSky';
 import MonthRidges from '@/components/profile/MonthRidges';
 import { useMonthPractice } from '@/hooks/useMonthPractice';
@@ -138,7 +136,8 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.identity}>
-          <KuficRing color={isNight ? alpha(colors.text, 0.72) : alpha(colors.primary, 0.78)}>
+          {/* The avatar in the room the Kufic ring had (it went, 28 Sep 2026), so it stays on the anchor. */}
+          <View style={styles.avatarBox}>
             <View style={[styles.avatar, { boxShadow: `0 0 36px ${alpha(disc.glow, 0.5)}` }]}>
               {avatar ? (
                 <Image source={{ uri: avatar }} style={styles.avatarImage} accessibilityIgnoresInvertColors />
@@ -149,7 +148,7 @@ export default function ProfileScreen() {
                 </>
               )}
             </View>
-          </KuficRing>
+          </View>
           {profile && (
             <>
               <Text accessibilityRole="header" style={[styles.username, { color: colors.text, fontFamily: fonts.display }]}>
@@ -429,7 +428,16 @@ function Segmented({
 }
 
 
+/** The avatar's room: the Kufic ring's old box, so the avatar keeps its place on the anchor. */
+const AVATAR_BOX = 224;
+
 const styles = StyleSheet.create({
+  avatarBox: {
+    width: AVATAR_BOX,
+    height: AVATAR_BOX,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   safe: {
     flex: 1,
   },
@@ -458,7 +466,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
     // The ring's centre on the mark's anchor (canvas "Round 3").
-    marginTop: layout.markAnchor - (16 + 48 + 16) - KUFIC_RING.box / 2,
+    marginTop: layout.markAnchor - (16 + 48 + 16) - AVATAR_BOX / 2,
   },
   avatar: {
     width: AVATAR,

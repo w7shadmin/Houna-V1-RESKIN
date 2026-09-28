@@ -468,11 +468,42 @@ ${SPIN}
     capH: 150,
     phones: MORE.map((v, i) => ({ T: TD, bg: '#2E2A5C', caption: `${v.id} · ${v.name} (the scene) · Home’s sun becomes this one where it is, on the anchor, in Dusk’s violet evening.`, html: scene(v, i + 7) })),
   });
+
+  /* ── G13 + G7: the ring of light with the Kufic words (G14–G17) ── */
+  const words = (cx, cy, size, color, glow, style = '', weight = 1.4) =>
+    at(cx, cy, size, `<svg width="${size}" height="${size}" viewBox="0 0 ${KUFIC.box} ${KUFIC.box}" aria-hidden="true" style="overflow: visible; filter: drop-shadow(0 0 ${size * 0.025}px ${glow})"><path d="${KUFIC.d}" fill="${color}" stroke="${color}" stroke-width="${weight}" stroke-linejoin="round"></path></svg>`, style);
+  // Sized so the words' circle (88 of the baked 224) sits at radius r.
+  const wordsAt = (r) => (r * KUFIC.box) / 88;
+  const clearSun = (cx, cy, d, markD = 0.5) =>
+    `${at(cx, cy, d * 2.2, '', 'border-radius: 999px; background: radial-gradient(closest-side, rgba(255,201,142,0) 36%, rgba(255,201,142,0.4) 45%, rgba(255,201,142,0) 70%); animation: breath5 5s ease-in-out infinite')}${at(cx, cy, d, markIn(d * markD, amber), 'border-radius: 999px; background: radial-gradient(circle, rgba(255,217,179,0.18), rgba(255,217,179,0.04)); display: flex; align-items: center; justify-content: center')}`;
+  const travelling = (cx, cy, size, color, glow) =>
+    `${words(cx, cy, size, color, 'rgba(0,0,0,0)', 'opacity: 0.3')}${at(cx, cy, size, `<div style="position: absolute; inset: 0; animation: spinCcw 10s linear infinite">${words(size / 2, size / 2, size, color, glow)}</div>`, `animation: spinCw 10s linear infinite; -webkit-mask-image: conic-gradient(from 0deg, transparent 0 55%, #000 88%, transparent 100%); mask-image: conic-gradient(from 0deg, transparent 0 55%, #000 88%, transparent 100%)`)}`;
+  const GOLD = '#FFE0B8', GLOW = 'rgba(255,201,142,0.95)';
+  // On Home's pale ground the gold vanishes: the words there are the deeper amber.
+  const EMBER = '#D9694A', EMBER_GLOW = 'rgba(236,140,110,0.55)';
+  const COMBO = [
+    { id: 'G14', name: 'The words are the ring', note: 'G13’s ring of light made of G7’s words: هُنا · نتنفّس معًا drawn in light round a clear sun, glowing gold, turning slowly; the mark in amber in the middle, and the halo breathing just outside. One ring, not two.', home: () => `${clearSun(95, 95, 120, 0.44)}${words(95, 95, wordsAt(62), EMBER, EMBER_GLOW, 'animation: spinCcw 120s linear infinite', 2)}`, scene: () => `${sunglow(195, ANCHOR, 0.2)}${clearSun(195, ANCHOR, 170, 0.44)}${words(195, ANCHOR, wordsAt(88), GOLD, GLOW, 'animation: spinCcw 120s linear infinite', 2)}` },
+    { id: 'G15', name: 'The ring, and the words round it', note: 'G13 as drawn, the bright ring with the amber mark, and G7’s words in a wider circle round it in rose-gold, turning slowly the other way from Sunrise’s stars. The ring holds still; the words move.', home: () => `${ringSun(95, 95, HD * 0.84)}${words(95, 95, wordsAt(80), EMBER, EMBER_GLOW, 'animation: spinCcw 120s linear infinite')}`, scene: () => `${sunglow(195, ANCHOR, 0.2)}${ringSun(195, ANCHOR, SD)}${words(195, ANCHOR, wordsAt(128), 'rgba(255,217,179,0.7)', 'rgba(255,201,142,0.5)', 'animation: spinCcw 150s linear infinite')}` },
+    { id: 'G16', name: 'The words inside the ring', note: 'An inscription, as round a coin or a medallion: the words turning just inside the ring of light, between it and the mark, which is smaller. Closest to one object; the words small on Home, clear in the scene.', home: () => `${ringSun(95, 95, 128)}${words(95, 95, wordsAt(48), '#B8503A', 'rgba(255,201,142,0.5)', 'animation: spinCcw 90s linear infinite', 1.8)}`, scene: () => `${sunglow(195, ANCHOR, 0.2)}${ringSun(195, ANCHOR, 150)}${words(195, ANCHOR, wordsAt(57), GOLD, GLOW, 'animation: spinCcw 90s linear infinite')}` },
+    { id: 'G17', name: 'The words lit in turn', note: 'G15, with the words still and faint, and a light going round them once every ten seconds, lighting each word as it passes, as the last light moves along a horizon. The ring breathes. A turning mask over the words.', home: () => `${ringSun(95, 95, HD * 0.84)}${travelling(95, 95, wordsAt(80), EMBER, EMBER_GLOW)}`, scene: () => `${sunglow(195, ANCHOR, 0.2)}${ringSun(195, ANCHOR, SD)}${travelling(195, ANCHOR, wordsAt(128), GOLD, GLOW)}` },
+  ];
+  row('G-dusk-combo-home.dc.html', {
+    title: 'G · G13 + G7 on Home',
+    css: css2,
+    capH: 150,
+    phones: COMBO.map((v) => ({ T: TD, caption: `${v.id} · ${v.name} · ${v.note}`, html: home(TD, { date: 'line', hero: v.home() }) })),
+  });
+  row('G-dusk-combo-scene.dc.html', {
+    title: 'G · G13 + G7 in the Tanafas scene',
+    css: css2,
+    capH: 150,
+    phones: COMBO.map((v, i) => ({ T: TD, bg: '#2E2A5C', caption: `${v.id} · ${v.name} (the scene) · Home’s sun becomes this one where it is, on the anchor, in Dusk’s violet evening.`, html: scene(v, i + 14) })),
+  });
 })();
 
 /* ── The canvas: Direction on top, then a row per study ── */
-const ROWS = [['Main.dc.html'], ['A-sunglow.dc.html'], ['B-suns.dc.html'], ['C-kufic.dc.html'], ['D-date.dc.html'], ['E-imprint-night.dc.html'], ['E-imprint-day.dc.html'], ['F-moon.dc.html', 'F-moon-close.dc.html'], ['G-dusk-home.dc.html'], ['G-dusk-scene.dc.html'], ['G-dusk-home-2.dc.html'], ['G-dusk-scene-2.dc.html']];
-const TITLES = { 1: 'A · The Sunrise scene’s glow', 2: 'B · Two different suns', 3: 'C · Classic Home with the Kufic ring', 4: 'D · A calmer Home date', 5: 'E · The mark on plain pages', 7: 'F · A new moon', 8: 'G · The Dusk sun, on Home and in its scene' };
+const ROWS = [['Main.dc.html'], ['A-sunglow.dc.html'], ['B-suns.dc.html'], ['C-kufic.dc.html'], ['D-date.dc.html'], ['E-imprint-night.dc.html'], ['E-imprint-day.dc.html'], ['F-moon.dc.html', 'F-moon-close.dc.html'], ['G-dusk-home.dc.html'], ['G-dusk-scene.dc.html'], ['G-dusk-home-2.dc.html'], ['G-dusk-scene-2.dc.html'], ['G-dusk-combo-home.dc.html'], ['G-dusk-combo-scene.dc.html']];
+const TITLES = { 1: 'A · The Sunrise scene’s glow', 2: 'B · Two different suns', 3: 'C · Classic Home with the Kufic ring', 4: 'D · A calmer Home date', 5: 'E · The mark on plain pages', 7: 'F · A new moon', 8: 'G · The Dusk sun, on Home and in its scene', 12: 'G · G13 + G7: the ring of light and the Kufic words' };
 const byFile = Object.fromEntries(out.map((b) => [b.file, b]));
 const boards = {}, notes = {}, order = [];
 let y = 0;

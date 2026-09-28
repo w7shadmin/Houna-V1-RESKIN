@@ -24,14 +24,21 @@ const HALO_STRENGTH = 0.32;
 const MIN_TERMINATOR = 0.02;
 
 /**
- * A pearl glass moon (Design studies "F4", in pearl rather than silver): milky white glass, a clear
- * highlight up and to the left, cooling towards a pearly rim, with a faint sheen of the night's tones
- * (teal, lavender, rose) turning slowly inside it, as nacre catches the light. Solid colours, so the
- * faces can be stacked in the phase windows without showing through one another.
+ * A pearl glass moon (Design studies F4 and F2 together): pearl glass the night shows through, a
+ * clear white highlight up and to the left, thinning through the middle and gathering again at a
+ * pearly rim, with a faint sheen of the night's tones (teal, lavender, rose) turning slowly inside
+ * it, as nacre catches the light. The unlit part is solid (the dark moon hides the stars behind it).
  */
 const PEARL = '#E4E2F4';
-const RIM = alpha('#FFFFFF', 0.7);
+const RIM = alpha('#FFFFFF', 0.75);
 const LIT: [string, number][] = [
+  [alpha('#FFFFFF', 0.94), 0],
+  [alpha('#F0F0F6', 0.6), 0.4],
+  [alpha('#DCE0EC', 0.34), 0.75],
+  [alpha('#C4CCE2', 0.52), 1],
+];
+/** The same pearl, solid: what the unlit part is shaded from. */
+const PEARL_SOLID: [string, number][] = [
   ['#FFFFFF', 0],
   ['#EDEEF3', 0.4],
   ['#D6DAE6', 0.75],
@@ -45,9 +52,11 @@ const SHEEN: [string, number, number, number][] = [
 ];
 /** The unlit part: the same glass in shadow (the night laid over it at 0.82), the mark just visible. */
 const shade = (c: string) => flatten(alpha(nightPalette.midnight, 0.82), c);
-const EARTHSHINE: [string, number][] = LIT.map(([c, o]) => [shade(c), o]);
-/** The mark as pressed into the glass. */
-const MARK_SURFACE = '#DCDFEA';
+const EARTHSHINE: [string, number][] = PEARL_SOLID.map(([c, o]) => [shade(c), o]);
+/** The dark lune of a gibbous moon, one even shade of it. */
+const LUNE = shade('#D6DAE6');
+/** The mark as pressed into the glass: the glass as it looks over the night. */
+const MARK_SURFACE = flatten(alpha('#F0F0F6', 0.6), nightPalette.midnight);
 
 /** The full moon's ring, well clear of the disc (the canvas "Moon halo": 176 round a 76 disc). */
 const RING = 192;
@@ -88,7 +97,7 @@ function InnerLight() {
       <Defs>
         <RadialGradient id={id} cx="50%" cy="50%" r="50%">
           <Stop offset={0.78} {...stopProps('#FFFFFF', 0)} />
-          <Stop offset={1} {...stopProps('#FFFFFF', 0.25)} />
+          <Stop offset={1} {...stopProps('#FFFFFF', 0.4)} />
         </RadialGradient>
       </Defs>
       <Circle cx={DISC / 2} cy={DISC / 2} r={DISC / 2} fill={`url(#${id})`} />
@@ -177,10 +186,19 @@ export default function MoonDisc({ form, date, ringOpacity: ringShown }: {
   const { breath } = useStarfield()!.clock;
   const phase = useMemo(() => moonPhase(date ?? new Date()), [date]);
 
-  const { terminator, inverse, light } = useMemo(() => {
+  const { terminator, inverse, light, lune } = useMemo(() => {
     const [out, held] = terminatorBreath(phase).map((t) => Math.max(t, MIN_TERMINATOR));
     const width = breath.interpolate({ inputRange: [0, 1], outputRange: [out, held] });
-    return { terminator: width, inverse: Animated.divide(1, width), light: 0.3 + 0.7 * phase.fraction };
+    // The lune's ring: its hole the disc, squeezed to the ellipse; thick enough that, squeezed as
+    // narrow as it gets, it still reaches the disc's edge.
+    const narrowest = Math.min(out, held);
+    const border = Math.min(60, (1 - narrowest) / narrowest + 1) * (DISC / 2);
+    return {
+      terminator: width,
+      inverse: Animated.divide(1, width),
+      light: 0.3 + 0.7 * phase.fraction,
+      lune: { size: DISC + border * 2, border },
+    };
   }, [breath, phase]);
 
   const haloOpacity = Animated.multiply(form, breath.interpolate({ inputRange: [0, 1], outputRange: [0.2 * light, light] }));
@@ -204,17 +222,38 @@ export default function MoonDisc({ form, date, ringOpacity: ringShown }: {
           so mid-fade they show through one another and the moon seems to sweep through phases. */}
       <Animated.View style={[styles.disc, { opacity: form }]} needsOffscreenAlphaCompositing>
         <View style={[styles.glow, { opacity: light }]} />
-        <DarkFace />
-        <View style={[styles.window, { transform: [{ translateX: side }] }]}>
-          <View style={[StyleSheet.absoluteFill, { transform: [{ translateX: -side }] }]}>
+        {phase.crescent ? (
+          // A crescent: the lit half, then the dark over it (the far half and the terminator's
+          // ellipse), so the dark part is solid and the lit part the only glass.
+          <>
+            <View style={[styles.window, { transform: [{ translateX: side }] }]}>
+              <View style={[StyleSheet.absoluteFill, { transform: [{ translateX: -side }] }]}>
+                <LitFace />
+              </View>
+            </View>
+            <View style={[styles.window, { transform: [{ translateX: -side }] }]}>
+              <View style={[StyleSheet.absoluteFill, { transform: [{ translateX: side }] }]}>
+                <DarkFace />
+              </View>
+            </View>
+            <Animated.View style={[styles.window, styles.round, { transform: [{ scaleX: terminator }] }]}>
+              <Animated.View style={[StyleSheet.absoluteFill, { transform: [{ scaleX: inverse }] }]}>
+                <DarkFace />
+              </Animated.View>
+            </Animated.View>
+          </>
+        ) : (
+          // Gibbous or full: the whole glass, then the dark lune on the far side over it: a ring whose
+          // hole is the terminator's ellipse (squeezed across as the ellipse was), in the far half.
+          <>
             <LitFace />
-          </View>
-        </View>
-        <Animated.View style={[styles.window, styles.round, { transform: [{ scaleX: terminator }] }]}>
-          <Animated.View style={[StyleSheet.absoluteFill, { transform: [{ scaleX: inverse }] }]}>
-            {phase.crescent ? <DarkFace /> : <LitFace />}
-          </Animated.View>
-        </Animated.View>
+            <View style={[styles.window, { transform: [{ translateX: -side }] }]}>
+              <View style={[StyleSheet.absoluteFill, styles.round, styles.clip, { transform: [{ translateX: side }] }]}>
+                <Animated.View style={[styles.lune, { left: (DISC - lune.size) / 2, top: (DISC - lune.size) / 2, width: lune.size, height: lune.size, borderRadius: lune.size / 2, borderWidth: lune.border, transform: [{ scaleX: terminator }] }]} />
+              </View>
+            </View>
+          </>
+        )}
       </Animated.View>
     </View>
   );
@@ -256,6 +295,10 @@ const styles = StyleSheet.create({
   },
   clip: {
     overflow: 'hidden',
+  },
+  lune: {
+    position: 'absolute',
+    borderColor: LUNE,
   },
   rim: {
     ...StyleSheet.absoluteFillObject,

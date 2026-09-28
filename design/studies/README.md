@@ -24,4 +24,4 @@ canvas and the app, as the Explorations picks did.
 | D | `D-date.dc.html` | A calmer place for Home's Hijri date |
 | E | `E-imprint-night.dc.html`, `E-imprint-day.dc.html` | The mark imprinted on plain pages |
 | F | `F-moon.dc.html`, `F-moon-close.dc.html` | A new moon for Night |
-| G | `G-dusk-home.dc.html`, `G-dusk-scene.dc.html`, `G-dusk-home-2.dc.html`, `G-dusk-scene-2.dc.html` | The Dusk sun, on Home and in its Tanafas scene (one column per variant; G0–G6, then G7–G13) |
+| G | `G-dusk-home.dc.html`, `G-dusk-scene.dc.html`, `G-dusk-home-2.dc.html`, `G-dusk-scene-2.dc.html`, `G-dusk-combo-home.dc.html`, `G-dusk-combo-scene.dc.html` | The Dusk sun, on Home and in its Tanafas scene (one column per variant; G0–G6, G7–G13, then G14–G17, G13 + G7) |

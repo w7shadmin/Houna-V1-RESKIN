@@ -427,12 +427,12 @@ the week (Monday to Monday, as the leaderboard's) and each day practised.
 
 **Account & badges** (phase 6, canvas "Houna — Account & badges (phase 6)"; the
 Explorations' section E with the held Profile & badges plan):
-- Profile (`app/profile.tsx`): the Kufic ring (`components/profile/KuficRing.tsx`),
-  هُنا · نتنفّس معًا turning slowly round the theme's own body (its disc, the mark
-  pressed in) or the person's photo. The ring is one baked outline
-  (`constants/kuficRing.ts`, from `design/canvas/scripts/make-kufic-ring.js`: HarfBuzz
-  shapes Amiri Bold and sets each glyph on the circle), because react-native-svg's
-  textPath doesn't join Arabic. Then, for an Alias: three numbers (the phone's
+- Profile (`app/profile.tsx`): the theme's own body (its disc, the mark pressed in) or the
+  person's photo, on the anchor in the room the Kufic ring had (`AVATAR_BOX`; the ring came off
+  Profile on 28 Sep 2026). The ring itself (`components/profile/KuficRing.tsx`, هُنا · نتنفّس معًا)
+  lives on in Classic Home (C1 below): one baked outline (`constants/kuficRing.ts`, from
+  `design/canvas/scripts/make-kufic-ring.js`: HarfBuzz shapes Amiri Bold and sets each glyph on
+  the circle), because react-native-svg's textPath doesn't join Arabic. Then, for an Alias: three numbers (the phone's
   practice streak, sessions this month, badges) and the badges card (gems held,
   the next streak badge unlit with the days to go), opening `app/account/badges.tsx`.
   For everyone, from the phone's own log (`hooks/useMonthPractice.ts`): Your sky
@@ -505,15 +505,20 @@ picks in its `PICKS.md`):
   the body stays on the anchor (`HijriDate`).
 - E4: plain pages (the Directory hub and its list pages, Events) carry the mark as a soft glow of the
   glow colour behind the header, fixed, never scrolling (`components/ui/PageMarkGlow.tsx`, drawing
-  `HounaMarkShape` through a blur).
-- F4, in pearl: the moon is pearl glass (`MoonDisc`; the sky clock's and Night Home's too): milky
-  white to a cool pearly rim, a white rim line and inner light, and a faint sheen of teal, lavender and
-  rose turning inside it on the clock's `turn` (`Sheen`). Its faces are solid colours, so the phase
-  windows can stack them without one showing through the other; the dark part is the same pearl with
-  the night laid over it at 0.82 (`flatten`).
+  `HounaMarkShape` through a 10px blur with the mark itself faintly over it: at the study's 22px it
+  read as a cloud and went unseen).
+- F4 and F2: the moon is see-through pearl glass (`MoonDisc`; the sky clock's and Night Home's
+  too): a clear white highlight, thinning through the middle so the night and its stars show through,
+  gathering at a pearly rim, with a faint sheen of teal, lavender and rose turning inside it on the
+  clock's `turn` (`Sheen`). The unlit part is solid (the same pearl with the night over it at 0.82),
+  and the glass is never drawn over it: a crescent draws its lit half, then the dark half and the
+  terminator's ellipse on top; a gibbous or full moon draws the whole glass, then the dark lune on
+  top, a thick ring (`lune`) whose hole is the terminator's ellipse, squeezed by the same native
+  `scaleX` and clipped to the far half of the disc, so the breath still swells it natively.
 - Sunrise's sun on Home ("Sun & moon") has no glow: `SunDisc`'s `glow={false}` leaves out its edge halo
   and wide sunglow, so it's the disc and its lattice alone. Its scene keeps both.
-- G (the Dusk sun, on Home and in its scene): thirteen variants on the canvas (G0–G6, G7–G13), not yet picked.
+- G (the Dusk sun, on Home and in its scene): on the canvas, not yet picked: G0–G6, G7–G13, and
+  G14–G17, G13's ring of light with G7's Kufic words.
 
 **The mark in one spot** (canvas "Round 3 — the mark in one spot"): `layout.markAnchor` (199)
 is where the centre of the Houna mark, or of the body, orb or gem it's pressed into, sits below
