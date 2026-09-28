@@ -634,7 +634,6 @@ export const GRID = 8;
 export const grid = (n: number) => n * GRID;
 
 export const spacing = {
-  xxs: 2,
   xs: 4,
   sm: 8,
   md: 16,

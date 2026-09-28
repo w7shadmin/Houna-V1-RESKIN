@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   badgeRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xxs,
+    gap: spacing.xs,
     marginTop: spacing.sm,
   },
   badgeText: {

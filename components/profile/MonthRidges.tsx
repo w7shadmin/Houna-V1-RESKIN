@@ -107,7 +107,7 @@ export default function MonthRidges({ byDayAndGroup, today, width, height }: Mon
 
 const styles = StyleSheet.create({
   wrap: {
-    gap: 6,
+    gap: 4,
   },
   axis: {
     height: 16,
@@ -124,13 +124,13 @@ const styles = StyleSheet.create({
     marginTop: 4,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 6,
+    gap: 4,
     columnGap: 12,
   },
   keyItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 4,
   },
   dot: {
     width: 8,

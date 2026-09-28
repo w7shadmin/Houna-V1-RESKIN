@@ -597,7 +597,7 @@ const styles = StyleSheet.create({
   gem: {
     width: 72,
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
   },
   gemName: {
     fontSize: 12,
@@ -605,7 +605,7 @@ const styles = StyleSheet.create({
   },
   rule: {
     height: 1,
-    marginVertical: 6,
+    marginVertical: 4,
   },
   next: {
     flexDirection: 'row',
@@ -621,7 +621,7 @@ const styles = StyleSheet.create({
   minutes: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    gap: 6,
+    gap: 4,
     marginBottom: 8,
   },
   minutesNumber: {

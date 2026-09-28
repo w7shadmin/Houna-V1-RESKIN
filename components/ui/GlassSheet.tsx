@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   head: {
-    gap: 6,
+    gap: 4,
     paddingHorizontal: 8,
   },
   eyebrowLatin: {

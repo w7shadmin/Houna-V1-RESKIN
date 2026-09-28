@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
     marginBottom: grid(1),
   },
   halo: {
-    padding: grid(0.75),
+    padding: grid(0.5),
     borderRadius: radius.full,
     borderWidth: 1,
   },

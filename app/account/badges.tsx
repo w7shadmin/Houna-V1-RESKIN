@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     width: 88,
     height: 12,
     borderRadius: 44,
-    marginTop: -2,
+    marginTop: -4,
     transform: [{ scaleY: 0.6 }],
   },
   heldName: {
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
   },
   aheadText: {
     flex: 1,
-    gap: 2,
+    gap: 4,
   },
   aheadName: {
     fontSize: 15,

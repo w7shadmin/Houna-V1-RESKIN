@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
   },
   forMeditationBody: {
     fontSize: typography.fontSize.xs,
-    marginTop: 2,
+    marginTop: 4,
   },
   error: {
     fontSize: typography.fontSize.sm,

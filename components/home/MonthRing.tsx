@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
   practisedRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 4,
   },
   practisedDot: {
     width: 7,

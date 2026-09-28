@@ -225,8 +225,11 @@ Amiri Bold in Arabic, as before (canvas "Numbers — four faces").
 `spacing` in `theme.ts`. Screen side padding is 16 (`layout.screenPadding`),
 not the canvas's 20. `TabBar` is the reference: 64 above the inset (8 · 24
 icon · 4 · 20 label · 8), raised button 56 sharing the icons' bottom edge.
-Spacing is on the grid everywhere except About and Voices; snap those when
-touched.
+Spacing is on the grid everywhere (Round 4, About and Voices included; `spacing.xxs` is gone):
+run `node scripts/grid-audit.js` before committing layout work; it lists any padding, margin or
+gap (numbers, or `grid(n)`) off the grid, and `--fix` snaps them (a tie to the smaller; a 2 or 3
+opens to 4). A line marked `// grid-ok` is skipped. Sizes aren't audited: components keep their
+designed sizes (the 52 pill button, the 44 round icon buttons, the 250 stage).
 
 **Android nav bar**: the tab bar runs edge-to-edge under the system
 buttons. RN 0.81 re-enables the nav-bar contrast scrim at startup (a dark

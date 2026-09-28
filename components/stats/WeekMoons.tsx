@@ -101,7 +101,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 44,
     alignItems: 'center',
-    gap: 6,
+    gap: 4,
   },
   moonBox: {
     width: 44,

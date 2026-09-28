@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
   submitBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xxs + 2,
+    gap: spacing.xs,
     height: 36,
     paddingHorizontal: spacing.md,
     borderRadius: radius.full,
@@ -241,17 +241,17 @@ const styles = StyleSheet.create({
   },
   cardUsername: {
     fontSize: typography.fontSize.xs,
-    marginTop: 1,
+    marginTop: 0,
   },
   cardStatus: {
     fontSize: typography.fontSize.xs,
-    marginTop: 1,
+    marginTop: 0,
   },
   badgeRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xxs,
-    marginTop: spacing.xxs + 2,
+    gap: spacing.xs,
+    marginTop: spacing.xs,
   },
   badgeText: {
     fontSize: 10,

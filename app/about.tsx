@@ -287,12 +287,12 @@ const styles = StyleSheet.create({
   },
   memberRole: {
     fontSize: typography.fontSize.xs,
-    marginTop: 1,
+    marginTop: 0,
   },
   memberBio: {
     fontSize: typography.fontSize.xs,
     lineHeight: typography.lineHeight.xs,
-    marginTop: 2,
+    marginTop: 4,
   },
   inlineError: {
     marginTop: spacing.md,

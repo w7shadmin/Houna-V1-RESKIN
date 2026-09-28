@@ -589,7 +589,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   corrected: {
-    gap: 2,
+    gap: 4,
     marginTop: -4,
   },
   correctedText: {

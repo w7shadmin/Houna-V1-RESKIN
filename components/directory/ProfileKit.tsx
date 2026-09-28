@@ -554,7 +554,7 @@ const styles = StyleSheet.create({
     paddingTop: grid(1.5),
     // The tab bar's raised Tanafas button rises 24 (+4 ring) into this bar;
     // keep the pill clear of it.
-    paddingBottom: grid(4.5),
+    paddingBottom: grid(4),
     borderTopWidth: StyleSheet.hairlineWidth,
   },
 });

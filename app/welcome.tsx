@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
   },
   switch: {
     flexDirection: 'row',
-    padding: 3,
+    padding: 4,
     borderRadius: 999,
     borderWidth: 1,
   },

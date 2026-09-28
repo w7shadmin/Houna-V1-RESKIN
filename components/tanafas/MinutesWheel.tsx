@@ -65,7 +65,7 @@ export default function MinutesWheel({ value, onDone }: { value: Minutes; onDone
 
 const styles = StyleSheet.create({
   wrap: {
-    gap: 20,
+    gap: 16,
   },
   window: {
     height: VIEW,
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
+    gap: 8,
   },
   number: {
     fontSize: 40,

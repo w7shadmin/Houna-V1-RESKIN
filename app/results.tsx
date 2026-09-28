@@ -107,8 +107,8 @@ const styles = StyleSheet.create({
   empty: {
     alignItems: 'center',
     gap: grid(1.5),
-    paddingVertical: grid(3.5),
-    paddingHorizontal: grid(2.5),
+    paddingVertical: grid(3),
+    paddingHorizontal: grid(2),
     borderRadius: 22,
     borderWidth: 1,
   },
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   },
   rowText: {
     flex: 1,
-    gap: 3,
+    gap: 4,
   },
   rowTitle: {
     fontSize: 15,
@@ -162,8 +162,8 @@ const styles = StyleSheet.create({
   },
   band: {
     maxWidth: 110,
-    paddingHorizontal: 10,
-    paddingVertical: 3,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     borderRadius: 999,
     borderWidth: 1,
     fontSize: 12,

@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     borderRadius: 999,
     borderWidth: 1,
-    paddingHorizontal: grid(2.5),
+    paddingHorizontal: grid(2),
   },
   pressed: {
     opacity: 0.85,
