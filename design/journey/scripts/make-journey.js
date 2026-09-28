@@ -21,14 +21,24 @@ const LINE = 'rgba(242,236,221,0.12)';
 const TEAL = '#6FD6CF';
 const out = [];
 
+/** Each theme's board: Night's midnight, or Sunrise's mist ground, charcoal ink and dark turquoise. */
+const LOOKS = {
+  night: { ground: INK, text: M.moonlight, sub: M.mist, accent: TEAL, glow: 'rgba(111,214,207,0.08)', panel: PANEL, line: LINE, shadow: 'rgba(0,0,0,0.5)' },
+  sunrise: { ground: '#F2F6F4', text: '#1D2B2A', sub: '#58595B', accent: '#196662', glow: 'rgba(249,169,128,0.22)', panel: '#FFFFFF', line: 'rgba(29,43,42,0.12)', shadow: 'rgba(29,43,42,0.22)' },
+};
+/** The screens that are one theme whatever the board (the skies and their scenes). */
+const THEME_FIXED = new Set(['04-home-sunrise', '05-home-dusk', '06-starfield', '07-sunrise-scene', '08-dusk-scene']);
+/** A screen in the board's theme: Sunrise's captures end in -s; Home at night becomes Home at sunrise. */
+const inTheme = (name, theme) => (theme !== 'sunrise' || THEME_FIXED.has(name) ? name : name === '03-home-night' ? '04-home-sunrise' : `${name}-s`);
+
 /* ── The phone: the app screen (390 × 844) at SCALE, in a frame with a plain top bezel ── */
 const SCALE = 0.82;
 const SW = Math.round(390 * SCALE), SH = Math.round(844 * SCALE);
 const BEZEL = 11, TOP = 26, BOTTOM = 14;
 const PW = SW + BEZEL * 2, PH = SH + TOP + BOTTOM;
-const phone = (name, alt, { x = 0, y = 0, scale = 1, tilt = 0 } = {}) => `
+const phone = (name, alt, { x = 0, y = 0, scale = 1, tilt = 0, shadow = 'rgba(0,0,0,0.5)' } = {}) => `
 <div style="position: absolute; left: ${x}px; top: ${y}px; width: ${PW}px; height: ${PH}px; transform-origin: 0 0; transform: scale(${scale}) rotate(${tilt}deg)">
-  <div style="position: absolute; inset: 0; border-radius: 50px; background: linear-gradient(145deg, #3A3F4E 0%, #1B1E28 45%, #2A2E3B 100%); box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 30px 60px rgba(0,0,0,0.5), inset 0 0 0 2px rgba(255,255,255,0.05)"></div>
+  <div style="position: absolute; inset: 0; border-radius: 50px; background: linear-gradient(145deg, #3A3F4E 0%, #1B1E28 45%, #2A2E3B 100%); box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 30px 60px ${shadow}, inset 0 0 0 2px rgba(255,255,255,0.05)"></div>
   <span style="position: absolute; left: -3px; top: 150px; width: 3px; height: 56px; border-radius: 2px; background: #2A2E3B"></span>
   <span style="position: absolute; left: -3px; top: 220px; width: 3px; height: 56px; border-radius: 2px; background: #2A2E3B"></span>
   <span style="position: absolute; right: -3px; top: 190px; width: 3px; height: 84px; border-radius: 2px; background: #2A2E3B"></span>
@@ -41,16 +51,17 @@ const phone = (name, alt, { x = 0, y = 0, scale = 1, tilt = 0 } = {}) => `
 
 /** The step between two screens: an arrow and what the person does. */
 const STEP_W = 128;
-const step = (x, y, text) => `
+const step = (x, y, text, look = LOOKS.night) => `
 <div style="position: absolute; left: ${x}px; top: ${y}px; width: ${STEP_W}px; display: flex; flex-direction: column; align-items: center; gap: 10px">
-  <svg width="96" height="18" viewBox="0 0 96 18" aria-hidden="true"><path d="M2 9 H88" stroke="${TEAL}" stroke-width="1.6" stroke-dasharray="4 5" fill="none"></path><path d="M82 3 L90 9 L82 15" stroke="${TEAL}" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-  <span style="font-size: 13px; line-height: 1.4; color: ${M.mist}; text-align: center">${text}</span>
+  <svg width="96" height="18" viewBox="0 0 96 18" aria-hidden="true"><path d="M2 9 H88" stroke="${look.accent}" stroke-width="1.6" stroke-dasharray="4 5" fill="none"></path><path d="M82 3 L90 9 L82 15" stroke="${look.accent}" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+  <span style="font-size: 13px; line-height: 1.4; color: ${look.sub}; text-align: center">${text}</span>
 </div>`;
 
 /** A stage: its header (number, name, the person's goal, what Houna does, how it should feel), then its screens in a row. */
 const PAD = 72;
 const HEADER = 250;
-function stage(file, { n, name, goal, does, feel, screens, lang = 'en' }) {
+function stage(file, { n, name, goal, does, feel, screens, lang = 'en', theme = 'night' }) {
+  const look = LOOKS[theme];
   const count = screens.length;
   const W = PAD * 2 + count * PW + (count - 1) * STEP_W;
   const H = PAD + HEADER + PH + 150 + PAD;
@@ -58,23 +69,24 @@ function stage(file, { n, name, goal, does, feel, screens, lang = 'en' }) {
   const phones = screens
     .map((s, i) => {
       const x = PAD + i * (PW + STEP_W);
-      const cap = `<div style="position: absolute; left: ${x}px; top: ${top + PH + 24}px; width: ${PW}px; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 16px; font-weight: 600; color: ${M.moonlight}">${s.title}</span><span style="font-size: 13.5px; line-height: 1.5; color: ${M.mist}">${s.note}</span></div>`;
-      const arrow = i < count - 1 && s.then ? step(x + PW, top + PH / 2 - 30, s.then) : '';
-      return phone(s.shot, s.title, { x, y: top }) + cap + arrow;
+      const cap = `<div style="position: absolute; left: ${x}px; top: ${top + PH + 24}px; width: ${PW}px; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 16px; font-weight: 600; color: ${look.text}">${s.title}</span><span style="font-size: 13.5px; line-height: 1.5; color: ${look.sub}">${s.note}</span></div>`;
+      const arrow = i < count - 1 && s.then ? step(x + PW, top + PH / 2 - 30, s.then, look) : '';
+      return phone(inTheme(s.shot, theme), s.title, { x, y: top, shadow: look.shadow }) + cap + arrow;
     })
     .join('');
-  const col = (label, text) => `<div style="display: flex; flex-direction: column; gap: 8px; max-width: 420px">${K.label(label, TEAL, 11)}<span style="font-size: 16px; line-height: 1.55; color: ${M.moonlight}">${text}</span></div>`;
+  const col = (label, text) => `<div style="display: flex; flex-direction: column; gap: 8px; max-width: 420px">${K.label(label, look.accent, 11)}<span style="font-size: 16px; line-height: 1.55; color: ${look.text}">${text}</span></div>`;
+  const themeTag = theme === 'sunrise' ? ` · Sunrise` : '';
   const body = `
-<span aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 0; height: 600px; background: radial-gradient(60% 100% at 20% 0%, rgba(111,214,207,0.08), rgba(11,16,38,0) 70%)"></span>
+<span aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 0; height: 600px; background: radial-gradient(60% 100% at 20% 0%, ${look.glow}, rgba(0,0,0,0) 70%)"></span>
 <div style="position: absolute; left: ${PAD}px; top: ${PAD}px; right: ${PAD}px; display: flex; gap: 64px; align-items: flex-start">
   <div style="display: flex; flex-direction: column; gap: 12px; min-width: 360px">
-    ${K.label(`Stage ${n}`, TEAL, 12)}
-    <h1 style="margin: 0; font-family: ${K.F.display}; font-weight: 400; font-size: 52px; line-height: 1.05; color: ${M.moonlight}">${name}</h1>
+    ${K.label(`Stage ${n}${themeTag}`, look.accent, 12)}
+    <h1 style="margin: 0; font-family: ${K.F.display}; font-weight: 400; font-size: 52px; line-height: 1.05; color: ${look.text}">${name}</h1>
   </div>
   <div style="display: flex; gap: 48px; padding-top: 6px">${col('The person wants', goal)}${col('Houna', does)}${col('How it should feel', feel)}</div>
 </div>
 ${phones}`;
-  out.push(K.board(file, { title: `${n} · ${name}`, lang, w: W, h: H, root: `background: ${INK}`, body, dir: DIR }));
+  out.push(K.board(file, { title: `${n} · ${name}${themeTag}`, lang, w: W, h: H, root: `background: ${look.ground}`, body, dir: DIR }));
 }
 
 /* ══════════ The stages ══════════ */
@@ -184,9 +196,16 @@ const STAGES = [
   },
 ];
 STAGES.forEach((s) => stage(s.file, s));
+/** Each stage again in Sunrise, beside its Night board (Choose a sky already shows every theme). */
+const sunriseFile = (file) => file.replace('.dc.html', '-sunrise.dc.html');
+const TWINNED = STAGES.filter((s) => s.n !== 2);
+TWINNED.forEach((s) => stage(sunriseFile(s.file), { ...s, theme: 'sunrise' }));
 
 /* ══════════ The journey map: every stage, at a glance ══════════ */
-(() => {
+function journeyMap(file, theme) {
+  const look = LOOKS[theme];
+  const TEAL = look.accent, PANEL = look.panel, LINE = look.line, INK = look.ground;
+  const M = { moonlight: look.text, mist: look.sub };
   const COLW = 300, GAP = 24, W = PAD * 2 + STAGES.length * COLW + (STAGES.length - 1) * GAP, H = 1300;
   // How it should feel along the way: a gentle climb, a dip where reflection gets real, then support.
   const FEEL = [0.35, 0.62, 0.72, 0.8, 0.58, 0.74, 0.88, 0.84];
@@ -207,13 +226,13 @@ STAGES.forEach((s) => stage(s.file, s));
   <span style="font-size: 14px; line-height: 1.5; color: ${M.moonlight}">${s.goal}</span>
   <span style="font-size: 13px; line-height: 1.5; color: ${M.mist}">${s.does}</span>
 </div>
-${phone(thumb.shot, thumb.title, { x: x + COLW / 2 - (PW * 0.34) / 2, y: 580, scale: 0.34 })}
+${phone(inTheme(thumb.shot, theme), thumb.title, { x: x + COLW / 2 - (PW * 0.34) / 2, y: 580, scale: 0.34, shadow: look.shadow })}
 <span style="position: absolute; left: ${x}px; top: ${curveTop + curveH + 28}px; width: ${COLW}px; text-align: center; font-size: 14px; color: ${M.moonlight}">${s.feel}</span>`;
   }).join('');
   const body = `
-<span aria-hidden="true" style="position: absolute; inset: 0; background: radial-gradient(50% 60% at 50% 0%, rgba(111,214,207,0.07), rgba(11,16,38,0) 70%)"></span>
+<span aria-hidden="true" style="position: absolute; inset: 0; background: radial-gradient(50% 60% at 50% 0%, ${look.glow}, rgba(0,0,0,0) 70%)"></span>
 <div style="position: absolute; left: ${PAD}px; top: ${PAD}px; display: flex; flex-direction: column; gap: 12px">
-  ${K.label('Houna · the journey map', TEAL, 12)}
+  ${K.label(`Houna · the journey map${theme === 'sunrise' ? ' · Sunrise' : ''}`, TEAL, 12)}
   <h1 style="margin: 0; font-family: ${K.F.display}; font-weight: 400; font-size: 56px; color: ${M.moonlight}">Eight moments, one calm thread</h1>
 </div>
 ${cols}
@@ -223,8 +242,10 @@ ${cols}
   <path d="${d}" fill="none" stroke="${TEAL}" stroke-width="2.5" stroke-linecap="round"></path>
   ${pts.map((p) => `<circle cx="${p[0]}" cy="${p[1]}" r="7" fill="${INK}" stroke="${TEAL}" stroke-width="2.5"></circle>`).join('')}
 </svg>`;
-  out.push(K.board('Map.dc.html', { title: 'The journey map', w: W, h: H, root: `background: ${INK}`, body, dir: DIR }));
-})();
+  out.push(K.board(file, { title: `The journey map${theme === 'sunrise' ? ' · Sunrise' : ''}`, w: W, h: H, root: `background: ${INK}`, body, dir: DIR }));
+}
+journeyMap('Map.dc.html', 'night');
+journeyMap('Map-sunrise.dc.html', 'sunrise');
 
 /* ══════════ The cover ══════════ */
 (() => {
@@ -247,7 +268,8 @@ ${phone('05-home-dusk', 'Home at dusk', { x: 1330, y: 190, scale: 0.86, tilt: 6 
 
 /* ── The canvas: the cover and the map on top, then a row per stage ── */
 const byFile = Object.fromEntries(out.map((b) => [b.file, b]));
-const ROWS = [['Main.dc.html', 'Map.dc.html'], ...STAGES.map((s) => [s.file])];
+// The cover, then the map in Night and Sunrise side by side; then each stage, Night then Sunrise.
+const ROWS = [['Main.dc.html', 'Map.dc.html', 'Map-sunrise.dc.html'], ...STAGES.map((s) => (s.n === 2 ? [s.file] : [s.file, sunriseFile(s.file)]))];
 const boards = {}, order = [], notes = {};
 let y = 0;
 ROWS.forEach((files, r) => {

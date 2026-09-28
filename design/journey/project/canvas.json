@@ -24,12 +24,26 @@
       "h": 1300,
       "title": "The journey map"
     },
+    "Map-sunrise.dc.html": {
+      "x": 4472,
+      "y": 0,
+      "w": 2712,
+      "h": 1300,
+      "title": "The journey map · Sunrise"
+    },
     "S1-arrive.dc.html": {
       "x": 0,
       "y": 1420,
       "w": 1426,
       "h": 1276,
       "title": "1 · Arrive"
+    },
+    "S1-arrive-sunrise.dc.html": {
+      "x": 1506,
+      "y": 1420,
+      "w": 1426,
+      "h": 1276,
+      "title": "1 · Arrive · Sunrise"
     },
     "S2-sky.dc.html": {
       "x": 0,
@@ -45,12 +59,26 @@
       "h": 1276,
       "title": "3 · Breathe"
     },
+    "S3-breathe-sunrise.dc.html": {
+      "x": 2446,
+      "y": 4212,
+      "w": 2366,
+      "h": 1276,
+      "title": "3 · Breathe · Sunrise"
+    },
     "S4-meditate.dc.html": {
       "x": 0,
       "y": 5608,
       "w": 1896,
       "h": 1276,
       "title": "4 · Meditate"
+    },
+    "S4-meditate-sunrise.dc.html": {
+      "x": 1976,
+      "y": 5608,
+      "w": 1896,
+      "h": 1276,
+      "title": "4 · Meditate · Sunrise"
     },
     "S5-reflect.dc.html": {
       "x": 0,
@@ -59,12 +87,26 @@
       "h": 1276,
       "title": "5 · Reflect"
     },
+    "S5-reflect-sunrise.dc.html": {
+      "x": 2446,
+      "y": 7004,
+      "w": 2366,
+      "h": 1276,
+      "title": "5 · Reflect · Sunrise"
+    },
     "S6-support.dc.html": {
       "x": 0,
       "y": 8400,
       "w": 3306,
       "h": 1276,
       "title": "6 · Find support"
+    },
+    "S6-support-sunrise.dc.html": {
+      "x": 3386,
+      "y": 8400,
+      "w": 3306,
+      "h": 1276,
+      "title": "6 · Find support · Sunrise"
     },
     "S7-practice.dc.html": {
       "x": 0,
@@ -73,25 +115,47 @@
       "h": 1276,
       "title": "7 · See the practice"
     },
+    "S7-practice-sunrise.dc.html": {
+      "x": 2916,
+      "y": 9796,
+      "w": 2836,
+      "h": 1276,
+      "title": "7 · See the practice · Sunrise"
+    },
     "S8-arabic.dc.html": {
       "x": 0,
       "y": 11192,
       "w": 1426,
       "h": 1276,
       "title": "8 · In Arabic"
+    },
+    "S8-arabic-sunrise.dc.html": {
+      "x": 1506,
+      "y": 11192,
+      "w": 1426,
+      "h": 1276,
+      "title": "8 · In Arabic · Sunrise"
     }
   },
   "order": [
     "Main.dc.html",
     "Map.dc.html",
+    "Map-sunrise.dc.html",
     "S1-arrive.dc.html",
+    "S1-arrive-sunrise.dc.html",
     "S2-sky.dc.html",
     "S3-breathe.dc.html",
+    "S3-breathe-sunrise.dc.html",
     "S4-meditate.dc.html",
+    "S4-meditate-sunrise.dc.html",
     "S5-reflect.dc.html",
+    "S5-reflect-sunrise.dc.html",
     "S6-support.dc.html",
+    "S6-support-sunrise.dc.html",
     "S7-practice.dc.html",
-    "S8-arabic.dc.html"
+    "S7-practice-sunrise.dc.html",
+    "S8-arabic.dc.html",
+    "S8-arabic-sunrise.dc.html"
   ],
   "notes": {},
   "designSystems": []
