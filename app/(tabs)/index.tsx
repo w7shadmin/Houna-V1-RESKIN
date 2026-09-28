@@ -192,13 +192,6 @@ export default function HomeScreen() {
     });
   };
 
-  // The sky clock: a long press on the mark or body (or the screen reader's action).
-  const openSky = () => {
-    if (away.current) return;
-    if (Platform.OS !== 'web') Haptics.selectionAsync().catch(() => {});
-    router.push('/sky');
-  };
-
   const pickPeriod = (i: number) => {
     setAutoRotate(false);
     setPeriod(i);
@@ -265,12 +258,8 @@ export default function HomeScreen() {
           {/* The mark opens this theme's scene: the starfield, the sunrise or the dusk. */}
           <Pressable
             onPress={openScene}
-            onLongPress={openSky}
-            delayLongPress={450}
             accessibilityRole="button"
             accessibilityLabel={sceneLabel}
-            accessibilityActions={[{ name: 'longpress', label: h.sky.open }]}
-            onAccessibilityAction={(e) => e.nativeEvent.actionName === 'longpress' && openSky()}
           >
             <View ref={haloRef} collapsable={false} style={starfield?.haloHidden && styles.hidden}>
               {/* Day: the logo's deeper teal, a little stronger — the pale Night glow vanishes on Daybreak. */}

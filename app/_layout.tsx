@@ -99,11 +99,6 @@ function InnerLayout() {
           name="dusk"
           options={{ presentation: 'transparentModal', animation: 'none', gestureEnabled: false, contentStyle: { backgroundColor: 'transparent' } }}
         />
-        {/* The sky clock (a long press on Home's mark or body): its own sky, fading in over Home. */}
-        <Stack.Screen
-          name="sky"
-          options={{ presentation: 'transparentModal', animation: 'none', gestureEnabled: false, contentStyle: { backgroundColor: 'transparent' } }}
-        />
         {/* The month of moons, a glass sheet over Home (from its Hijri date), like the check-in. */}
         <Stack.Screen
           name="month"

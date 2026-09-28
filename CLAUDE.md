@@ -471,18 +471,8 @@ Explorations' section E with the held Profile & badges plan):
   ringed, days to come faint, never "missed"), the longest beneath, and a badges
   row opening the badges page. Part colours are shared (`practiceColours`).
 
-**The sky clock** (canvas "Phase 3 — the sky clock"; a long press on Home's mark
-or body, or the screen reader's "Today's sky" action; the only entry for now, to
-settle with the others): `app/sky.tsx`, a scene of its own over Home. One sky
-through the day (Sunrise's pre-dawn and morning skies, Dusk's violet evening,
-the night) with the sun and tonight's moon crossing over the hills, from
-`lib/skyClock.ts` (the sun for the Gulf's latitude, solar noon from the phone's
-clock and time zone, the moon trailing by its age: offline, no location). It
-plays the day from first light to now in 20s (sampled tables driving native
-interpolations), then holds at the hour, moving every 30s; the words are the
-part of the day, the time and the next sunrise or sunset. It never changes the
-theme. Tap anywhere or Back to leave; counted as a `sky` session, titled Tanafas
-in Recap.
+**The sky clock** (canvas "Phase 3 — the sky clock") was removed on 28 Sep 2026, with its long press on
+Home's mark or body. Sessions already logged as `sky` still count as Tanafas in Recap and practice.
 
 **Sunrise's accent, three ways, while it's decided** (More → Appearance →
 Sunrise accent, shown in Sunrise only; `SunriseAccent` in `constants/theme.ts`,
@@ -521,7 +511,7 @@ picks in its `PICKS.md`):
   itself faintly over it (at the study's 22px it read as a cloud and went unseen), each drawn in a
   solid fill and faded as a layer: the mark's ring and figure overlap at the top, and a translucent
   fill doubled up there, drawing the top thicker.
-- F4 and F2: the moon is see-through pearl glass (`MoonDisc`; the sky clock's and Night Home's
+- F4 and F2: the moon is see-through pearl glass (`MoonDisc`; Night Home's and Profile's
   too): a clear white highlight, thinning through the middle so the night and its stars show through,
   gathering at a pearly rim, with a faint sheen of teal, lavender and rose turning inside it on the
   clock's `turn` (`Sheen`). The unlit part is solid (the same pearl with the night over it at 0.82),

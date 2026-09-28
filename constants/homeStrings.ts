@@ -39,15 +39,6 @@ export const homeStrings = {
       practised: { one: '{n} minute practised', few: '{n} minutes practised' },
     },
     // The sky clock (long-press Home's sun or moon): the day from first light to now, then the hour.
-    sky: {
-      open: "Today's sky",
-      close: 'Back to Home',
-      parts: { dawn: 'Dawn', day: 'Day', dusk: 'Dusk', night: 'Night' },
-      sunrise: 'Sunrise {t}',
-      sunset: 'Sunset {t}',
-      am: 'AM',
-      pm: 'PM',
-    },
     // The Houna starfield: only its accessibility labels; the scene's one visible word is "Tanafas".
     starfield: {
       open: 'Breathe under the stars',
@@ -211,15 +202,6 @@ export const homeStrings = {
       note: 'كل ليالي الشهر الهجري بأطوارها. المس ليلة لتراها؛ الليلة محاطة بحلقة.',
       close: 'إغلاق الشهر',
       practised: { one: 'دقيقة واحدة من التمرّن', two: 'دقيقتان من التمرّن', few: '{n} دقائق من التمرّن', many: '{n} دقيقة من التمرّن' },
-    },
-    sky: {
-      open: 'سماء اليوم',
-      close: 'العودة إلى الرئيسية',
-      parts: { dawn: 'الفجر', day: 'النهار', dusk: 'الغروب', night: 'الليل' },
-      sunrise: 'الشروق {t}',
-      sunset: 'الغروب {t}',
-      am: 'ص',
-      pm: 'م',
     },
     starfield: {
       open: 'تنفّس تحت النجوم',
