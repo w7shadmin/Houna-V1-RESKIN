@@ -104,7 +104,8 @@ export default function RecapScreen() {
   const periodLabel = period === 'year' ? num(from.getFullYear()) : t.journal.dateNames.monthsLong[from.getMonth()];
 
   useEffect(() => {
-    Promise.all([sessionsBetween(from, to), loadEntries()])
+    // A journal that can't be read shouldn't hide the practice: it counts as empty.
+    Promise.all([sessionsBetween(from, to), loadEntries().catch(() => [])])
       .then(([logged, entries]) => {
         setSessions(logged);
         setRecap(computeRecap(logged, entries, from, to));
