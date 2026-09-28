@@ -86,6 +86,20 @@
       "w": 3050,
       "h": 1034,
       "title": "G · The Dusk sun, in its Tanafas scene"
+    },
+    "G-dusk-home-2.dc.html": {
+      "x": 0,
+      "y": 13026,
+      "w": 3050,
+      "h": 1034,
+      "title": "G · More Dusk suns, on Home"
+    },
+    "G-dusk-scene-2.dc.html": {
+      "x": 0,
+      "y": 14180,
+      "w": 3050,
+      "h": 1034,
+      "title": "G · More Dusk suns, in the Tanafas scene"
     }
   },
   "order": [
@@ -99,7 +113,9 @@
     "F-moon.dc.html",
     "F-moon-close.dc.html",
     "G-dusk-home.dc.html",
-    "G-dusk-scene.dc.html"
+    "G-dusk-scene.dc.html",
+    "G-dusk-home-2.dc.html",
+    "G-dusk-scene-2.dc.html"
   ],
   "notes": {
     "row1": {

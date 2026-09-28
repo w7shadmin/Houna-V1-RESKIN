@@ -114,7 +114,7 @@ const bowl = (id) => `<svg width="190" height="190" viewBox="0 0 240 240" style=
     ['D · A calmer Home date', 'The Hijri chip crowds the top of Home. Five quieter places for it, now the map has no card; each still opens the month of moons.'],
     ['E · The mark on plain pages', 'The Directory and Events have no art of their own. Five ways to imprint the mark very faintly behind them, by night and by day.'],
     ['F · A new moon', 'A better moon for the starfield, the mark pressed in, tonight’s real phase kept. Five surfaces beside today’s teal disc.'],
-    ['G · The Dusk sun', 'Dusk’s sun is a plain amber disc beside Sunrise’s turning stars and Night’s bowl. Six ways to give it its own, each drawn on Home and in its Tanafas scene.'],
+    ['G · The Dusk sun', 'Dusk’s sun is a plain amber disc beside Sunrise’s turning stars and Night’s bowl. Twelve ways to give it its own (two rows of six or seven), each drawn on Home and in its Tanafas scene.'],
   ];
   const body = `<div style="position: absolute; inset: 0; padding: 72px; box-sizing: border-box; display: flex; flex-direction: column; gap: 40px">
 <div style="display: flex; flex-direction: column; gap: 16px">${K.label('Houna · design studies', '#6FD6CF', 12)}
@@ -426,12 +426,52 @@ ${SPIN}
     title: 'G · The Dusk sun, in its Tanafas scene',
     css,
     capH: 150,
-    phones: VARIANTS.map((v, i) => ({ T: TD, bg: '#2E2A5C', caption: `${v.id} · ${v.name} (the scene) · Home’s mark glides down and becomes this sun, on the anchor, in Dusk’s violet evening; the first stars come out round it.`, html: scene(v, i) })),
+    phones: VARIANTS.map((v, i) => ({ T: TD, bg: '#2E2A5C', caption: `${v.id} · ${v.name} (the scene) · Home’s sun becomes this one where it is, on the anchor, in Dusk’s violet evening; the first stars come out round it.`, html: scene(v, i) })),
+  });
+
+  /* ── More Dusk suns (G7–G13), asked for after the first six ── */
+  const kufic = (cx, cy, size, color, dur) =>
+    at(cx, cy, size, `<svg width="${size}" height="${size}" viewBox="0 0 ${KUFIC.box} ${KUFIC.box}" aria-hidden="true"><path d="${KUFIC.d}" fill="${color}"></path></svg>`, `animation: spinCcw ${dur}s linear infinite`);
+  const hilal = (cx, cy, r, id) =>
+    at(cx, cy, r * 2, `<svg width="${r * 2}" height="${r * 2}" viewBox="0 0 ${r * 2} ${r * 2}" aria-hidden="true" style="overflow: visible; filter: drop-shadow(0 0 ${r * 0.5}px rgba(255,243,228,0.8))"><defs><mask id="hil${id}"><rect width="${r * 2}" height="${r * 2}" fill="#fff"></rect><circle cx="${r * 0.62}" cy="${r * 0.78}" r="${r * 0.92}" fill="#000"></circle></mask></defs><circle cx="${r}" cy="${r}" r="${r}" fill="#FFF3E4" mask="url(#hil${id})"></circle></svg>`, 'animation: breath5 5s ease-in-out infinite');
+  const QAMARIYA = 'radial-gradient(circle at 50% 45%, rgba(255,249,241,0.85) 0%, rgba(255,249,241,0) 34%), conic-gradient(from 22.5deg, #F5B08A 0 45deg, #E98AA0 45deg 90deg, #FFD9B3 90deg 135deg, #B3A7F5 135deg 180deg, #F5B08A 180deg 225deg, #E98AA0 225deg 270deg, #FFD9B3 270deg 315deg, #B3A7F5 315deg 360deg)';
+  const qamariya = (cx, cy, d) =>
+    at(cx, cy, d, `<svg width="${d}" height="${d}" aria-hidden="true" style="position: absolute; inset: 0"><polygon points="${K.star8(d / 2, d / 2, d * 0.47)}" fill="none" stroke="rgba(94,52,72,0.55)" stroke-width="${d * 0.022}" stroke-linejoin="round"></polygon><circle cx="${d / 2}" cy="${d / 2}" r="${d * 0.3}" fill="#FFE9D3" stroke="rgba(94,52,72,0.55)" stroke-width="${d * 0.022}"></circle>${[0, 45, 90, 135].map((a) => `<line x1="${d / 2 + d * 0.3 * Math.cos((a * Math.PI) / 180)}" y1="${d / 2 + d * 0.3 * Math.sin((a * Math.PI) / 180)}" x2="${d / 2 + d * 0.5 * Math.cos((a * Math.PI) / 180)}" y2="${d / 2 + d * 0.5 * Math.sin((a * Math.PI) / 180)}" stroke="rgba(94,52,72,0.4)" stroke-width="${d * 0.014}"></line><line x1="${d / 2 - d * 0.3 * Math.cos((a * Math.PI) / 180)}" y1="${d / 2 - d * 0.3 * Math.sin((a * Math.PI) / 180)}" x2="${d / 2 - d * 0.5 * Math.cos((a * Math.PI) / 180)}" y2="${d / 2 - d * 0.5 * Math.sin((a * Math.PI) / 180)}" stroke="rgba(94,52,72,0.4)" stroke-width="${d * 0.014}"></line>`).join('')}</svg><div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center">${K.pressedMark(d * 0.46, '#FFE9D3')}</div>`, `border-radius: 999px; overflow: hidden; background: ${QAMARIYA}; box-shadow: 0 0 ${d * 0.2}px rgba(233,138,160,0.55), 0 0 ${d * 0.5}px rgba(179,167,245,0.35)`);
+  const dune = (w, top, rise, fill, id, bottom = top + 1200) => `<svg width="${w}" height="${844}" aria-hidden="true" style="position: absolute; left: 0; top: 0; overflow: visible"><defs><linearGradient id="dune${id}" x1="0" y1="0" x2="0" y2="1">${fill}</linearGradient></defs><path d="M0 ${top + rise * 0.4} Q ${w * 0.3} ${top - rise * 0.5} ${w * 0.55} ${top + rise * 0.1} T ${w} ${top - rise * 0.2} V ${bottom} H 0 Z" fill="url(#dune${id})"></path></svg>`;
+  const beams = (cx, cy, size, a) =>
+    at(cx, cy, size, '', `border-radius: 999px; background: repeating-conic-gradient(from -84deg at 50% 50%, rgba(255,217,179,${a}) 0deg 5deg, rgba(255,217,179,0) 5deg 21deg); -webkit-mask-image: linear-gradient(180deg, #000 0 50%, transparent 50%), radial-gradient(circle, #000 20%, transparent 62%); -webkit-mask-composite: source-in; mask-image: linear-gradient(180deg, #000 0 50%, transparent 50%), radial-gradient(circle, #000 20%, transparent 62%); mask-composite: intersect; filter: blur(${size > 400 ? 4 : 1.5}px); animation: beamsBreath 5s ease-in-out infinite`);
+  const ringSun = (cx, cy, d) =>
+    `${at(cx, cy, d * 2.2, '', 'border-radius: 999px; background: radial-gradient(closest-side, rgba(255,201,142,0) 40%, rgba(255,201,142,0.45) 47%, rgba(255,201,142,0) 70%); animation: breath5 5s ease-in-out infinite')}${at(cx, cy, d, markIn(d * 0.56, amber), `border-radius: 999px; border: ${d * 0.06}px solid #FFE0B8; box-sizing: border-box; background: radial-gradient(circle, rgba(255,217,179,0.2), rgba(255,217,179,0.05)); box-shadow: 0 0 ${d * 0.16}px rgba(255,201,142,0.9), inset 0 0 ${d * 0.14}px rgba(255,201,142,0.7); display: flex; align-items: center; justify-content: center`)}`;
+  const belt = (cx, cy, w, h) =>
+    `${at(cx, cy, w, '', `height: ${h}px; top: ${cy - h / 2}px; border-radius: 50%; background: radial-gradient(closest-side, rgba(234,144,168,0.5), rgba(234,144,168,0)); animation: breath5 5s ease-in-out infinite`)}${at(cx, cy + h * 0.55, w, '', `height: ${h * 0.8}px; top: ${cy + h * 0.2}px; border-radius: 50%; background: radial-gradient(closest-side, rgba(90,78,154,0.4), rgba(90,78,154,0))`)}`;
+
+  const MORE = [
+    { id: 'G7', name: 'The Kufic words at evening', note: 'Profile’s words, هُنا · نتنفّس معًا, circling the sun in rose-gold, turning slowly the other way from Sunrise’s stars. On Home a close ring; in the scene a wide one in the sky. The baked Kufic outline, as Profile draws it.', home: () => `${halo(95, 95, HD * 0.84, '236,140,110', 0.3)}${kufic(95, 95, 176, 'rgba(236,140,110,0.78)', 120)}${disc(95, 95, HD * 0.84)}`, scene: () => `${sunglow(195, ANCHOR, 0.22)}${kufic(195, ANCHOR, 300, 'rgba(255,217,179,0.62)', 150)}${halo(195, ANCHOR, SD, '236,140,110', 0.34)}${disc(195, ANCHOR, SD)}` },
+    { id: 'G8', name: 'The hilal at maghrib', note: 'The evening the new moon is looked for: as the sun goes down, a thin hilal glows beside it and breathes. On Home a small crescent up and to the side; in the scene higher in the violet, the first light of the night. Tied to Home’s Hijri date: shown on the evening a month begins, or always.', home: () => `${halo(88, 104, HD * 0.86, '236,140,110', 0.34)}${disc(88, 104, HD * 0.86)}${hilal(152, 36, 13, 'h')}`, scene: () => `${sunglow(195, ANCHOR + 30, 0.24)}${halo(195, ANCHOR + 30, SD, '236,140,110', 0.36)}${disc(195, ANCHOR + 30, SD)}${hilal(292, ANCHOR - 118, 20, 's')}` },
+    { id: 'G9', name: 'A qamariya', note: 'The sun as the round stained-glass window over a Gulf doorway: amber, rose, cream and violet panes in an eight-point star, the evening light coming through, the mark pressed into its clear centre. Built with gradients and the khatam star.', home: () => qamariya(95, 95, HD), scene: () => `${sunglow(195, ANCHOR, 0.26)}${qamariya(195, ANCHOR, SD * 1.15)}` },
+    { id: 'G10', name: 'Over the dunes', note: 'The sun settling on a soft ridge of sand, its foot hidden, the mark whole above it. On Home a faint ridge that fades into the page; in the scene, dunes in two violets across the foot of the screen.', home: () => `${halo(95, 100, HD, '236,140,110', 0.36)}${disc(95, 100, HD)}<span style="position: absolute; left: -60px; width: 310px; top: 138px; height: 72px; border-radius: 50% 50% 0 0 / 30px 30px 0 0; background: linear-gradient(180deg, rgba(167,133,176,0.55), rgba(167,133,176,0) 85%); -webkit-mask-image: linear-gradient(90deg, transparent, #000 28%, #000 72%, transparent); mask-image: linear-gradient(90deg, transparent, #000 28%, #000 72%, transparent)"></span>`, scene: () => `${sunglow(195, ANCHOR + 30, 0.3)}${halo(195, ANCHOR + 20, SD, '236,140,110', 0.4)}${disc(195, ANCHOR + 20, SD)}${dune(390, ANCHOR + 78, 34, '<stop offset="0" stop-color="#5A4E9A"></stop><stop offset="1" stop-color="#2E2A5C"></stop>', 's1')}${dune(390, ANCHOR + 150, -40, '<stop offset="0" stop-color="#3B3470"></stop><stop offset="1" stop-color="#1F1B42"></stop>', 's2')}` },
+    { id: 'G11', name: 'Afterglow', note: 'Soft beams fanning up from the sun, as the last light does through the haze after sunset, breathing slowly; nothing turns (Sunrise’s stars do). Short on Home, reaching up across the sky in the scene.', home: () => `${beams(95, 95, 220, 0.5)}${halo(95, 95, HD, '236,140,110', 0.34)}${disc(95, 95, HD)}`, scene: () => `${beams(195, ANCHOR, 700, 0.22)}${halo(195, ANCHOR, SD, '236,140,110', 0.36)}${disc(195, ANCHOR, SD)}` },
+    { id: 'G12', name: 'The belt of Venus', note: 'The evening sky’s own colours: the rose band that rises opposite the sunset, with the blue-violet of the earth’s shadow beneath, as a soft band behind the sun. On Home a wide, low oval; in the scene it spans the sky.', home: () => `${belt(95, 104, 280, 90)}${halo(95, 95, HD, '236,140,110', 0.3)}${disc(95, 95, HD)}`, scene: () => `${belt(195, ANCHOR + 40, 760, 220)}${halo(195, ANCHOR, SD, '236,140,110', 0.34)}${disc(195, ANCHOR, SD)}` },
+    { id: 'G13', name: 'A ring of light', note: 'The light withdrawing: the sun drawn as a bright ring, clear inside, the mark in amber in its middle, and a halo just outside the ring breathing. Quiet, and unlike any other body. Circles and a border only.', home: () => ringSun(95, 95, HD), scene: () => `${sunglow(195, ANCHOR, 0.2)}${ringSun(195, ANCHOR, SD)}` },
+  ];
+  const css2 = `${css}
+@keyframes beamsBreath { 0%,100% { opacity: 0.6; transform: scale(0.96) } 50% { opacity: 1; transform: scale(1.04) } }`;
+  row('G-dusk-home-2.dc.html', {
+    title: 'G · More Dusk suns, on Home',
+    css: css2,
+    capH: 150,
+    phones: MORE.map((v) => ({ T: TD, caption: `${v.id} · ${v.name} · ${v.note}`, html: home(TD, { date: 'line', hero: v.home() }) })),
+  });
+  row('G-dusk-scene-2.dc.html', {
+    title: 'G · More Dusk suns, in the Tanafas scene',
+    css: css2,
+    capH: 150,
+    phones: MORE.map((v, i) => ({ T: TD, bg: '#2E2A5C', caption: `${v.id} · ${v.name} (the scene) · Home’s sun becomes this one where it is, on the anchor, in Dusk’s violet evening.`, html: scene(v, i + 7) })),
   });
 })();
 
 /* ── The canvas: Direction on top, then a row per study ── */
-const ROWS = [['Main.dc.html'], ['A-sunglow.dc.html'], ['B-suns.dc.html'], ['C-kufic.dc.html'], ['D-date.dc.html'], ['E-imprint-night.dc.html'], ['E-imprint-day.dc.html'], ['F-moon.dc.html', 'F-moon-close.dc.html'], ['G-dusk-home.dc.html'], ['G-dusk-scene.dc.html']];
+const ROWS = [['Main.dc.html'], ['A-sunglow.dc.html'], ['B-suns.dc.html'], ['C-kufic.dc.html'], ['D-date.dc.html'], ['E-imprint-night.dc.html'], ['E-imprint-day.dc.html'], ['F-moon.dc.html', 'F-moon-close.dc.html'], ['G-dusk-home.dc.html'], ['G-dusk-scene.dc.html'], ['G-dusk-home-2.dc.html'], ['G-dusk-scene-2.dc.html']];
 const TITLES = { 1: 'A · The Sunrise scene’s glow', 2: 'B · Two different suns', 3: 'C · Classic Home with the Kufic ring', 4: 'D · A calmer Home date', 5: 'E · The mark on plain pages', 7: 'F · A new moon', 8: 'G · The Dusk sun, on Home and in its scene' };
 const byFile = Object.fromEntries(out.map((b) => [b.file, b]));
 const boards = {}, notes = {}, order = [];

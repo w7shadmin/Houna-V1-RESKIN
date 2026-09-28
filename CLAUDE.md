@@ -296,7 +296,7 @@ value) and hands the mark to `app/starfield.tsx`, a transparent modal that
 draws its moon at the measured spot (`x`/`y` params), then glides it to the
 middle over a turning, twinkling sky with shooting stars
 (`components/starfield/`), the mark becoming the moon on the way: a small
-glass moon in cool silver about the mark's size with the mark pressed in
+pearl glass moon about the mark's size with the mark pressed in
 (`MoonDisc`, Design studies "F4"), its halo joined to the disc's edge (`EdgeHalo`). The moon is
 in tonight's real phase (`lib/moonPhase.ts`, from the date alone: offline, no
 permissions), lit on the right while waxing as seen from the Gulf, the dark part
@@ -355,18 +355,17 @@ strip of sun · setting sun · moon above it, the current one lit, tapping moves
 to the next in `APPEARANCE_OPTIONS` order). Classic is the mark in its ring,
 as above. "Sun & moon" (canvas "Home — appearance"): the mark and its ring of
 dots give way to the theme's own body, alone (`components/home/HomeBody.tsx`:
-the scene's sun at `HOME_SUN_SCALE`, or Night's crescent bowl, in the mark's box so
-nothing round it moves). The bowl (`components/home/CrescentBowl.tsx`, canvas
-"Phase 3 — Night: the crescent bowl", `crescentBowl` in `theme.ts`) is a dawn-lit
-cup with the mark resting in its hollow, floating on the 5s breath; tapping it,
-its cup fades with Home's chrome (`cupOpacity`) and Home hands the starfield the
-mark itself (its spot, and `mark`, its size), which grows as it rises and becomes
-the moon, as Classic's does. A change sets the current body, whole, past the right edge;
+the scene's sun at `HOME_SUN_SCALE`, or Night's moon, in the mark's box so
+nothing round it moves). Night's is the starfield's own pearl moon in tonight's phase
+(`MoonDisc` at `HOME_MOON_SCALE`, 1.25, as large as the suns; it replaced the crescent bowl, 28 Sep
+2026, so the moon on Home and the starfield's are one), without the full-moon ring, which would
+crowd the date (`ringOpacity`; the starfield fades it in with its sky). A change sets the current body, whole, past the right edge;
 with the sky empty the colours crossfade, and once the old colours have nearly
 gone the next body rises in whole from beyond the left edge (`startSkyChange`). Those directions are physical (the sky
 doesn't mirror in Arabic); Reduce Motion fades the bodies in place. Home then
-passes `body=1` to the scene (Night's bowl aside), and the scene (`fromBody` from `useSceneFrame`)
-starts with that body whole instead of turning the mark into it. When one
+passes `body=1` to the scene, Night's too, and the scene (`fromBody` from `useSceneFrame`)
+starts with that body whole instead of turning the mark into it (the starfield keeps the moon at
+`HOME_MOON_SCALE` then: the same moon, never swapped or resized, the sky gathering round it). When one
 style is chosen, delete the other and the setting.
 
 **Home's Hijri date and the month of moons** (canvas "Phase 3 — Home: the Hijri
@@ -507,12 +506,14 @@ picks in its `PICKS.md`):
 - E4: plain pages (the Directory hub and its list pages, Events) carry the mark as a soft glow of the
   glow colour behind the header, fixed, never scrolling (`components/ui/PageMarkGlow.tsx`, drawing
   `HounaMarkShape` through a blur).
-- F4: the moon is glass, as the 4-7-8 orb, in cool silver (`MoonDisc`; the sky clock's moon too). Its
-  faces are the study's glass flattened over midnight (`flatten`), so the phase windows can stack them
-  without one showing through the other; the dark part is that glass with the night laid over it at 0.82.
+- F4, in pearl: the moon is pearl glass (`MoonDisc`; the sky clock's and Night Home's too): milky
+  white to a cool pearly rim, a white rim line and inner light, and a faint sheen of teal, lavender and
+  rose turning inside it on the clock's `turn` (`Sheen`). Its faces are solid colours, so the phase
+  windows can stack them without one showing through the other; the dark part is the same pearl with
+  the night laid over it at 0.82 (`flatten`).
 - Sunrise's sun on Home ("Sun & moon") has no glow: `SunDisc`'s `glow={false}` leaves out its edge halo
   and wide sunglow, so it's the disc and its lattice alone. Its scene keeps both.
-- G (the Dusk sun, on Home and in its scene): on the canvas, not yet picked.
+- G (the Dusk sun, on Home and in its scene): thirteen variants on the canvas (G0–G6, G7–G13), not yet picked.
 
 **The mark in one spot** (canvas "Round 3 — the mark in one spot"): `layout.markAnchor` (199)
 is where the centre of the Houna mark, or of the body, orb or gem it's pressed into, sits below
@@ -520,8 +521,7 @@ the top inset, horizontally centred, on every screen where it's the centrepiece,
 jumps between them. Home draws it there; the Tanafas stage is pinned to it (`STAGE_TOP` in
 `PlayerFrame`, from the hub's header; 4-7-8's mark no longer lifts in a session, its word sits
 lower, `WORD_DROP`), and so are Profile's ring, the first breath's orb, a new badge's gem and the
-scenes' moon and suns (they grow where Home's body was; Night's bowl hands over its mark 22 lower,
-which rises that little way into the moon). Measure any new screen against it on the web
+scenes' moon and suns (they grow where Home's body was, or are it, as Night's moon is). Measure any new screen against it on the web
 preview at 390×844 (the centre at 199 with no inset).
 
 **Motion** (phase 1 of the Explorations picks, `design/explorations/PICKS.md`;

@@ -1,25 +1,36 @@
 import React, { useRef } from 'react';
 import { Animated, Easing, StyleSheet, View, useWindowDimensions } from 'react-native';
 import SunDisc, { HOME_LATTICE } from '@/components/sunrise/SunDisc';
-import CrescentBowl from '@/components/home/CrescentBowl';
+import MoonDisc from '@/components/starfield/MoonDisc';
 import { HALO_BOX } from '@/components/starfield/MarkHalo';
 import { duskScene, sunriseScene, type ColorScheme } from '@/constants/theme';
 import { NATIVE } from '@/hooks/useCalmLoop';
 
 /** Home's sun is a little smaller than its scene's settled one (0.9), to sit inside the ring. */
 export const HOME_SUN_SCALE = 0.8;
+/**
+ * Night's moon on Home, drawn as large as the suns there (its 84 disc to their 106); the starfield
+ * keeps it at this size when Home hands it over, so it's the same moon throughout.
+ */
+export const HOME_MOON_SCALE = 1.25;
 
-type Opacity = Animated.Value | Animated.AnimatedInterpolation<number>;
+/** The full-moon ring stays in the starfield: on Home it would crowd the date above. */
+const NO_RING = new Animated.Value(0);
 
 /**
  * A theme's own body, still and whole: Sunrise's sun (its star lattice drawn close), Dusk's
- * evening sun, Night's crescent bowl with the mark resting in it. Sunrise's sun goes without its glow
- * here (the halo and the wide sunglow): the disc and its lattice alone. `cupOpacity` fades the bowl's
- * cup (not its mark) with Home's chrome as the starfield opens.
+ * evening sun, Night's pearl moon in tonight's phase (the starfield's own). Sunrise's sun goes without
+ * its glow here (the halo and the wide sunglow): the disc and its lattice alone.
  */
-export function Body({ scheme, cupOpacity }: { scheme: ColorScheme; cupOpacity?: Opacity }) {
+export function Body({ scheme }: { scheme: ColorScheme }) {
   const whole = useRef(new Animated.Value(1)).current;
-  if (scheme === 'night') return <CrescentBowl cupOpacity={cupOpacity} />;
+  if (scheme === 'night') {
+    return (
+      <View style={{ transform: [{ scale: HOME_MOON_SCALE }] }}>
+        <MoonDisc form={whole} ringOpacity={NO_RING} />
+      </View>
+    );
+  }
   return (
     <View style={{ transform: [{ scale: HOME_SUN_SCALE }] }}>
       <SunDisc form={whole} scene={scheme === 'sunrise' ? sunriseScene : duskScene} latticeScale={HOME_LATTICE} glow={scheme !== 'sunrise'} />
@@ -82,12 +93,10 @@ export default function HomeBody({
   scheme,
   change,
   reduceMotion,
-  cupOpacity,
 }: {
   scheme: ColorScheme;
   change: SkyChange | null;
   reduceMotion: boolean;
-  cupOpacity?: Opacity;
 }) {
   const { width } = useWindowDimensions();
   // How far a body travels to be wholly off screen, either side (the box is centred on the screen).
@@ -96,7 +105,7 @@ export default function HomeBody({
   if (!change) {
     return (
       <View style={styles.box} pointerEvents="none">
-        <Body scheme={scheme} cupOpacity={cupOpacity} />
+        <Body scheme={scheme} />
       </View>
     );
   }

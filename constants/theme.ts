@@ -135,15 +135,6 @@ export interface SunScene {
 }
 
 /** Sunrise: pre-dawn warming to morning; a pale-gold sun with short turning rays. */
-/**
- * Night's Home body in "Sun & moon" (canvas "Phase 3 — Night: the crescent bowl"): a crescent
- * cup lit like dawn, centre (low) to rim, and the glow it gives off.
- */
-export const crescentBowl = {
-  stops: [['#FFD9A0', 0], [nightPalette.dawn, 0.55], ['#E4826A', 1]] as [string, number][],
-  glow: nightPalette.dawn,
-};
-
 export const sunriseScene: SunScene = {
   skyA: { colors: ['#274A5E', '#4F7A86', '#C99A8A', '#F2B38F'], locations: [0, 0.42, 0.8, 1] },
   skyB: { colors: ['#A9DDE0', '#DDF1EF', '#FCE7D8', '#FBC9A6'], locations: [0, 0.38, 0.74, 1] },

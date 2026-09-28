@@ -18,7 +18,6 @@ import { NATIVE, useReduceMotion } from '@/hooks/useCalmLoop';
 import AppearanceToggle, { STRIP_TURN_MS } from '@/components/home/AppearanceToggle';
 import HomeBody, { startSkyChange, type SkyChange } from '@/components/home/HomeBody';
 import HijriDate from '@/components/home/HijriDate';
-import { BOWL_MARK, BOWL_MARK_DROP } from '@/components/home/CrescentBowl';
 import MoodBloom, { HOME_BLOOM } from '@/components/mood/MoodBloom';
 import IconButton from '@/components/ui/IconButton';
 import CanvasIcon from '@/components/ui/CanvasIcon';
@@ -133,18 +132,16 @@ export default function HomeScreen() {
     Animated.timing(sf.chrome, { toValue: 0, duration: 450, easing: Easing.out(Easing.quad), useNativeDriver: NATIVE }).start(() => {
       haloRef.current?.measureInWindow((x, y, w, hgt) => {
         // The scene draws its moon or sun over this exact spot, then hides this mark (haloHidden).
-        // "Sun & moon": Home already shows the scene's body, so the scene starts with it whole;
-        // but Night's is the crescent bowl, whose cup has faded with the chrome: the mark resting
-        // in it lifts out, at its own size, and becomes the moon as Classic's does.
-        const bowl = sky && isNight;
+        // "Sun & moon": Home already shows the scene's body (Night's moon too), so the scene
+        // starts with it whole, at this spot and size.
         router.push({
           pathname: scene,
           params: {
             x: String(x + w / 2),
-            y: String(y + hgt / 2 + (bowl ? BOWL_MARK_DROP : 0)),
+            y: String(y + hgt / 2),
             // The anchor: where the scene's moon or sun settles, the centre of the mark's box.
             ay: String(y + hgt / 2),
-            ...(bowl ? { mark: String(BOWL_MARK) } : sky ? { body: '1' } : {}),
+            ...(sky ? { body: '1' } : {}),
           },
         });
       });
@@ -278,7 +275,7 @@ export default function HomeScreen() {
             <View ref={haloRef} collapsable={false} style={starfield?.haloHidden && styles.hidden}>
               {/* Day: the logo's deeper teal, a little stronger — the pale Night glow vanishes on Daybreak. */}
               {sky ? (
-                <HomeBody scheme={scheme} change={change} reduceMotion={reduceMotion} cupOpacity={starfield?.chrome} />
+                <HomeBody scheme={scheme} change={change} reduceMotion={reduceMotion} />
               ) : (
                 <MarkHalo
                   accent={accent}

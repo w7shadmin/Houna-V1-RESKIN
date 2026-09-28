@@ -18,40 +18,46 @@ import { stopProps } from '@/lib/svgStop';
 const DISC = 84;
 const MARK = 58;
 const HALO = 150;
-/** The moon's halo: cool moonlight, softer than the teal it was. */
-const HALO_STRENGTH = 0.3;
+/** The moon's halo: pearly moonlight, soft. */
+const HALO_STRENGTH = 0.32;
 /** The narrowest the terminator ellipse gets, so its counter-scale stays finite (under a pixel wide). */
 const MIN_TERMINATOR = 0.02;
 
 /**
- * A glass moon (Design studies "F4"), like the 4-7-8 orb in cool silver: a white highlight up and to
- * the left, clear through the middle, a little deeper at the edge, a silver rim. Its stops are the
- * study's glass laid over the night's ground, so the faces are solid and can be stacked in the phase
- * windows without showing through one another.
+ * A pearl glass moon (Design studies "F4", in pearl rather than silver): milky white glass, a clear
+ * highlight up and to the left, cooling towards a pearly rim, with a faint sheen of the night's tones
+ * (teal, lavender, rose) turning slowly inside it, as nacre catches the light. Solid colours, so the
+ * faces can be stacked in the phase windows without showing through one another.
  */
-const SILVER = '#BED2F5';
-const RIM = alpha('#DCE6FF', 0.55);
-const over = (c: string) => flatten(c, nightPalette.midnight);
+const PEARL = '#E4E2F4';
+const RIM = alpha('#FFFFFF', 0.7);
 const LIT: [string, number][] = [
-  [over(alpha('#FFFFFF', 0.6)), 0],
-  [over(alpha('#D2DEF5', 0.2)), 0.45],
-  [over(alpha('#AABEE6', 0.32)), 1],
+  ['#FFFFFF', 0],
+  ['#EDEEF3', 0.4],
+  ['#D6DAE6', 0.75],
+  ['#B7BFD4', 1],
+];
+/** The sheen: [colour, cx, cy, strength], turning with the ring's slow lap. */
+const SHEEN: [string, number, number, number][] = [
+  [nightPalette.hounaGlow, 0.7, 0.7, 0.34],
+  [nightPalette.dusk, 0.72, 0.24, 0.3],
+  ['#EA90A8', 0.24, 0.72, 0.26],
 ];
 /** The unlit part: the same glass in shadow (the night laid over it at 0.82), the mark just visible. */
 const shade = (c: string) => flatten(alpha(nightPalette.midnight, 0.82), c);
 const EARTHSHINE: [string, number][] = LIT.map(([c, o]) => [shade(c), o]);
 /** The mark as pressed into the glass. */
-const MARK_SURFACE = '#AFC0DE';
+const MARK_SURFACE = '#DCDFEA';
 
 /** The full moon's ring, well clear of the disc (the canvas "Moon halo": 176 round a 76 disc). */
 const RING = 192;
-/** Its bands, as the canvas: a warm inner edge, then the moon's silver, then lavender, fading out. */
+/** Its bands, as the canvas: a warm inner edge, then the moon's pearl, then lavender, fading out. */
 const RING_BANDS: [string, number, number][] = [
-  [SILVER, 0, 0.8],
+  [PEARL, 0, 0.8],
   ['#FFD2BE', 0.22, 0.86],
-  [SILVER, 0.42, 0.9],
+  [PEARL, 0.42, 0.9],
   [nightPalette.dusk, 0.2, 0.94],
-  [SILVER, 0, 1],
+  [PEARL, 0, 1],
 ];
 
 /**
@@ -90,11 +96,36 @@ function InnerLight() {
   );
 }
 
-/** The lit moon: the glass with the mark pressed in. */
+/** The pearl's sheen: soft washes of the night's tones, turning slowly inside the glass. */
+function Sheen() {
+  const { turn } = useStarfield()!.clock;
+  const id = `moonSheen${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
+  const rotate = turn.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
+  return (
+    <Animated.View style={[StyleSheet.absoluteFill, { transform: [{ rotate }] }]}>
+      <Svg width={DISC} height={DISC}>
+        <Defs>
+          {SHEEN.map(([c, , , o], k) => (
+            <RadialGradient key={k} id={`${id}${k}`} cx="50%" cy="50%" r="50%">
+              <Stop offset={0} {...stopProps(c, o)} />
+              <Stop offset={1} {...stopProps(c, 0)} />
+            </RadialGradient>
+          ))}
+        </Defs>
+        {SHEEN.map(([, x, y], k) => (
+          <Circle key={k} cx={x * DISC} cy={y * DISC} r={DISC * 0.42} fill={`url(#${id}${k})`} />
+        ))}
+      </Svg>
+    </Animated.View>
+  );
+}
+
+/** The lit moon: the pearl glass with the mark pressed in. */
 function LitFace() {
   return (
-    <View style={StyleSheet.absoluteFill}>
+    <View style={[StyleSheet.absoluteFill, styles.round, styles.clip]}>
       <Orb size={DISC} stops={LIT} fx={0.35} fy={0.3} />
+      <Sheen />
       <InnerLight />
       <View style={[styles.rim, { borderColor: RIM }]} />
       <PressedMark size={MARK} surface={MARK_SURFACE} />
@@ -107,17 +138,17 @@ function DarkFace() {
   return (
     <View style={StyleSheet.absoluteFill}>
       <Orb size={DISC} stops={EARTHSHINE} fx={0.35} fy={0.3} />
-      <View style={[styles.rim, { borderColor: alpha(SILVER, 0.3) }]} />
+      <View style={[styles.rim, { borderColor: alpha(PEARL, 0.3) }]} />
       <View style={[styles.centre, styles.faint]} needsOffscreenAlphaCompositing>
-        <HounaMark size={MARK} color={SILVER} />
+        <HounaMark size={MARK} color={PEARL} />
       </View>
     </View>
   );
 }
 
 /**
- * The starfield's moon, in tonight's real phase (`lib/moonPhase.ts`), a glass moon in cool silver
- * (Design studies "F4"): Home's mark becoming one solid object with the moon, the mark pressed into its lit
+ * The starfield's moon, in tonight's real phase (`lib/moonPhase.ts`), a pearl glass moon
+ * (Design studies "F4", in pearl): Home's mark becoming one solid object with the moon, the mark pressed into its lit
  * part and just visible in the dark part (earthshine), so a new moon is never
  * an empty sky.
  *
@@ -135,7 +166,14 @@ function DarkFace() {
  * Drawn in the mark's 190px box, so it can take the mark's place. The sides are
  * physical, so placed with transforms, which RTL never mirrors.
  */
-export default function MoonDisc({ form, date }: { form: Animated.Value | Animated.AnimatedInterpolation<number>; date?: Date }) {
+type Opacity = Animated.Value | Animated.AnimatedInterpolation<number>;
+
+export default function MoonDisc({ form, date, ringOpacity: ringShown }: {
+  form: Opacity;
+  date?: Date;
+  /** The full-moon ring's own opacity (0 on Home, where it would crowd the date; the starfield fades it in). */
+  ringOpacity?: Opacity;
+}) {
   const { breath } = useStarfield()!.clock;
   const phase = useMemo(() => moonPhase(date ?? new Date()), [date]);
 
@@ -148,7 +186,8 @@ export default function MoonDisc({ form, date }: { form: Animated.Value | Animat
   const haloOpacity = Animated.multiply(form, breath.interpolate({ inputRange: [0, 1], outputRange: [0.2 * light, light] }));
   const haloScale = breath.interpolate({ inputRange: [0, 1], outputRange: [0.95, 1.1] });
   const side = phase.waxing ? DISC / 2 : -DISC / 2;
-  const ringOpacity = Animated.multiply(form, breath.interpolate({ inputRange: [0, 1], outputRange: [0.35, 1] }));
+  const ringBreath = Animated.multiply(form, breath.interpolate({ inputRange: [0, 1], outputRange: [0.35, 1] }));
+  const ringOpacity = ringShown ? Animated.multiply(ringShown, ringBreath) : ringBreath;
   const ringScale = breath.interpolate({ inputRange: [0, 1], outputRange: [0.95, 1.08] });
 
   return (
@@ -159,7 +198,7 @@ export default function MoonDisc({ form, date }: { form: Animated.Value | Animat
         </Animated.View>
       )}
       <Animated.View style={[styles.halo, { opacity: haloOpacity, transform: [{ scale: haloScale }] }]}>
-        <EdgeHalo size={HALO} edge={DISC / 2} color={SILVER} strength={HALO_STRENGTH} />
+        <EdgeHalo size={HALO} edge={DISC / 2} color={PEARL} strength={HALO_STRENGTH} />
       </Animated.View>
       {/* Faded as one layer: the faces are stacked, and Android otherwise fades each on its own,
           so mid-fade they show through one another and the moon seems to sweep through phases. */}
@@ -206,7 +245,7 @@ const styles = StyleSheet.create({
   glow: {
     ...StyleSheet.absoluteFillObject,
     borderRadius: DISC / 2,
-    boxShadow: `0 0 21px ${alpha(SILVER, 0.35)}`,
+    boxShadow: `0 0 21px ${alpha(PEARL, 0.4)}`,
   },
   window: {
     ...StyleSheet.absoluteFillObject,
@@ -214,6 +253,9 @@ const styles = StyleSheet.create({
   },
   round: {
     borderRadius: DISC / 2,
+  },
+  clip: {
+    overflow: 'hidden',
   },
   rim: {
     ...StyleSheet.absoluteFillObject,
