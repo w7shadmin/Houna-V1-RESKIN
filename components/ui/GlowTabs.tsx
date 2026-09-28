@@ -22,7 +22,8 @@ interface GlowTabsProps<K extends string> {
  * Tabs with a soft glow under the selected one that slides, overshooting a touch and
  * settling, when another is chosen (canvas "Motion — the Tanafas tabs", the glow style).
  * The glow is the theme's glow hue; the labels stay plain text. Reduce Motion moves it
- * without the slide.
+ * without the slide. The tabs share whatever width they're given equally (on a narrow phone, or
+ * with large text, a label shrinks a little rather than pushing its neighbours off the screen).
  */
 export default function GlowTabs<K extends string>({ items, value, onChange, accessibilityLabel }: GlowTabsProps<K>) {
   const { colors, isNight } = useTheme();
@@ -77,7 +78,14 @@ export default function GlowTabs<K extends string>({ items, value, onChange, acc
             onLayout={onTabLayout(key)}
             style={({ pressed }) => [styles.tab, pressed && styles.pressed]}
           >
-            <Text style={[styles.label, { color: selected ? colors.text : colors.textTertiary, fontFamily: fonts.semiBold }]}>{label}</Text>
+            <Text
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.8}
+              style={[styles.label, { color: selected ? colors.text : colors.textTertiary, fontFamily: fonts.semiBold }]}
+            >
+              {label}
+            </Text>
           </Pressable>
         );
       })}
@@ -87,8 +95,8 @@ export default function GlowTabs<K extends string>({ items, value, onChange, acc
 
 const styles = StyleSheet.create({
   row: {
+    flex: 1,
     flexDirection: 'row',
-    gap: 8,
   },
   glowLayer: {
     ...StyleSheet.absoluteFillObject,
@@ -101,8 +109,10 @@ const styles = StyleSheet.create({
     height: GLOW_H,
   },
   tab: {
+    flex: 1,
     height: 44,
-    paddingHorizontal: 12,
+    paddingHorizontal: 4,
+    alignItems: 'center',
     justifyContent: 'center',
   },
   label: {

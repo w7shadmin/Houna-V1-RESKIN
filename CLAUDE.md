@@ -546,7 +546,9 @@ canvas "Houna — Motion (phase 1)"):
   `variant="glow"`, a turning ring of the four tones (`expo-linear-gradient`)
   over a pulsing haze. Used on Discover's Begin.
 - The Tanafas tabs are `components/ui/GlowTabs.tsx`: a glow springs under the
-  chosen tab, placed by measured physical offsets.
+  chosen tab, placed by measured physical offsets. The tabs share the room between the close
+  and journal buttons equally, a label shrinking a little if it must (at 360 wide they pushed
+  the journal button off the screen). Check new layouts at 360 wide as well as 390.
 
 **Tanafas player**: the Breathe carousel is
 `components/tanafas/PlayerFrame.tsx` (stage, title row, tag, description,

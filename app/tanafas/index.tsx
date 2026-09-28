@@ -133,7 +133,8 @@ export default function TanafasHubScreen() {
             renderIcon={(c) => <CanvasIcon name="close" size={18} strokeWidth={1.8} color={c} />}
           />
           <Animated.View
-            style={{ opacity: tabsShown }}
+            // The room between the close and journal buttons, shared by the three tabs.
+            style={{ flex: 1, opacity: tabsShown }}
             pointerEvents={breathing ? 'none' : 'auto'}
             accessibilityElementsHidden={breathing}
             importantForAccessibility={breathing ? 'no-hide-descendants' : 'auto'}
