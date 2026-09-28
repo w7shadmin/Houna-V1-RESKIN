@@ -6,6 +6,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { alpha } from '@/constants/theme';
 import { MEDITATION_SCENES, SCENE_ORBS, type SceneId } from '@/components/meditation/scenes';
 import Button from '@/components/ui/Button';
+import { Check } from 'lucide-react-native';
 import { NATIVE, useReduceMotion } from '@/hooks/useCalmLoop';
 import { stopProps } from '@/lib/svgStop';
 
@@ -24,12 +25,93 @@ function archPath(w: number, h: number) {
 const ARCH = archPath(W, H);
 
 /**
+ * Which scene sheet: 'rows' (option C, being tried) or 'window' (option A). Both kept while it's
+ * decided (canvas "Round 2 — the scene sheet"); when one is chosen, delete the other and this switch.
+ */
+const SCENE_SHEET: 'rows' | 'window' = 'rows';
+
+interface PickerProps {
+  value: number;
+  onBegin: (index: number) => void;
+}
+
+export default function ScenePicker(props: PickerProps) {
+  return SCENE_SHEET === 'rows' ? <RowsPicker {...props} /> : <WindowPicker {...props} />;
+}
+
+/**
+ * Choosing a scene as rows (option C): each scene a row, a round window of it at the start, its
+ * name and line; the chosen row lit in its scene's light, its sound's bars in its window and a
+ * check at the end. The button begins it ("Begin by the fire"), so choosing and starting are one step.
+ */
+function RowsPicker({ value, onBegin }: PickerProps) {
+  const { colors, isNight } = useTheme();
+  const { t, fonts } = useLanguage();
+  const h = t.discover.hub;
+  const names = t.tanafas.meditation.scenes;
+  const [picked, setPicked] = useState(value);
+  useEffect(() => setPicked(value), [value]);
+  const id = MEDITATION_SCENES[picked].id as SceneId;
+
+  return (
+    <View style={styles.wrap}>
+      <View style={styles.rows} accessibilityRole="radiogroup">
+        {MEDITATION_SCENES.map((s, k) => {
+          const selected = k === picked;
+          const sid = s.id as SceneId;
+          const o = SCENE_ORBS[sid];
+          return (
+            <Pressable
+              key={s.id}
+              accessibilityRole="radio"
+              aria-checked={selected}
+              accessibilityLabel={`${names[sid].name}. ${h.sceneLines[sid]}`}
+              onPress={() => setPicked(k)}
+              style={({ pressed }) => [
+                styles.row,
+                selected
+                  ? { backgroundColor: alpha(o.c, isNight ? 0.14 : 0.16), borderColor: alpha(o.c, 0.8), boxShadow: `0 0 24px ${alpha(o.c, 0.25)}` }
+                  : { backgroundColor: colors.card, borderColor: colors.border },
+                pressed && styles.pressed,
+              ]}
+            >
+              <View style={styles.rowWindow}>
+                {s.thumbnail ? (
+                  <Image source={s.thumbnail} style={styles.orbImage} accessibilityIgnoresInvertColors />
+                ) : (
+                  <View style={[styles.orbImage, { backgroundColor: o.c }]} />
+                )}
+                {selected && (
+                  <View style={styles.rowBars}>
+                    <Bars />
+                  </View>
+                )}
+              </View>
+              <View style={styles.rowText}>
+                <Text style={[styles.rowName, { color: colors.text, fontFamily: fonts.display }]}>{names[sid].name}</Text>
+                <Text style={[styles.rowLine, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{h.sceneLines[sid]}</Text>
+              </View>
+              {selected && (
+                <View style={[styles.check, { backgroundColor: colors.text }]}>
+                  <Check size={14} strokeWidth={2.6} color={colors.background} />
+                </View>
+              )}
+            </Pressable>
+          );
+        })}
+      </View>
+      <Button block label={h.beginWith[id]} onPress={() => onBegin(picked)} />
+    </View>
+  );
+}
+
+/**
  * Choosing a scene, as one window (canvas "Round 2 — the scene sheet", option A): the chosen scene
  * large in an arch, in its own light, its name and line on it and the bars of its sound; the four
  * scenes as round windows beneath to switch between. The button begins it ("Begin by the fire"),
  * so choosing and starting are one step.
  */
-export default function ScenePicker({ value, onBegin }: { value: number; onBegin: (index: number) => void }) {
+function WindowPicker({ value, onBegin }: PickerProps) {
   const { colors } = useTheme();
   const { t, fonts } = useLanguage();
   const h = t.discover.hub;
@@ -204,6 +286,50 @@ const styles = StyleSheet.create({
     height: 18,
     borderRadius: 2,
     backgroundColor: '#FFFFFF',
+  },
+  rows: {
+    gap: 8,
+  },
+  row: {
+    minHeight: 80,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    paddingHorizontal: 16,
+    borderRadius: 22,
+    borderWidth: 1.5,
+  },
+  rowWindow: {
+    width: ORB,
+    height: ORB,
+    borderRadius: ORB / 2,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rowBars: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.25)',
+  },
+  rowText: {
+    flex: 1,
+    gap: 4,
+  },
+  rowName: {
+    fontSize: 21,
+    lineHeight: 26,
+  },
+  rowLine: {
+    fontSize: 13.5,
+  },
+  check: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   orbs: {
     flexDirection: 'row',

@@ -595,11 +595,13 @@ from `lib/hijri.ts`: Umm al-Qura via `Intl`, left out where the calendar is
 missing), a line to sit with (`sceneLines`), and a glowing play ring that
 opens the full-screen player. Its Scene and Length rows open
 `components/ui/GlassSheet.tsx` (the check-in's glass, for choices made in
-place): `ScenePicker` and `MinutesWheel`. The scene sheet is one window (canvas "Round 2 —
-the scene sheet", option A): the chosen scene large in a mihrab arch (photo clipped by
-`react-native-svg`) in its own light, its name, line and sound bars on it, the four as round
-windows beneath; its button begins it ("Begin by the fire": the hub opens the player once the
-sheet has sunk, `onHidden`), so choosing and starting are one step. On the web preview a click outside
+place): `ScenePicker` and `MinutesWheel`. The scene sheet (canvas "Round 2 — the scene
+sheet") is being tried two ways, `SCENE_SHEET` in `ScenePicker.tsx`: 'rows' (option C, on: each
+scene a row, a round window of it, its name and line, the chosen row lit in its scene's light)
+and 'window' (option A: the chosen scene large in a mihrab arch, the four as round windows
+beneath). Either way its button begins it ("Begin by the fire": the hub opens the player once
+the sheet has sunk, `onHidden`), so choosing and starting are one step. When one is chosen,
+delete the other and the switch. On the web preview a click outside
 the app's frame dismisses the hub modal (`GO_BACK`): that's the preview.
 
 **Discover questionnaires** (phase one: short, free screeners with Arabic
