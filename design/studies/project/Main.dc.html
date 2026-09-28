@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Houna — design studies</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=DM+Mono:wght@400;500&amp;family=Figtree:wght@300;400;500;600&amp;family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&amp;family=Marcellus&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font:inherit;color:inherit}
+@keyframes twinkle { 0%,100% { opacity: 0.25 } 50% { opacity: 1 } }
+@keyframes drift { 0% { transform: translate(0,0) scale(1) } 50% { transform: translate(24px,-18px) scale(1.08) } 100% { transform: translate(0,0) scale(1) } }
+@keyframes drift2 { 0% { transform: translate(0,0) scale(1.05) } 50% { transform: translate(-30px,22px) scale(0.95) } 100% { transform: translate(0,0) scale(1.05) } }
+@keyframes spin { to { transform: rotate(360deg) } }
+@keyframes spinBack { to { transform: rotate(-360deg) } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: none } }
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes glowPulse { 0%,100% { opacity: 0.55 } 50% { opacity: 1 } }
+@keyframes bars { 0%,100% { transform: scaleY(0.35) } 50% { transform: scaleY(1) } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important } }
+
+</style>
+</helmet>
+<div style="position: relative; width: 1400px; height: 820px; overflow: hidden; box-sizing: border-box; font-family: 'Figtree', system-ui, sans-serif; background: #0B1026">
+<div style="position: absolute; inset: 0; padding: 72px; box-sizing: border-box; display: flex; flex-direction: column; gap: 40px">
+<div style="display: flex; flex-direction: column; gap: 16px"><span style="font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #6FD6CF; white-space: nowrap">Houna · design studies</span>
+<span style="font-family: 'Marcellus', serif; font-size: 64px; line-height: 1.05; color: #F2ECDD">Six questions, in variants</span>
+<span style="max-width: 1040px; font-size: 17px; line-height: 1.55; color: #B6BAD6">Each row below is one question, every phone one answer, most of them moving. Nothing here is in the app yet. Pick by selecting the boards you like (or comment on one: “this, but slower”), and it goes to the Houna Redesign canvas, then the app, as before. Numbers, colours and sizes are the app’s own.</span></div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px"><div style="padding: 24px; border-radius: 22px; background: rgba(242,236,221,0.045); border: 1px solid rgba(242,236,221,0.1); display: flex; flex-direction: column; gap: 10px"><span style="font-size: 18px; font-weight: 600; color: #F2ECDD">A · The Sunrise scene’s glow</span><span style="font-size: 14.5px; line-height: 1.55; color: #B6BAD6">The turning star lattice sits oddly on the sunglow. Six ways to make the geometry and the light one thing, most of them breathing.</span></div><div style="padding: 24px; border-radius: 22px; background: rgba(242,236,221,0.045); border: 1px solid rgba(242,236,221,0.1); display: flex; flex-direction: column; gap: 10px"><span style="font-size: 18px; font-weight: 600; color: #F2ECDD">B · Two different suns</span><span style="font-size: 14.5px; line-height: 1.55; color: #B6BAD6">Sunrise’s and Dusk’s suns are both peach. Four pairs that tell morning from evening at a glance, each with its stops written for theme.ts.</span></div><div style="padding: 24px; border-radius: 22px; background: rgba(242,236,221,0.045); border: 1px solid rgba(242,236,221,0.1); display: flex; flex-direction: column; gap: 10px"><span style="font-size: 18px; font-weight: 600; color: #F2ECDD">C · Classic Home, the Kufic ring</span><span style="font-size: 14.5px; line-height: 1.55; color: #B6BAD6">The words from Profile (هُنا · نتنفّس معًا) circling the mark in place of the ring of dots. Four ways, in the three themes.</span></div><div style="padding: 24px; border-radius: 22px; background: rgba(242,236,221,0.045); border: 1px solid rgba(242,236,221,0.1); display: flex; flex-direction: column; gap: 10px"><span style="font-size: 18px; font-weight: 600; color: #F2ECDD">D · A calmer Home date</span><span style="font-size: 14.5px; line-height: 1.55; color: #B6BAD6">The Hijri chip crowds the top of Home. Five quieter places for it, now the map has no card; each still opens the month of moons.</span></div><div style="padding: 24px; border-radius: 22px; background: rgba(242,236,221,0.045); border: 1px solid rgba(242,236,221,0.1); display: flex; flex-direction: column; gap: 10px"><span style="font-size: 18px; font-weight: 600; color: #F2ECDD">E · The mark on plain pages</span><span style="font-size: 14.5px; line-height: 1.55; color: #B6BAD6">The Directory and Events have no art of their own. Five ways to imprint the mark very faintly behind them, by night and by day.</span></div><div style="padding: 24px; border-radius: 22px; background: rgba(242,236,221,0.045); border: 1px solid rgba(242,236,221,0.1); display: flex; flex-direction: column; gap: 10px"><span style="font-size: 18px; font-weight: 600; color: #F2ECDD">F · A new moon</span><span style="font-size: 14.5px; line-height: 1.55; color: #B6BAD6">A better moon for the starfield, the mark pressed in, tonight’s real phase kept. Five surfaces beside today’s teal disc.</span></div></div>
+<span style="font-size: 14.5px; line-height: 1.55; color: #8990B5">And the sky clock: yes, it’s in the app (phase 3, app/sky.tsx). A long press on Home’s mark or body opens it, the only way in until its entry is decided.</span>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1400,"height":820}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
