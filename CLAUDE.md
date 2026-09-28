@@ -551,8 +551,8 @@ tiles, round button). Pressing play on a breathing exercise keeps the
 layout and fades each slot over to the session (round, phase, time left).
 Each exercise has its stage (`BreatheStages.tsx`; canvas "Houna — Players
 (phase 2)"). 4-7-8's is `OrbStage`: a large glass orb, no dots, the Houna
-mark pressed into it (lit with the rim, as the others'), which rises as a
-session starts to make room for the phase word beneath it, a halo breathing with it (kept within
+mark pressed into it (lit with the rim, as the others'; it stays on the anchor, the phase word
+beneath it in the orb), a halo breathing with it (kept within
 the stage, or a short screen's scroll view cuts it straight) and motes rising
 past it, all the motes from one minute-long loop (`sawtooth`); its title and
 round sit beneath, and each phase is announced to screen readers
