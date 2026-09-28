@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { uploadToBucket } from './storageUpload';
+import { imageExtension, uploadToBucket } from './storageUpload';
 
 export type VoicePostStatus = 'pending' | 'approved' | 'rejected';
 
@@ -61,7 +61,7 @@ export async function submitPost(input: SubmitPostInput): Promise<{ error: strin
     let imageUrl: string | null = null;
 
     if (input.imageUri) {
-      const ext = input.imageUri.split('.').pop()?.toLowerCase() || 'jpg';
+      const ext = imageExtension(input.imageUri, input.imageMimeType);
       const unique = `${Date.now()}-${Math.floor(Math.random() * 1e6)}`;
       const path = `${input.userId}/${unique}.${ext}`;
       imageUrl = await uploadToBucket('voices', path, input.imageUri, input.imageMimeType);
@@ -83,6 +83,15 @@ export async function submitPost(input: SubmitPostInput): Promise<{ error: strin
   }
 }
 
+/** Deletes a post and its photo, so the photo's public link stops working too. */
 export async function deletePost(id: string): Promise<void> {
+  const { data } = await supabase.from('voice_posts').select('image_url').eq('id', id).maybeSingle();
   await supabase.from('voice_posts').delete().eq('id', id);
+  const marker = '/storage/v1/object/public/voices/';
+  const url: string | null = data?.image_url ?? null;
+  const at = url ? url.indexOf(marker) : -1;
+  if (url && at >= 0) {
+    const path = decodeURIComponent(url.slice(at + marker.length).split('?')[0]);
+    await supabase.storage.from('voices').remove([path]).catch(() => {});
+  }
 }

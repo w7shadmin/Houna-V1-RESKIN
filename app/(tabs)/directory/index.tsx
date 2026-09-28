@@ -201,7 +201,7 @@ export default function DirectoryHubScreen() {
       }
       default: {
         const url = safeUrl(item.key);
-        if (url) Linking.openURL(url);
+        if (url) Linking.openURL(url).catch(() => {});
       }
     }
   };

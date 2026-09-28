@@ -41,10 +41,13 @@
       "expo-audio",
       "expo-navigation-bar",
       "./plugins/withNavigationBarContrastOff",
+      "./plugins/withReleaseSigning",
       [
         "expo-image-picker",
         {
-          "photosPermission": "Houna needs access to your photos so you can choose an avatar for your Alias."
+          "photosPermission": "Houna needs access to your photos so you can choose an avatar for your Alias.",
+          "cameraPermission": false,
+          "microphonePermission": false
         }
       ],
       "expo-notifications"
@@ -54,14 +57,20 @@
     },
     "android": {
       "permissions": [
-        "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS"
       ],
       "package": "com.anonymous.houna",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#3BAAA7"
-      }
+      },
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.CAMERA"
+      ]
     },
     "androidNavigationBar": {
       "enforceContrast": false

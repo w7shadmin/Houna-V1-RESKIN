@@ -2,7 +2,7 @@ import { createClient } from "npm:@supabase/supabase-js@2.45.4";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "Access-Control-Allow-Methods": "GET, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
 };
 
@@ -34,6 +34,28 @@ function decodeHtmlEntities(text: string): string {
 // Detail-page slugs are interpolated into both the cache key and the upstream URL.
 // Constrain them so a caller cannot mint unlimited cache rows or walk upstream paths.
 const SLUG_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/;
+
+/** The filters the app offers (constants/directoryStrings.ts): anything else is refused. */
+const AVAILABILITY = new Set(["", "offline", "online"]);
+const SORTS = new Set(["name-ASC", "name-DESC", "created_at-ASC", "created_at-DESC"]);
+/** houna.org's filter ids are small numbers (countries, professions). */
+const ID_PARAM = /^\d{1,3}$/;
+/** More than the directory's pages (about 30), few enough that pages can't be used to flood the cache. */
+const MAX_PAGE = 60;
+
+function validPage(page: string): boolean {
+  if (!/^\d{1,3}$/.test(page)) return false;
+  const n = parseInt(page, 10);
+  return n >= 1 && n <= MAX_PAGE;
+}
+const validId = (value: string) => value === "" || ID_PARAM.test(value);
+
+function badRequest(): Response {
+  return new Response(JSON.stringify({ error: "Bad request" }), {
+    status: 400,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
+}
 
 function isValidSlug(slug: string): boolean {
   return SLUG_PATTERN.test(slug);
@@ -1054,7 +1076,26 @@ function extractCardList(html: string, imagePathPrefix: string) {
   return items;
 }
 
-async function fetchCached(key: string, fetcher: () => Promise<Response>): Promise<{ data: unknown; fromCache: boolean }> {
+/** The proxy's own cache keys (the search index keeps its rows in the same table and manages them itself). */
+const PROXY_KEY_PREFIXES = [
+  "therapists", "therapist_detail", "organizations", "org_detail", "wellness_centers", "wellness_center_detail",
+  "articles", "events", "event_detail", "speakers", "speaker_detail", "podcasts", "about", "team_detail",
+  "resources", "resource_detail", "real_stories", "support_groups",
+];
+/** Deployed as houna-proxy-test (a side-by-side check before replacing the live proxy), its rows are kept apart. */
+let keyPrefix = "";
+
+/** Now and then, clear the proxy's rows that expired over a day ago, so the table can't only grow. */
+async function purgeExpired(): Promise<void> {
+  if (Math.random() > 0.02) return;
+  const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const like = PROXY_KEY_PREFIXES.map((k) => `cache_key.like.${keyPrefix}${k}:*`).join(",");
+  const { error } = await supabase.from("houna_cache").delete().lt("expires_at", cutoff).or(like);
+  if (error) console.error("houna-proxy purge:", error.message);
+}
+
+async function fetchCached(rawKey: string, fetcher: () => Promise<Response>): Promise<{ data: unknown; fromCache: boolean }> {
+  const key = keyPrefix + rawKey;
   const { data: cached } = await supabase
     .from("houna_cache")
     .select("data, expires_at")
@@ -1077,6 +1118,7 @@ async function fetchCached(key: string, fetcher: () => Promise<Response>): Promi
     data,
     expires_at: new Date(Date.now() + CACHE_TTL_MINUTES * 60 * 1000).toISOString(),
   });
+  await purgeExpired();
 
   return { data, fromCache: false };
 }
@@ -1088,7 +1130,9 @@ Deno.serve(async (req: Request) => {
 
   try {
     const url = new URL(req.url);
-    const path = url.pathname.replace(/^\/houna-proxy/, "");
+    const test = /^\/houna-proxy-test(\/|$)/.test(url.pathname);
+    keyPrefix = test ? "test:" : "";
+    const path = url.pathname.replace(/^\/houna-proxy(-test)?/, "");
     const params = url.searchParams;
 
     // Route: /therapists?page=N&availability=X&profession=Y&country=Z&sort=S&lang=en|ar
@@ -1099,6 +1143,9 @@ Deno.serve(async (req: Request) => {
       const country = params.get("country") || "";
       const sort = params.get("sort") || "name-ASC";
       const lang = params.get("lang") === "ar" ? "ar" : "en" as "en" | "ar";
+      if (!validPage(page) || !AVAILABILITY.has(availability) || !validId(profession) || !validId(country) || !SORTS.has(sort)) {
+        return badRequest();
+      }
 
       const cacheKey = `therapists:${lang}:${page}:${availability}:${profession}:${country}:${sort}`;
 
@@ -1164,6 +1211,7 @@ Deno.serve(async (req: Request) => {
       const page = params.get("page") || "1";
       const country = params.get("country") || "";
       const lang = params.get("lang") === "ar" ? "ar" : "en" as "en" | "ar";
+      if (!validPage(page) || !validId(country)) return badRequest();
       const cacheKey = `organizations:${lang}:${page}:${country}`;
 
       const result = await fetchCached(cacheKey, async () => {
@@ -1219,6 +1267,7 @@ Deno.serve(async (req: Request) => {
     if (path === "/wellness-centers") {
       const country = params.get("country") || "";
       const lang = params.get("lang") === "ar" ? "ar" : "en" as "en" | "ar";
+      if (!validId(country)) return badRequest();
       const cacheKey = `wellness_centers:${lang}:${country}`;
 
       const result = await fetchCached(cacheKey, async () => {
@@ -1472,6 +1521,12 @@ Deno.serve(async (req: Request) => {
 
     if (path.startsWith("/resources/")) {
       const slug = path.replace("/resources/", "");
+      if (!isValidSlug(slug)) {
+        return new Response(JSON.stringify({ error: "Not found" }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
       const lang = params.get("lang") === "ar" ? "ar" : "en" as "en" | "ar";
       const cacheKey = `resource_detail:${lang}:${slug}`;
       const result = await fetchCached(cacheKey, async () => {

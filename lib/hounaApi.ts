@@ -62,6 +62,25 @@ export function resolveImageUrl(raw: string | null | undefined): string | null {
   }
 }
 
+/**
+ * An image link that arrived from outside the app's own data (a deep link's params): only
+ * https images from houna.org itself are loaded, so a crafted link can't make the phone fetch
+ * from someone else's server (and tell them this person uses Houna).
+ */
+export function trustedImageUrl(raw: string | null | undefined): string | null {
+  const url = resolveImageUrl(raw);
+  if (!url) return null;
+  try {
+    const { protocol, hostname } = new URL(url);
+    return protocol === 'https:' && (hostname === 'houna.org' || hostname.endsWith('.houna.org')) ? url : null;
+  } catch {
+    return null;
+  }
+}
+
+/** A slug or id from a route, as one path segment: never able to climb to another endpoint. */
+const seg = (value: string) => encodeURIComponent(value);
+
 export interface Therapist {
   name: string;
   role: string;
@@ -170,7 +189,7 @@ export async function fetchTherapists(
 }
 
 export async function fetchTherapistDetail(slug: string, lang: 'en' | 'ar' = 'en'): Promise<TherapistDetail> {
-  const resp = await apiFetch(`/therapists/${slug}`, { lang });
+  const resp = await apiFetch(`/therapists/${seg(slug)}`, { lang });
   if (!resp.ok) throw new Error(`Failed to load profile (${resp.status})`);
   return resp.json();
 }
@@ -182,7 +201,7 @@ export async function fetchOrganizations(country?: string, lang: 'en' | 'ar' = '
 }
 
 export async function fetchOrganizationDetail(id: string, lang: 'en' | 'ar' = 'en'): Promise<OrganizationDetail> {
-  const resp = await apiFetch(`/organizations/${id}`, { lang });
+  const resp = await apiFetch(`/organizations/${seg(id)}`, { lang });
   if (!resp.ok) throw new Error(`Failed to load organization (${resp.status})`);
   return resp.json();
 }
@@ -222,7 +241,7 @@ export async function fetchWellnessCenters(
 }
 
 export async function fetchWellnessCenterDetail(id: string, lang: 'en' | 'ar' = 'en'): Promise<WellnessCenterDetail> {
-  const resp = await apiFetch(`/wellness-centers/${id}`, { lang });
+  const resp = await apiFetch(`/wellness-centers/${seg(id)}`, { lang });
   if (!resp.ok) throw new Error(`Failed to load wellness center (${resp.status})`);
   return resp.json();
 }
@@ -278,7 +297,7 @@ export async function fetchEvents(lang: 'en' | 'ar' = 'en'): Promise<EventListRe
 }
 
 export async function fetchEventDetail(slug: string, lang: 'en' | 'ar' = 'en'): Promise<EventDetail> {
-  const resp = await apiFetch(`/events/${slug}`, { lang });
+  const resp = await apiFetch(`/events/${seg(slug)}`, { lang });
   if (!resp.ok) throw new Error(`Failed to load event (${resp.status})`);
   return resp.json();
 }
@@ -313,7 +332,7 @@ export async function fetchSpeakers(lang: 'en' | 'ar' = 'en'): Promise<SpeakerLi
 }
 
 export async function fetchSpeakerDetail(slug: string, lang: 'en' | 'ar' = 'en'): Promise<SpeakerDetail> {
-  const resp = await apiFetch(`/speakers/${slug}`, { lang });
+  const resp = await apiFetch(`/speakers/${seg(slug)}`, { lang });
   if (!resp.ok) throw new Error(`Failed to load speaker (${resp.status})`);
   return resp.json();
 }
@@ -406,7 +425,7 @@ export async function fetchResourceDirectory(lang: 'en' | 'ar' = 'en'): Promise<
 }
 
 export async function fetchResourceDetail(slug: string, lang: 'en' | 'ar' = 'en'): Promise<ResourceDetailData> {
-  const resp = await apiFetch(`/resources/${slug}`, { lang });
+  const resp = await apiFetch(`/resources/${seg(slug)}`, { lang });
   if (!resp.ok) throw new Error(`Failed to load topic (${resp.status})`);
   return resp.json();
 }

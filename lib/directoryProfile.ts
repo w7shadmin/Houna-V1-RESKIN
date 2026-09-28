@@ -36,7 +36,11 @@ export function organizationIdFromUrl(url: string | null | undefined): string | 
  * "email-protection" wrapper are rebuilt from the plain address.
  */
 export function contactLink(c: ContactInfo): string | null {
-  if (c.type === 'email' && c.value.includes('@')) return `mailto:${c.value.trim()}`;
+  // Just the address: a scraped value can't carry ?subject= / &body= into the person's mail app.
+  if (c.type === 'email' && c.value.includes('@')) {
+    const address = c.value.trim().split(/[?&\s]/)[0];
+    return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(address) ? `mailto:${address}` : null;
+  }
   const href = safeUrl(c.href);
   if (href && !href.includes('email-protection')) return href;
   if (c.type === 'phone' && /\d/.test(c.value)) return `tel:${c.value.replace(/[^+\d]/g, '')}`;

@@ -18,7 +18,9 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
  *
  * `detectSessionInUrl` is web-only: on native there's no browser URL to
  * inspect, and leaving it on there throws. AsyncStorage as the auth token
- * store is what makes sign-in survive an app restart.
+ * store is what makes sign-in survive an app restart. PKCE: a sign-in redirect carries a
+ * one-time code, not the tokens, and only this app (holding the verifier) can exchange it, so
+ * another app registering the `houna` scheme and catching the redirect gets nothing it can use.
  */
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
@@ -26,5 +28,6 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: Platform.OS === 'web',
+    flowType: 'pkce',
   },
 });

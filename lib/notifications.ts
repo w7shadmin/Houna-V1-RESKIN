@@ -111,6 +111,22 @@ export async function registerPushToken(userId: string, prefs: RemotePushPrefs):
   }
 }
 
+/**
+ * Removes this phone's push token (on sign-out), so the Alias's pushes stop coming to a phone
+ * someone else may use next. Only this device's token: the Alias's other phones keep theirs.
+ */
+export async function unregisterPushToken(): Promise<void> {
+  try {
+    if (!Device.isDevice) return;
+    const projectId = Constants.expoConfig?.extra?.eas?.projectId;
+    if (!projectId) return;
+    const { data } = await Notifications.getExpoPushTokenAsync({ projectId });
+    await supabase.from('push_tokens').delete().eq('token', data);
+  } catch {
+    // Non-fatal: signing out must never fail over this.
+  }
+}
+
 /** Updates just the category prefs on an already-registered token, e.g. when the user flips a toggle without needing to re-register. */
 export async function updatePushPrefs(userId: string, prefs: RemotePushPrefs): Promise<void> {
   try {

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { View, Text, ScrollView, useWindowDimensions, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Linking, useWindowDimensions, StyleSheet } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import RenderHTML from 'react-native-render-html';
@@ -7,7 +7,7 @@ import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { grid, layout, radius } from '@/constants/theme';
-import { fetchResourceDetail, type ResourceDetailData } from '@/lib/hounaApi';
+import { fetchResourceDetail, safeUrl, type ResourceDetailData } from '@/lib/hounaApi';
 import { LoadingState, ErrorState } from '@/components/directory/AsyncState';
 import { CrisisRow } from '@/components/directory/SearchResults';
 import LottieTopicIcon from '@/components/directory/LottieTopicIcon';
@@ -52,6 +52,15 @@ function cleanHtml(html: string): string {
  * chips, the active section as a card — then a way to a professional and
  * the crisis line, so reading about a condition never dead-ends.
  */
+const RENDERERS_PROPS = {
+  a: {
+    onPress: (_event: unknown, href: string) => {
+      const url = safeUrl(href);
+      if (url) Linking.openURL(url).catch(() => {});
+    },
+  },
+};
+
 export default function ResourceDetailScreen() {
   const { colors } = useTheme();
   const router = useRouter();
@@ -170,6 +179,8 @@ export default function ResourceDetailScreen() {
               source={{ html: cleanHtml(section.content) }}
               tagsStyles={tagsStyles}
               systemFonts={systemFonts}
+              // A link in the article opens only if it's http(s), mailto or tel (never file:, intent: or javascript:).
+              renderersProps={RENDERERS_PROPS}
               baseStyle={{
                 color: colors.textSecondary,
                 fontFamily: fonts.regular,

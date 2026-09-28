@@ -13,7 +13,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { GCC_CODES, getCountryList, getCountryName } from '@/lib/countries';
-import { uploadToBucket } from '@/lib/storageUpload';
+import { imageExtension, uploadToBucket } from '@/lib/storageUpload';
 import { alpha, grid, layout, radius } from '@/constants/theme';
 
 const AVATAR = 96;
@@ -64,7 +64,7 @@ export default function AccountProfileScreen() {
     setUploading(true);
     try {
       const asset = result.assets[0];
-      const ext = asset.uri.split('.').pop()?.toLowerCase() || 'jpg';
+      const ext = imageExtension(asset.uri, asset.mimeType);
       const path = `${session.user.id}/avatar.${ext}`;
       const publicUrl = await uploadToBucket('avatars', path, asset.uri, asset.mimeType ?? null);
       // Cache-bust — the path is stable per user, so a reused filename won't

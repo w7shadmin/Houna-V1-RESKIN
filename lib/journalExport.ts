@@ -48,7 +48,20 @@ export function journalHtml(entries: Awaited<ReturnType<typeof loadEntries>>, l:
  * printing is native (expo-print): where it isn't built in yet (an older dev client, the web),
  * the same page is shared as an HTML file, which opens in any browser and prints to PDF.
  */
+/**
+ * The last export's file. It's removed when the next export starts rather than straight after
+ * sharing: on Android the share sheet can close before the receiving app (Drive, say) has read it.
+ */
+let lastExport: string | null = null;
+
 export async function exportJournal(labels: JournalExportLabels): Promise<void> {
+  if (lastExport) {
+    try {
+      const old = new File(lastExport);
+      if (old.exists) old.delete();
+    } catch {}
+    lastExport = null;
+  }
   const html = journalHtml(await loadEntries(), labels);
   const stamp = new Date().toISOString().slice(0, 10);
   let uri: string | null = null;
@@ -65,6 +78,7 @@ export async function exportJournal(labels: JournalExportLabels): Promise<void> 
     uri = file.uri;
     mimeType = 'text/html';
   }
+  lastExport = uri;
   if (await Sharing.isAvailableAsync()) {
     await Sharing.shareAsync(uri, { mimeType, UTI: mimeType === 'application/pdf' ? 'com.adobe.pdf' : 'public.html', dialogTitle: labels.title });
   }

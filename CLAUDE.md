@@ -91,6 +91,37 @@ the foreground from `icon.png` if the mark changes, keeping it inside the
   enabled"` error at sign-in — that's a project setting, not a bug in
   `components/account/GoogleButton.tsx` or the auth call.
 
+### Security baseline (pre-release audit, 28 Sep 2026)
+
+Keep these when changing anything nearby:
+
+- **Release signing**: Android releases are signed with Houna's own upload key, never the public
+  debug key (`plugins/withReleaseSigning.js`). The keystore and passwords live outside the repo
+  (`D:/houna-keys/`, wired through `~/.gradle/gradle.properties`, `HOUNA_UPLOAD_*`). A machine
+  without them builds with the debug key and a loud Gradle warning: never share that build.
+  Losing the key means testers must uninstall (and lose their journal) to update. The package
+  name is still `com.anonymous.houna`, to change once the domain is bought (a new app for
+  Android, same key).
+- **Permissions**: only what's used. `app.json` `blockedPermissions` strips microphone, camera,
+  draw-over-apps and legacy storage (the picker uses Android's photo picker).
+- **Database** (`supabase/migrations/20260928160000_security_hardening.sql`):
+  - sessions: 0–8h, `completed_at` after `started_at`, inserted within a day of starting, never
+    overlapping one another (`refuse_overlapping_session`), so the leaderboard can't be forged;
+  - badges: only the app's codes;
+  - `get_leaderboard`: signed-in only;
+  - storage: images only (5 MB avatars, 10 MB Voices), no public listing (public links still work),
+    and `image_url` / `avatar_url` must point into the owner's own folder.
+- **Directory proxy**: only the filter values the app sends (`AVAILABILITY`, `SORTS`, small numeric
+  ids, pages 1–60), slugs validated on every detail route, expired cache rows purged. Add a new
+  filter value to both `constants/directoryStrings.ts` and the proxy.
+- **Sign-in**: PKCE (`flowType: 'pkce'`, `exchangeCodeForSession`), so a redirect caught by another
+  app registering `houna://` is useless. Passwords at least 8; sign-up doesn't confirm which emails
+  have an account. Sign-out removes this phone's push token.
+- **Links and images from outside**: scraped links open only through `safeUrl` (http(s), mailto,
+  tel), including links inside articles (`RenderHTML`'s `renderersProps`); an image handed over in a
+  deep link loads only from houna.org (`trustedImageUrl`); route slugs are encoded
+  (`encodeURIComponent`) before reaching the proxy.
+
 ### Bilingual & RTL infrastructure
 
 The *mechanism* is foundation; the *copy* is content, and belongs to

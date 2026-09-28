@@ -10,7 +10,7 @@ import { grid, layout, radius, shadows } from '@/constants/theme';
 import { arabicNumber } from '@/lib/arabicNumerals';
 import { decodeEntities, profileFacts } from '@/lib/directoryProfile';
 import { formatEventDate } from '@/lib/eventDate';
-import { fetchEventDetail, resolveImageUrl, type EventDetail } from '@/lib/hounaApi';
+import { fetchEventDetail, resolveImageUrl, trustedImageUrl, type EventDetail } from '@/lib/hounaApi';
 import { stripHtml } from '@/lib/html';
 import { useReduceMotion } from '@/hooks/useCalmLoop';
 import { LoadingState, ErrorState } from '@/components/directory/AsyncState';
@@ -121,7 +121,8 @@ export default function EventDetailScreen() {
 
   // The card's own photo, already loaded, so nothing swaps or flashes as it lands; the page's
   // copy only where there was no card.
-  const uri = params.img || resolveImageUrl(detail?.imageUrl ?? '') || '';
+  // The card's photo comes in the link's params: loaded only from houna.org (a crafted link can't point it elsewhere).
+  const uri = trustedImageUrl(params.img) || resolveImageUrl(detail?.imageUrl ?? '') || '';
   const pageStyle = useAnimatedStyle(() => ({ opacity: grow.value }));
   const topBarStyle = useAnimatedStyle(() => ({ opacity: interpolate(grow.value, [0, 0.55, 1], [0, 0, 1]) }));
   const restStyle = useAnimatedStyle(() => ({

@@ -4,6 +4,7 @@ import * as WebBrowser from 'expo-web-browser';
 import * as AuthSession from 'expo-auth-session';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
+import { unregisterPushToken } from '@/lib/notifications';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -134,17 +135,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
     if (result.type !== 'success' || !result.url) return { error: 'cancelled' };
 
-    const hashIndex = result.url.indexOf('#');
-    const params = new URLSearchParams(hashIndex >= 0 ? result.url.slice(hashIndex + 1) : '');
-    const access_token = params.get('access_token');
-    const refresh_token = params.get('refresh_token');
-    if (!access_token || !refresh_token) return { error: 'unknown' };
-
-    const { error: sessionError } = await supabase.auth.setSession({ access_token, refresh_token });
+    // PKCE: the redirect carries a one-time code, exchanged here with the verifier this app holds.
+    const code = new URL(result.url).searchParams.get('code');
+    if (!code) return { error: 'unknown' };
+    const { error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
     return { error: sessionError ? 'unknown' : null };
   }, []);
 
   const signOut = useCallback(async () => {
+    await unregisterPushToken();
     await supabase.auth.signOut();
     setProfile(null);
   }, []);

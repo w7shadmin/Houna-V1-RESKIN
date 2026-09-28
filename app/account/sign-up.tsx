@@ -49,7 +49,7 @@ export default function SignUpScreen() {
     }
   };
 
-  const canSubmit = email.trim().length > 0 && password.length >= 6;
+  const canSubmit = email.trim().length > 0 && password.length >= 8;
 
   if (checkEmail) {
     return (
