@@ -1,12 +1,10 @@
 import type { Localized, TestDefinition } from '@/lib/psychometrics/types';
 import { validateTest } from '@/lib/psychometrics/score';
-import devSample from './dev-sample.json';
 import phq8 from './phq8.json';
 import gad7 from './gad7.json';
 import who5 from './who5.json';
 import asrs5 from './asrs5.json';
 import pcl5 from './pcl5.json';
-import ace from './ace.json';
 
 /**
  * Registered self-reflection tests, in the order Discover lists them. Add a
@@ -16,7 +14,7 @@ import ace from './ace.json';
  * with Arabic versions; longer or restricted ones wait for phase two, with
  * professionals on board.
  */
-const ALL: TestDefinition[] = [phq8, gad7, who5, asrs5, pcl5, ace, devSample] as TestDefinition[];
+const ALL: TestDefinition[] = [phq8, gad7, who5, asrs5, pcl5] as TestDefinition[];
 
 function usable(def: TestDefinition): boolean {
   if ((def.devOnly || def.arabicPending) && !__DEV__) return false;

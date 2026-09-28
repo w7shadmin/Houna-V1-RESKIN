@@ -14,64 +14,78 @@
       "x": 0,
       "y": 0,
       "w": 1400,
-      "h": 820,
+      "h": 980,
       "title": "Houna — design studies"
     },
     "A-sunglow.dc.html": {
       "x": 0,
-      "y": 1200,
+      "y": 1360,
       "w": 3050,
       "h": 994,
       "title": "A · The Sunrise scene’s glow"
     },
     "B-suns.dc.html": {
       "x": 0,
-      "y": 2574,
+      "y": 2734,
       "w": 2190,
       "h": 994,
       "title": "B · Two different suns"
     },
     "C-kufic.dc.html": {
       "x": 0,
-      "y": 3948,
+      "y": 4108,
       "w": 2190,
       "h": 994,
       "title": "C · Classic Home with the Kufic ring"
     },
     "D-date.dc.html": {
       "x": 0,
-      "y": 5322,
+      "y": 5482,
       "w": 3480,
       "h": 994,
       "title": "D · A calmer Home date"
     },
     "E-imprint-night.dc.html": {
       "x": 0,
-      "y": 6696,
+      "y": 6856,
       "w": 2190,
       "h": 994,
       "title": "E · The mark on plain pages (Night)"
     },
     "E-imprint-day.dc.html": {
       "x": 0,
-      "y": 7810,
+      "y": 7970,
       "w": 2190,
       "h": 994,
       "title": "E · The mark on plain pages (Sunrise)"
     },
     "F-moon.dc.html": {
       "x": 0,
-      "y": 9184,
+      "y": 9344,
       "w": 2620,
       "h": 994,
       "title": "F · A new moon (the starfield)"
     },
     "F-moon-close.dc.html": {
       "x": 2700,
-      "y": 9184,
+      "y": 9344,
       "w": 1480,
       "h": 760,
       "title": "F · the moons, close"
+    },
+    "G-dusk-home.dc.html": {
+      "x": 0,
+      "y": 10718,
+      "w": 3050,
+      "h": 1034,
+      "title": "G · The Dusk sun, on Home"
+    },
+    "G-dusk-scene.dc.html": {
+      "x": 0,
+      "y": 11872,
+      "w": 3050,
+      "h": 1034,
+      "title": "G · The Dusk sun, in its Tanafas scene"
     }
   },
   "order": [
@@ -83,14 +97,16 @@
     "E-imprint-night.dc.html",
     "E-imprint-day.dc.html",
     "F-moon.dc.html",
-    "F-moon-close.dc.html"
+    "F-moon-close.dc.html",
+    "G-dusk-home.dc.html",
+    "G-dusk-scene.dc.html"
   ],
   "notes": {
     "row1": {
       "kind": "title1",
       "text": "A · The Sunrise scene’s glow",
       "x": 0,
-      "y": 960,
+      "y": 1120,
       "maxW": 3050,
       "w": 240
     },
@@ -98,7 +114,7 @@
       "kind": "title1",
       "text": "B · Two different suns",
       "x": 0,
-      "y": 2334,
+      "y": 2494,
       "maxW": 2190,
       "w": 240
     },
@@ -106,7 +122,7 @@
       "kind": "title1",
       "text": "C · Classic Home with the Kufic ring",
       "x": 0,
-      "y": 3708,
+      "y": 3868,
       "maxW": 2190,
       "w": 240
     },
@@ -114,7 +130,7 @@
       "kind": "title1",
       "text": "D · A calmer Home date",
       "x": 0,
-      "y": 5082,
+      "y": 5242,
       "maxW": 3480,
       "w": 240
     },
@@ -122,7 +138,7 @@
       "kind": "title1",
       "text": "E · The mark on plain pages",
       "x": 0,
-      "y": 6456,
+      "y": 6616,
       "maxW": 2190,
       "w": 240
     },
@@ -130,8 +146,16 @@
       "kind": "title1",
       "text": "F · A new moon",
       "x": 0,
-      "y": 8944,
+      "y": 9104,
       "maxW": 4180,
+      "w": 240
+    },
+    "row8": {
+      "kind": "title1",
+      "text": "G · The Dusk sun, on Home and in its scene",
+      "x": 0,
+      "y": 10478,
+      "maxW": 3050,
       "w": 240
     }
   },

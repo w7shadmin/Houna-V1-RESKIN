@@ -13,7 +13,8 @@ type Opacity = Animated.Value | Animated.AnimatedInterpolation<number>;
 
 /**
  * A theme's own body, still and whole: Sunrise's sun (its star lattice drawn close), Dusk's
- * evening sun, Night's crescent bowl with the mark resting in it. `cupOpacity` fades the bowl's
+ * evening sun, Night's crescent bowl with the mark resting in it. Sunrise's sun goes without its glow
+ * here (the halo and the wide sunglow): the disc and its lattice alone. `cupOpacity` fades the bowl's
  * cup (not its mark) with Home's chrome as the starfield opens.
  */
 export function Body({ scheme, cupOpacity }: { scheme: ColorScheme; cupOpacity?: Opacity }) {
@@ -21,7 +22,7 @@ export function Body({ scheme, cupOpacity }: { scheme: ColorScheme; cupOpacity?:
   if (scheme === 'night') return <CrescentBowl cupOpacity={cupOpacity} />;
   return (
     <View style={{ transform: [{ scale: HOME_SUN_SCALE }] }}>
-      <SunDisc form={whole} scene={scheme === 'sunrise' ? sunriseScene : duskScene} latticeScale={HOME_LATTICE} />
+      <SunDisc form={whole} scene={scheme === 'sunrise' ? sunriseScene : duskScene} latticeScale={HOME_LATTICE} glow={scheme !== 'sunrise'} />
     </View>
   );
 }

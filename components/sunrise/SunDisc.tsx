@@ -50,6 +50,8 @@ interface SunDiscProps {
   scene: SunScene;
   /** How far out the star lattice reaches (1 in the scene; `HOME_LATTICE` on Home). */
   latticeScale?: number;
+  /** False leaves out its glow: the halo round the disc and the wide sunglow (Sunrise's sun on Home, "Sun & moon"). */
+  glow?: boolean;
 }
 
 /**
@@ -62,7 +64,7 @@ interface SunDiscProps {
  * fade on the out-breath; behind, a wide, faint sunglow breathing with them.
  * Drawn in the mark's own 190px box, so it can take the mark's place exactly.
  */
-export default function SunDisc({ form, scene, latticeScale = 1 }: SunDiscProps) {
+export default function SunDisc({ form, scene, latticeScale = 1, glow = true }: SunDiscProps) {
   const { breath, turn } = useStarfield()!.clock;
 
   // The moon's breath: most of the light ebbs away on the out-breath.
@@ -84,17 +86,19 @@ export default function SunDisc({ form, scene, latticeScale = 1 }: SunDiscProps)
 
   return (
     <View style={styles.box} pointerEvents="none">
-      <Animated.View style={[styles.glow, { opacity: glowOpacity, transform: [{ scale: glowScale }] }]}>
-        <Svg width={GLOW} height={GLOW}>
-          <Defs>
-            <RadialGradient id="sunglow" cx="50%" cy="50%" r="50%">
-              <Stop offset="0.2" {...stopProps(alpha(scene.glow, 0.28))} />
-              <Stop offset="1" {...stopProps(alpha(scene.glow, 0))} />
-            </RadialGradient>
-          </Defs>
-          <Circle cx={GLOW / 2} cy={GLOW / 2} r={GLOW / 2} fill="url(#sunglow)" />
-        </Svg>
-      </Animated.View>
+      {glow && (
+        <Animated.View style={[styles.glow, { opacity: glowOpacity, transform: [{ scale: glowScale }] }]}>
+          <Svg width={GLOW} height={GLOW}>
+            <Defs>
+              <RadialGradient id="sunglow" cx="50%" cy="50%" r="50%">
+                <Stop offset="0.2" {...stopProps(alpha(scene.glow, 0.28))} />
+                <Stop offset="1" {...stopProps(alpha(scene.glow, 0))} />
+              </RadialGradient>
+            </Defs>
+            <Circle cx={GLOW / 2} cy={GLOW / 2} r={GLOW / 2} fill="url(#sunglow)" />
+          </Svg>
+        </Animated.View>
+      )}
 
       {scene.lattice && <Lattice colors={scene.lattice} form={form} scale={latticeScale} />}
 
@@ -114,7 +118,7 @@ export default function SunDisc({ form, scene, latticeScale = 1 }: SunDiscProps)
           </Svg>
         </Animated.View>
         )}
-        <EdgeHalo size={HALO} edge={DISC / 2} color={scene.halo} strength={HALO_STRENGTH} />
+        {glow && <EdgeHalo size={HALO} edge={DISC / 2} color={scene.halo} strength={HALO_STRENGTH} />}
       </Animated.View>
 
       {/* The disc and the mark: still, only fading in as the sun forms. */}

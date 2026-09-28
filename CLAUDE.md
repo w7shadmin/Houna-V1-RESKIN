@@ -296,8 +296,8 @@ value) and hands the mark to `app/starfield.tsx`, a transparent modal that
 draws its moon at the measured spot (`x`/`y` params), then glides it to the
 middle over a turning, twinkling sky with shooting stars
 (`components/starfield/`), the mark becoming the moon on the way: a small
-solid teal disc about the mark's size with the mark pressed in
-(`MoonDisc`), its halo joined to the disc's edge (`EdgeHalo`). The moon is
+glass moon in cool silver about the mark's size with the mark pressed in
+(`MoonDisc`, Design studies "F4"), its halo joined to the disc's edge (`EdgeHalo`). The moon is
 in tonight's real phase (`lib/moonPhase.ts`, from the date alone: offline, no
 permissions), lit on the right while waxing as seen from the Gulf, the dark part
 in earthshine with the mark just visible. The lit shape is two clipping windows
@@ -507,7 +507,12 @@ picks in its `PICKS.md`):
 - E4: plain pages (the Directory hub and its list pages, Events) carry the mark as a soft glow of the
   glow colour behind the header, fixed, never scrolling (`components/ui/PageMarkGlow.tsx`, drawing
   `HounaMarkShape` through a blur).
-- F: no new moon picked yet.
+- F4: the moon is glass, as the 4-7-8 orb, in cool silver (`MoonDisc`; the sky clock's moon too). Its
+  faces are the study's glass flattened over midnight (`flatten`), so the phase windows can stack them
+  without one showing through the other; the dark part is that glass with the night laid over it at 0.82.
+- Sunrise's sun on Home ("Sun & moon") has no glow: `SunDisc`'s `glow={false}` leaves out its edge halo
+  and wide sunglow, so it's the disc and its lattice alone. Its scene keeps both.
+- G (the Dusk sun, on Home and in its scene): on the canvas, not yet picked.
 
 **The mark in one spot** (canvas "Round 3 — the mark in one spot"): `layout.markAnchor` (199)
 is where the centre of the Houna mark, or of the body, orb or gem it's pressed into, sits below
@@ -625,7 +630,9 @@ from `lib/hijri.ts`: Umm al-Qura via `Intl`, left out where the calendar is
 missing), a line to sit with (`sceneLines`), and a glowing play ring that
 opens the full-screen player. Its Scene and Length rows open
 `components/ui/GlassSheet.tsx` (the check-in's glass, for choices made in
-place): `ScenePicker` and `MinutesWheel`. The scene sheet (canvas "Round 2 — the scene
+place, and dragged down to close, `useDragToClose` over the whole sheet): `ScenePicker` and
+`MinutesWheel`. On the web a short drag that ends on a row can still pick it (the browser's click
+follows the pointer with the sheet); on the phone the drag takes the touch from the row. The scene sheet (canvas "Round 2 — the scene
 sheet") is being tried two ways, `SCENE_SHEET` in `ScenePicker.tsx`: 'rows' (option C, on: each
 scene a row, a round window of it, its name and line, the chosen row lit in its scene's light)
 and 'window' (option A: the chosen scene large in a mihrab arch, the four as round windows
@@ -636,9 +643,7 @@ the app's frame dismisses the hub modal (`GO_BACK`): that's the preview.
 
 **Discover questionnaires** (phase one: short, free screeners with Arabic
 versions; longer or restricted ones wait for phase two, with professionals on
-board): PHQ-8, GAD-7, WHO-5, ASRS-5, PCL-5 and the adult ACE questionnaire
-(ACEs Aware; its official Arabic question 5 mistranslates "each other" as
-"you", awaiting review), one JSON each in `constants/psychometrics/`
+board): PHQ-8, GAD-7, WHO-5, ASRS-5 and PCL-5, one JSON each in `constants/psychometrics/`
 (registered in `index.ts`). Scoring (`lib/psychometrics/score.ts`) is `mean`
 (trait reflections), `sum` (the screeners' totals; `multiplier` makes WHO-5 a
 percentage) or `count` (items at or above their `threshold`; unused since ASRS

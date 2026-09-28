@@ -1,7 +1,7 @@
 // "Houna — Design studies" (https://claude.ai/artifact/5DqkLLhgEWF1bS4vFcf7EL): six visual questions
 // explored as variants before anything is built. A · the Sunrise scene's glow; B · two different
 // suns; C · Classic Home with the Kufic ring; D · a calmer Home date; E · the mark imprinted on plain
-// pages; F · a new moon. Built from the Explorations kit and the app's own values, so the boards
+// pages; F · a new moon; G · the Dusk sun, on Home and in its scene. Built from the Explorations kit and the app's own values, so the boards
 // match the app. `node design/studies/scripts/make-studies.js` writes every board and canvas.json.
 const fs = require('fs');
 const path = require('path');
@@ -114,15 +114,16 @@ const bowl = (id) => `<svg width="190" height="190" viewBox="0 0 240 240" style=
     ['D · A calmer Home date', 'The Hijri chip crowds the top of Home. Five quieter places for it, now the map has no card; each still opens the month of moons.'],
     ['E · The mark on plain pages', 'The Directory and Events have no art of their own. Five ways to imprint the mark very faintly behind them, by night and by day.'],
     ['F · A new moon', 'A better moon for the starfield, the mark pressed in, tonight’s real phase kept. Five surfaces beside today’s teal disc.'],
+    ['G · The Dusk sun', 'Dusk’s sun is a plain amber disc beside Sunrise’s turning stars and Night’s bowl. Six ways to give it its own, each drawn on Home and in its Tanafas scene.'],
   ];
   const body = `<div style="position: absolute; inset: 0; padding: 72px; box-sizing: border-box; display: flex; flex-direction: column; gap: 40px">
 <div style="display: flex; flex-direction: column; gap: 16px">${K.label('Houna · design studies', '#6FD6CF', 12)}
-<span style="font-family: ${K.F.display}; font-size: 64px; line-height: 1.05; color: ${M.moonlight}">Six questions, in variants</span>
+<span style="font-family: ${K.F.display}; font-size: 64px; line-height: 1.05; color: ${M.moonlight}">Seven questions, in variants</span>
 <span style="max-width: 1040px; font-size: 17px; line-height: 1.55; color: ${M.mist}">Each row below is one question, every phone one answer, most of them moving. Nothing here is in the app yet. Pick by selecting the boards you like (or comment on one: “this, but slower”), and it goes to the Houna Redesign canvas, then the app, as before. Numbers, colours and sizes are the app’s own.</span></div>
 <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px">${ROWS.map(([t, d]) => `<div style="padding: 24px; border-radius: 22px; background: rgba(242,236,221,0.045); border: 1px solid rgba(242,236,221,0.1); display: flex; flex-direction: column; gap: 10px"><span style="font-size: 18px; font-weight: 600; color: ${M.moonlight}">${t}</span><span style="font-size: 14.5px; line-height: 1.55; color: ${M.mist}">${d}</span></div>`).join('')}</div>
 <span style="font-size: 14.5px; line-height: 1.55; color: ${M.haze}">And the sky clock: yes, it’s in the app (phase 3, app/sky.tsx). A long press on Home’s mark or body opens it, the only way in until its entry is decided.</span>
 </div>`;
-  out.push(K.board('Main.dc.html', { title: 'Houna — design studies', w: 1400, h: 820, root: `background: ${M.midnight}`, body, dir: DIR }));
+  out.push(K.board('Main.dc.html', { title: 'Houna — design studies', w: 1400, h: 980, root: `background: ${M.midnight}`, body, dir: DIR }));
 })();
 
 /* ══════════ A · The Sunrise scene's glow ══════════ */
@@ -357,9 +358,81 @@ ${kinds.map((k, i) => `${at(64 + 100 + i * 225, 330, 180, moonArt(k, 180, `c${i}
   out.push(K.board('F-moon-close.dc.html', { title: 'F · the moons, close', w: W, h: H, root: `background: ${M.midnight}`, css: `${BREATH}\n${SPIN}`, body, dir: DIR }));
 })();
 
+/* ══════════ G · The Dusk sun, on Home and in its scene ══════════ */
+(() => {
+  // The app's own: SunDisc's 132 disc, at HOME_SUN_SCALE (0.8) on Home and 0.9 settled in the scene.
+  const HD = 106, SD = 119;
+  const DUSK = K.DISCS.dusk;
+  const SKY = 'linear-gradient(180deg, #2E2A5C 0%, #5A4E9A 40%, #A785B0 76%, #EFA07E 100%)'; // duskScene.skyB
+  const rose = '#F5B08A', amber = '#EC8C6E', violet = '#B3A7F5', gold = '#FFD9B3';
+  const halo = (cx, cy, d, rgb = '236,140,110', a = 0.42) => at(cx, cy, d * 2.6, '', `border-radius: 999px; background: radial-gradient(closest-side, rgba(${rgb},${a}), rgba(${rgb},0)); animation: breath5 5s ease-in-out infinite`);
+  const sunglow = (cx, cy, a = 0.28) => at(cx, cy, 420, '', `border-radius: 999px; background: radial-gradient(closest-side, rgba(242,160,120,${a}), rgba(242,160,120,0)); animation: breath5 5s ease-in-out infinite`);
+  const disc = (cx, cy, d, { stops = DUSK.stops, surface = DUSK.surface, style = '' } = {}) =>
+    at(cx, cy, d, K.pressedMark(d * 0.56, surface), `border-radius: 999px; background: ${stops}; box-shadow: 0 0 14px rgba(242,160,120,0.45); ${style}`);
+
+  // G1: the sun slipping below, cut by bands that widen towards its foot.
+  const BANDS = 'linear-gradient(180deg, #000 0 58%, transparent 58% 62%, #000 62% 71%, transparent 71% 76%, #000 76% 84%, transparent 84% 91%, #000 91% 96%, transparent 96%)';
+  const banded = `-webkit-mask-image: ${BANDS}; mask-image: ${BANDS}; animation: bandsDrift 5s ease-in-out infinite`;
+  // G5: lit from below, as the sun sits on the horizon: violet-rose above, gold at its foot.
+  const LOW = 'radial-gradient(circle at 50% 88%, #FFF1D6 0%, #FFC98E 30%, #E98A78 64%, #8E5E9E 100%)';
+  const lowLit = { stops: LOW, surface: '#E39A84', style: 'box-shadow: inset 0 -3px 6px rgba(255,236,200,0.85), 0 6px 18px rgba(255,201,142,0.5)' };
+  // G4: one still eight-point star, its points lit by first stars.
+  const star = (cx, cy, r, sw = 1.2) => {
+    const pts = K.star8(cx, cy, r).split(' ');
+    const tips = pts.filter((_, i) => i % 2 === 0);
+    return `<svg width="${cx * 2}" height="${cy * 2}" aria-hidden="true" style="position: absolute; left: 0; top: 0; overflow: visible; animation: starBreath 5s ease-in-out infinite; transform-origin: ${cx}px ${cy}px"><polygon points="${pts.join(' ')}" fill="rgba(179,167,245,0.07)" stroke="${violet}" stroke-opacity="0.7" stroke-width="${sw}" stroke-linejoin="round"></polygon>${tips
+      .map((p, k) => { const [x, y] = p.split(',').map(Number); return `<circle cx="${x}" cy="${y}" r="${sw * 1.4}" fill="#FFF3E4" style="animation: twinkle ${3 + (k % 3)}s ease-in-out ${-k * 0.7}s infinite"></circle>`; })
+      .join('')}</svg>`;
+  };
+  // G3: rings of evening, and one born on each breath.
+  const rings = (cx, cy, d, reach) =>
+    [[1.32, amber, 0.55], [1.66, '#E98AA0', 0.42], [2.05, violet, 0.32]]
+      .map(([k, c, o]) => at(cx, cy, d * k, '', `border-radius: 999px; border: 1px solid ${c}; opacity: ${o}; box-sizing: border-box`))
+      .join('') + [0, 2.5].map((delay) => at(cx, cy, d * reach, '', `border-radius: 999px; border: 1.2px solid ${gold}; box-sizing: border-box; animation: ringOut 5s ease-out ${delay}s infinite; opacity: 0`)).join('');
+  // G2: the evening through a mihrab window.
+  const mihrab = (w, h, x, y, id, inner = '') =>
+    `<svg width="${x * 2 + w}" height="${y + h}" aria-hidden="true" style="position: absolute; left: 0; top: 0; overflow: visible"><defs><linearGradient id="mih${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5A4E9A" stop-opacity="0.35"></stop><stop offset="1" stop-color="#EFA07E" stop-opacity="0.3"></stop></linearGradient></defs><path d="${K.archPath(w, h, x, y)}" fill="url(#mih${id})" stroke="${rose}" stroke-opacity="0.8" stroke-width="1.3"></path><path d="${K.archPath(w - 12, h - 6, x + 6, y + 6)}" fill="none" stroke="${gold}" stroke-opacity="0.35" stroke-width="0.8"></path></svg>${inner}`;
+  // G6: its reflection on the Gulf, a column of light broken into ripples.
+  const shimmer = (cx, top, n, w0, gap, h = 2) =>
+    Array.from({ length: n }, (_, k) => {
+      const w = w0 * (1 - k / (n + 2)) * (k % 2 ? 0.82 : 1);
+      return `<span style="position: absolute; left: ${(cx - w / 2).toFixed(1)}px; top: ${top + k * gap}px; width: ${w.toFixed(1)}px; height: ${h}px; border-radius: 2px; background: linear-gradient(90deg, rgba(255,217,179,0), rgba(255,217,179,${(0.85 - k / (n * 1.3)).toFixed(2)}), rgba(255,217,179,0)); animation: shimmer ${2.6 + (k % 4) * 0.4}s ease-in-out ${-k * 0.3}s infinite"></span>`;
+    }).join('');
+
+  const VARIANTS = [
+    { id: 'G0', name: 'Today', note: 'An amber disc in its halo and a wide sunglow: soft, but only a warmer twin of Sunrise’s sun, with nothing of its own.', home: () => `${halo(95, 95, HD)}${disc(95, 95, HD)}`, scene: () => `${sunglow(195, ANCHOR)}${halo(195, ANCHOR, SD)}${disc(195, ANCHOR, SD)}` },
+    { id: 'G1', name: 'Slipping below', note: 'The sun cut by bands that widen towards its foot, as a setting sun through the haze; they drift down a touch on each out-breath. The mark stays whole above them. A mask on the disc (SunDisc’s one change).', home: () => `${halo(95, 95, HD, '236,140,110', 0.34)}${disc(95, 95, HD, { style: banded })}`, scene: () => `${sunglow(195, ANCHOR, 0.24)}${halo(195, ANCHOR, SD, '236,140,110', 0.34)}${disc(195, ANCHOR, SD, { style: banded })}` },
+    { id: 'G2', name: 'Through a mihrab', note: 'The evening seen through an arch, the Meditate scenes’ mihrab, in rose-gold lines: on Home a small window round the sun; in the scene a tall one holding the sky, the first stars inside it. Still; only the sun breathes.', home: () => `${mihrab(142, 184, 24, 0, 'h')}${halo(95, 108, HD * 0.8, '236,140,110', 0.34)}${disc(95, 108, HD * 0.8)}`, scene: () => `${mihrab(300, 470, 45, ANCHOR - 150, 's', `<div style="position: absolute; left: 45px; top: ${ANCHOR - 150}px; width: 300px; height: 470px; ${K.archClip(300, 470)}">${K.starfield(22, 300, 200, 71, '255,243,228')}</div>`)}${halo(195, ANCHOR + 60, SD, '236,140,110', 0.4)}${disc(195, ANCHOR + 60, SD)}` },
+    { id: 'G3', name: 'Rings of evening', note: 'Three fine rings round the sun in the evening’s own colours, amber, rose, violet, and one ring of gold born on each in-breath, spreading out and fading. On Home they stay near; in the scene they reach across the sky. Circles only.', home: () => `${rings(95, 95, HD, 1.8)}${disc(95, 95, HD)}`, scene: () => `${rings(195, ANCHOR, SD, 3.6)}${disc(195, ANCHOR, SD)}` },
+    { id: 'G4', name: 'One still star', note: 'Sunrise’s stars turn; Dusk’s one eight-point star is still, in violet, and only breathes, a first star lighting at each of its points. Morning moves, evening settles. Built as Sunrise’s lattice, one star, no turning.', home: () => `${star(95, 95, 86)}${halo(95, 95, HD, '236,140,110', 0.3)}${disc(95, 95, HD)}`, scene: () => `${sunglow(195, ANCHOR, 0.2)}<div style="position: absolute; inset: 0">${star(195, ANCHOR, 150, 1.4)}</div>${halo(195, ANCHOR, SD, '236,140,110', 0.3)}${disc(195, ANCHOR, SD)}` },
+    { id: 'G5', name: 'Lit from below', note: 'The sun as it sits on the horizon: violet-rose above, gold gathering at its foot, a bright rim along the bottom edge, as Night’s crescent bowl is lit from beneath. The three bodies become one family. Gradients only.', home: () => `${halo(95, 110, HD, '255,201,142', 0.4)}${disc(95, 95, HD, lowLit)}`, scene: () => `${at(195, ANCHOR + 70, 460, '', 'border-radius: 999px; background: radial-gradient(closest-side, rgba(255,201,142,0.42), rgba(255,201,142,0)); animation: breath5 5s ease-in-out infinite')}${disc(195, ANCHOR, SD, lowLit)}` },
+    { id: 'G6', name: 'On the Gulf', note: 'The sun above the water, its reflection a column of light broken into ripples that shimmer on the breath. On Home a short reflection under the disc, inside the box; in the scene, a sea of evening below the horizon, the reflection reaching down it.', home: () => `${halo(95, 72, HD * 0.84, '236,140,110', 0.34)}${disc(95, 72, HD * 0.84)}${shimmer(95, 128, 9, 76, 7)}`, scene: () => `<span style="position: absolute; left: 0; right: 0; top: ${ANCHOR + 70}px; bottom: 0; background: linear-gradient(180deg, #7C6AA8 0%, #4B3F82 40%, #2E2A5C 100%)"></span><span style="position: absolute; left: 0; right: 0; top: ${ANCHOR + 70}px; height: 1px; background: rgba(255,217,179,0.6)"></span>${sunglow(195, ANCHOR + 20, 0.26)}${halo(195, ANCHOR, SD, '236,140,110', 0.36)}${disc(195, ANCHOR, SD)}${shimmer(195, ANCHOR + 78, 30, 200, 15, 2.4)}` },
+  ];
+  const css = `${BREATH}
+${SPIN}
+@keyframes bandsDrift { 0%,100% { -webkit-mask-position: 0 0; mask-position: 0 0 } 50% { -webkit-mask-position: 0 3px; mask-position: 0 3px } }
+@keyframes starBreath { 0%,100% { transform: scale(1); opacity: 0.7 } 50% { transform: scale(1.05); opacity: 1 } }
+@keyframes ringOut { 0% { transform: scale(0.5); opacity: 0 } 15% { opacity: 0.7 } 100% { transform: scale(1); opacity: 0 } }
+@keyframes shimmer { 0%,100% { opacity: 0.45; transform: scaleX(0.9) } 50% { opacity: 1; transform: scaleX(1.08) } }`;
+  const word = `<span style="position: absolute; left: 0; right: 0; bottom: 40px; text-align: center">${K.label('Tanafas', 'rgba(46,42,92,0.8)', 11)}</span>`;
+  const scene = (v, i) => `<span style="position: absolute; inset: 0; background: ${SKY}"></span>${K.starfield(26, 390, 360, 40 + i, '255,243,228')}${v.scene()}${word}`;
+  row('G-dusk-home.dc.html', {
+    title: 'G · The Dusk sun, on Home',
+    css,
+    capH: 150,
+    phones: VARIANTS.map((v) => ({ T: TD, caption: `${v.id} · ${v.name} · ${v.note}`, html: home(TD, { date: 'line', hero: v.home() }) })),
+  });
+  row('G-dusk-scene.dc.html', {
+    title: 'G · The Dusk sun, in its Tanafas scene',
+    css,
+    capH: 150,
+    phones: VARIANTS.map((v, i) => ({ T: TD, bg: '#2E2A5C', caption: `${v.id} · ${v.name} (the scene) · Home’s mark glides down and becomes this sun, on the anchor, in Dusk’s violet evening; the first stars come out round it.`, html: scene(v, i) })),
+  });
+})();
+
 /* ── The canvas: Direction on top, then a row per study ── */
-const ROWS = [['Main.dc.html'], ['A-sunglow.dc.html'], ['B-suns.dc.html'], ['C-kufic.dc.html'], ['D-date.dc.html'], ['E-imprint-night.dc.html'], ['E-imprint-day.dc.html'], ['F-moon.dc.html', 'F-moon-close.dc.html']];
-const TITLES = { 1: 'A · The Sunrise scene’s glow', 2: 'B · Two different suns', 3: 'C · Classic Home with the Kufic ring', 4: 'D · A calmer Home date', 5: 'E · The mark on plain pages', 7: 'F · A new moon' };
+const ROWS = [['Main.dc.html'], ['A-sunglow.dc.html'], ['B-suns.dc.html'], ['C-kufic.dc.html'], ['D-date.dc.html'], ['E-imprint-night.dc.html'], ['E-imprint-day.dc.html'], ['F-moon.dc.html', 'F-moon-close.dc.html'], ['G-dusk-home.dc.html'], ['G-dusk-scene.dc.html']];
+const TITLES = { 1: 'A · The Sunrise scene’s glow', 2: 'B · Two different suns', 3: 'C · Classic Home with the Kufic ring', 4: 'D · A calmer Home date', 5: 'E · The mark on plain pages', 7: 'F · A new moon', 8: 'G · The Dusk sun, on Home and in its scene' };
 const byFile = Object.fromEntries(out.map((b) => [b.file, b]));
 const boards = {}, notes = {}, order = [];
 let y = 0;

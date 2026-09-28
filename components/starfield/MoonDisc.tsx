@@ -7,7 +7,7 @@ import PressedMark from '@/components/ui/PressedMark';
 import { HALO_BOX } from '@/components/starfield/MarkHalo';
 import EdgeHalo from '@/components/starfield/EdgeHalo';
 import { useStarfield } from '@/contexts/StarfieldContext';
-import { alpha, nightPalette } from '@/constants/theme';
+import { alpha, flatten, nightPalette } from '@/constants/theme';
 import { moonPhase, terminatorBreath } from '@/lib/moonPhase';
 import { stopProps } from '@/lib/svgStop';
 
@@ -18,32 +18,40 @@ import { stopProps } from '@/lib/svgStop';
 const DISC = 84;
 const MARK = 58;
 const HALO = 150;
-/** The moon's halo strength, as Home's Night mark. */
-const HALO_STRENGTH = 0.4;
+/** The moon's halo: cool moonlight, softer than the teal it was. */
+const HALO_STRENGTH = 0.3;
 /** The narrowest the terminator ellipse gets, so its counter-scale stays finite (under a pixel wide). */
 const MIN_TERMINATOR = 0.02;
 
-/** A solid teal moon: the Profile avatar's lit orb, highlight a touch above centre. */
+/**
+ * A glass moon (Design studies "F4"), like the 4-7-8 orb in cool silver: a white highlight up and to
+ * the left, clear through the middle, a little deeper at the edge, a silver rim. Its stops are the
+ * study's glass laid over the night's ground, so the faces are solid and can be stacked in the phase
+ * windows without showing through one another.
+ */
+const SILVER = '#BED2F5';
+const RIM = alpha('#DCE6FF', 0.55);
+const over = (c: string) => flatten(c, nightPalette.midnight);
 const LIT: [string, number][] = [
-  ['#D9FAF6', 0],
-  [nightPalette.hounaGlow, 0.55],
-  ['#2E8F8A', 1],
+  [over(alpha('#FFFFFF', 0.6)), 0],
+  [over(alpha('#D2DEF5', 0.2)), 0.45],
+  [over(alpha('#AABEE6', 0.32)), 1],
 ];
-/** The unlit part, faintly lit by the Earth: a deep navy disc with a teal rim. */
-const EARTHSHINE: [string, number][] = [
-  ['#1D2E52', 0],
-  ['#0F1838', 1],
-];
+/** The unlit part: the same glass in shadow (the night laid over it at 0.82), the mark just visible. */
+const shade = (c: string) => flatten(alpha(nightPalette.midnight, 0.82), c);
+const EARTHSHINE: [string, number][] = LIT.map(([c, o]) => [shade(c), o]);
+/** The mark as pressed into the glass. */
+const MARK_SURFACE = '#AFC0DE';
 
 /** The full moon's ring, well clear of the disc (the canvas "Moon halo": 176 round a 76 disc). */
 const RING = 192;
-/** Its bands, as the canvas: a warm inner edge, then teal, then lavender, fading out. */
+/** Its bands, as the canvas: a warm inner edge, then the moon's silver, then lavender, fading out. */
 const RING_BANDS: [string, number, number][] = [
-  [nightPalette.hounaGlow, 0, 0.8],
+  [SILVER, 0, 0.8],
   ['#FFD2BE', 0.22, 0.86],
-  [nightPalette.hounaGlow, 0.42, 0.9],
+  [SILVER, 0.42, 0.9],
   [nightPalette.dusk, 0.2, 0.94],
-  [nightPalette.hounaGlow, 0, 1],
+  [SILVER, 0, 1],
 ];
 
 /**
@@ -66,12 +74,30 @@ function FullMoonRing() {
   );
 }
 
-/** The lit moon: the teal disc with the mark pressed in. */
+/** The glass's soft inner light, round its edge. */
+function InnerLight() {
+  const id = `moonInner${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
+  return (
+    <Svg width={DISC} height={DISC} style={StyleSheet.absoluteFill}>
+      <Defs>
+        <RadialGradient id={id} cx="50%" cy="50%" r="50%">
+          <Stop offset={0.78} {...stopProps('#FFFFFF', 0)} />
+          <Stop offset={1} {...stopProps('#FFFFFF', 0.25)} />
+        </RadialGradient>
+      </Defs>
+      <Circle cx={DISC / 2} cy={DISC / 2} r={DISC / 2} fill={`url(#${id})`} />
+    </Svg>
+  );
+}
+
+/** The lit moon: the glass with the mark pressed in. */
 function LitFace() {
   return (
     <View style={StyleSheet.absoluteFill}>
-      <Orb size={DISC} stops={LIT} fx={0.5} fy={0.45} />
-      <PressedMark size={MARK} surface={nightPalette.hounaGlow} />
+      <Orb size={DISC} stops={LIT} fx={0.35} fy={0.3} />
+      <InnerLight />
+      <View style={[styles.rim, { borderColor: RIM }]} />
+      <PressedMark size={MARK} surface={MARK_SURFACE} />
     </View>
   );
 }
@@ -80,18 +106,18 @@ function LitFace() {
 function DarkFace() {
   return (
     <View style={StyleSheet.absoluteFill}>
-      <Orb size={DISC} stops={EARTHSHINE} fx={0.5} fy={0.45} />
-      <View style={styles.rim} />
+      <Orb size={DISC} stops={EARTHSHINE} fx={0.35} fy={0.3} />
+      <View style={[styles.rim, { borderColor: alpha(SILVER, 0.3) }]} />
       <View style={[styles.centre, styles.faint]} needsOffscreenAlphaCompositing>
-        <HounaMark size={MARK} color={nightPalette.hounaGlow} />
+        <HounaMark size={MARK} color={SILVER} />
       </View>
     </View>
   );
 }
 
 /**
- * The starfield's moon, in tonight's real phase (`lib/moonPhase.ts`): Home's
- * mark becoming one solid object with the moon, the mark pressed into its lit
+ * The starfield's moon, in tonight's real phase (`lib/moonPhase.ts`), a glass moon in cool silver
+ * (Design studies "F4"): Home's mark becoming one solid object with the moon, the mark pressed into its lit
  * part and just visible in the dark part (earthshine), so a new moon is never
  * an empty sky.
  *
@@ -133,7 +159,7 @@ export default function MoonDisc({ form, date }: { form: Animated.Value | Animat
         </Animated.View>
       )}
       <Animated.View style={[styles.halo, { opacity: haloOpacity, transform: [{ scale: haloScale }] }]}>
-        <EdgeHalo size={HALO} edge={DISC / 2} color={nightPalette.hounaGlow} strength={HALO_STRENGTH} />
+        <EdgeHalo size={HALO} edge={DISC / 2} color={SILVER} strength={HALO_STRENGTH} />
       </Animated.View>
       {/* Faded as one layer: the faces are stacked, and Android otherwise fades each on its own,
           so mid-fade they show through one another and the moon seems to sweep through phases. */}
@@ -180,7 +206,7 @@ const styles = StyleSheet.create({
   glow: {
     ...StyleSheet.absoluteFillObject,
     borderRadius: DISC / 2,
-    boxShadow: `0 0 14px ${alpha(nightPalette.hounaGlow, 0.45)}`,
+    boxShadow: `0 0 21px ${alpha(SILVER, 0.35)}`,
   },
   window: {
     ...StyleSheet.absoluteFillObject,
@@ -193,7 +219,6 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     borderRadius: DISC / 2,
     borderWidth: 1,
-    borderColor: alpha(nightPalette.hounaGlow, 0.35),
   },
   centre: {
     ...StyleSheet.absoluteFillObject,

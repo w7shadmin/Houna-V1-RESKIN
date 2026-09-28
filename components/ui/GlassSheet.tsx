@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { alpha, layout } from '@/constants/theme';
 import { NATIVE, useReduceMotion } from '@/hooks/useCalmLoop';
+import { useDragToClose } from '@/hooks/useDragToClose';
 
 const IN_MS = 650;
 const OUT_MS = 360;
@@ -27,7 +28,7 @@ interface GlassSheetProps {
 /**
  * A glass sheet over the current screen (canvas "Motion — the check-in as a glass sheet"):
  * the screen behind softens and dims, the frosted sheet rises from the bottom, and it sinks
- * back when closed or when the backdrop is tapped. For choices made in place, like the
+ * back when closed, when the backdrop is tapped or when it is dragged down. For choices made in place, like the
  * Meditate hero's scene and length; the check-in is its own route with the same look.
  */
 export default function GlassSheet({ visible, onClose, eyebrow, title, closeLabel, children, onHidden }: GlassSheetProps) {
@@ -39,9 +40,14 @@ export default function GlassSheet({ visible, onClose, eyebrow, title, closeLabe
   const enter = useRef(new Animated.Value(0)).current;
   // Stays mounted through the sinking animation, then goes.
   const [mounted, setMounted] = useState(visible);
+  // Dragged down far or fast enough, it closes (from where the finger left it).
+  const { drag, panHandlers } = useDragToClose(onClose, visible);
 
   useEffect(() => {
-    if (visible) setMounted(true);
+    if (visible) {
+      setMounted(true);
+      drag.setValue(0);
+    }
     const anim = Animated.timing(enter, {
       toValue: visible ? 1 : 0,
       duration: reduceMotion ? 0 : visible ? IN_MS : OUT_MS,
@@ -74,12 +80,13 @@ export default function GlassSheet({ visible, onClose, eyebrow, title, closeLabe
       </Animated.View>
       <Animated.View
         accessibilityViewIsModal
+        {...panHandlers}
         style={[
           styles.sheet,
           {
             borderColor: colors.borderLight,
             paddingBottom: 24 + insets.bottom,
-            transform: [{ translateY: enter.interpolate({ inputRange: [0, 1], outputRange: [height, 0] }) }],
+            transform: [{ translateY: Animated.add(enter.interpolate({ inputRange: [0, 1], outputRange: [height, 0] }), drag) }],
           },
         ]}
       >
