@@ -20,7 +20,18 @@ export default function HounaMark({ size, color }: HounaMarkProps) {
   const fill = color ?? colors.logo.primary;
 
   return (
-    <Svg width={size} height={size} viewBox="17 5.4 20.6 20.6">
+    <Svg width={size} height={size} viewBox={HOUNA_MARK_VIEWBOX}>
+      <HounaMarkShape fill={fill} />
+    </Svg>
+  );
+}
+
+/** The mark's own frame: it fills a square this viewBox, in the logo's units. */
+export const HOUNA_MARK_VIEWBOX = '17 5.4 20.6 20.6';
+
+/** The mark's paths alone, for drawing it inside another SVG (through a filter, say). */
+export function HounaMarkShape({ fill }: { fill: string }) {
+  return (
       <G transform="translate(-10.7 -6.6)">
         <G transform="translate(29.24 13.384)">
           <Path
@@ -33,6 +44,5 @@ export default function HounaMark({ size, color }: HounaMarkProps) {
           <Path d={FIGURE_WITH_HEAD_HOLE_D} transform="translate(-48.6 -18.8)" fill={fill} fillRule="evenodd" />
         </G>
       </G>
-    </Svg>
   );
 }

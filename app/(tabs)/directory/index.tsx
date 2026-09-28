@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Linking, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type TextStyle } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import PageMarkGlow from '@/components/ui/PageMarkGlow';
 import { BookOpen, Building2, Headphones, HeartPulse, Newspaper, Users, type LucideIcon } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -261,6 +262,8 @@ export default function DirectoryHubScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
+      {/* The mark as a soft glow behind the header (Design studies "E4"). */}
+      <PageMarkGlow />
       <ScrollView
         contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled"

@@ -494,6 +494,21 @@ resolves once the new colours are in place. The module is native, so a dev
 client built before it was added (or the web) just switches at once: it's
 loaded lazily, because its import throws when the native side is missing.
 
+**Design studies picks** (https://claude.ai/artifact/5DqkLLhgEWF1bS4vFcf7EL, `design/studies/`,
+picks in its `PICKS.md`):
+- A2: Sunrise's star lattice is lines of light: each star a soft, blurred line in the pale `core`
+  colour (react-native-svg's `FeGaussianBlur`) over a faint crisp one, swelling 6% and brightening
+  with the breath (`Lattice` in `SunDisc.tsx`; Home's small lattice too).
+- B0: the suns keep today's colours.
+- C1: Classic Home's ring is the Kufic words, turning (`MarkHalo`'s `kufic` colour; `KuficRing` takes a
+  `size`); the dots remain only where `kufic` is left out.
+- D1: Home's Hijri date is one quiet line under the wordmark, no chip, in the chip's 28 of height so
+  the body stays on the anchor (`HijriDate`).
+- E4: plain pages (the Directory hub and its list pages, Events) carry the mark as a soft glow of the
+  glow colour behind the header, fixed, never scrolling (`components/ui/PageMarkGlow.tsx`, drawing
+  `HounaMarkShape` through a blur).
+- F: no new moon picked yet.
+
 **The mark in one spot** (canvas "Round 3 — the mark in one spot"): `layout.markAnchor` (199)
 is where the centre of the Houna mark, or of the body, orb or gem it's pressed into, sits below
 the top inset, horizontally centred, on every screen where it's the centrepiece, so it never

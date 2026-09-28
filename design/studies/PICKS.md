@@ -7,9 +7,9 @@ lands.
 
 | Study | Picked | Note | App surface | Shipped |
 | --- | --- | --- | --- | --- |
-| A · The Sunrise scene's glow |  |  | `components/sunrise/SunDisc.tsx` (`Lattice`), `SunScene.tsx` |  |
-| B · Two different suns |  |  | `sunriseScene` / `duskScene` in `constants/theme.ts` (and Home's bodies, which share them) |  |
-| C · Classic Home, the Kufic ring |  |  | `components/starfield/MarkHalo.tsx` (the dot ring), `components/profile/KuficRing.tsx` |  |
-| D · A calmer Home date |  |  | `components/home/HijriDate.tsx`, `app/(tabs)/index.tsx` |  |
-| E · The mark on plain pages |  |  | The Directory and Events screens (a shared background component) |  |
-| F · A new moon |  |  | `components/starfield/MoonDisc.tsx` |  |
+| A · The Sunrise scene's glow | 28 Sep 2026: A2 | Lines of light | `components/sunrise/SunDisc.tsx` (`Lattice`), `SunScene.tsx` | 28 Sep 2026 |
+| B · Two different suns | 28 Sep 2026: B0 | Keep today's suns; nothing to build | `sunriseScene` / `duskScene` in `constants/theme.ts` (and Home's bodies, which share them) | — (kept) |
+| C · Classic Home, the Kufic ring | 28 Sep 2026: C1 | Profile's ring, turning | `components/starfield/MarkHalo.tsx` (the dot ring), `components/profile/KuficRing.tsx` | 28 Sep 2026 |
+| D · A calmer Home date | 28 Sep 2026: D1 | A quiet line under the wordmark | `components/home/HijriDate.tsx`, `app/(tabs)/index.tsx` | 28 Sep 2026 |
+| E · The mark on plain pages | 28 Sep 2026: E4 | A glow in its shape |  The Directory and Events screens (a shared background component) | 28 Sep 2026 |
+| F · A new moon | not yet | None picked: today's teal disc stays for now | `components/starfield/MoonDisc.tsx` |  |

@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
-import Svg, { Circle, Defs, Path, Polygon, RadialGradient, Stop } from 'react-native-svg';
+import Svg, { Circle, Defs, FeGaussianBlur, Filter, G, Path, Polygon, RadialGradient, Stop } from 'react-native-svg';
 import PressedMark from '@/components/ui/PressedMark';
 import Orb from '@/components/ui/Orb';
 import { HALO_BOX } from '@/components/starfield/MarkHalo';
@@ -128,32 +128,46 @@ export default function SunDisc({ form, scene, latticeScale = 1 }: SunDiscProps)
   );
 }
 
-/** Sunrise's rays, woven: the stars turning slowly, their light easing a little with the breath. */
-function Lattice({ colors, form, scale }: { colors: { deep: string; light: string }; form: SunDiscProps['form']; scale: number }) {
+/**
+ * Sunrise's rays, woven: the stars turning slowly, drawn as lines of light (Design studies "A2"): each
+ * a soft blurred glow in the pale core colour with a faint crisp line under it, so they read as the
+ * sun's light catching rather than a drawing, swelling a touch and brightening with the breath.
+ */
+function Lattice({ colors, form, scale }: { colors: { deep: string; light: string; core: string }; form: SunDiscProps['form']; scale: number }) {
   const { breath } = useStarfield()!.clock;
   const lap = useCalmLoop((v) => Animated.loop(Animated.timing(v, { toValue: 1, duration: LATTICE_LOOP_MS, easing: Easing.linear, useNativeDriver: NATIVE })));
   const turns = [lap.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '1440deg'] }), lap.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '-1080deg'] })];
-  const opacity = Animated.multiply(form, breath.interpolate({ inputRange: [0, 1], outputRange: [0.65, 1] }));
+  const opacity = Animated.multiply(form, breath.interpolate({ inputRange: [0, 1], outputRange: [0.55, 1] }));
+  const swell = breath.interpolate({ inputRange: [0, 1], outputRange: [1, 1.06] });
   const c = LATTICE / 2;
+  // Drawn in, the lines would thin: keep them about as fine as in the scene.
+  const w = 1 / Math.sqrt(scale);
   return (
     <Animated.View style={[styles.lattice, { opacity, transform: [{ scale }] }]}>
-      {turns.map((rotate, pair) => (
-        <Animated.View key={pair} style={[StyleSheet.absoluteFill, { transform: [{ rotate }] }]}>
-          <Svg width={LATTICE} height={LATTICE}>
-            {LATTICE_STARS.filter((st) => st.pair === pair).map((st, k) => (
-              <Polygon
-                key={k}
-                points={star8Points(c, c, (st.r * DISC) / 2, st.rot)}
-                fill="none"
-                stroke={st.deep ? colors.deep : colors.light}
-                strokeOpacity={st.opacity}
-                // Drawn in, the lines would thin: keep them about as fine as in the scene.
-                strokeWidth={st.width / Math.sqrt(scale)}
-              />
-            ))}
-          </Svg>
-        </Animated.View>
-      ))}
+      <Animated.View style={[StyleSheet.absoluteFill, { transform: [{ scale: swell }] }]}>
+        {turns.map((rotate, pair) => (
+          <Animated.View key={pair} style={[StyleSheet.absoluteFill, { transform: [{ rotate }] }]}>
+            <Svg width={LATTICE} height={LATTICE}>
+              <Defs>
+                <Filter id={`latticeLight${pair}`} x="-10%" y="-10%" width="120%" height="120%">
+                  <FeGaussianBlur stdDeviation={1.6 * w} />
+                </Filter>
+              </Defs>
+              {LATTICE_STARS.filter((st) => st.pair === pair).map((st, k) => {
+                const points = star8Points(c, c, (st.r * DISC) / 2, st.rot);
+                return (
+                  <G key={k}>
+                    {/* The faint line itself. */}
+                    <Polygon points={points} fill="none" stroke={st.deep ? colors.deep : colors.light} strokeOpacity={st.opacity * 0.4} strokeWidth={st.width * w} />
+                    {/* Its light: soft and pale. */}
+                    <Polygon points={points} fill="none" stroke={colors.core} strokeOpacity={Math.min(1, st.opacity * 1.8)} strokeWidth={2.4 * st.width * w} filter={`url(#latticeLight${pair})`} />
+                  </G>
+                );
+              })}
+            </Svg>
+          </Animated.View>
+        ))}
+      </Animated.View>
     </Animated.View>
   );
 }

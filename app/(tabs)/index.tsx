@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Defs, Ellipse, RadialGradient, Stop } from 'react-native-svg';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { APPEARANCE_OPTIONS, THEME_FADE_MS, useTheme } from '@/contexts/ThemeContext';
-import { dayPalette, flatten, layout, typography, type ColorScheme } from '@/constants/theme';
+import { alpha, dayPalette, flatten, layout, typography, type ColorScheme } from '@/constants/theme';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { getTodayEntry } from '@/lib/journal';
 import { ACTIVITY_PERIODS, fetchCommunityActivity, type CommunityActivity } from '@/lib/communityActivity';
@@ -260,7 +260,7 @@ export default function HomeScreen() {
 
         {/* The Hijri date, tonight's moon beside it: opens the month of moons. */}
         <Animated.View style={[styles.hijri, chrome.style]} pointerEvents={chrome.pointerEvents}>
-          <HijriDate background={solid(colors.control)} />
+          <HijriDate />
         </Animated.View>
 
         {/* Mark, "You're not alone", rotating line */}
@@ -286,6 +286,7 @@ export default function HomeScreen() {
                   glow={isNight ? colors.glow : dayPalette.hounaTeal}
                   glowStrength={isNight ? 0.4 : 0.5}
                   ringOpacity={starfield?.chrome}
+                  kufic={isNight ? alpha(colors.text, 0.72) : alpha(colors.primary, 0.78)}
                 />
               )}
             </View>

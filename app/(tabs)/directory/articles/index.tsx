@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, FlatList, Linking, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import PageMarkGlow from '@/components/ui/PageMarkGlow';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { grid, layout } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -46,6 +47,8 @@ export default function ArticlesListScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
+      {/* The mark as a soft glow behind the header (Design studies "E4"). */}
+      <PageMarkGlow />
       {loading && articles.length === 0 ? (
         <View style={styles.stateWrap}>
           {header}

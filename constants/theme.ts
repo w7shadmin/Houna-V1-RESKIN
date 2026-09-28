@@ -111,9 +111,10 @@ export interface SunScene {
   rays: string | null;
   /**
    * Rays woven from four eight-point stars turning in pairs, opposite ways (canvas "Phase 3 —
-   * Sunrise: the star-lattice sun"): the deeper line and the light one. Takes the place of `rays`.
+   * Sunrise: the star-lattice sun"): the deeper line and the light one, and the pale core of its lines
+   * of light (Design studies "A2"). Takes the place of `rays`.
    */
-  lattice: { deep: string; light: string } | null;
+  lattice: { deep: string; light: string; core: string } | null;
   /** The disc's surface, the mark is pressed into (a shade deeper, as the breathing orbs'). */
   surface: string;
   /** The one word, "Tanafas". */
@@ -150,7 +151,7 @@ export const sunriseScene: SunScene = {
   halo: sunrisePalette.peach,
   glow: sunrisePalette.peach,
   rays: '#FFDEBE',
-  lattice: { deep: sunrisePalette.coral, light: sunrisePalette.peach },
+  lattice: { deep: sunrisePalette.coral, light: sunrisePalette.peach, core: '#FFE6CC' },
   surface: '#FBC8A3',
   word: sunrisePalette.grey80,
   stars: null,

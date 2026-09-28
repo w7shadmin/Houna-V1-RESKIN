@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 import Svg, { Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
 import HounaMark from '@/components/HounaMark';
+import KuficRing from '@/components/profile/KuficRing';
 import { useStarfield } from '@/contexts/StarfieldContext';
 import { WAVE_STEPS, wave } from '@/hooks/useCalmLoop';
 
@@ -29,7 +30,15 @@ interface MarkHaloProps {
   ringOpacity?: Animated.Value | Animated.AnimatedInterpolation<number>;
   /** False drops the ring altogether (the starfield's moon). */
   showRing?: boolean;
+  /**
+   * The ring as the Kufic words (هُنا · نتنفّس معًا) in this colour, turning, in place of the dots
+   * (Classic Home; Design studies "C1"). Left out, the dots.
+   */
+  kufic?: string;
 }
+
+/** The Kufic ring, drawn at the dot ring's reach. */
+const KUFIC_SIZE = 184;
 
 /**
  * The Houna mark with its 28-dot ring (first half brand accent, second half
@@ -41,7 +50,7 @@ interface MarkHaloProps {
  * stays crisp and still. Every copy runs on the one shared clock (see
  * StarfieldContext), so Home's mark and the starfield's moon match exactly.
  */
-export default function MarkHalo({ accent, dusk, glow, glowStrength, ringOpacity, showRing = true }: MarkHaloProps) {
+export default function MarkHalo({ accent, dusk, glow, glowStrength, ringOpacity, showRing = true, kufic }: MarkHaloProps) {
   const N = 28;
   const R = 86;
   const { drift, turn, breath } = useStarfield()!.clock;
@@ -82,7 +91,12 @@ export default function MarkHalo({ accent, dusk, glow, glowStrength, ringOpacity
 
   return (
     <View style={styles.halo} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-      {showRing && (
+      {showRing && kufic && (
+        <Animated.View style={[styles.ring, { opacity: ringOpacity ?? 1 }]}>
+          <KuficRing color={kufic} size={KUFIC_SIZE} />
+        </Animated.View>
+      )}
+      {showRing && !kufic && (
         // The ring turns slowly (a lap every two minutes) and breathes, opening out and drawing back.
         <Animated.View style={[styles.ring, { opacity: ringOpacity ?? 1, transform: [{ rotate: ringTurn }, { scale: ringScale }] }]}>
           {dots.map((d, i) => (

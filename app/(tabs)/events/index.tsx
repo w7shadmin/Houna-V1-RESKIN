@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { View, Text, Image, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import PageMarkGlow from '@/components/ui/PageMarkGlow';
 import { ArrowUpDown, Calendar } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -98,6 +99,8 @@ export default function EventsListScreen() {
   if ((loading || error) && events.length === 0) {
     return (
       <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
+        {/* The mark as a soft glow behind the header (Design studies "E4"). */}
+        <PageMarkGlow />
         <View style={styles.stateWrap}>
           {header}
           {loading ? <LoadingState label={s.loading} /> : <ErrorState message={error!} retryLabel={common.tryAgain} onRetry={handleRetry} />}
@@ -108,6 +111,8 @@ export default function EventsListScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
+      {/* The mark as a soft glow behind the header (Design studies "E4"). */}
+      <PageMarkGlow />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
         {header}
 

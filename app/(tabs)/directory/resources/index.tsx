@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import PageMarkGlow from '@/components/ui/PageMarkGlow';
 import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -60,6 +61,8 @@ export default function ResourceDirectoryScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
+      {/* The mark as a soft glow behind the header (Design studies "E4"). */}
+      <PageMarkGlow />
       {loading && !data ? (
         <View style={styles.stateWrap}>
           {header}

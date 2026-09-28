@@ -12,13 +12,13 @@ const LAP_MS = 90000;
  * breathe together", round the avatar, turning slowly (still under Reduce Motion). Baked as one
  * outline (constants/kuficRing.ts) so the Arabic joins on every platform. Its children sit in the middle.
  */
-export default function KuficRing({ color, children }: { color: string; children?: React.ReactNode }) {
+export default function KuficRing({ color, size = KUFIC_RING.box, children }: { color: string; size?: number; children?: React.ReactNode }) {
   const lap = useCalmLoop((v) => Animated.loop(Animated.timing(v, { toValue: 1, duration: LAP_MS, easing: Easing.linear, useNativeDriver: NATIVE })));
   const rotate = lap.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '360deg'] });
   return (
-    <View style={styles.box}>
+    <View style={[styles.box, { width: size, height: size }]}>
       <Animated.View style={[StyleSheet.absoluteFill, { transform: [{ rotate }] }]} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-        <Svg width={KUFIC_RING.box} height={KUFIC_RING.box}>
+        <Svg width={size} height={size} viewBox={`0 0 ${KUFIC_RING.box} ${KUFIC_RING.box}`}>
           <Path d={KUFIC_RING.d} fill={color} />
         </Svg>
       </Animated.View>

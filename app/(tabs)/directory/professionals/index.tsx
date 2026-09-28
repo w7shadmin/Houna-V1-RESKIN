@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { View, Text, FlatList, Pressable, ActivityIndicator, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import PageMarkGlow from '@/components/ui/PageMarkGlow';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { grid, layout, radius } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -109,6 +110,8 @@ export default function ProfessionalsListScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
+      {/* The mark as a soft glow behind the header (Design studies "E4"). */}
+      <PageMarkGlow />
       {loading && therapists.length === 0 ? (
         <View style={styles.stateWrap}>
           {header}
