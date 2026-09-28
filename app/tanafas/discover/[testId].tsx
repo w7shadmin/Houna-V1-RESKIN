@@ -20,7 +20,7 @@ const SECONDS_PER_ITEM = 10;
 
 /**
  * One self-reflection test (canvas "Self-reflection — question"). An intro
- * with the source and the not-a-diagnosis disclaimer comes first, then one
+ * comes first: the not-a-diagnosis disclaimer, then the description and the source; then one
  * statement per screen. Leaving never asks "are you sure?" — no pressure.
  * On finish, scores are computed and stored on this phone only.
  */
@@ -93,6 +93,11 @@ export default function TestScreen() {
             <Text accessibilityRole="header" style={[styles.introTitle, isRTL && styles.introTitleArabic, { color: colors.text, fontFamily: fonts.display }]}>
               {test.title[language]}
             </Text>
+            {/* Not a diagnosis, first; then what it is, and where it comes from. */}
+            <View style={[styles.disclaimer, { backgroundColor: colors.crisis.bg, borderColor: colors.crisis.borderSoft }]}>
+              <CanvasIcon name="shield" size={20} strokeWidth={1.7} color={colors.tones.dawn.fg} />
+              <Text style={[styles.disclaimerText, { color: colors.text, fontFamily: fonts.regular }]}>{s.disclaimer}</Text>
+            </View>
             <Text style={[styles.body, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{test.description[language]}</Text>
             {test.instructions && (
               <Text style={[styles.body, { color: colors.text, fontFamily: fonts.regular }]}>{testText(test.instructions, language)}</Text>
@@ -100,10 +105,6 @@ export default function TestScreen() {
             <Text style={[styles.source, { color: colors.textTertiary, fontFamily: fonts.regular }]}>
               {s.source}: {test.source.citation}
             </Text>
-            <View style={[styles.disclaimer, { backgroundColor: colors.crisis.bg, borderColor: colors.crisis.borderSoft }]}>
-              <CanvasIcon name="shield" size={20} strokeWidth={1.7} color={colors.tones.dawn.fg} />
-              <Text style={[styles.disclaimerText, { color: colors.text, fontFamily: fonts.regular }]}>{s.disclaimer}</Text>
-            </View>
             <View style={styles.footer}>
               <Button variant="glow" label={s.begin} onPress={() => setStep(0)} block style={styles.primary} />
             </View>

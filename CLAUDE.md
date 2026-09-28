@@ -141,7 +141,10 @@ not synced. No PIN or biometric lock for the MVP.
 - Entries carry a UUID and an `updatedAt` timestamp even though nothing
   syncs yet, so sync can be added later without a data migration.
 - Must provide an export — a local-only journal with no export means a
-  lost phone is total data loss.
+  lost phone is total data loss. It's a PDF anyone can open (`lib/journalExport.ts`, via
+  `hooks/useJournalExport.ts`: dated entries with their mood, in the reader's language and
+  direction, printed by `expo-print` and shared through the system sheet); where `expo-print`
+  isn't built in (a dev client from before it, the web) the same page goes out as an HTML file.
 - Never write copy claiming the journal "never leaves the device" — it's
   included in the phone's normal OS backup.
 
@@ -189,6 +192,13 @@ full-screen player starts straight away. Every breathing and meditation
 session ends with `lib/sessionEndAlert.ts`'s gentle buzz.
 
 ## Current skin — Night / Dusk / Sunrise
+
+**SHOWCASE MODE IS ON (temporary)**: `lib/showcase.ts`'s `SHOWCASE` layers generated demo data
+over the real, for presenting the app: a busier community map (`fetchCommunityActivity`), a full
+practice log in every colour (`sessionsBetween` / `sessionDays`: Profile's graphs, Stats, Recap),
+a long streak, badges, badge shares and a leaderboard (`lib/streaks.ts`). It writes nothing
+(`awardBadges` returns early) and leaves the phone's own log alone. When the showcase is over,
+set it to false, then delete `lib/showcase.ts`, its uses and this paragraph.
 
 Designed on the canvas at https://claude.ai/artifact/EMxmwt7o1Uq6kx32BdAUA7
 (Night row = primary, Dusk row = the light theme once called Daylight,
@@ -306,7 +316,8 @@ the pressed mark never distorts and the breath animates natively: the lit part
 swells a little on the in-breath, never past the quarter line, and the halo
 follows the light (full on full-moon nights). On full-moon nights only (the
 "full" eighth of the cycle, three or four nights a month) a wide, faint ring
-circles it too (the canvas "Moon halo" concept). Canvas: "Houna moon — real
+circles it too (the canvas "Moon halo" concept), coming out slowly in the starfield once the sky is
+in (its own `ring` value, 2.8s, growing from 0.85; never on Home, so it can't pop). Canvas: "Houna moon — real
 phases", option B. The moon fades as one layer (`needsOffscreenAlphaCompositing`):
 Android otherwise fades its stacked faces separately and it seems to sweep
 through phases. The only word is "Tanafas"; tapping the
@@ -579,7 +590,10 @@ canvas "Houna — Motion (phase 1)"):
 
 **Tanafas player**: the Breathe carousel is
 `components/tanafas/PlayerFrame.tsx` (stage, title row, tag, description,
-tiles, round button). Pressing play on a breathing exercise keeps the
+tiles, round button), in `BREATHE_ORDER` (4-7-8, the physiological sigh, box, five senses, muscle
+relaxation). Its scroll view reaches up under the hub's header (`UNDER_HEADER`, its content padded
+down by as much), so a full orb's glow fades into the sky rather than being cut straight where the
+scroll view began. Pressing play on a breathing exercise keeps the
 layout and fades each slot over to the session (round, phase, time left).
 Each exercise has its stage (`BreatheStages.tsx`; canvas "Houna — Players
 (phase 2)"). 4-7-8's is `OrbStage`: a large glass orb, no dots, the Houna
@@ -638,7 +652,8 @@ missing), a line to sit with (`sceneLines`), and a glowing play ring that
 opens the full-screen player. Its Scene and Length rows open
 `components/ui/GlassSheet.tsx` (the check-in's glass, for choices made in
 place, and dragged down to close, `useDragToClose` over the whole sheet): `ScenePicker` and
-`MinutesWheel`. On the web a short drag that ends on a row can still pick it (the browser's click
+`MinutesWheel` (a wheel that scrolls and settles on a row: `MEDITATION_MINUTES`, 3 to 60 minutes and no
+limit, then Custom, which sets 1 to 120 minutes with − and +, `MEDITATION_CUSTOM_RANGE`). On the web a short drag that ends on a row can still pick it (the browser's click
 follows the pointer with the sheet); on the phone the drag takes the touch from the row. The scene sheet (canvas "Round 2 — the scene
 sheet") is being tried two ways, `SCENE_SHEET` in `ScenePicker.tsx`: 'rows' (option C, on: each
 scene a row, a round window of it, its name and line, the chosen row lit in its scene's light)
@@ -650,8 +665,10 @@ the app's frame dismisses the hub modal (`GO_BACK`): that's the preview.
 
 **Discover questionnaires** (phase one: short, free screeners with Arabic
 versions; longer or restricted ones wait for phase two, with professionals on
-board): PHQ-8, GAD-7, WHO-5, ASRS-5 and PCL-5, one JSON each in `constants/psychometrics/`
-(registered in `index.ts`). Scoring (`lib/psychometrics/score.ts`) is `mean`
+board): PHQ-8, GAD-7, WHO-5, ASRS-5 and PCL-5, one JSON each in `constants/psychometrics/`. A
+test's intro puts the not-a-diagnosis warning first, then its description and instructions, then
+its source.
+Tests are registered in `index.ts`. Scoring (`lib/psychometrics/score.ts`) is `mean`
 (trait reflections), `sum` (the screeners' totals; `multiplier` makes WHO-5 a
 percentage) or `count` (items at or above their `threshold`; unused since ASRS
 v1.1 gave way to ASRS-5), with the published cut-offs as bands; a band can say

@@ -174,7 +174,7 @@ export const duskScene: SunScene = {
   halo: '#EC8C6E',
   glow: '#F2A078',
   sunGlow: true,
-  ring: { light: '#FFE0B8', glow: '#FFC98E', mark: '#EC8C6E', words: alpha('#FFD9B3', 0.72), wordsHome: alpha('#F2A078', 0.92) },
+  ring: { light: '#FFEBD6', glow: '#FFD6B0', mark: '#EFA58A', words: alpha('#FFE6CC', 0.6), wordsHome: alpha('#F2B394', 0.85) },
   rays: null,
   lattice: null,
   surface: '#F5B08A',

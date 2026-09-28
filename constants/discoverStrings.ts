@@ -19,6 +19,9 @@ export const discoverStrings = {
       duration: 'Duration',
       video: 'Video',
       noLimit: 'No limit',
+      custom: 'Custom',
+      fewerMinutes: 'A minute less',
+      moreMinutes: 'A minute more',
       on: 'On',
       off: 'Off',
       patterns: {
@@ -106,6 +109,9 @@ export const discoverStrings = {
       duration: 'المدة',
       video: 'الفيديو',
       noLimit: 'بلا حد',
+      custom: 'مدة مخصّصة',
+      fewerMinutes: 'دقيقة أقل',
+      moreMinutes: 'دقيقة أكثر',
       on: 'مفعّل',
       off: 'غير متاح',
       patterns: {

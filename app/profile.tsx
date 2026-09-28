@@ -9,7 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { alpha, layout, type ColorScheme } from '@/constants/theme';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { getCountryName } from '@/lib/countries';
-import { exportAndShareJournal } from '@/lib/journal';
+import { useJournalExport } from '@/hooks/useJournalExport';
 import { computeStreak, getMyBadges, getMyStreak } from '@/lib/streaks';
 import { sessionDays } from '@/lib/sessionLog';
 import { listResults } from '@/lib/psychometrics/results';
@@ -97,9 +97,10 @@ export default function ProfileScreen() {
   const monthName = t.journal.dateNames.monthsLong[new Date().getMonth()];
   const back = () => (router.canGoBack() ? router.back() : router.replace('/(tabs)'));
   const go = (href: Href) => () => router.push(href);
+  const exportJournal = useJournalExport();
   const onExport = () => {
     setExportFailed(false);
-    exportAndShareJournal().catch(() => setExportFailed(true));
+    exportJournal().catch(() => setExportFailed(true));
   };
 
   const country = profile?.country ? getCountryName(profile.country, language) : null;

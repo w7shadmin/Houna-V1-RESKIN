@@ -28,6 +28,8 @@ const GLOW = 420;
 
 /** Where the halo's layers overlap, their light adds up to this at the disc's edge. */
 const HALO_STRENGTH = 0.6;
+/** Round Dusk's ring of light the halo is softer: the ring is its own light. */
+const RING_HALO_STRENGTH = 0.32;
 
 /**
  * The star lattice (canvas "Phase 3 — Sunrise: the star-lattice sun"): four eight-point stars,
@@ -50,7 +52,7 @@ const WORDS_REACH_HOME = 100;
 /** The baked Kufic ring's own proportions: its words circle at 88 of its 224. */
 const WORDS_SIZE = (WORDS_REACH * 224) / 88;
 /** The ring of light's width. */
-const RING_WIDTH = 8;
+const RING_WIDTH = 6;
 
 type Num = Animated.Value | Animated.AnimatedInterpolation<number>;
 
@@ -108,7 +110,7 @@ export default function SunDisc({ form, scene, home = 0 }: SunDiscProps) {
           <Svg width={GLOW} height={GLOW}>
             <Defs>
               <RadialGradient id="sunglow" cx="50%" cy="50%" r="50%">
-                <Stop offset="0.2" {...stopProps(alpha(scene.glow, 0.28))} />
+                <Stop offset="0.2" {...stopProps(alpha(scene.glow, scene.ring ? 0.14 : 0.28))} />
                 <Stop offset="1" {...stopProps(alpha(scene.glow, 0))} />
               </RadialGradient>
             </Defs>
@@ -152,7 +154,7 @@ export default function SunDisc({ form, scene, home = 0 }: SunDiscProps) {
           </Svg>
         </Animated.View>
         )}
-        {glow && <EdgeHalo size={HALO} edge={DISC / 2} color={scene.halo} strength={HALO_STRENGTH} />}
+        {glow && <EdgeHalo size={HALO} edge={DISC / 2} color={scene.halo} strength={scene.ring ? RING_HALO_STRENGTH : HALO_STRENGTH} />}
       </Animated.View>
 
       {/* The disc and the mark: still, only fading in as the sun forms. */}
@@ -187,12 +189,12 @@ function RingLight({ light, glow }: { light: string; glow: string }) {
           <RadialGradient id="ringInside" cx="50%" cy="50%" r="50%">
             <Stop offset={0} {...stopProps(light, 0.14)} />
             <Stop offset={0.7} {...stopProps(glow, 0.12)} />
-            <Stop offset={1} {...stopProps(glow, 0.6)} />
+            <Stop offset={1} {...stopProps(glow, 0.32)} />
           </RadialGradient>
         </Defs>
         <Circle cx={DISC / 2} cy={DISC / 2} r={DISC / 2} fill="url(#ringInside)" />
       </Svg>
-      <View style={[styles.ring, { borderColor: light, boxShadow: `0 0 21px ${alpha(glow, 0.9)}` }]} />
+      <View style={[styles.ring, { borderColor: light, boxShadow: `0 0 16px ${alpha(glow, 0.5)}` }]} />
     </View>
   );
 }
@@ -206,8 +208,8 @@ function Lattice({ colors, form, scale }: { colors: { deep: string; light: strin
   const { breath } = useStarfield()!.clock;
   const lap = useCalmLoop((v) => Animated.loop(Animated.timing(v, { toValue: 1, duration: LATTICE_LOOP_MS, easing: Easing.linear, useNativeDriver: NATIVE })));
   const turns = [lap.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '1440deg'] }), lap.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '-1080deg'] })];
-  // A deep breath, so it reads: from faint to full, swelling about an eighth.
-  const opacity = Animated.multiply(form, breath.interpolate({ inputRange: [0, 1], outputRange: [0.3, 1] }));
+  // It breathes in size (about an eighth) and a little in light, but never fades into the sky.
+  const opacity = Animated.multiply(form, breath.interpolate({ inputRange: [0, 1], outputRange: [0.75, 1] }));
   const swell = breath.interpolate({ inputRange: [0, 1], outputRange: [0.94, 1.08] });
   const c = LATTICE / 2;
   // Drawn in, the lines would thin: keep them about as fine as in the scene.
@@ -228,7 +230,7 @@ function Lattice({ colors, form, scale }: { colors: { deep: string; light: strin
                 return (
                   <G key={k}>
                     {/* The line itself, in the deeper colour so it reads against the pale morning. */}
-                    <Polygon points={points} fill="none" stroke={colors.deep} strokeOpacity={Math.min(1, st.opacity * (st.deep ? 1.3 : 1))} strokeWidth={1.3 * st.width * w} />
+                    <Polygon points={points} fill="none" stroke={colors.deep} strokeOpacity={Math.min(0.95, st.opacity * (st.deep ? 2 : 1.5))} strokeWidth={1.8 * st.width * w} />
                     {/* Its light: soft and pale. */}
                     <Polygon points={points} fill="none" stroke={colors.core} strokeOpacity={Math.min(1, st.opacity * 1.8)} strokeWidth={2.4 * st.width * w} filter={`url(#latticeLight${pair})`} />
                   </G>

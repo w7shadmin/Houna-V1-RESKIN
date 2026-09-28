@@ -8,8 +8,6 @@
  * only tracked `createdAt`. `id` is now a real UUID rather than the old
  * `${Date.now()}-${random}` string.
  */
-import { File, Paths } from 'expo-file-system';
-import * as Sharing from 'expo-sharing';
 import { MOOD_STYLE } from '@/constants/moods';
 import { generateId, getLocalDb } from './localDb';
 
@@ -230,28 +228,4 @@ export function formatEntryDateShort(dateStr: string, names: DateNames, num: (n:
 /** e.g. "Sunday, September 21" — used for the new-entry heading. */
 export function formatEntryDateLong(d: Date, names: DateNames, num: (n: number) => string): string {
   return `${names.weekdaysLong[d.getDay()]}${names.comma}${dayMonth(num(d.getDate()), names.monthsLong[d.getMonth()], names)}`;
-}
-
-export async function exportEntriesAsJson(): Promise<string> {
-  const entries = await loadEntries();
-  return JSON.stringify(entries, null, 2);
-}
-
-/**
- * Real backup mechanism: writes all entries to a JSON file and opens the
- * native share sheet so the user can save it anywhere they choose (Files,
- * email to self, cloud drive, etc). Replaces the old MVP's decorative
- * Canvas "share as image" feature, which has no RN equivalent — this is
- * the actual data-loss protection CLAUDE.md asks for, since the journal
- * lives only in this on-device database.
- */
-export async function exportAndShareJournal(): Promise<void> {
-  const json = await exportEntriesAsJson();
-  const file = new File(Paths.cache, `houna-journal-export-${Date.now()}.json`);
-  file.create();
-  file.write(json);
-  const available = await Sharing.isAvailableAsync();
-  if (available) {
-    await Sharing.shareAsync(file.uri, { mimeType: 'application/json', UTI: 'public.json' });
-  }
 }

@@ -9,7 +9,7 @@ import type { IconTileTone } from '@/components/ui/IconTile';
 
 export type BreatheKey = 'anxiety-relief' | 'steady-mind' | 'panic-relief' | 'tension-release' | 'physiological-sigh';
 
-export const BREATHE_ORDER: readonly BreatheKey[] = ['anxiety-relief', 'steady-mind', 'panic-relief', 'tension-release', 'physiological-sigh'];
+export const BREATHE_ORDER: readonly BreatheKey[] = ['anxiety-relief', 'physiological-sigh', 'steady-mind', 'panic-relief', 'tension-release'];
 
 export const BREATHE_TONE: Record<BreatheKey, IconTileTone> = {
   'anxiety-relief': 'glow',
@@ -79,5 +79,7 @@ export const TENSE_MS = 5000;
 export const RELEASE_MS = 7000;
 
 /** Meditation lengths offered on the hub; null is "no limit". */
-export const MEDITATION_MINUTES: readonly (number | null)[] = [5, 10, 20, null];
+export const MEDITATION_MINUTES: readonly (number | null)[] = [3, 5, 10, 15, 20, 30, 45, 60, null];
+/** A custom length, set on the wheel's last row: from 1 minute to 2 hours. */
+export const MEDITATION_CUSTOM_RANGE = [1, 120] as const;
 export const DEFAULT_MEDITATION_MINUTES = 10;

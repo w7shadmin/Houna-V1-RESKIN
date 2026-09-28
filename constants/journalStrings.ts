@@ -86,6 +86,9 @@ export const journalStrings = {
       frustrated: 'Frustrated',
       tired: 'Tired',
     } as Record<MoodTag, string>,
+    exportTitle: 'My Houna journal',
+    exportedOn: 'Exported {date}',
+    exportEmpty: 'No entries yet.',
     moodLabelsFull: {
       angry: 'Angry',
       anxious: 'Anxious',
@@ -175,6 +178,9 @@ export const journalStrings = {
       frustrated: 'محبط',
       tired: 'متعب',
     } as Record<MoodTag, string>,
+    exportTitle: 'يومياتي في هُنا',
+    exportedOn: 'صُدّرت في {date}',
+    exportEmpty: 'لا توجد مدخلات بعد.',
     moodLabelsFull: {
       angry: 'غاضب',
       anxious: 'قلق',

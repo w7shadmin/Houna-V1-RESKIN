@@ -41,6 +41,8 @@ export default function StarfieldScreen() {
   // Home's "Sun & moon" hands over its moon whole: it stays that size, the same moon throughout.
   const moonScale = fromBody ? HOME_MOON_SCALE : 1;
   const sky = useRef(new Animated.Value(0)).current;
+  /** The full moon's ring, coming out slowly once the sky is in (and going first on the way home). */
+  const ring = useRef(new Animated.Value(0)).current;
   const glide = useRef(new Animated.Value(0)).current;
   const word = useRef(new Animated.Value(0)).current;
   const [settled, setSettled] = useState(false);
@@ -55,6 +57,11 @@ export default function StarfieldScreen() {
   useEffect(() => {
     if (!frame) return;
     const raf = requestAnimationFrame(() => setHaloHidden(true));
+    // The ring on its own, slower than the rest, so the word can still come in on time.
+    Animated.sequence([
+      Animated.delay(700),
+      Animated.timing(ring, { toValue: 1, duration: 2800, easing: Easing.inOut(Easing.sin), useNativeDriver: NATIVE }),
+    ]).start();
     Animated.sequence([
       Animated.parallel([
         Animated.timing(sky, { toValue: 1, duration: 900, easing: Easing.out(Easing.quad), useNativeDriver: NATIVE }),
@@ -87,9 +94,11 @@ export default function StarfieldScreen() {
     countVisit();
     setSettled(false);
     word.stopAnimation();
+    ring.stopAnimation();
     Animated.sequence([
       Animated.timing(word, { toValue: 0, duration: 250, useNativeDriver: NATIVE }),
       Animated.parallel([
+        Animated.timing(ring, { toValue: 0, duration: 700, easing: Easing.inOut(Easing.sin), useNativeDriver: NATIVE }),
         Animated.timing(glide, { toValue: 0, duration: 1100, easing: Easing.inOut(Easing.cubic), useNativeDriver: NATIVE }),
         Animated.sequence([
           Animated.delay(300),
@@ -101,7 +110,7 @@ export default function StarfieldScreen() {
       setHaloHidden(false);
       requestAnimationFrame(() => requestAnimationFrame(() => router.back()));
     });
-  }, [word, glide, sky, router, setHaloHidden, countVisit]);
+  }, [word, glide, sky, ring, router, setHaloHidden, countVisit]);
 
   // Screen on, system bars away, Android Back = tapping the moon.
   useImmersiveScene('houna-starfield', close);
@@ -156,7 +165,7 @@ export default function StarfieldScreen() {
             <Pressable onPress={close} accessibilityRole="button" accessibilityLabel={t.home.starfield.close}>
               {/* The mark becoming the moon partway through the glide (and back on the way home). */}
               {/* The full-moon ring comes out with the sky (Home's moon has none). */}
-              <MoonDisc form={moonForm} ringOpacity={sky} />
+              <MoonDisc form={moonForm} ringOpacity={ring} />
               {/* Exactly Home's Night mark (same colours, strength and clock), minus the ring,
                   giving way to the moon's own. */}
               {!fromBody && (

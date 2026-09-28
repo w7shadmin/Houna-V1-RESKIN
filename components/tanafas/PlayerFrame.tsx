@@ -60,6 +60,12 @@ interface PlayerFrameProps {
  * header (the hub's 16 of padding and its 44 row, below the top inset), and every stage is 250 tall.
  */
 const STAGE_TOP = layout.markAnchor - (16 + 44) - 250 / 2;
+/**
+ * The hub's header room (its 16 of padding and 44 row). The scroll view reaches up under it, its
+ * content padded down by as much, so a full orb's glow fades out into the sky instead of being cut
+ * straight where the scroll view used to start.
+ */
+const UNDER_HEADER = 16 + 44;
 
 export default function PlayerFrame({ stage, heading, label, body, nav, info, controls, mode, away, stageTop = STAGE_TOP }: PlayerFrameProps) {
   const { colors } = useTheme();
@@ -91,7 +97,7 @@ export default function PlayerFrame({ stage, heading, label, body, nav, info, co
   return (
     <View style={styles.player}>
       {/* Scrolls only when a long completion message wouldn't otherwise fit. */}
-      <ScrollView style={styles.player} contentContainerStyle={[styles.stageArea, { paddingTop: stageTop }]} showsVerticalScrollIndicator={false} bounces={false}>
+      <ScrollView style={[styles.player, styles.underHeader]} contentContainerStyle={[styles.stageArea, { paddingTop: stageTop + UNDER_HEADER }]} showsVerticalScrollIndicator={false} bounces={false}>
         {stage}
 
         <View style={styles.titleRow}>
@@ -301,6 +307,9 @@ export function SideSpacer() {
 const styles = StyleSheet.create({
   player: {
     flex: 1,
+  },
+  underHeader: {
+    marginTop: -UNDER_HEADER,
   },
   stageArea: {
     flexGrow: 1,

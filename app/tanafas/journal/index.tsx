@@ -9,7 +9,8 @@ import { grid, layout, radius } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
 import { MOOD_STYLE } from '@/constants/moods';
 import { arabicNumber } from '@/lib/arabicNumerals';
-import { loadEntries, exportAndShareJournal, formatEntryDateShort, MOOD_TAGS, type JournalEntry } from '@/lib/journal';
+import { loadEntries, formatEntryDateShort, MOOD_TAGS, type JournalEntry } from '@/lib/journal';
+import { useJournalExport } from '@/hooks/useJournalExport';
 import EntryCard from '@/components/journal/EntryCard';
 import MoodTrendChart from '@/components/journal/MoodTrendChart';
 import MoodGlyph from '@/components/mood/MoodGlyph';
@@ -87,10 +88,11 @@ export default function JournalHomeScreen() {
     return { dateStr: selectedDateStr, entry: moodEntries.find((e) => e.date === selectedDateStr) ?? null };
   }, [selectedDateStr, moodEntries]);
 
+  const exportJournal = useJournalExport();
   const handleExport = async () => {
     setExporting(true);
     try {
-      await exportAndShareJournal();
+      await exportJournal();
     } catch {
       Alert.alert(list.exportError);
     } finally {

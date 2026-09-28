@@ -182,7 +182,7 @@ type Opacity = Animated.Value | Animated.AnimatedInterpolation<number>;
 export default function MoonDisc({ form, date, ringOpacity: ringShown }: {
   form: Opacity;
   date?: Date;
-  /** The full-moon ring's own opacity (0 on Home, where it would crowd the date; the starfield fades it in). */
+  /** The full-moon ring's own opacity (0 on Home, where it would crowd the date; the starfield fades and grows it in). */
   ringOpacity?: Opacity;
 }) {
   const { breath } = useStarfield()!.clock;
@@ -208,7 +208,9 @@ export default function MoonDisc({ form, date, ringOpacity: ringShown }: {
   const side = phase.waxing ? DISC / 2 : -DISC / 2;
   const ringBreath = Animated.multiply(form, breath.interpolate({ inputRange: [0, 1], outputRange: [0.35, 1] }));
   const ringOpacity = ringShown ? Animated.multiply(ringShown, ringBreath) : ringBreath;
-  const ringScale = breath.interpolate({ inputRange: [0, 1], outputRange: [0.95, 1.08] });
+  const ringBreathScale = breath.interpolate({ inputRange: [0, 1], outputRange: [0.95, 1.08] });
+  // Coming out, the ring also grows gently into place, never popping in.
+  const ringScale = ringShown ? Animated.multiply(ringBreathScale, ringShown.interpolate({ inputRange: [0, 1], outputRange: [0.85, 1] })) : ringBreathScale;
 
   return (
     <View style={styles.box} pointerEvents="none">
