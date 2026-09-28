@@ -287,4 +287,5 @@ ${K.label('Round 2 of 10', T.dark ? M.mist : T.sec, 11)}
 })();
 
 module.exports = out;
+module.exports.helpers = { header, hero, THEMES, IMG, HERO_CSS };
 if (require.main === module) console.log(out.map((b) => `${b.file} ${b.w}×${b.h}`).join('\n'));

@@ -20,7 +20,6 @@ import HomeBody, { startSkyChange, type SkyChange } from '@/components/home/Home
 import HijriDate from '@/components/home/HijriDate';
 import { BOWL_MARK, BOWL_MARK_DROP } from '@/components/home/CrescentBowl';
 import MoodBloom, { HOME_BLOOM } from '@/components/mood/MoodBloom';
-import Card from '@/components/ui/Card';
 import IconButton from '@/components/ui/IconButton';
 import CanvasIcon from '@/components/ui/CanvasIcon';
 import NightStars from '@/components/home/NightStars';
@@ -314,8 +313,9 @@ export default function HomeScreen() {
         </View>
 
         <Animated.View style={[styles.lower, chrome.style]} pointerEvents={chrome.pointerEvents}>
-        {/* Community card */}
-        <Card variant="feature" style={[styles.community, { backgroundColor: solid(colors.card) }]}>
+        {/* Breathing together: the map, its periods and the count, straight on the sky (canvas "Round 2 —
+            Home's map without its card"); the card's room is kept, so nothing else moves. */}
+        <View style={styles.community}>
           <View style={styles.communityHead}>
             <Text
               style={[
@@ -398,7 +398,7 @@ export default function HomeScreen() {
               </Text>
             )
           )}
-        </Card>
+        </View>
 
         {/* Crisis — always here, never behind navigation. */}
         <Pressable
@@ -527,6 +527,8 @@ const styles = StyleSheet.create({
   },
   community: {
     gap: 12,
+    // The card's own padding, kept: the map, chips and count stay where they were.
+    padding: 16,
   },
   communityHead: {
     flexDirection: 'row',

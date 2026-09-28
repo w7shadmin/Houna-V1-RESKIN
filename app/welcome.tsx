@@ -35,7 +35,7 @@ interface Cue {
 const BREATH_CUES: Cue[] = [];
 let at = BREATH_AT;
 for (const phase of FIRST_BREATH) {
-  BREATH_CUES.push({ key: phase.key, from: at, to: at + phase.seconds * 1000 });
+  BREATH_CUES.push({ key: phase.key as 'inhale' | 'hold' | 'exhale', from: at, to: at + phase.seconds * 1000 });
   at += phase.seconds * 1000;
 }
 const END_AT = at + 200;

@@ -12,10 +12,10 @@ test('the first session, and streak badges up to the streak', () => {
   assert.deepEqual(qualifyingBadges(8, [s('breathing', 'steady-mind')]), ['first_session', 'streak_3', 'streak_7']);
 });
 
-test('every breath needs all four exercises; a sky visit is not one of them', () => {
-  const three = ['anxiety-relief', 'steady-mind', 'panic-relief'].map((e) => s('breathing', e));
-  assert.ok(!qualifyingBadges(0, [...three, s('breathing', 'starfield')]).includes('all_breathing'));
-  assert.ok(qualifyingBadges(0, [...three, s('breathing', 'tension-release')]).includes('all_breathing'));
+test('every breath needs all five exercises; a sky visit is not one of them', () => {
+  const four = ['anxiety-relief', 'steady-mind', 'panic-relief', 'tension-release'].map((e) => s('breathing', e));
+  assert.ok(!qualifyingBadges(0, [...four, s('breathing', 'starfield')]).includes('all_breathing'));
+  assert.ok(qualifyingBadges(0, [...four, s('breathing', 'physiological-sigh')]).includes('all_breathing'));
 });
 
 test('every scene and every sky', () => {
@@ -30,7 +30,7 @@ test('every scene and every sky', () => {
 
 test('results keep the shown order', () => {
   const all = qualifyingBadges(100, [
-    ...['anxiety-relief', 'steady-mind', 'panic-relief', 'tension-release', 'sunrise', 'dusk', 'starfield'].map((e) => s('breathing', e)),
+    ...['anxiety-relief', 'steady-mind', 'panic-relief', 'tension-release', 'physiological-sigh', 'sunrise', 'dusk', 'starfield'].map((e) => s('breathing', e)),
     ...['fire', 'rain', 'forest', 'ocean'].map((e) => s('meditation', e)),
   ]);
   assert.deepEqual(all, [...BADGE_ORDER]);

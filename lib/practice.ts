@@ -7,8 +7,8 @@ import type { LoggedSession } from './sessionLog';
  * and the journal can never count here.
  */
 
-/** The parts of practice, in the arc's order: the four exercises in their tones, meditation, then the Home scenes. */
-export const PRACTICE_GROUPS = ['anxietyRelief', 'steadyMind', 'panicRelief', 'tensionRelease', 'meditation', 'tanafas'] as const;
+/** The parts of practice, in the arc's order: the five exercises in their tones, meditation, then the Home scenes. */
+export const PRACTICE_GROUPS = ['anxietyRelief', 'steadyMind', 'panicRelief', 'tensionRelease', 'physiologicalSigh', 'meditation', 'tanafas'] as const;
 export type PracticeGroup = (typeof PRACTICE_GROUPS)[number];
 
 const EXERCISE_GROUP: Record<string, PracticeGroup> = {
@@ -16,6 +16,7 @@ const EXERCISE_GROUP: Record<string, PracticeGroup> = {
   'steady-mind': 'steadyMind',
   'panic-relief': 'panicRelief',
   'tension-release': 'tensionRelease',
+  'physiological-sigh': 'physiologicalSigh',
 };
 
 /** Which part of practice a session was: an exercise, meditation, or a visit to Home's sky (the starfield, sunrise, dusk, the sky clock). */

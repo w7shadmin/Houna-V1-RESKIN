@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Round 2 — Home’s map without its card</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=DM+Mono:wght@400;500&amp;family=Figtree:wght@300;400;500;600&amp;family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&amp;family=Marcellus&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font:inherit;color:inherit}
+@keyframes twinkle { 0%,100% { opacity: 0.25 } 50% { opacity: 1 } }
+@keyframes drift { 0% { transform: translate(0,0) scale(1) } 50% { transform: translate(24px,-18px) scale(1.08) } 100% { transform: translate(0,0) scale(1) } }
+@keyframes drift2 { 0% { transform: translate(0,0) scale(1.05) } 50% { transform: translate(-30px,22px) scale(0.95) } 100% { transform: translate(0,0) scale(1.05) } }
+@keyframes spin { to { transform: rotate(360deg) } }
+@keyframes spinBack { to { transform: rotate(-360deg) } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: none } }
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes glowPulse { 0%,100% { opacity: 0.55 } 50% { opacity: 1 } }
+@keyframes bars { 0%,100% { transform: scaleY(0.35) } 50% { transform: scaleY(1) } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important } }
+
+</style>
+</helmet>
+<div style="position: relative; width: 2620px; height: 994px; overflow: hidden; box-sizing: border-box; font-family: 'Figtree', system-ui, sans-serif; background: #070B1C">
+<img src="img/r2/home-card-night.png" alt="Night, today" style="position: absolute; left: 40px; top: 40px; width: 390px; height: 844px; border-radius: 34px; box-shadow: 0 0 0 1px rgba(242,236,221,0.12), 0 20px 50px rgba(0,0,0,0.35)">
+<div style="position: absolute; left: 40px; top: 902px; width: 390px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 15px; font-weight: 600; color: #F2ECDD">Night, today</span><span style="font-size: 13px; line-height: 1.45; color: #B6BAD6">The map in its card.</span></div>
+<img src="img/r2/home-nocard-night.png" alt="Night, no card" style="position: absolute; left: 470px; top: 40px; width: 390px; height: 844px; border-radius: 34px; box-shadow: 0 0 0 1px rgba(242,236,221,0.12), 0 20px 50px rgba(0,0,0,0.35)">
+<div style="position: absolute; left: 470px; top: 902px; width: 390px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 15px; font-weight: 600; color: #F2ECDD">Night, no card</span><span style="font-size: 13px; line-height: 1.45; color: #B6BAD6">The map, chips and count straight on the sky, where the card was: nothing else moves.</span></div>
+<img src="img/r2/home-card-day.png" alt="Dusk, today" style="position: absolute; left: 900px; top: 40px; width: 390px; height: 844px; border-radius: 34px; box-shadow: 0 0 0 1px rgba(242,236,221,0.12), 0 20px 50px rgba(0,0,0,0.35)">
+<div style="position: absolute; left: 900px; top: 902px; width: 390px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 15px; font-weight: 600; color: #F2ECDD">Dusk, today</span></div>
+<img src="img/r2/home-nocard-day.png" alt="Dusk, no card" style="position: absolute; left: 1330px; top: 40px; width: 390px; height: 844px; border-radius: 34px; box-shadow: 0 0 0 1px rgba(242,236,221,0.12), 0 20px 50px rgba(0,0,0,0.35)">
+<div style="position: absolute; left: 1330px; top: 902px; width: 390px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 15px; font-weight: 600; color: #F2ECDD">Dusk, no card</span><span style="font-size: 13px; line-height: 1.45; color: #B6BAD6">The chips keep their pill, so the choice still reads as a control.</span></div>
+<img src="img/r2/home-card-sunrise.png" alt="Sunrise, today" style="position: absolute; left: 1760px; top: 40px; width: 390px; height: 844px; border-radius: 34px; box-shadow: 0 0 0 1px rgba(242,236,221,0.12), 0 20px 50px rgba(0,0,0,0.35)">
+<div style="position: absolute; left: 1760px; top: 902px; width: 390px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 15px; font-weight: 600; color: #F2ECDD">Sunrise, today</span></div>
+<img src="img/r2/home-nocard-sunrise.png" alt="Sunrise, no card" style="position: absolute; left: 2190px; top: 40px; width: 390px; height: 844px; border-radius: 34px; box-shadow: 0 0 0 1px rgba(242,236,221,0.12), 0 20px 50px rgba(0,0,0,0.35)">
+<div style="position: absolute; left: 2190px; top: 902px; width: 390px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 15px; font-weight: 600; color: #F2ECDD">Sunrise, no card</span><span style="font-size: 13px; line-height: 1.45; color: #B6BAD6">Lighter: the page reads as one sky, from the sun down to the count.</span></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":2620,"height":994}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

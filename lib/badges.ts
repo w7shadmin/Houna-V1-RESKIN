@@ -33,7 +33,7 @@ export const BADGE_ORDER: readonly BadgeCode[] = [
 export const isBadgeCode = (code: string): code is BadgeCode => (BADGE_ORDER as readonly string[]).includes(code);
 
 /** What each exploring badge asks for, by the session log's `exercise` ids. */
-const BREATHING = ['anxiety-relief', 'steady-mind', 'panic-relief', 'tension-release'];
+const BREATHING = ['anxiety-relief', 'steady-mind', 'panic-relief', 'tension-release', 'physiological-sigh'];
 const SCENES = ['fire', 'rain', 'forest', 'ocean'];
 const SKIES = ['sunrise', 'dusk', 'starfield'];
 

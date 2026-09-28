@@ -26,6 +26,7 @@ export const discoverStrings = {
         steadyMind: '4 · 4 · 4 · 4',
         panicRelief: 'Five senses',
         tensionRelease: 'Group by group',
+        physiologicalSigh: '2 · 1 · 6',
       },
       ambientScene: 'Ambient scene',
       /** The Meditate tab's hero (canvas "Players — the Meditate tab as a hero"). */
@@ -35,6 +36,8 @@ export const discoverStrings = {
       chooseScene: 'Choose a scene',
       chooseSceneTitle: 'Choose a scene',
       choose: 'Choose {name}',
+      // The scene sheet's button: choosing and starting in one step (canvas "Round 2 — the scene sheet").
+      beginWith: { fire: 'Begin by the fire', rain: 'Begin with the rain', forest: 'Begin by the creek', ocean: 'Begin by the sea' },
       lengthTitle: 'How long?',
       done: 'Done',
       withVideo: 'Video and sound on · change them during the session',
@@ -110,6 +113,7 @@ export const discoverStrings = {
         steadyMind: '٤ · ٤ · ٤ · ٤',
         panicRelief: 'الحواس الخمس',
         tensionRelease: 'مجموعة تلو الأخرى',
+        physiologicalSigh: '٢ · ١ · ٦',
       },
       ambientScene: 'مشهد محيطي',
       meditate: 'تأمّل',
@@ -118,6 +122,7 @@ export const discoverStrings = {
       chooseScene: 'اختر مشهدًا',
       chooseSceneTitle: 'اختر مشهدًا',
       choose: 'اختر {name}',
+      beginWith: { fire: 'لنبدأ قرب النار', rain: 'لنبدأ مع المطر', forest: 'لنبدأ قرب الجدول', ocean: 'لنبدأ قرب البحر' },
       lengthTitle: 'كم من الوقت؟',
       done: 'تم',
       withVideo: 'الفيديو والصوت يعملان · يمكنك تغييرهما أثناء الجلسة',

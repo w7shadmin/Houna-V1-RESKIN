@@ -1,15 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Easing, Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { ClipPath, Defs, Image as SvgImage, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { alpha } from '@/constants/theme';
 import { MEDITATION_SCENES, SCENE_ORBS, type SceneId } from '@/components/meditation/scenes';
 import Button from '@/components/ui/Button';
 import { NATIVE, useReduceMotion } from '@/hooks/useCalmLoop';
 import { stopProps } from '@/lib/svgStop';
 
-const W = 118;
-const H = 168;
+/** The window: one large mihrab arch. */
+const W = 236;
+const H = 300;
+/** The round windows beneath, one per scene. */
+const ORB = 56;
 
 /** A mihrab arch w×h: two arcs of radius 0.7w meeting at a point, on straight sides. */
 function archPath(w: number, h: number) {
@@ -20,64 +24,112 @@ function archPath(w: number, h: number) {
 const ARCH = archPath(W, H);
 
 /**
- * The app's scenes in mihrab arches, two by two (canvas "Players — choosing a scene"): the
- * chosen one outlined, with little bars moving in it, and a button to take it.
+ * Choosing a scene, as one window (canvas "Round 2 — the scene sheet", option A): the chosen scene
+ * large in an arch, in its own light, its name and line on it and the bars of its sound; the four
+ * scenes as round windows beneath to switch between. The button begins it ("Begin by the fire"),
+ * so choosing and starting are one step.
  */
-export default function ScenePicker({ value, onChoose }: { value: number; onChoose: (index: number) => void }) {
+export default function ScenePicker({ value, onBegin }: { value: number; onBegin: (index: number) => void }) {
   const { colors } = useTheme();
   const { t, fonts } = useLanguage();
   const h = t.discover.hub;
   const names = t.tanafas.meditation.scenes;
   const [picked, setPicked] = useState(value);
   useEffect(() => setPicked(value), [value]);
+  const scene = MEDITATION_SCENES[picked];
+  const id = scene.id as SceneId;
+  const orb = SCENE_ORBS[id];
 
   return (
     <View style={styles.wrap}>
-      <View style={styles.grid}>
-        {MEDITATION_SCENES.map((scene, k) => {
+      <View style={styles.window} accessible accessibilityLabel={`${names[id].name}. ${h.sceneLines[id]}`}>
+        <View pointerEvents="none" style={[styles.light, { boxShadow: `0 0 60px 10px ${orb.glow}` }]} />
+        {/* Keyed on the scene, so a new one fades in rather than swapping. */}
+        <FadeIn key={id}>
+          <Svg width={W} height={H}>
+            <Defs>
+              <ClipPath id="sceneArch">
+                <Path d={ARCH} />
+              </ClipPath>
+              <LinearGradient id="sceneFill" x1="0" y1="0" x2="0" y2="1">
+                <Stop offset="0" {...stopProps(orb.hi)} />
+                <Stop offset="0.5" {...stopProps(orb.c)} />
+                <Stop offset="1" {...stopProps(orb.lo)} />
+              </LinearGradient>
+              <LinearGradient id="sceneShade" x1="0" y1="0" x2="0" y2="1">
+                <Stop offset="0.55" {...stopProps('#000000', 0)} />
+                <Stop offset="1" {...stopProps('#000000', 0.5)} />
+              </LinearGradient>
+            </Defs>
+            {scene.thumbnail ? (
+              <SvgImage href={scene.thumbnail} x={0} y={0} width={W} height={H} preserveAspectRatio="xMidYMid slice" clipPath="url(#sceneArch)" />
+            ) : (
+              <Rect x={0} y={0} width={W} height={H} fill="url(#sceneFill)" clipPath="url(#sceneArch)" />
+            )}
+            <Rect x={0} y={0} width={W} height={H} fill="url(#sceneShade)" clipPath="url(#sceneArch)" />
+          </Svg>
+          <View style={styles.caption} pointerEvents="none">
+            <Text style={[styles.sceneName, { fontFamily: fonts.display }]}>{names[id].name}</Text>
+            <Text style={[styles.sceneLine, { fontFamily: fonts.regular }]}>{h.sceneLines[id]}</Text>
+          </View>
+          <View style={styles.bars}>
+            <Bars />
+          </View>
+        </FadeIn>
+      </View>
+
+      <View style={styles.orbs} accessibilityRole="radiogroup">
+        {MEDITATION_SCENES.map((s, k) => {
           const selected = k === picked;
-          const orb = SCENE_ORBS[scene.id as SceneId];
+          const o = SCENE_ORBS[s.id as SceneId];
           return (
             <Pressable
-              key={scene.id}
+              key={s.id}
               accessibilityRole="radio"
               aria-checked={selected}
-              accessibilityLabel={names[scene.id].name}
+              accessibilityLabel={names[s.id].name}
               onPress={() => setPicked(k)}
-              style={({ pressed }) => [styles.cell, pressed && styles.pressed]}
+              style={({ pressed }) => [styles.orbCell, pressed && styles.pressed]}
             >
-              <View style={styles.archBox}>
-                <Svg width={W + 8} height={H + 8} viewBox={`-4 -4 ${W + 8} ${H + 8}`}>
-                  <Defs>
-                    <ClipPath id={`arch-${scene.id}`}>
-                      <Path d={ARCH} />
-                    </ClipPath>
-                    <LinearGradient id={`archFill-${scene.id}`} x1="0" y1="0" x2="0" y2="1">
-                      <Stop offset="0" {...stopProps(orb.hi)} />
-                      <Stop offset="0.5" {...stopProps(orb.c)} />
-                      <Stop offset="1" {...stopProps(orb.lo)} />
-                    </LinearGradient>
-                  </Defs>
-                  {scene.thumbnail ? (
-                    <SvgImage href={scene.thumbnail} x={0} y={0} width={W} height={H} preserveAspectRatio="xMidYMid slice" clipPath={`url(#arch-${scene.id})`} />
-                  ) : (
-                    <Rect x={0} y={0} width={W} height={H} fill={`url(#archFill-${scene.id})`} clipPath={`url(#arch-${scene.id})`} />
-                  )}
-                  {selected && <Path d={ARCH} fill="none" stroke={colors.text} strokeWidth={2.5} />}
-                </Svg>
-                {selected && <Bars />}
+              <View
+                style={[
+                  styles.orb,
+                  selected
+                    ? { borderColor: colors.text, boxShadow: `0 0 18px ${o.glow}` }
+                    : { borderColor: alpha(colors.text, 0.12) },
+                ]}
+              >
+                {s.thumbnail ? (
+                  <Image source={s.thumbnail} style={styles.orbImage} accessibilityIgnoresInvertColors />
+                ) : (
+                  <View style={[styles.orbImage, { backgroundColor: o.c }]} />
+                )}
               </View>
-              <Text style={[styles.name, { color: colors.text, fontFamily: selected ? fonts.semiBold : fonts.regular }]}>{names[scene.id].name}</Text>
+              <Text style={[styles.orbName, { color: selected ? colors.text : colors.textSecondary, fontFamily: selected ? fonts.semiBold : fonts.regular }]}>
+                {names[s.id].name}
+              </Text>
             </Pressable>
           );
         })}
       </View>
-      <Button block label={h.choose.replace('{name}', names[MEDITATION_SCENES[picked].id].name)} onPress={() => onChoose(picked)} />
+
+      <Button block label={h.beginWith[id]} onPress={() => onBegin(picked)} />
     </View>
   );
 }
 
-/** Four little bars rising and falling in the chosen arch. Still under Reduce Motion. */
+/** Fades its child in as it mounts: key it on what it shows. */
+function FadeIn({ children }: { children: React.ReactNode }) {
+  const v = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    const anim = Animated.timing(v, { toValue: 1, duration: 350, easing: Easing.out(Easing.quad), useNativeDriver: NATIVE });
+    anim.start();
+    return () => anim.stop();
+  }, [v]);
+  return <Animated.View style={{ opacity: v }}>{children}</Animated.View>;
+}
+
+/** Four little bars rising and falling: the scene's sound. Still under Reduce Motion. */
 function Bars() {
   const reduceMotion = useReduceMotion();
   const vs = useRef([0, 1, 2, 3].map(() => new Animated.Value(0.6))).current;
@@ -95,7 +147,7 @@ function Bars() {
     return () => loops.forEach((l) => l.stop());
   }, [vs, reduceMotion]);
   return (
-    <View pointerEvents="none" style={styles.bars}>
+    <View pointerEvents="none" style={styles.barRow}>
       {vs.map((v, i) => (
         <Animated.View key={i} style={[styles.bar, { transform: [{ scaleY: v }] }]} />
       ))}
@@ -105,40 +157,77 @@ function Bars() {
 
 const styles = StyleSheet.create({
   wrap: {
-    gap: 20,
+    gap: 24,
   },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    columnGap: 32,
-    rowGap: 16,
+  window: {
+    alignSelf: 'center',
+    width: W,
+    height: H,
+    marginTop: 8,
   },
-  cell: {
-    alignItems: 'center',
-    gap: 8,
+  light: {
+    position: 'absolute',
+    left: 24,
+    right: 24,
+    top: 48,
+    bottom: 24,
+    borderRadius: W / 2,
   },
-  archBox: {
-    width: W + 8,
-    height: H + 8,
-    alignItems: 'center',
-    justifyContent: 'center',
+  caption: {
+    position: 'absolute',
+    start: 20,
+    bottom: 16,
+    gap: 4,
+  },
+  sceneName: {
+    color: '#FFFFFF',
+    fontSize: 26,
+    lineHeight: 32,
+  },
+  sceneLine: {
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: 13.5,
   },
   bars: {
     position: 'absolute',
+    end: 20,
+    bottom: 24,
+  },
+  barRow: {
     flexDirection: 'row',
     alignItems: 'flex-end',
     gap: 4,
-    height: 22,
+    height: 18,
   },
   bar: {
     width: 3,
-    height: 22,
+    height: 18,
     borderRadius: 2,
     backgroundColor: '#FFFFFF',
   },
-  name: {
-    fontSize: 15,
+  orbs: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 8,
+  },
+  orbCell: {
+    width: 72,
+    alignItems: 'center',
+    gap: 8,
+  },
+  orb: {
+    width: ORB,
+    height: ORB,
+    borderRadius: ORB / 2,
+    borderWidth: 2,
+    overflow: 'hidden',
+  },
+  orbImage: {
+    width: '100%',
+    height: '100%',
+  },
+  orbName: {
+    fontSize: 13,
   },
   pressed: {
     opacity: 0.85,

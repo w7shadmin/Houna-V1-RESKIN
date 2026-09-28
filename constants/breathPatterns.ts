@@ -7,9 +7,9 @@ import type { IconTileTone } from '@/components/ui/IconTile';
  * from here, never hardcode them.
  */
 
-export type BreatheKey = 'anxiety-relief' | 'steady-mind' | 'panic-relief' | 'tension-release';
+export type BreatheKey = 'anxiety-relief' | 'steady-mind' | 'panic-relief' | 'tension-release' | 'physiological-sigh';
 
-export const BREATHE_ORDER: readonly BreatheKey[] = ['anxiety-relief', 'steady-mind', 'panic-relief', 'tension-release'];
+export const BREATHE_ORDER: readonly BreatheKey[] = ['anxiety-relief', 'steady-mind', 'panic-relief', 'tension-release', 'physiological-sigh'];
 
 export const BREATHE_TONE: Record<BreatheKey, IconTileTone> = {
   'anxiety-relief': 'glow',
@@ -17,17 +17,20 @@ export const BREATHE_TONE: Record<BreatheKey, IconTileTone> = {
   'panic-relief': 'dawn',
   // Its own colour: it sits between grounding (dawn) and, wrapping round, 4-7-8 (glow).
   'tension-release': 'bloom',
+  // A fifth tone: between relaxation (bloom) and, wrapping round, 4-7-8 (glow).
+  'physiological-sigh': 'tide',
 };
 
 export interface BreathPhase {
-  key: 'inhale' | 'hold' | 'exhale';
+  /** `topup`: the physiological sigh's second, short breath in, on top of the first. */
+  key: 'inhale' | 'topup' | 'hold' | 'exhale';
   seconds: number;
-  /** How full the orb is by the end of the phase: 0 at rest, 1 filling the ring. */
-  fill: 0 | 1;
+  /** How full the orb is by the end of the phase: 0 at rest, 1 filling the ring (the sigh's first breath stops short). */
+  fill: number;
 }
 
 /** Timed breathing patterns: one round is the phases in order. */
-export const BREATH_PATTERNS: Record<'anxiety-relief' | 'steady-mind', readonly BreathPhase[]> = {
+export const BREATH_PATTERNS: Record<'anxiety-relief' | 'steady-mind' | 'physiological-sigh', readonly BreathPhase[]> = {
   // 4-7-8
   'anxiety-relief': [
     { key: 'inhale', seconds: 4, fill: 1 },
@@ -41,6 +44,12 @@ export const BREATH_PATTERNS: Record<'anxiety-relief' | 'steady-mind', readonly 
     { key: 'exhale', seconds: 4, fill: 0 },
     { key: 'hold', seconds: 4, fill: 0 },
   ],
+  // The physiological sigh: in through the nose, a short top-up, one long breath out. No hold.
+  'physiological-sigh': [
+    { key: 'inhale', seconds: 2, fill: 0.8 },
+    { key: 'topup', seconds: 1, fill: 1 },
+    { key: 'exhale', seconds: 6, fill: 0 },
+  ],
 };
 
 /**
@@ -52,6 +61,9 @@ export const FIRST_BREATH: readonly BreathPhase[] = [
   { key: 'hold', seconds: 2, fill: 1 },
   { key: 'exhale', seconds: 6, fill: 0 },
 ];
+
+/** Seconds of 3 · 2 · 1 before any breathing exercise starts (components/tanafas/Countdown.tsx). */
+export const COUNTDOWN_SECONDS = 3;
 
 export const SESSION_MINUTES = [1, 3, 5] as const;
 export const DEFAULT_SESSION_MINUTES = 3;

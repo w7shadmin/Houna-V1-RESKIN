@@ -75,6 +75,7 @@ const EXERCISE_KEYS = {
   'steady-mind': 'steadyMind',
   'panic-relief': 'panicRelief',
   'tension-release': 'tensionRelease',
+  'physiological-sigh': 'physiologicalSigh',
 } as const;
 
 /**

@@ -17,7 +17,7 @@ interface MonthRidgesProps {
 }
 
 /** Drawn back to front: the sky visits and meditation behind, the exercises' tones over them. */
-const DRAW_ORDER: PracticeGroup[] = ['tanafas', 'meditation', 'tensionRelease', 'panicRelief', 'steadyMind', 'anxietyRelief'];
+const DRAW_ORDER: PracticeGroup[] = ['tanafas', 'meditation', 'physiologicalSigh', 'tensionRelease', 'panicRelief', 'steadyMind', 'anxietyRelief'];
 const TICKS = [1, 8, 15, 22, 29];
 
 /** A smooth line through points (Catmull-Rom as cubic Béziers). */

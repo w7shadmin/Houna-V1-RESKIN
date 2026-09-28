@@ -22,7 +22,8 @@ import { useSessionLog } from '@/hooks/useSessionLog';
 import { sessionEndAlert } from '@/lib/sessionEndAlert';
 import CanvasIcon, { DirectionalIcon } from '@/components/ui/CanvasIcon';
 import type { IconTileTone } from '@/components/ui/IconTile';
-import { BreathStage, NATIVE_DRIVER, OrbStage, StarStage } from './BreatheStages';
+import { BreathStage, NATIVE_DRIVER, OrbStage, SighStage, StarStage } from './BreatheStages';
+import { CountdownNumber, CountdownRing, useCountdown } from './Countdown';
 import PlayerFrame, {
   Body,
   FadeIn,
@@ -72,6 +73,7 @@ export default function BreathePlayer(props: PlayerProps) {
   switch (props.exercise) {
     case 'anxiety-relief':
     case 'steady-mind':
+    case 'physiological-sigh':
       return <PhasePlayer key={props.exercise} {...props} />;
     case 'panic-relief':
       return <GroundingPlayer {...props} />;
@@ -86,6 +88,7 @@ export const EXERCISE_TEXT = {
   'steady-mind': 'steadyMind',
   'panic-relief': 'panicRelief',
   'tension-release': 'tensionRelease',
+  'physiological-sigh': 'physiologicalSigh',
 } as const;
 
 /** Glow for the round button and the screen, from the tone's light hue. */
@@ -120,6 +123,19 @@ function useIdleSlots(exercise: BreatheKey) {
     durationTile: <Tile label={h.duration}>{e.duration}</Tile>,
     beginLabel: `${h.begin} — ${e.title}`,
   };
+}
+
+/** Play during the countdown stops it: nothing has started, so nothing is counted. */
+function StopCountdown({ onPress, tone }: { onPress: () => void; tone: IconTileTone }) {
+  const { colors } = useTheme();
+  const { t } = useLanguage();
+  return (
+    <>
+      <SideSpacer />
+      <MainButton label={t.tanafas.session.stopCountdown} glow={toneGlow(colors, tone)} onPress={onPress} renderIcon={(c) => <CanvasIcon name="pause" size={28} color={c} />} />
+      <SideSpacer />
+    </>
+  );
 }
 
 function PlayIcon(c: string) {
@@ -291,8 +307,8 @@ function PhasePlayer({ exercise, breath, nav, onSessionActive, onInSession, away
   const { e, tone } = idle;
   const accent = colors.tones[tone].fg;
   const accentText = colors.tones[tone].text;
-  const phases = BREATH_PATTERNS[exercise as 'anxiety-relief' | 'steady-mind'];
-  const phaseLabel = (p: BreathPhase) => ('inhale' in e ? e[p.key] : p.key);
+  const phases = BREATH_PATTERNS[exercise as keyof typeof BREATH_PATTERNS];
+  const phaseLabel = (p: BreathPhase) => (e as Partial<Record<BreathPhase['key'], string>>)[p.key] ?? p.key;
 
   const [minutes, setMinutes] = useState(DEFAULT_SESSION_MINUTES);
   const trace = useRef(new Animated.Value(0)).current;
@@ -300,11 +316,15 @@ function PhasePlayer({ exercise, breath, nav, onSessionActive, onInSession, away
   const cycle = useBreathCycle(exercise, phases, minutes, breath, trace);
   const { status, clock } = cycle;
   const inSession = status === 'running' || status === 'paused';
-  const mode = inSession ? 'session' : status;
+  // 3 · 2 · 1 before the first breath: the session's look, the stage at rest.
+  const countdown = useCountdown();
+  const counting = countdown.active;
+  const mode = inSession || counting ? 'session' : status;
   useReportActive(status === 'running', onSessionActive);
-  useReportActive(inSession, onInSession);
+  useReportActive(inSession || counting, onInSession);
   useHoldTurns(status, clock, phases, turn);
-  // 4-7-8 breathes a glass orb with the phase inside it; box breathing traces the star.
+  // 4-7-8 breathes a glass orb with the phase inside it; box breathing traces the star; the sigh
+  // rises to two lines in its glass. Box and the sigh show the phase beneath the stage.
   const orb = exercise === 'anxiety-relief';
   const phaseNow = phaseLabel(phases[clock.phase]);
   // The phase is drawn, not read out: say each one to a screen reader as it comes.
@@ -331,10 +351,11 @@ function PhasePlayer({ exercise, breath, nav, onSessionActive, onInSession, away
   return (
     <PlayerFrame
       mode={mode}
-      nav={status === 'idle' ? nav : null}
+      nav={status === 'idle' && !counting ? nav : null}
       away={away}
       stage={
-        orb ? (
+        <CountdownRing active={counting} tone={tone}>
+        {orb ? (
           <OrbStage
             tone={tone}
             breath={breath}
@@ -342,12 +363,19 @@ function PhasePlayer({ exercise, breath, nav, onSessionActive, onInSession, away
             full={inSession && phases[clock.phase].key === 'hold' && phases[clock.phase].fill === 1}
             word={inSession ? phaseNow : undefined}
           />
+        ) : exercise === 'physiological-sigh' ? (
+          <SighStage tone={tone} breath={breath} />
         ) : (
           <StarStage tone={tone} trace={trace} turn={turn} showTracer={inSession} full={inSession && phases[clock.phase].key === 'hold'} />
-        )
+        )}
+        </CountdownRing>
       }
       heading={
-        inSession ? (
+        counting ? (
+          <FadeIn key={countdown.n}>
+            <CountdownNumber n={countdown.n} />
+          </FadeIn>
+        ) : inSession ? (
           orb ? (
             // The phase is in the orb; the exercise's name sits beneath it.
             <Heading>{e.title}</Heading>
@@ -363,7 +391,12 @@ function PhasePlayer({ exercise, breath, nav, onSessionActive, onInSession, away
         )
       }
       label={
-        inSession ? (
+        counting ? (
+          <>
+            <Body>{s.settle}</Body>
+            <TrackedLabel color={accentText}>{e.title}</TrackedLabel>
+          </>
+        ) : inSession ? (
           <>
             {!orb && <Body>{e.title}</Body>}
             <TrackedLabel color={accentText}>{`${s.round} ${num(clock.round)} ${s.ofTotal} ${num(cycle.totalRounds)}`}</TrackedLabel>
@@ -375,14 +408,16 @@ function PhasePlayer({ exercise, breath, nav, onSessionActive, onInSession, away
         )
       }
       body={
-        inSession ? null : status === 'complete' ? (
+        inSession || counting ? null : status === 'complete' ? (
           <Body>{e.completionBody}</Body>
         ) : (
           idle.body
         )
       }
       info={
-        inSession ? (
+        counting ? (
+          <ProgressInfo progress={0} color={accent} label={s.timeLeft.replace('{t}', `${num(minutes)}:${num(0)}${num(0)}`)} />
+        ) : inSession ? (
           <ProgressInfo progress={cycle.progress} color={accent} label={status === 'paused' ? s.paused : s.timeLeft.replace('{t}', clockText)} />
         ) : status === 'complete' ? null : (
           <InfoTiles>
@@ -392,7 +427,9 @@ function PhasePlayer({ exercise, breath, nav, onSessionActive, onInSession, away
         )
       }
       controls={
-        inSession ? (
+        counting ? (
+          <StopCountdown onPress={countdown.cancel} tone={tone} />
+        ) : inSession ? (
           <>
             <SideButton label={s.end} onPress={cycle.reset} renderIcon={(c) => <RotateCcw size={22} color={c} strokeWidth={1.7} />} />
             <MainButton
@@ -406,13 +443,13 @@ function PhasePlayer({ exercise, breath, nav, onSessionActive, onInSession, away
         ) : status === 'complete' ? (
           <>
             <EndButton label={s.done} onPress={cycle.reset} />
-            <MainButton label={s.startAgain} glow={toneGlow(colors, tone)} onPress={cycle.start} renderIcon={(c) => <RotateCcw size={26} color={c} strokeWidth={1.8} />} />
+            <MainButton label={s.startAgain} glow={toneGlow(colors, tone)} onPress={() => countdown.begin(cycle.start)} renderIcon={(c) => <RotateCcw size={26} color={c} strokeWidth={1.8} />} />
             <SideSpacer />
           </>
         ) : (
           <>
             <SideSpacer />
-            <MainButton label={idle.beginLabel} glow={toneGlow(colors, tone)} onPress={cycle.start} renderIcon={PlayIcon} />
+            <MainButton label={idle.beginLabel} glow={toneGlow(colors, tone)} onPress={() => countdown.begin(cycle.start)} renderIcon={PlayIcon} />
             <SideSpacer />
           </>
         )
@@ -484,13 +521,16 @@ function GroundingPlayer({ exercise, breath, nav, onInSession }: PlayerProps) {
   const current = steps[step];
   const isLast = step === steps.length - 1;
   const running = status === 'running';
-  useReportActive(running, onInSession);
+  const countdown = useCountdown();
+  const counting = countdown.active;
+  useReportActive(running || counting, onInSession);
 
   return (
     <PlayerFrame
-      mode={status}
-      nav={status === 'idle' ? nav : null}
+      mode={counting ? 'running' : status}
+      nav={status === 'idle' && !counting ? nav : null}
       stage={
+        <CountdownRing active={counting} tone={tone}>
         <BreathStage
           tone={tone}
           breath={breath}
@@ -498,9 +538,14 @@ function GroundingPlayer({ exercise, breath, nav, onInSession }: PlayerProps) {
           full={full}
           // The mark sits in the orb; the step's count is in the prompt beneath.
         />
+        </CountdownRing>
       }
       heading={
-        running ? (
+        counting ? (
+          <FadeIn key={countdown.n}>
+            <CountdownNumber n={countdown.n} />
+          </FadeIn>
+        ) : running ? (
           <FadeIn key={step}>
             <Heading>{current.prompt}</Heading>
           </FadeIn>
@@ -511,7 +556,12 @@ function GroundingPlayer({ exercise, breath, nav, onInSession }: PlayerProps) {
         )
       }
       label={
-        running ? (
+        counting ? (
+          <>
+            <Body>{s.settle}</Body>
+            <TrackedLabel color={accentText}>{idle.e.title}</TrackedLabel>
+          </>
+        ) : running ? (
           <TrackedLabel color={accentText}>{ex.stepCounter(step + 1, steps.length, current.sense)}</TrackedLabel>
         ) : status === 'complete' ? (
           <TrackedLabel color={accentText}>{ex.completionSubtitle}</TrackedLabel>
@@ -519,9 +569,9 @@ function GroundingPlayer({ exercise, breath, nav, onInSession }: PlayerProps) {
           idle.label
         )
       }
-      body={running ? <Body>{ex.takeYourTime}</Body> : status === 'complete' ? <Body>{ex.completionBody}</Body> : idle.body}
+      body={counting ? null : running ? <Body>{ex.takeYourTime}</Body> : status === 'complete' ? <Body>{ex.completionBody}</Body> : idle.body}
       info={
-        running ? (
+        counting ? null : running ? (
           <View style={styles.steps} accessibilityRole="tablist">
             {steps.map((st, i) => (
               <Pressable
@@ -549,7 +599,9 @@ function GroundingPlayer({ exercise, breath, nav, onInSession }: PlayerProps) {
         )
       }
       controls={
-        running ? (
+        counting ? (
+          <StopCountdown onPress={countdown.cancel} tone={tone} />
+        ) : running ? (
           <>
             <SideButton
               label={t.directory.common.goBack}
@@ -569,13 +621,13 @@ function GroundingPlayer({ exercise, breath, nav, onInSession }: PlayerProps) {
         ) : status === 'complete' ? (
           <>
             <EndButton label={s.done} onPress={() => setStatus('idle')} />
-            <MainButton label={ex.startAgain} glow={toneGlow(colors, tone)} onPress={begin} renderIcon={(c) => <RotateCcw size={26} color={c} strokeWidth={1.8} />} />
+            <MainButton label={ex.startAgain} glow={toneGlow(colors, tone)} onPress={() => countdown.begin(begin)} renderIcon={(c) => <RotateCcw size={26} color={c} strokeWidth={1.8} />} />
             <SideSpacer />
           </>
         ) : (
           <>
             <SideSpacer />
-            <MainButton label={idle.beginLabel} glow={toneGlow(colors, tone)} onPress={begin} renderIcon={PlayIcon} />
+            <MainButton label={idle.beginLabel} glow={toneGlow(colors, tone)} onPress={() => countdown.begin(begin)} renderIcon={PlayIcon} />
             <SideSpacer />
           </>
         )
@@ -673,22 +725,30 @@ function TensionPlayer({ exercise, breath, nav, onSessionActive, onInSession, aw
   const isFinal = group === groups.length - 1 && !isTense;
   const current = groups[group];
   const secondsLeft = Math.max(Math.ceil((duration - elapsed) / 1000), 0);
+  const countdown = useCountdown();
+  const counting = countdown.active;
   useReportActive(status === 'running', onSessionActive);
-  useReportActive(inSession, onInSession);
+  useReportActive(inSession || counting, onInSession);
 
   return (
     <PlayerFrame
-      mode={inSession ? 'session' : status}
-      nav={status === 'idle' ? nav : null}
+      mode={inSession || counting ? 'session' : status}
+      nav={status === 'idle' && !counting ? nav : null}
       away={away}
       stage={
         // The same lit orb as the other exercises; the count sits on it in ink, as the play icon does on its light button.
         // The mark sits in the orb; the countdown joins the Tense / Release label.
         // Lit briefly as each tense begins: the release has just filled the orb (or, first time, it's just opened).
-        <BreathStage tone={tone} breath={breath} full={inSession && isTense && elapsed >= 400 && elapsed < 1100} />
+        <CountdownRing active={counting} tone={tone}>
+          <BreathStage tone={tone} breath={breath} full={inSession && isTense && elapsed >= 400 && elapsed < 1100} />
+        </CountdownRing>
       }
       heading={
-        inSession ? (
+        counting ? (
+          <FadeIn key={countdown.n}>
+            <CountdownNumber n={countdown.n} />
+          </FadeIn>
+        ) : inSession ? (
           <FadeIn key={group}>
             <Heading>{current.name}</Heading>
           </FadeIn>
@@ -699,7 +759,12 @@ function TensionPlayer({ exercise, breath, nav, onSessionActive, onInSession, aw
         )
       }
       label={
-        inSession ? (
+        counting ? (
+          <>
+            <Body>{s.settle}</Body>
+            <TrackedLabel color={accentText}>{idle.e.title}</TrackedLabel>
+          </>
+        ) : inSession ? (
           <FadeIn key={phase}>
             <TrackedLabel color={accentText}>{`${isTense ? ex.tense : ex.release} · ${num(secondsLeft)}`}</TrackedLabel>
           </FadeIn>
@@ -710,7 +775,7 @@ function TensionPlayer({ exercise, breath, nav, onSessionActive, onInSession, aw
         )
       }
       body={
-        inSession ? (
+        counting ? null : inSession ? (
           <FadeIn key={`${group}-${phase}`}>
             <Body>{isTense ? current.tensePrompt : current.releasePrompt}</Body>
           </FadeIn>
@@ -721,7 +786,7 @@ function TensionPlayer({ exercise, breath, nav, onSessionActive, onInSession, aw
         )
       }
       info={
-        inSession ? (
+        counting ? null : inSession ? (
           <ProgressInfo
             progress={elapsed / duration}
             color={accent}
@@ -735,7 +800,9 @@ function TensionPlayer({ exercise, breath, nav, onSessionActive, onInSession, aw
         )
       }
       controls={
-        inSession ? (
+        counting ? (
+          <StopCountdown onPress={countdown.cancel} tone={tone} />
+        ) : inSession ? (
           <>
             <SideButton
               label={t.directory.common.goBack}
@@ -759,13 +826,13 @@ function TensionPlayer({ exercise, breath, nav, onSessionActive, onInSession, aw
         ) : status === 'complete' ? (
           <>
             <EndButton label={s.done} onPress={() => setStatus('idle')} />
-            <MainButton label={ex.startAgain} glow={toneGlow(colors, tone)} onPress={begin} renderIcon={(c) => <RotateCcw size={26} color={c} strokeWidth={1.8} />} />
+            <MainButton label={ex.startAgain} glow={toneGlow(colors, tone)} onPress={() => countdown.begin(begin)} renderIcon={(c) => <RotateCcw size={26} color={c} strokeWidth={1.8} />} />
             <SideSpacer />
           </>
         ) : (
           <>
             <SideSpacer />
-            <MainButton label={idle.beginLabel} glow={toneGlow(colors, tone)} onPress={begin} renderIcon={PlayIcon} />
+            <MainButton label={idle.beginLabel} glow={toneGlow(colors, tone)} onPress={() => countdown.begin(begin)} renderIcon={PlayIcon} />
             <SideSpacer />
           </>
         )

@@ -379,6 +379,9 @@ phase round a ring from the 1st (counter-clockwise in Arabic), tap one for its
 phase and date, tonight faintly ringed, and the days to the next new moon. The
 nights practised glow softly behind their moons, and a tap on one says its minutes.
 
+**Home's map** sits straight on the sky, with its periods and count (canvas "Round 2 — Home's map
+without its card"): the card's box went, its padding stayed, so nothing on Home moved.
+
 **Graphs** (phase 4, canvas "Houna — Graphs (phase 4)"), all from the phone's own
 session log (`lib/sessionLog.ts`: breathing and meditation only, so mood never
 counts) through `lib/practice.ts` (tested): the parts of practice
@@ -564,7 +567,19 @@ a ring also turns (not while grounding lights it), and none take Home's
 5s breath, which would fight the exercise's own pace.
 Nothing is drawn over the orb: grounding's count is in its prompt, muscle
 relaxation's countdown in its Tense / Release label. Tones: 4-7-8 glow, box
-dusk, five senses dawn, muscle relaxation bloom (a fourth tone, the mood palette's rose, so neighbours in the carousel never share a colour).
+dusk, five senses dawn, muscle relaxation bloom (a fourth tone, the mood palette's rose, so neighbours in the carousel never share a colour), the physiological sigh tide (a fifth: sky blue in Night and Dusk, late-morning gold in Sunrise, whose blue is its dusk tone).
+The physiological sigh (canvas "Round 2 — the physiological sigh") is the fifth exercise, run by
+the timed player: in 2 (to `fill` 0.8), a short top-up of 1 (`topup`, to full), out 6, no hold,
+so the breath-retention safeguards don't apply. Its stage, `SighStage`, is 4-7-8's glass orb with
+two lines to rise to (dashed, where the first breath stops; the outer ring, which lights with the
+mark as the glass meets it, read from `breath` itself); its words sit beneath, as box's do. It's a
+part of practice of its own (`physiologicalSigh`), and "Every breath" now asks for all five.
+Every breathing exercise starts with a countdown (canvas "Round 2 — a countdown"):
+`components/tanafas/Countdown.tsx` counts `COUNTDOWN_SECONDS` (3) where the phase word will be,
+"Settle in. Breathe as you are." beneath, a thin ring in the tone drawing down round the stage
+(`CountdownRing` always wraps the stage, so it never remounts), then calls the player's own start.
+The session's look (ground, full screen) begins with it; its button stops it, before anything is
+counted. Each number is said to a screen reader; under Reduce Motion the ring holds still.
 While any breathing session is on, running or paused, the hub lays the
 orbit board's fall of light behind it (`colors.sessionGround`, midnight or
 the theme's ground down to dawn; `BreathePlayer` reports `onInSession`), and
@@ -580,8 +595,11 @@ from `lib/hijri.ts`: Umm al-Qura via `Intl`, left out where the calendar is
 missing), a line to sit with (`sceneLines`), and a glowing play ring that
 opens the full-screen player. Its Scene and Length rows open
 `components/ui/GlassSheet.tsx` (the check-in's glass, for choices made in
-place): `ScenePicker` (the scenes in mihrab arches, photos clipped by
-`react-native-svg`) and `MinutesWheel`. On the web preview a click outside
+place): `ScenePicker` and `MinutesWheel`. The scene sheet is one window (canvas "Round 2 —
+the scene sheet", option A): the chosen scene large in a mihrab arch (photo clipped by
+`react-native-svg`) in its own light, its name, line and sound bars on it, the four as round
+windows beneath; its button begins it ("Begin by the fire": the hub opens the player once the
+sheet has sunk, `onHidden`), so choosing and starting are one step. On the web preview a click outside
 the app's frame dismisses the hub modal (`GO_BACK`): that's the preview.
 
 **Discover questionnaires** (phase one: short, free screeners with Arabic

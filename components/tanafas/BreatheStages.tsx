@@ -12,6 +12,7 @@ import HounaMark from '@/components/HounaMark';
 import { useStarfield } from '@/contexts/StarfieldContext';
 import { WAVE_STEPS, useCalmLoop, wave } from '@/hooks/useCalmLoop';
 import type { IconTileTone } from '@/components/ui/IconTile';
+import { BREATH_PATTERNS } from '@/constants/breathPatterns';
 
 /** Animations on the stage and the screen glow stay on the UI thread on native. */
 export const NATIVE_DRIVER = Platform.OS !== 'web';
@@ -305,6 +306,70 @@ function sawtooth(laps: number, offset: number) {
   return { inputRange, outputRange };
 }
 
+/* ──────────────── The physiological sigh: two lines to rise to ──────────────── */
+
+/** Where the sigh's first breath stops, as the glass's scale (its fill, on the orb's rest-to-full range). */
+const SIGH_FIRST = GLASS_REST + (1 - GLASS_REST) * BREATH_PATTERNS['physiological-sigh'][0].fill;
+
+/**
+ * The physiological sigh's stage (canvas "Round 2 — the physiological sigh"): 4-7-8's glass orb
+ * with two lines to rise to. The first breath fills it to the dashed line; the short top-up takes
+ * it to the outer ring, which lights, with the mark, as the glass meets it (read from `breath`
+ * itself, so it lights exactly there); then the long, slow fall. The mark is pressed in at the
+ * stage's centre, where the others' sit. Phase words sit beneath, as box breathing's do.
+ */
+export function SighStage({ tone, breath }: { tone: IconTileTone; breath: Animated.Value }) {
+  const { colors, isNight } = useTheme();
+  const fg = colors.tones[tone].fg;
+  const hue = colors.tones[tone].hue;
+  const scale = breath.interpolate({ inputRange: [0, 1], outputRange: [GLASS_REST, 1] });
+  const haloScale = breath.interpolate({ inputRange: [0, 1], outputRange: [0.75, 1] });
+  const haloOpacity = breath.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0.9] });
+  const lit = breath.interpolate({ inputRange: [0, 0.9, 1], outputRange: [0, 0, 1], extrapolate: 'clamp' });
+  const surface = flatten(alpha(hue, 0.22), colors.background);
+  const stops: [string, number][] = [
+    [alpha('#FFFFFF', isNight ? 0.32 : 0.85), 0],
+    [alpha(hue, 0.16), 0.45],
+    [alpha(hue, 0.26), 1],
+  ];
+  const line = isNight ? alpha(colors.text, 0.22) : alpha(colors.text, 0.2);
+  return (
+    <View style={styles.stage} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+      <Animated.View pointerEvents="none" style={[styles.halo, { opacity: haloOpacity, transform: [{ scale: haloScale }] }]}>
+        <Svg width={SIZE} height={SIZE}>
+          <Defs>
+            <RadialGradient id="sighHalo" cx="50%" cy="50%" r="50%">
+              <Stop offset={0} {...stopProps(alpha(hue, 0.3))} />
+              <Stop offset={1} {...stopProps(alpha(hue, 0))} />
+            </RadialGradient>
+          </Defs>
+          <Circle cx={C} cy={C} r={C} fill="url(#sighHalo)" />
+        </Svg>
+      </Animated.View>
+      {/* The two lines: the first breath's (dashed), the top-up's (the outer ring). */}
+      <Svg width={SIZE} height={SIZE} style={StyleSheet.absoluteFill} pointerEvents="none">
+        <Circle cx={C} cy={C} r={(GLASS * SIGH_FIRST) / 2} fill="none" stroke={line} strokeWidth={1} strokeDasharray="4 5" />
+        <Circle cx={C} cy={C} r={GLASS / 2} fill="none" stroke={line} strokeOpacity={0.75} strokeWidth={1} />
+      </Svg>
+      <Animated.View style={{ transform: [{ scale }] }}>
+        <Orb size={GLASS} fx={0.35} fy={0.3} stops={stops} glow={`0 0 40px ${alpha(hue, 0.25)}`} />
+        <View pointerEvents="none" style={[styles.glassEdge, { borderColor: alpha(hue, 0.45) }]} />
+      </Animated.View>
+      {/* Not inside the scale: the mark stays its size, pressed into the glass at the centre. */}
+      <PressedMark size={SIGH_MARK} surface={surface} />
+      <Animated.View style={[styles.centre, { opacity: lit }]} pointerEvents="none" needsOffscreenAlphaCompositing>
+        <HounaMark size={SIGH_MARK} color={fg} />
+      </Animated.View>
+      <Animated.View
+        pointerEvents="none"
+        style={[styles.sighRing, { borderColor: fg, boxShadow: `0 0 18px ${alpha(fg, 0.8)}`, opacity: lit }]}
+      />
+    </View>
+  );
+}
+/** The sigh's mark: the size 4-7-8's rests at, as the star's. */
+const SIGH_MARK = 44;
+
 /* ──────────────── Box breathing: the star ──────────────── */
 
 /** The squares' half-diagonal; the bead runs round the squares' sides. */
@@ -513,6 +578,15 @@ const styles = StyleSheet.create({
     fontSize: 28,
     lineHeight: 44,
     textAlign: 'center',
+  },
+  sighRing: {
+    position: 'absolute',
+    left: C - GLASS / 2 - 1,
+    top: C - GLASS / 2 - 1,
+    width: GLASS + 2,
+    height: GLASS + 2,
+    borderRadius: GLASS / 2 + 1,
+    borderWidth: RIM,
   },
   wordPlace: {
     transform: [{ translateY: WORD_DROP }],

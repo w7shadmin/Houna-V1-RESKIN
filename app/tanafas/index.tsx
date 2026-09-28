@@ -86,6 +86,13 @@ export default function TanafasHubScreen() {
     setTab(next);
   };
   const close = () => (router.canGoBack() ? router.back() : router.replace('/(tabs)'));
+  // The full-screen player, on a scene and the chosen length (from the hero, or the scene sheet's Begin).
+  const beginScene = useRef<number | null>(null);
+  const openPlayer = (i: number) =>
+    router.push({
+      pathname: '/tanafas/meditation/[scene]',
+      params: { scene: MEDITATION_SCENES[i].id, minutes: meditateMinutes === null ? 'none' : String(meditateMinutes) },
+    });
   // Drag the hub down to close it, Home showing behind (a transparent modal): not during a
   // breathing session (it would end it), nor with a glass sheet open (that drag is the sheet's).
   const { height } = useWindowDimensions();
@@ -169,19 +176,30 @@ export default function TanafasHubScreen() {
             minutes={meditateMinutes}
             onScene={() => setSheet('scene')}
             onLength={() => setSheet('length')}
-            onBegin={() =>
-              router.push({ pathname: '/tanafas/meditation/[scene]', params: { scene: scene.id, minutes: meditateMinutes === null ? 'none' : String(meditateMinutes) } })
-            }
+            onBegin={() => openPlayer(sceneIndex)}
           />
         )}
       </View>
 
       {/* The Meditate hero's choices, as glass sheets over the hub. */}
-      <GlassSheet visible={sheet === 'scene'} onClose={() => setSheet(null)} eyebrow={h.scene} title={h.chooseSceneTitle} closeLabel={t.checkIn.close}>
+      <GlassSheet
+        visible={sheet === 'scene'}
+        onClose={() => setSheet(null)}
+        eyebrow={h.scene}
+        title={h.chooseSceneTitle}
+        closeLabel={t.checkIn.close}
+        // "Begin" chose a scene: once the sheet has sunk, the player opens on it.
+        onHidden={() => {
+          const i = beginScene.current;
+          beginScene.current = null;
+          if (i !== null) openPlayer(i);
+        }}
+      >
         <ScenePicker
           value={sceneIndex}
-          onChoose={(i) => {
+          onBegin={(i) => {
             setSceneIndex(i);
+            beginScene.current = i;
             setSheet(null);
           }}
         />

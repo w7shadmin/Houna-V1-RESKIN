@@ -28,6 +28,8 @@ export const nightPalette = {
   dusk: '#B3A7F5', // Secondary accent
   /** A fourth tone, added after the sheets (the mood palette's rose): muscle relaxation. */
   bloom: '#EA90A8',
+  /** A fifth tone, "tide" (the physiological sigh): sky blue. */
+  tide: '#8CC8F2',
   /** Tab bar ground (Home artboard nav). */
   tabBar: '#0F1534',
 } as const;
@@ -45,6 +47,8 @@ export const dayPalette = {
   duskDeep: '#6353C9', // Secondary accent
   /** Deep rose for the bloom tone on light (added after the sheet). */
   bloomDeep: '#B24B6B',
+  /** Deep sky for the tide tone on light. */
+  tideDeep: '#2E6DA8',
   /** Pale fill (Daylight sheet swatch-card ground). */
   paleFill: '#EEF3F1',
 } as const;
@@ -73,6 +77,10 @@ export const sunrisePalette = {
   peach: '#F9A980',
   lightCyan: '#20C4F4',
   raspberry: '#F37B83',
+  /** Late-morning gold for the tide tone: Sunrise spends its blue on dusk. Not a brand colour. */
+  gold: '#C98A12',
+  goldText: '#A06C0A',
+  lightGold: '#F4C35A',
   /** Pale fill (swatch cards, topic stage). */
   paleFill: '#E6F2EF',
   /** Check-in sheet and its scrim. */
@@ -285,7 +293,7 @@ export interface ColorTokens {
   onAccent: string;
 
   /** Icon-tile tones from the canvas. */
-  tones: { glow: AccentTone; dawn: AccentTone; dusk: AccentTone; bloom: AccentTone };
+  tones: { glow: AccentTone; dawn: AccentTone; dusk: AccentTone; bloom: AccentTone; tide: AccentTone };
 
   /** "Need to talk now?" crisis pill. */
   crisis: { bg: string; border: string; borderSoft: string; icon: string };
@@ -344,12 +352,14 @@ const TONE_BG = {
   dawn: alpha(N.dawn, 0.12),
   dusk: alpha(N.dusk, 0.12),
   bloom: alpha(N.bloom, 0.12),
+  tide: alpha(N.tide, 0.12),
 };
 const TONE_BORDER = {
   glow: alpha(N.hounaGlow, 0.28),
   dawn: alpha(N.dawn, 0.28),
   dusk: alpha(N.dusk, 0.3),
   bloom: alpha(N.bloom, 0.3),
+  tide: alpha(N.tide, 0.3),
 };
 
 export const nightColors: ColorTokens = {
@@ -388,6 +398,7 @@ export const nightColors: ColorTokens = {
     dawn: { fg: N.dawn, text: N.dawn, hue: N.dawn, bg: TONE_BG.dawn, border: TONE_BORDER.dawn },
     dusk: { fg: N.dusk, text: N.dusk, hue: N.dusk, bg: TONE_BG.dusk, border: TONE_BORDER.dusk },
     bloom: { fg: N.bloom, text: N.bloom, hue: N.bloom, bg: TONE_BG.bloom, border: TONE_BORDER.bloom },
+    tide: { fg: N.tide, text: N.tide, hue: N.tide, bg: TONE_BG.tide, border: TONE_BORDER.tide },
   },
 
   crisis: { bg: alpha(N.dawn, 0.08), border: alpha(N.dawn, 0.4), borderSoft: alpha(N.dawn, 0.35), icon: N.dawn },
@@ -458,6 +469,7 @@ export const dayColors: ColorTokens = {
     dawn: { fg: D.dawnDeep, text: D.dawnDeep, hue: N.dawn, bg: TONE_BG.dawn, border: TONE_BORDER.dawn },
     dusk: { fg: D.duskDeep, text: D.duskDeep, hue: N.dusk, bg: TONE_BG.dusk, border: TONE_BORDER.dusk },
     bloom: { fg: D.bloomDeep, text: D.bloomDeep, hue: N.bloom, bg: TONE_BG.bloom, border: TONE_BORDER.bloom },
+    tide: { fg: D.tideDeep, text: D.tideDeep, hue: N.tide, bg: TONE_BG.tide, border: TONE_BORDER.tide },
   },
 
   crisis: { bg: alpha(N.dawn, 0.08), border: alpha(N.dawn, 0.4), borderSoft: alpha(N.dawn, 0.35), icon: D.dawnDeep },
@@ -551,6 +563,7 @@ function sunriseColorsWith(accent: SunriseAccent): ColorTokens {
       dawn: { fg: S.coral, text: S.coralText, hue: S.peach, bg: alpha(S.peach, 0.12), border: alpha(S.peach, 0.28) },
       dusk: { fg: S.sky, text: S.skyText, hue: S.lightCyan, bg: alpha(S.lightCyan, 0.12), border: alpha(S.lightCyan, 0.3) },
       bloom: { fg: S.raspberryDeep, text: S.raspberryDeep, hue: S.raspberry, bg: alpha(S.raspberry, 0.12), border: alpha(S.raspberry, 0.3) },
+      tide: { fg: S.gold, text: S.goldText, hue: S.lightGold, bg: alpha(S.lightGold, 0.14), border: alpha(S.lightGold, 0.34) },
     },
 
     crisis: { bg: alpha(S.peach, 0.08), border: alpha(S.peach, 0.4), borderSoft: alpha(S.peach, 0.35), icon: S.coral },

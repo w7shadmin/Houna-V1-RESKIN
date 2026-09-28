@@ -23,6 +23,13 @@
       "x": 6068,
       "y": 11600
     },
+    "BadgesP6.dc.html": {
+      "h": 984,
+      "title": "Phase 6 — Badges: skies inside gems",
+      "w": 1760,
+      "x": 2270,
+      "y": 23472
+    },
     "BodiesDate.dc.html": {
       "h": 984,
       "title": "Phase 3 — Home: the Hijri date",
@@ -174,6 +181,13 @@
       "w": 1760,
       "x": 0,
       "y": 22108
+    },
+    "GemsP6.dc.html": {
+      "h": 1130,
+      "title": "Phase 6 — nine skies, set in gems",
+      "w": 1436,
+      "x": 4110,
+      "y": 23472
     },
     "GraphsMonthGlow.dc.html": {
       "h": 984,
@@ -504,6 +518,13 @@
       "x": 6060,
       "y": 4840
     },
+    "ProfileP6.dc.html": {
+      "h": 1740,
+      "title": "Phase 6 — Profile: the Kufic ring",
+      "w": 2190,
+      "x": 0,
+      "y": 23472
+    },
     "ProfileRevamp.dc.html": {
       "h": 1320,
       "is_interactive": true,
@@ -543,6 +564,13 @@
       "x": 6530,
       "y": 4840
     },
+    "ResultsP6.dc.html": {
+      "h": 984,
+      "title": "Phase 6 — My results",
+      "w": 1760,
+      "x": 11146,
+      "y": 23472
+    },
     "Search.dc.html": {
       "h": 1380,
       "is_interactive": true,
@@ -574,6 +602,13 @@
       "x": 0,
       "y": 9500
     },
+    "SkyP6.dc.html": {
+      "h": 984,
+      "title": "Phase 6 — Your sky",
+      "w": 1760,
+      "x": 9306,
+      "y": 23472
+    },
     "Starfield.dc.html": {
       "h": 844,
       "is_interactive": true,
@@ -597,6 +632,13 @@
       "w": 390,
       "x": 1504,
       "y": 7200
+    },
+    "StreakP6.dc.html": {
+      "h": 984,
+      "title": "Phase 6 — Stats: the week in moons",
+      "w": 1760,
+      "x": 7466,
+      "y": 23472
     },
     "Sunrise.dc.html": {
       "h": 844,
@@ -729,27 +771,6 @@
       "x": 5590,
       "y": 4840
     },
-    "ProfileP6.dc.html": {
-      "h": 1740,
-      "title": "Phase 6 — Profile: the Kufic ring",
-      "w": 2190,
-      "x": 0,
-      "y": 23472
-    },
-    "BadgesP6.dc.html": {
-      "h": 984,
-      "title": "Phase 6 — Badges: skies inside gems",
-      "w": 1760,
-      "x": 2270,
-      "y": 23472
-    },
-    "GemsP6.dc.html": {
-      "h": 1130,
-      "title": "Phase 6 — nine skies, set in gems",
-      "w": 1436,
-      "x": 4110,
-      "y": 23472
-    },
     "UnlockP6.dc.html": {
       "h": 984,
       "is_interactive": true,
@@ -758,26 +779,33 @@
       "x": 5626,
       "y": 23472
     },
-    "StreakP6.dc.html": {
-      "h": 984,
-      "title": "Phase 6 — Stats: the week in moons",
+    "CountdownR2.dc.html": {
+      "h": 994,
+      "title": "Round 2 — a countdown before each breathing exercise",
       "w": 1760,
-      "x": 7466,
-      "y": 23472
+      "x": 0,
+      "y": 25592
     },
-    "SkyP6.dc.html": {
-      "h": 984,
-      "title": "Phase 6 — Your sky",
+    "SighR2.dc.html": {
+      "h": 994,
+      "title": "Round 2 — the physiological sigh, a fifth exercise",
       "w": 1760,
-      "x": 9306,
-      "y": 23472
+      "x": 1840,
+      "y": 25592
     },
-    "ResultsP6.dc.html": {
-      "h": 984,
-      "title": "Phase 6 — My results",
-      "w": 1760,
-      "x": 11146,
-      "y": 23472
+    "ScenesR2.dc.html": {
+      "h": 994,
+      "title": "Round 2 — the scene sheet, three ways",
+      "w": 2620,
+      "x": 3680,
+      "y": 25592
+    },
+    "HomeMapR2.dc.html": {
+      "h": 994,
+      "title": "Round 2 — Home’s map without its card",
+      "w": 2620,
+      "x": 6380,
+      "y": 25592
     }
   },
   "createdOnFiles": {
@@ -796,6 +824,14 @@
       "w": 240,
       "x": 0,
       "y": -300
+    },
+    "titleAccountPhase": {
+      "kind": "title1",
+      "maxW": 8000,
+      "text": "Houna — Account & badges (phase 6)",
+      "w": 240,
+      "x": 0,
+      "y": 23212
     },
     "titleBodiesPhase": {
       "kind": "title1",
@@ -917,13 +953,13 @@
       "x": 0,
       "y": 9200
     },
-    "titleAccountPhase": {
+    "titleRound2": {
       "kind": "title1",
-      "maxW": 12906,
-      "text": "Houna — Account & badges (phase 6)",
+      "maxW": 9000,
+      "text": "Houna — Round 2 (countdown, the sigh, scenes, Home’s map)",
       "w": 240,
       "x": 0,
-      "y": 23212
+      "y": 25332
     }
   },
   "order": [
@@ -1029,7 +1065,11 @@
     "UnlockP6.dc.html",
     "StreakP6.dc.html",
     "SkyP6.dc.html",
-    "ResultsP6.dc.html"
+    "ResultsP6.dc.html",
+    "CountdownR2.dc.html",
+    "SighR2.dc.html",
+    "ScenesR2.dc.html",
+    "HomeMapR2.dc.html"
   ],
   "pages": [],
   "title": "Houna Redesign"

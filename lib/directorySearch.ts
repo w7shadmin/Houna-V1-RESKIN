@@ -43,7 +43,7 @@ export interface SearchItem {
   /** Professionals: what their own page says (location, languages, who they work with, specialties), searched and shown. */
   profile?: ProfessionalProfile;
   /** Tanafas items: the exercise's tone. */
-  tone?: 'glow' | 'dawn' | 'dusk' | 'bloom';
+  tone?: 'glow' | 'dawn' | 'dusk' | 'bloom' | 'tide';
 }
 
 export interface LocalTopic {

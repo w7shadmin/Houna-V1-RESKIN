@@ -8,6 +8,7 @@ export function practiceColours(colors: ColorTokens): Record<PracticeGroup, stri
     steadyMind: colors.tones.dusk.fg,
     panicRelief: colors.tones.dawn.fg,
     tensionRelease: colors.tones.bloom.fg,
+    physiologicalSigh: colors.tones.tide.fg,
     meditation: colors.text,
     tanafas: alpha(colors.text, 0.5),
   };
