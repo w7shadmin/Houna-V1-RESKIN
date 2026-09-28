@@ -81,7 +81,7 @@ export default function SunScene({ scene, session, closeLabel }: SunSceneProps) 
   const router = useRouter();
   const { t, fonts } = useLanguage();
   const { setHaloHidden } = useStarfield()!;
-  const { rootRef, frame, onLayout, from, to, fromBody } = useSceneFrame(scene.settle);
+  const { rootRef, frame, onLayout, from, to, fromBody } = useSceneFrame();
   const skyA = useRef(new Animated.Value(0)).current;
   const skyB = useRef(new Animated.Value(0)).current;
   const rising = scene.entrance === 'rise';

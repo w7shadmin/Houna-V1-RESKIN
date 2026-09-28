@@ -27,6 +27,7 @@ import HounaMark from '@/components/HounaMark';
 import NightStars from '@/components/home/NightStars';
 import BadgeGem from '@/components/badges/BadgeGem';
 import KuficRing from '@/components/profile/KuficRing';
+import { KUFIC_RING } from '@/constants/kuficRing';
 import YourSky from '@/components/profile/YourSky';
 import MonthRidges from '@/components/profile/MonthRidges';
 import { useMonthPractice } from '@/hooks/useMonthPractice';
@@ -456,7 +457,8 @@ const styles = StyleSheet.create({
   identity: {
     alignItems: 'center',
     gap: 4,
-    marginTop: -24,
+    // The ring's centre on the mark's anchor (canvas "Round 3").
+    marginTop: layout.markAnchor - (16 + 48 + 16) - KUFIC_RING.box / 2,
   },
   avatar: {
     width: AVATAR,

@@ -321,11 +321,11 @@ Home's mark, to `app/sunrise.tsx` / `app/dusk.tsx`, thin wrappers round one
 scene (`components/sunrise/SunScene.tsx`) that reads a `SunScene` from
 `theme.ts` (`sunriseScene` / `duskScene`). A first sky comes in as Home steps
 back (pre-dawn; golden hour), and the sun arrives by the scene's `entrance`.
-Dusk `glide`s: the mark glides down as the moon does to where that sun settles
-(`settle`: the moon's 0.42; Dusk's lower 0.55, a setting sun), becoming the sun.
+Dusk `glide`s: the mark becomes the sun where it is (since Round 3 nothing travels: the
+moon and both suns settle on the mark's anchor, Home's own spot, `ay`, in `useSceneFrame`).
 Sunrise `rise`s (canvas "Houna sunrise — from below"): the mark fades where it
 is, a `horizon` glow gathers along the bottom edge, and the sun comes up through
-it from below the screen, a touch larger while low, and sinks back on the way
+it from below the screen to the anchor, a touch larger while low, and sinks back on the way
 out. Either way, a small sun (`SunDisc`: pale-gold, its rays a star
 lattice, four eight-point stars from `lib/khatam.ts` turning in pairs opposite
 ways, 90s and 120s a lap, drawn closer on Home by `HOME_LATTICE`; amber with no
@@ -490,6 +490,16 @@ underneath once it's drawn, then fades it out over `THEME_FADE_MS`; it
 resolves once the new colours are in place. The module is native, so a dev
 client built before it was added (or the web) just switches at once: it's
 loaded lazily, because its import throws when the native side is missing.
+
+**The mark in one spot** (canvas "Round 3 — the mark in one spot"): `layout.markAnchor` (199)
+is where the centre of the Houna mark, or of the body, orb or gem it's pressed into, sits below
+the top inset, horizontally centred, on every screen where it's the centrepiece, so it never
+jumps between them. Home draws it there; the Tanafas stage is pinned to it (`STAGE_TOP` in
+`PlayerFrame`, from the hub's header; 4-7-8's mark no longer lifts in a session, its word sits
+lower, `WORD_DROP`), and so are Profile's ring, the first breath's orb, a new badge's gem and the
+scenes' moon and suns (they grow where Home's body was; Night's bowl hands over its mark 22 lower,
+which rises that little way into the moon). Measure any new screen against it on the web
+preview at 390×844 (the centre at 199 with no inset).
 
 **Motion** (phase 1 of the Explorations picks, `design/explorations/PICKS.md`;
 canvas "Houna — Motion (phase 1)"):

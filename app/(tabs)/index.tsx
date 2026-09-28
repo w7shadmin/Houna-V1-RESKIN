@@ -142,6 +142,8 @@ export default function HomeScreen() {
           params: {
             x: String(x + w / 2),
             y: String(y + hgt / 2 + (bowl ? BOWL_MARK_DROP : 0)),
+            // The anchor: where the scene's moon or sun settles, the centre of the mark's box.
+            ay: String(y + hgt / 2),
             ...(bowl ? { mark: String(BOWL_MARK) } : sky ? { body: '1' } : {}),
           },
         });

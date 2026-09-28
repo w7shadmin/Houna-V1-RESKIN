@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AppState, BackHandler, type LayoutChangeEvent, type View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { layout } from '@/constants/theme';
 import { activateKeepAwakeAsync, deactivateKeepAwake } from 'expo-keep-awake';
 import * as NavigationBar from 'expo-navigation-bar';
 import { useStarfield } from '@/contexts/StarfieldContext';
@@ -22,14 +24,18 @@ export interface SceneFrame {
 }
 
 /**
- * Where the mark starts (Home's measured spot, in this screen's pixels) and where it
- * settles: centred, `settle` of the way down (the moon's 0.42, a little above the middle). The screen measures its own origin rather
- * than trusting that its coordinates match Home's (on Android they differ by the status bar).
+ * Where the mark starts (Home's measured spot, in this screen's pixels) and where it settles:
+ * on the anchor, where Home's body is (`ay`; canvas "Round 3 — the mark in one spot"), so the
+ * moon and the suns grow in place rather than travel (Night's bowl hands over its mark, a little
+ * lower, which rises that little way into the moon). Without Home's measurement, the anchor below
+ * the top inset. The screen measures its own origin rather than trusting that its coordinates
+ * match Home's (on Android they differ by the status bar).
  * `fromBody`: Home (style "Sun & moon") handed over the scene's own sun or moon, not the mark,
  * so the scene starts with it whole instead of turning the mark into it.
  */
-export function useSceneFrame(settle = 0.42) {
-  const params = useLocalSearchParams<{ x?: string; y?: string; body?: string }>();
+export function useSceneFrame() {
+  const params = useLocalSearchParams<{ x?: string; y?: string; ay?: string; body?: string }>();
+  const insets = useSafeAreaInsets();
   const rootRef = useRef<View>(null);
   const [frame, setFrame] = useState<SceneFrame | null>(null);
 
@@ -38,11 +44,12 @@ export function useSceneFrame(settle = 0.42) {
     rootRef.current?.measureInWindow((ox, oy) => setFrame({ ox, oy, width, height }));
   };
 
+  const anchor = Number(params.ay) || Number(params.y) || insets.top + layout.markAnchor;
   const from = frame && {
     x: (Number(params.x) || frame.ox + frame.width / 2) - frame.ox,
-    y: (Number(params.y) || frame.oy + frame.height * 0.3) - frame.oy,
+    y: (Number(params.y) || anchor) - frame.oy,
   };
-  const to = frame && { x: frame.width / 2, y: frame.height * settle };
+  const to = frame && { x: frame.width / 2, y: anchor - frame.oy };
   return { rootRef, frame, onLayout, from, to, fromBody: params.body === '1' };
 }
 

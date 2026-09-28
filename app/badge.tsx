@@ -116,6 +116,7 @@ function Moment({
 }) {
   const { colors } = useTheme();
   const { fonts, isRTL } = useLanguage();
+  const insets = useSafeAreaInsets();
   const rise = useRef(new Animated.Value(still ? 1 : 0)).current;
   const bloom = useRef(new Animated.Value(still ? 1 : 0)).current;
   const spark = useRef(new Animated.Value(still ? 1 : 0)).current;
@@ -141,7 +142,7 @@ function Moment({
   const up = (v: Animated.Value) => ({ opacity: v, transform: [{ translateY: v.interpolate({ inputRange: [0, 1], outputRange: [14, 0] }) }] });
 
   return (
-    <View style={styles.moment} pointerEvents="none">
+    <View style={[styles.moment, { paddingTop: insets.top + layout.markAnchor - GEM / 2 }]} pointerEvents="none">
       <View style={styles.stage}>
         <Animated.View
           style={[
@@ -210,10 +211,10 @@ function Moment({
 }
 
 const styles = StyleSheet.create({
+  // From the top: the gem's centre on the mark's anchor (canvas "Round 3"), the words beneath.
   moment: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
     gap: 40,
     paddingHorizontal: layout.screenPadding,
   },

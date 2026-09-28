@@ -124,11 +124,10 @@ export function BreathStage({ tone, breath, progress, full = false, children }: 
 /** The glass orb's full size, and its size at rest as a fraction of that. */
 const GLASS = 240;
 const GLASS_REST = 0.6;
-/** The mark pressed into the glass, in the orb's full-size frame; during a session it rises to make room for the word. */
+/** The mark pressed into the glass, in the orb's full-size frame. It stays at the stage's centre, the anchor. */
 const GLASS_MARK = 72;
-const MARK_LIFT = 28;
-/** How far below the middle the phase word sits (unscaled). */
-const WORD_DROP = 36;
+/** How far below the middle the phase word sits (unscaled): under the mark, which no longer lifts. */
+const WORD_DROP = 54;
 
 interface OrbStageProps {
   tone: IconTileTone;
@@ -143,7 +142,7 @@ interface OrbStageProps {
 /**
  * 4-7-8's stage (canvas "Players — 4-7-8 with the glass orb"): a large glass orb, no dots,
  * filling and emptying with `breath`, the Houna mark pressed into it and the phase word beneath
- * the mark, a soft halo that breathes with it, and motes drifting up past it. Its rim and the
+ * the mark (it stays at the stage's centre, the anchor), a soft halo that breathes with it, and motes drifting up past it. Its rim and the
  * mark light through the hold, as the other stages' orbs do.
  */
 export function OrbStage({ tone, breath, full = false, word }: OrbStageProps) {
@@ -156,8 +155,6 @@ export function OrbStage({ tone, breath, full = false, word }: OrbStageProps) {
   const haloScale = breath.interpolate({ inputRange: [0, 1], outputRange: [0.75, 1] });
   const haloOpacity = breath.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0.9] });
   const rim = useRimLight(full);
-  const lift = useMarkLift(!!word);
-  const markY = lift.interpolate({ inputRange: [0, 1], outputRange: [0, -MARK_LIFT] });
   // The glass as the mark is pressed into it: the tone faintly over the ground.
   const surface = flatten(alpha(hue, 0.22), colors.background);
   // Clear glass: a white highlight up and to the left, the tone faint through the middle and
@@ -186,7 +183,7 @@ export function OrbStage({ tone, breath, full = false, word }: OrbStageProps) {
         <Orb size={GLASS} fx={0.35} fy={0.3} stops={stops} glow={`0 0 40px ${alpha(hue, 0.25)}`} />
         <View pointerEvents="none" style={[styles.glassEdge, { borderColor: alpha(hue, 0.45) }]} />
         {/* Inside the breathing scale, so the mark grows and shrinks as one with the glass. */}
-        <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { transform: [{ translateY: markY }] }]}>
+        <Animated.View pointerEvents="none" style={StyleSheet.absoluteFill}>
           <PressedMark size={GLASS_MARK} surface={surface} />
           <Animated.View style={[styles.centre, { opacity: rim }]} needsOffscreenAlphaCompositing>
             <HounaMark size={GLASS_MARK} color={fg} />
@@ -213,17 +210,6 @@ export function OrbStage({ tone, breath, full = false, word }: OrbStageProps) {
       )}
     </View>
   );
-}
-
-/** 0 → 1 as a session starts and the mark rises to make room for the word; back as it ends. */
-function useMarkLift(up: boolean) {
-  const v = useRef(new Animated.Value(up ? 1 : 0)).current;
-  useEffect(() => {
-    const anim = Animated.timing(v, { toValue: up ? 1 : 0, duration: 600, easing: Easing.inOut(Easing.sin), useNativeDriver: NATIVE_DRIVER });
-    anim.start();
-    return () => anim.stop();
-  }, [up, v]);
-  return v;
 }
 
 /** Fades its child in as it mounts: key it on what it shows. */

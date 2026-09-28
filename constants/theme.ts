@@ -118,8 +118,6 @@ export interface SunScene {
   surface: string;
   /** The one word, "Tanafas". */
   word: string;
-  /** Where the sun settles, as a fraction of the screen's height (the moon's is 0.42). */
-  settle: number;
   /** The first faint stars coming out once it has settled, or none. */
   stars: string | null;
   /** The starfield's far-off shooting stars, now and then, once it has settled. */
@@ -155,7 +153,6 @@ export const sunriseScene: SunScene = {
   lattice: { deep: sunrisePalette.coral, light: sunrisePalette.peach },
   surface: '#FBC8A3',
   word: sunrisePalette.grey80,
-  settle: 0.42,
   stars: null,
   shootingStars: false,
   entrance: 'rise',
@@ -178,7 +175,6 @@ export const duskScene: SunScene = {
   lattice: null,
   surface: '#F5B08A',
   word: dayPalette.ink,
-  settle: 0.55,
   stars: dayPalette.daybreak,
   shootingStars: true,
   entrance: 'glide',
@@ -618,6 +614,13 @@ export const layout = {
   maxContentWidth: 430,
   /** Screen side padding — grid(2); the canvas artboards use 20, snapped to the 8-point grid. */
   screenPadding: 16,
+  /**
+   * The mark's one spot (canvas "Round 3 — the mark in one spot"): the centre of the Houna mark,
+   * or of the body, orb or gem it's pressed into, this far below the top inset, horizontally
+   * centred, on every screen where it's the centrepiece. It's where Home draws it; the others
+   * place theirs to match, so moving between screens it never jumps.
+   */
+  markAnchor: 199,
 } as const;
 
 /* ──────────────────────── Spacing ──────────────────────── */

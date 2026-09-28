@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Animated, Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { alpha } from '@/constants/theme';
+import { alpha, layout } from '@/constants/theme';
 import { arabicNumber } from '@/lib/arabicNumerals';
 import IconButton from '@/components/ui/IconButton';
 import type { IconTileTone } from '@/components/ui/IconTile';
@@ -35,6 +35,8 @@ export interface CarouselNav {
 
 interface PlayerFrameProps {
   stage: React.ReactNode;
+  /** Space above the stage, so its centre sits on the mark's anchor (the hub works it out). */
+  stageTop?: number;
   /** Title (display face) and, beneath it, a tag or session label. */
   heading: React.ReactNode;
   label: React.ReactNode;
@@ -53,7 +55,13 @@ interface PlayerFrameProps {
   away?: { opacity: Animated.Value; interactive: boolean };
 }
 
-export default function PlayerFrame({ stage, heading, label, body, nav, info, controls, mode, away }: PlayerFrameProps) {
+/**
+ * Space above the stage so its centre sits on the mark's anchor: the frame sits under the hub's
+ * header (the hub's 16 of padding and its 44 row, below the top inset), and every stage is 250 tall.
+ */
+const STAGE_TOP = layout.markAnchor - (16 + 44) - 250 / 2;
+
+export default function PlayerFrame({ stage, heading, label, body, nav, info, controls, mode, away, stageTop = STAGE_TOP }: PlayerFrameProps) {
   const { colors } = useTheme();
   const { t, isRTL } = useLanguage();
   const h = t.discover.hub;
@@ -83,7 +91,7 @@ export default function PlayerFrame({ stage, heading, label, body, nav, info, co
   return (
     <View style={styles.player}>
       {/* Scrolls only when a long completion message wouldn't otherwise fit. */}
-      <ScrollView style={styles.player} contentContainerStyle={styles.stageArea} showsVerticalScrollIndicator={false} bounces={false}>
+      <ScrollView style={styles.player} contentContainerStyle={[styles.stageArea, { paddingTop: stageTop }]} showsVerticalScrollIndicator={false} bounces={false}>
         {stage}
 
         <View style={styles.titleRow}>
@@ -297,7 +305,8 @@ const styles = StyleSheet.create({
   stageArea: {
     flexGrow: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    // From the top: the stage on the anchor, the rest beneath it.
+    justifyContent: 'flex-start',
     gap: 24,
   },
   titleRow: {

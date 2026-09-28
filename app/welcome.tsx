@@ -182,6 +182,7 @@ function Breath({ onContinue, isRTL }: { onContinue: () => void; isRTL: boolean 
           </Line>
         ))}
       </View>
+      <View style={styles.spacer} />
       <Animated.View style={[styles.action, { opacity: endIn }]} pointerEvents={ended ? 'auto' : 'none'}>
         <Button label={w.continue} onPress={onContinue} block disabled={!ended} />
       </Animated.View>
@@ -250,14 +251,20 @@ const styles = StyleSheet.create({
   pressed: {
     opacity: 0.85,
   },
+  // The orb's centre on the mark's anchor (canvas "Round 3"): the top bar is grid(7) tall, the stage 250.
   stage: {
-    flex: 1,
+    marginTop: layout.markAnchor - grid(7) - 250 / 2,
+    height: 250,
     alignItems: 'center',
     justifyContent: 'center',
   },
   words: {
     height: grid(14),
+    marginTop: grid(2),
     marginHorizontal: grid(2),
+  },
+  spacer: {
+    flex: 1,
   },
   lineBox: {
     ...StyleSheet.absoluteFillObject,
