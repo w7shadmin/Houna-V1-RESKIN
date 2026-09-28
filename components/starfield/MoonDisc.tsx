@@ -16,6 +16,8 @@ import { stopProps } from '@/lib/svgStop';
  * round a slightly smaller mark, pressed in.
  */
 const DISC = 84;
+/** The disc's size, for drawing the moon at another (Home, Profile). */
+export const MOON_DISC = DISC;
 const MARK = 58;
 const HALO = 150;
 /** The moon's halo: pearly moonlight, soft. */
@@ -32,10 +34,10 @@ const MIN_TERMINATOR = 0.02;
 const PEARL = '#E4E2F4';
 const RIM = alpha('#FFFFFF', 0.75);
 const LIT: [string, number][] = [
-  [alpha('#FFFFFF', 0.94), 0],
-  [alpha('#F0F0F6', 0.6), 0.4],
-  [alpha('#DCE0EC', 0.34), 0.75],
-  [alpha('#C4CCE2', 0.52), 1],
+  [alpha('#FFFFFF', 0.82), 0],
+  [alpha('#F0F0F6', 0.42), 0.4],
+  [alpha('#DCE0EC', 0.2), 0.75],
+  [alpha('#C4CCE2', 0.4), 1],
 ];
 /** The same pearl, solid: what the unlit part is shaded from. */
 const PEARL_SOLID: [string, number][] = [
@@ -56,7 +58,7 @@ const EARTHSHINE: [string, number][] = PEARL_SOLID.map(([c, o]) => [shade(c), o]
 /** The dark lune of a gibbous moon, one even shade of it. */
 const LUNE = shade('#D6DAE6');
 /** The mark as pressed into the glass: the glass as it looks over the night. */
-const MARK_SURFACE = flatten(alpha('#F0F0F6', 0.6), nightPalette.midnight);
+const MARK_SURFACE = flatten(alpha('#F0F0F6', 0.42), nightPalette.midnight);
 
 /** The full moon's ring, well clear of the disc (the canvas "Moon halo": 176 round a 76 disc). */
 const RING = 192;

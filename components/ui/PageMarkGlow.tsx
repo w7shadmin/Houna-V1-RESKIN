@@ -2,7 +2,6 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Svg, { Defs, FeGaussianBlur, Filter, G } from 'react-native-svg';
 import { useTheme } from '@/contexts/ThemeContext';
-import { alpha } from '@/constants/theme';
 import { HounaMarkShape } from '@/components/HounaMark';
 
 /** The mark's width, and the canvas round it that the blur spreads into. */
@@ -24,17 +23,25 @@ export default function PageMarkGlow() {
   const { colors, isNight } = useTheme();
   return (
     <View pointerEvents="none" style={styles.wrap} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-      <Svg width={BOX} height={BOX} viewBox={VIEWBOX}>
-        <Defs>
-          <Filter id="pageMarkGlow" x="-30%" y="-30%" width="160%" height="160%">
-            <FeGaussianBlur stdDeviation={BLUR} />
-          </Filter>
-        </Defs>
-        <G filter="url(#pageMarkGlow)">
-          <HounaMarkShape fill={alpha(colors.tones.glow.hue, isNight ? 0.3 : 0.36)} />
-        </G>
-        <HounaMarkShape fill={alpha(colors.tones.glow.hue, isNight ? 0.1 : 0.14)} />
-      </Svg>
+      {/* Solid fills, each layer faded as a whole: the mark's ring and figure overlap at the top,
+          and a translucent fill doubled up there, drawing the top thicker than the rest. */}
+      <View style={[styles.layer, { opacity: isNight ? 0.2 : 0.24 }]} needsOffscreenAlphaCompositing>
+        <Svg width={BOX} height={BOX} viewBox={VIEWBOX}>
+          <Defs>
+            <Filter id="pageMarkGlow" x="-30%" y="-30%" width="160%" height="160%">
+              <FeGaussianBlur stdDeviation={BLUR} />
+            </Filter>
+          </Defs>
+          <G filter="url(#pageMarkGlow)">
+            <HounaMarkShape fill={colors.tones.glow.hue} />
+          </G>
+        </Svg>
+      </View>
+      <View style={[styles.layer, { opacity: isNight ? 0.12 : 0.16 }]} needsOffscreenAlphaCompositing>
+        <Svg width={BOX} height={BOX} viewBox={VIEWBOX}>
+          <HounaMarkShape fill={colors.tones.glow.hue} />
+        </Svg>
+      </View>
     </View>
   );
 }
@@ -47,5 +54,11 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     alignItems: 'center',
+    height: BOX,
+  },
+  layer: {
+    position: 'absolute',
+    width: BOX,
+    height: BOX,
   },
 });

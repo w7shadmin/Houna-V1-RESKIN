@@ -7,6 +7,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { grid, layout, radius } from '@/constants/theme';
 import IconButton from '@/components/ui/IconButton';
 import KeyboardSafeView from '@/components/ui/KeyboardSafeView';
+import PageMarkGlow from '@/components/ui/PageMarkGlow';
 import { DirectionalIcon } from '@/components/ui/CanvasIcon';
 
 /*
@@ -27,9 +28,11 @@ interface AccountScreenProps {
   children: React.ReactNode;
   /** Where back goes when there's no history (a deep link); defaults to Profile. */
   fallback?: '/profile' | '/(tabs)/more';
+  /** The mark as a soft glow behind the header (plain settings pages, e.g. Notifications). */
+  markGlow?: boolean;
 }
 
-export function AccountScreen({ title, subtitle, eyebrow, children, fallback = '/profile' }: AccountScreenProps) {
+export function AccountScreen({ title, subtitle, eyebrow, children, fallback = '/profile', markGlow = false }: AccountScreenProps) {
   const { colors } = useTheme();
   const router = useRouter();
   const { t, fonts, isRTL } = useLanguage();
@@ -38,6 +41,7 @@ export function AccountScreen({ title, subtitle, eyebrow, children, fallback = '
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
+      {markGlow && <PageMarkGlow />}
       <KeyboardSafeView>
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
           <View style={styles.topBar}>

@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Image, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Animated, Image, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { useFocusEffect, useRouter, type Href } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Polygon } from 'react-native-svg';
@@ -28,21 +28,25 @@ import NightStars from '@/components/home/NightStars';
 import BadgeGem from '@/components/badges/BadgeGem';
 import YourSky from '@/components/profile/YourSky';
 import MonthRidges from '@/components/profile/MonthRidges';
+import MoonDisc, { MOON_DISC } from '@/components/starfield/MoonDisc';
 import { useMonthPractice } from '@/hooks/useMonthPractice';
 import { useBadgeCheck } from '@/hooks/useBadgeCheck';
 
-/** The body at the ring's centre: the theme's own sun or moon, as a lit disc with the mark pressed in (pressed-kit's discs). */
+/** The theme's own body: its sun as a lit disc with the mark pressed in (pressed-kit's discs); Night's is the pearl moon, the glow its light. */
 const DISC: Record<ColorScheme, { stops: [string, number][]; surface: string; glow: string }> = {
   sunrise: { stops: [['#FFF9F1', 0], ['#FFE9D3', 0.52], ['#FBC8A3', 0.82], ['#F9A980', 1]], surface: '#FBC8A3', glow: '#F9A980' },
   day: { stops: [['#FFF3E4', 0], ['#FFD9B3', 0.5], ['#F5B08A', 0.8], ['#E4826A', 1]], surface: '#F5B08A', glow: '#EC8C6E' },
-  night: { stops: [['#D9FAF6', 0], ['#6FD6CF', 0.55], ['#2E8F8A', 1]], surface: '#6FD6CF', glow: '#6FD6CF' },
+  night: { stops: [['#D9FAF6', 0], ['#6FD6CF', 0.55], ['#2E8F8A', 1]], surface: '#6FD6CF', glow: '#C9C6EA' },
 };
 const AVATAR = 108;
+/** Night's pearl moon, in tonight's phase, drawn as large as the avatar; no full-moon ring. */
+const MOON_SCALE = AVATAR / MOON_DISC;
+const NO_RING = new Animated.Value(0);
+const WHOLE = new Animated.Value(1);
 
 /**
- * Profile (canvas "Phase 6 — Profile: the Kufic ring"), opened from Home's top-right button. The
- * ring reads هُنا · نتنفّس معًا, "here · we breathe together", turning slowly round the theme's own
- * body with the mark pressed in (or the person's photo). Then, for an Alias: three numbers (the
+ * Profile (canvas "Phase 6 — Profile"), opened from Home's top-right button: the theme's own body
+ * with the mark pressed in, Night's pearl moon (or the person's photo), on the mark's anchor. Then, for an Alias: three numbers (the
  * practice streak, sessions this month, badges) and the badges held, lit in their gems, the next
  * one waiting unlit. For everyone, from the phone's own log: Your sky (a star for each day
  * practised this month) and Your month in breath (the month's minutes as ridges). Then My results,
@@ -138,6 +142,11 @@ export default function ProfileScreen() {
         <View style={styles.identity}>
           {/* The avatar in the room the Kufic ring had (it went, 28 Sep 2026), so it stays on the anchor. */}
           <View style={styles.avatarBox}>
+            {isNight && !avatar ? (
+              <View style={{ transform: [{ scale: MOON_SCALE }] }}>
+                <MoonDisc form={WHOLE} ringOpacity={NO_RING} />
+              </View>
+            ) : (
             <View style={[styles.avatar, { boxShadow: `0 0 36px ${alpha(disc.glow, 0.5)}` }]}>
               {avatar ? (
                 <Image source={{ uri: avatar }} style={styles.avatarImage} accessibilityIgnoresInvertColors />
@@ -148,6 +157,7 @@ export default function ProfileScreen() {
                 </>
               )}
             </View>
+            )}
           </View>
           {profile && (
             <>

@@ -172,7 +172,7 @@ export default function AboutScreen() {
   }
 
   return (
-    <DetailScreen title={t.more.about}>
+    <DetailScreen title={t.more.about} markGlow>
       {content}
     </DetailScreen>
   );

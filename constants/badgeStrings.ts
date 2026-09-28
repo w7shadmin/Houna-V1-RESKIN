@@ -63,7 +63,7 @@ export const badgeStrings = {
       streak_100: 'البدر',
       all_breathing: 'كل الأنفاس',
       all_scenes: 'كل المشاهد',
-      all_skies: 'كل السماوات',
+      all_skies: 'السماء',
     },
     how: {
       first_session: 'أول جلسة تنفّس أو تأمّل',

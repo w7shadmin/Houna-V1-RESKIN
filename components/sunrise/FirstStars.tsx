@@ -9,7 +9,7 @@ const TWINKLE_MS = 9000;
  * starfield's turning sky (a lap every eight minutes) high above its moon.
  */
 const DRIFT_MS = 80000;
-const COUNT = 40;
+const COUNT = 72;
 
 /** A fixed seed, so the same stars come out every visit. */
 function seeded(seed: number) {
@@ -26,8 +26,8 @@ interface FirstStarsProps {
 }
 
 /**
- * The Houna dusk's first stars: a scatter high in the violet (thinning toward
- * the horizon), each twinkling slowly on its own phase of one shared loop, as
+ * The Houna dusk's first stars: a scatter through the violet, down past the middle
+ * (thinning and fading toward the warm horizon), each twinkling slowly on its own phase of one shared loop, as
  * the starfield's twinkling stars do, and all drifting slowly left to right as
  * the starfield's sky turns. The drift is two copies of one screen-wide strip
  * side by side, so it loops without a seam. A nod to Night next door; held still
@@ -42,12 +42,13 @@ export default function FirstStars({ width, height, color, shown }: FirstStarsPr
     const strip = Array.from({ length: COUNT }, (_, i) => {
       const r = (rand() < 0.8 ? 1 + rand() * 0.8 : 1.8 + rand() * 0.6) / 2;
       const o = 0.3 + rand() * 0.4;
+      // Down to four-fifths of the sky, most high up, thinning and fainter toward the warm horizon.
+      const depth = Math.pow(rand(), 1.25);
       return {
         x: rand() * width,
-        // Most high up, fewer lower down.
-        y: height * (0.02 + Math.pow(rand(), 1.4) * 0.36),
+        y: height * (0.02 + depth * 0.8),
         r,
-        o,
+        o: o * (1 - 0.45 * depth),
         phase: (i * 0.37) % 1,
       };
     });

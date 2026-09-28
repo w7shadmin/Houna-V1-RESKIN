@@ -20,6 +20,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import type { Language } from '@/constants/strings';
 import { spacing, typography, radius, shadows, latinFontFamily, arabicFontFamily } from '@/constants/theme';
 import { APPEARANCE_OPTIONS, HOME_STYLES, useTheme } from '@/contexts/ThemeContext';
+import PageMarkGlow from '@/components/ui/PageMarkGlow';
 import { SUNRISE_ACCENTS } from '@/constants/theme';
 
 interface MenuItem {
@@ -52,6 +53,7 @@ export default function MoreScreen() {
       style={[styles.safe, { backgroundColor: colors.background }]}
       edges={['top']}
     >
+      <PageMarkGlow />
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}

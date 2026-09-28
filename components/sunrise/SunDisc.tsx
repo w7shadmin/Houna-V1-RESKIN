@@ -2,6 +2,8 @@ import React, { useMemo } from 'react';
 import { Animated, Easing, StyleSheet, View } from 'react-native';
 import Svg, { Circle, Defs, FeGaussianBlur, Filter, G, Path, Polygon, RadialGradient, Stop } from 'react-native-svg';
 import PressedMark from '@/components/ui/PressedMark';
+import HounaMark from '@/components/HounaMark';
+import KuficRing from '@/components/profile/KuficRing';
 import Orb from '@/components/ui/Orb';
 import { HALO_BOX } from '@/components/starfield/MarkHalo';
 import EdgeHalo from '@/components/starfield/EdgeHalo';
@@ -42,16 +44,26 @@ const LATTICE = Math.ceil(3.77 * DISC) + 8;
 const LATTICE_LOOP_MS = 360_000;
 /** On Home the lattice draws in closer round the sun, clear of the logo and the date. */
 export const HOME_LATTICE = 0.64;
+/** The ring of light's words: how far out they circle (disc units), in the scene and, closer, on Home. */
+const WORDS_REACH = 140;
+const WORDS_REACH_HOME = 100;
+/** The baked Kufic ring's own proportions: its words circle at 88 of its 224. */
+const WORDS_SIZE = (WORDS_REACH * 224) / 88;
+/** The ring of light's width. */
+const RING_WIDTH = 8;
+
+type Num = Animated.Value | Animated.AnimatedInterpolation<number>;
 
 interface SunDiscProps {
   /** 0 → 1: from nothing to the full sun (the disc, its halo, rays and glow). */
   form: Animated.Value | Animated.AnimatedInterpolation<number>;
   /** Its colours, and whether it has rays (Sunrise's does; Dusk's evening sun is a glow). */
   scene: SunScene;
-  /** How far out the star lattice reaches (1 in the scene; `HOME_LATTICE` on Home). */
-  latticeScale?: number;
-  /** False leaves out its glow: the halo round the disc and the wide sunglow (Sunrise's sun on Home, "Sun & moon"). */
-  glow?: boolean;
+  /**
+   * How close round the sun its lattice or words are drawn: 1 on Home (`HOME_LATTICE`, the words
+   * nearer), 0 in the scene; animated as Home hands its sun over, so it grows into the scene's.
+   */
+  home?: number | Num;
 }
 
 /**
@@ -64,8 +76,13 @@ interface SunDiscProps {
  * fade on the out-breath; behind, a wide, faint sunglow breathing with them.
  * Drawn in the mark's own 190px box, so it can take the mark's place exactly.
  */
-export default function SunDisc({ form, scene, latticeScale = 1, glow = true }: SunDiscProps) {
+export default function SunDisc({ form, scene, home = 0 }: SunDiscProps) {
   const { breath, turn } = useStarfield()!.clock;
+  const glow = scene.sunGlow;
+  const near = (outside: number, inside: number) =>
+    typeof home === 'number' ? outside + (inside - outside) * home : home.interpolate({ inputRange: [0, 1], outputRange: [outside, inside] });
+  const latticeScale = near(1, HOME_LATTICE);
+  const wordsScale = near(1, WORDS_REACH_HOME / WORDS_REACH);
 
   // The moon's breath: most of the light ebbs away on the out-breath.
   const haloOpacity = Animated.multiply(form, breath.interpolate({ inputRange: [0, 1], outputRange: [0.2, 1] }));
@@ -102,6 +119,23 @@ export default function SunDisc({ form, scene, latticeScale = 1, glow = true }: 
 
       {scene.lattice && <Lattice colors={scene.lattice} form={form} scale={latticeScale} />}
 
+      {scene.ring && (
+        // The words round the ring of light, turning slowly (Design studies "G15"); lighter on Home's pale ground.
+        // Handed over from Home, Home's colour gives way to the scene's as it grows.
+        <Animated.View style={[styles.words, { opacity: form, transform: [{ scale: wordsScale }] }]}>
+          {home !== 1 && (
+            <Animated.View style={[StyleSheet.absoluteFill, typeof home !== 'number' && { opacity: near(1, 0) }]}>
+              <KuficRing color={scene.ring.words} size={WORDS_SIZE} />
+            </Animated.View>
+          )}
+          {home !== 0 && (
+            <Animated.View style={[StyleSheet.absoluteFill, typeof home !== 'number' && { opacity: home }]}>
+              <KuficRing color={scene.ring.wordsHome} size={WORDS_SIZE} />
+            </Animated.View>
+          )}
+        </Animated.View>
+      )}
+
       <Animated.View style={[styles.breathing, { opacity: haloOpacity, transform: [{ scale: haloScale }] }]}>
         {scene.rays && !scene.lattice && (
         <Animated.View style={[styles.rays, { transform: [{ rotate: rayTurn }] }]}>
@@ -123,11 +157,42 @@ export default function SunDisc({ form, scene, latticeScale = 1, glow = true }: 
 
       {/* The disc and the mark: still, only fading in as the sun forms. */}
       <Animated.View style={[styles.disc, { opacity: form }]}>
-        <Orb size={DISC} stops={scene.disc} fx={0.5} fy={0.45} glow={`0 0 14px ${alpha(scene.glow, 0.45)}`} />
-        <View style={styles.mark}>
-          <PressedMark size={MARK} surface={scene.surface} />
-        </View>
+        {scene.ring ? (
+          // A ring of light, clear inside, lit a little from its edge in, the mark in its middle.
+          <>
+            <RingLight light={scene.ring.light} glow={scene.ring.glow} />
+            <View style={styles.mark}>
+              <HounaMark size={MARK} color={scene.ring.mark} />
+            </View>
+          </>
+        ) : (
+          <>
+            <Orb size={DISC} stops={scene.disc} fx={0.5} fy={0.45} glow={glow ? `0 0 14px ${alpha(scene.glow, 0.45)}` : undefined} />
+            <View style={styles.mark}>
+              <PressedMark size={MARK} surface={scene.surface} />
+            </View>
+          </>
+        )}
       </Animated.View>
+    </View>
+  );
+}
+
+/** The ring of light: a bright band with its glow, the inside clear but for light falling in from it. */
+function RingLight({ light, glow }: { light: string; glow: string }) {
+  return (
+    <View style={StyleSheet.absoluteFill}>
+      <Svg width={DISC} height={DISC} style={StyleSheet.absoluteFill}>
+        <Defs>
+          <RadialGradient id="ringInside" cx="50%" cy="50%" r="50%">
+            <Stop offset={0} {...stopProps(light, 0.14)} />
+            <Stop offset={0.7} {...stopProps(glow, 0.12)} />
+            <Stop offset={1} {...stopProps(glow, 0.6)} />
+          </RadialGradient>
+        </Defs>
+        <Circle cx={DISC / 2} cy={DISC / 2} r={DISC / 2} fill="url(#ringInside)" />
+      </Svg>
+      <View style={[styles.ring, { borderColor: light, boxShadow: `0 0 21px ${alpha(glow, 0.9)}` }]} />
     </View>
   );
 }
@@ -137,15 +202,16 @@ export default function SunDisc({ form, scene, latticeScale = 1, glow = true }: 
  * a soft blurred glow in the pale core colour with a faint crisp line under it, so they read as the
  * sun's light catching rather than a drawing, swelling a touch and brightening with the breath.
  */
-function Lattice({ colors, form, scale }: { colors: { deep: string; light: string; core: string }; form: SunDiscProps['form']; scale: number }) {
+function Lattice({ colors, form, scale }: { colors: { deep: string; light: string; core: string }; form: SunDiscProps['form']; scale: number | Num }) {
   const { breath } = useStarfield()!.clock;
   const lap = useCalmLoop((v) => Animated.loop(Animated.timing(v, { toValue: 1, duration: LATTICE_LOOP_MS, easing: Easing.linear, useNativeDriver: NATIVE })));
   const turns = [lap.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '1440deg'] }), lap.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '-1080deg'] })];
-  const opacity = Animated.multiply(form, breath.interpolate({ inputRange: [0, 1], outputRange: [0.55, 1] }));
-  const swell = breath.interpolate({ inputRange: [0, 1], outputRange: [1, 1.06] });
+  // A deep breath, so it reads: from faint to full, swelling about an eighth.
+  const opacity = Animated.multiply(form, breath.interpolate({ inputRange: [0, 1], outputRange: [0.3, 1] }));
+  const swell = breath.interpolate({ inputRange: [0, 1], outputRange: [0.94, 1.08] });
   const c = LATTICE / 2;
   // Drawn in, the lines would thin: keep them about as fine as in the scene.
-  const w = 1 / Math.sqrt(scale);
+  const w = 1 / Math.sqrt(typeof scale === 'number' ? scale : 1);
   return (
     <Animated.View style={[styles.lattice, { opacity, transform: [{ scale }] }]}>
       <Animated.View style={[StyleSheet.absoluteFill, { transform: [{ scale: swell }] }]}>
@@ -161,8 +227,8 @@ function Lattice({ colors, form, scale }: { colors: { deep: string; light: strin
                 const points = star8Points(c, c, (st.r * DISC) / 2, st.rot);
                 return (
                   <G key={k}>
-                    {/* The faint line itself. */}
-                    <Polygon points={points} fill="none" stroke={st.deep ? colors.deep : colors.light} strokeOpacity={st.opacity * 0.4} strokeWidth={st.width * w} />
+                    {/* The line itself, in the deeper colour so it reads against the pale morning. */}
+                    <Polygon points={points} fill="none" stroke={colors.deep} strokeOpacity={Math.min(1, st.opacity * (st.deep ? 1.3 : 1))} strokeWidth={1.3 * st.width * w} />
                     {/* Its light: soft and pale. */}
                     <Polygon points={points} fill="none" stroke={colors.core} strokeOpacity={Math.min(1, st.opacity * 1.8)} strokeWidth={2.4 * st.width * w} filter={`url(#latticeLight${pair})`} />
                   </G>
@@ -177,6 +243,16 @@ function Lattice({ colors, form, scale }: { colors: { deep: string; light: strin
 }
 
 const styles = StyleSheet.create({
+  words: {
+    position: 'absolute',
+    width: WORDS_SIZE,
+    height: WORDS_SIZE,
+  },
+  ring: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: DISC / 2,
+    borderWidth: RING_WIDTH,
+  },
   lattice: {
     position: 'absolute',
     width: LATTICE,

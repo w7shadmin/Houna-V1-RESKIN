@@ -107,6 +107,14 @@ export interface SunScene {
   /** The halo at the disc's edge, and the wide sunglow behind. */
   halo: string;
   glow: string;
+  /** Whether the sun wears them (Sunrise's doesn't, on Home or in its scene: its lattice is its light). */
+  sunGlow: boolean;
+  /**
+   * The sun as a ring of light, clear inside, the mark in `mark` in its middle, with the Kufic words
+   * (هُنا · نتنفّس معًا) turning round it (Design studies "G15"): the ring's colour and its glow, and
+   * the words' colour in the scene and, lighter, on Home. Takes the place of the disc; or none.
+   */
+  ring: { light: string; glow: string; mark: string; words: string; wordsHome: string } | null;
   /** Short turning rays, or none (an evening sun is a glow). Left for `lattice` where it has one. */
   rays: string | null;
   /**
@@ -141,6 +149,8 @@ export const sunriseScene: SunScene = {
   disc: [['#FFF9F1', 0], ['#FFE9D3', 0.52], ['#FBC8A3', 0.82], [sunrisePalette.peach, 1]],
   halo: sunrisePalette.peach,
   glow: sunrisePalette.peach,
+  sunGlow: false,
+  ring: null,
   rays: '#FFDEBE',
   lattice: { deep: sunrisePalette.coral, light: sunrisePalette.peach, core: '#FFE6CC' },
   surface: '#FBC8A3',
@@ -163,6 +173,8 @@ export const duskScene: SunScene = {
   disc: [['#FFF3E4', 0], ['#FFD9B3', 0.5], ['#F5B08A', 0.8], ['#E4826A', 1]],
   halo: '#EC8C6E',
   glow: '#F2A078',
+  sunGlow: true,
+  ring: { light: '#FFE0B8', glow: '#FFC98E', mark: '#EC8C6E', words: alpha('#FFD9B3', 0.72), wordsHome: alpha('#F2A078', 0.92) },
   rays: null,
   lattice: null,
   surface: '#F5B08A',

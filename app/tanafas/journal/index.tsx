@@ -18,6 +18,7 @@ import Button from '@/components/ui/Button';
 import Chip from '@/components/ui/Chip';
 import IconButton from '@/components/ui/IconButton';
 import { DirectionalIcon } from '@/components/ui/CanvasIcon';
+import PageMarkGlow from '@/components/ui/PageMarkGlow';
 import { GroupLabel } from '@/components/directory/ProfileKit';
 
 type JournalTab = 'entries' | 'insights';
@@ -102,6 +103,7 @@ export default function JournalHomeScreen() {
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
+      <PageMarkGlow />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <View style={styles.topBar}>
           <IconButton

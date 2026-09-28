@@ -6,7 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 export default function ContactScreen() {
   const { t } = useLanguage();
   return (
-    <DetailScreen title={t.more.contact}>
+    <DetailScreen title={t.more.contact} markGlow>
       <ComingSoon />
     </DetailScreen>
   );

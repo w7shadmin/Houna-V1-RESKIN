@@ -60,7 +60,7 @@ export default function NotificationSettingsScreen() {
   };
 
   return (
-    <AccountScreen title={s.title} subtitle={s.subtitle}>
+    <AccountScreen title={s.title} subtitle={s.subtitle} markGlow>
       <SettingsGroup label={s.onDevice}>
         <SettingsRow
           title={s.reminderTitle}

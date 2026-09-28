@@ -174,7 +174,7 @@ export default function SkyScreen() {
           <Sky wash={SKIES.day} opacity={values.day} />
           {/* The stars, only above the hills (which let a little of the sky through). */}
           <Animated.View style={[styles.stars, { height: H * HORIZON, opacity: values.night }]}>
-            <StarSky cx={W / 2} cy={H * HORIZON} diagonal={Math.hypot(W, H)} />
+            <StarSky cx={W / 2} cy={H * HORIZON} reach={Math.hypot(W / 2, Math.max(H * HORIZON, H * (1 - HORIZON)))} />
           </Animated.View>
 
           {/* The moon, in tonight's phase, and the sun: placed by their centres, in physical pixels. */}

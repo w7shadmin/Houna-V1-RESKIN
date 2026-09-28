@@ -13,7 +13,7 @@ import { stopProps } from '@/lib/svgStop';
 import { useBreathingVisit, useImmersiveScene, useSceneFrame } from '@/hooks/useBreathingScene';
 import MarkHalo, { HALO_BOX } from '@/components/starfield/MarkHalo';
 import ShootingStars from '@/components/starfield/ShootingStars';
-import SunDisc, { HOME_LATTICE } from './SunDisc';
+import SunDisc from './SunDisc';
 import { HOME_SUN_SCALE } from '@/components/home/HomeBody';
 import FirstStars from './FirstStars';
 
@@ -84,7 +84,9 @@ export default function SunScene({ scene, session, closeLabel }: SunSceneProps) 
   const { rootRef, frame, onLayout, from, to, fromBody } = useSceneFrame();
   const skyA = useRef(new Animated.Value(0)).current;
   const skyB = useRef(new Animated.Value(0)).current;
-  const rising = scene.entrance === 'rise';
+  // From Home's "Sun & moon" the sun is already there: it stays, growing into the scene's, rather
+  // than one sun fading as another rises (which read as a glitch).
+  const rising = scene.entrance === 'rise' && !fromBody;
   /** 0 → 1: the sun's way from where it starts (Home's mark, or below the bottom edge) to where it settles. */
   const glide = useRef(new Animated.Value(0)).current;
   /** 0 → 1: Home's mark becoming the sun (gliding); rising, the sun is whole from the start. */
@@ -233,7 +235,7 @@ export default function SunScene({ scene, session, closeLabel }: SunSceneProps) 
             ]}
           >
             <Pressable onPress={close} accessibilityRole="button" accessibilityLabel={closeLabel}>
-              <SunDisc form={sun} scene={scene} />
+              <SunDisc form={sun} scene={scene} home={fromBody ? glide.interpolate({ inputRange: [0, 1], outputRange: [1, 0] }) : 0} />
               {/* Gliding: exactly Home's mark in this theme (same colours, strength and clock),
                   minus the ring, giving way to the sun's own. */}
               {!rising && !fromBody && (
@@ -244,21 +246,14 @@ export default function SunScene({ scene, session, closeLabel }: SunSceneProps) 
             </Pressable>
           </Animated.View>
 
-          {/* Rising: Home's mark (or, from "Sun & moon", Home's sun) stays where it was drawn,
-              fading as the day steps back. */}
+          {/* Rising: Home's mark stays where it was drawn, fading as the day steps back. */}
           {rising && (
             <Animated.View
               pointerEvents="none"
               needsOffscreenAlphaCompositing
               style={[styles.sun, { opacity: mark, transform: [{ translateX: from.x - HALO_BOX / 2 }, { translateY: from.y - HALO_BOX / 2 }] }]}
             >
-              {fromBody ? (
-                <View style={{ transform: [{ scale: HOME_SUN_SCALE }] }}>
-                  <SunDisc form={sun} scene={scene} latticeScale={HOME_LATTICE} />
-                </View>
-              ) : (
-                <HomeMark />
-              )}
+              <HomeMark />
             </Animated.View>
           )}
 

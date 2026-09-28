@@ -329,15 +329,24 @@ moon and both suns settle on the mark's anchor, Home's own spot, `ay`, in `useSc
 Sunrise `rise`s (canvas "Houna sunrise — from below"): the mark fades where it
 is, a `horizon` glow gathers along the bottom edge, and the sun comes up through
 it from below the screen to the anchor, a touch larger while low, and sinks back on the way
-out. Either way, a small sun (`SunDisc`: pale-gold, its rays a star
+out; but from "Sun & moon" (`fromBody`) Home's sun is already there, so it stays and grows
+into the scene's, its lattice or words drawing out as it does (`SunDisc`'s `home`, 1 → 0; one
+sun fading while another rose read as a glitch, and on Android the fading copy's glow was cut
+square by its layer). Either way, a small sun (`SunDisc`: Sunrise's pale-gold, its rays a star
 lattice, four eight-point stars from `lib/khatam.ts` turning in pairs opposite
-ways, 90s and 120s a lap, drawn closer on Home by `HOME_LATTICE`; amber with no
-rays; the mark pressed into it) as the second sky takes over (morning; violet dusk,
-where `FirstStars` then come out, drifting slowly left to right at the pace of
-the starfield's turning sky, with the starfield's `ShootingStars` now and
+ways, 90s and 120s a lap, drawn closer on Home by `HOME_LATTICE`, the mark pressed into it, and
+no glow, on Home or in its scene (`sunGlow: false`); Dusk's a ring of light, below) as the
+second sky takes over (morning; violet dusk, where `FirstStars` then come out through the
+violet, most high up, thinning and fading toward the warm horizon, drifting slowly left to right
+at the pace of the starfield's turning sky, with the starfield's `ShootingStars` now and
 then). The disc and mark stay still; the edge
-halo, rays and wide sunglow breathe on the shared clock exactly as the
-moon's halo does. Counted as `sunrise` / `dusk` sessions, titled Tanafas in
+halo, rays and wide sunglow (where the scene has them) breathe on the shared clock exactly as
+the moon's halo does. Dusk's sun (Design studies "G15", `duskScene.ring`) is a ring of light,
+clear inside, the mark in amber in its middle, its halo breathing just outside, and the Kufic
+words (`KuficRing`, هُنا · نتنفّس معًا) turning round it: gold in the scene, a lighter amber on
+Home (`wordsHome`), crossfading as Home hands it over. The starfield's sky (`StarSky`) is
+sized to reach the screen's farthest corner from the moon (`reach`), so the bottom has stars
+too. Counted as `sunrise` / `dusk` sessions, titled Tanafas in
 Recap. Every theme's mark now opens a scene. All three share
 `hooks/useBreathingScene.ts` (the measured handoff, visit counting,
 keep-awake / hidden bars / Back); keep one animation per value inside a
@@ -427,7 +436,8 @@ the week (Monday to Monday, as the leaderboard's) and each day practised.
 
 **Account & badges** (phase 6, canvas "Houna — Account & badges (phase 6)"; the
 Explorations' section E with the held Profile & badges plan):
-- Profile (`app/profile.tsx`): the theme's own body (its disc, the mark pressed in) or the
+- Profile (`app/profile.tsx`): the theme's own body (its disc, the mark pressed in; Night's is
+  the pearl moon in tonight's phase, `MoonDisc` at `AVATAR / MOON_DISC`, no full-moon ring) or the
   person's photo, on the anchor in the room the Kufic ring had (`AVATAR_BOX`; the ring came off
   Profile on 28 Sep 2026). The ring itself (`components/profile/KuficRing.tsx`, هُنا · نتنفّس معًا)
   lives on in Classic Home (C1 below): one baked outline (`constants/kuficRing.ts`, from
@@ -496,17 +506,21 @@ loaded lazily, because its import throws when the native side is missing.
 **Design studies picks** (https://claude.ai/artifact/5DqkLLhgEWF1bS4vFcf7EL, `design/studies/`,
 picks in its `PICKS.md`):
 - A2: Sunrise's star lattice is lines of light: each star a soft, blurred line in the pale `core`
-  colour (react-native-svg's `FeGaussianBlur`) over a faint crisp one, swelling 6% and brightening
-  with the breath (`Lattice` in `SunDisc.tsx`; Home's small lattice too).
+  colour (react-native-svg's `FeGaussianBlur`) over a crisp one in the deeper coral (so it reads on
+  the pale morning), breathing deeply: 0.94 → 1.08 in size, 0.3 → 1 in light (`Lattice` in
+  `SunDisc.tsx`; Home's small lattice too).
 - B0: the suns keep today's colours.
 - C1: Classic Home's ring is the Kufic words, turning (`MarkHalo`'s `kufic` colour; `KuficRing` takes a
   `size`); the dots remain only where `kufic` is left out.
 - D1: Home's Hijri date is one quiet line under the wordmark, no chip, in the chip's 28 of height so
   the body stays on the anchor (`HijriDate`).
-- E4: plain pages (the Directory hub and its list pages, Events) carry the mark as a soft glow of the
-  glow colour behind the header, fixed, never scrolling (`components/ui/PageMarkGlow.tsx`, drawing
-  `HounaMarkShape` through a 10px blur with the mark itself faintly over it: at the study's 22px it
-  read as a cloud and went unseen).
+- E4: plain pages carry the mark as a soft glow of the glow colour behind the header, fixed, never
+  scrolling (`components/ui/PageMarkGlow.tsx`): the Directory hub and its list pages, Events, More,
+  the journal, and, through `markGlow` on `DetailScreen` / `AccountScreen`, About, Contact, Get
+  involved and Notifications; never Discover. `HounaMarkShape` through a 10px blur with the mark
+  itself faintly over it (at the study's 22px it read as a cloud and went unseen), each drawn in a
+  solid fill and faded as a layer: the mark's ring and figure overlap at the top, and a translucent
+  fill doubled up there, drawing the top thicker.
 - F4 and F2: the moon is see-through pearl glass (`MoonDisc`; the sky clock's and Night Home's
   too): a clear white highlight, thinning through the middle so the night and its stars show through,
   gathering at a pearly rim, with a faint sheen of teal, lavender and rose turning inside it on the
@@ -515,10 +529,8 @@ picks in its `PICKS.md`):
   terminator's ellipse on top; a gibbous or full moon draws the whole glass, then the dark lune on
   top, a thick ring (`lune`) whose hole is the terminator's ellipse, squeezed by the same native
   `scaleX` and clipped to the far half of the disc, so the breath still swells it natively.
-- Sunrise's sun on Home ("Sun & moon") has no glow: `SunDisc`'s `glow={false}` leaves out its edge halo
-  and wide sunglow, so it's the disc and its lattice alone. Its scene keeps both.
-- G (the Dusk sun, on Home and in its scene): on the canvas, not yet picked: G0–G6, G7–G13, and
-  G14–G17, G13's ring of light with G7's Kufic words.
+- Sunrise's sun has no glow, on Home or in its scene (`sunGlow: false`): the disc and its lattice alone.
+- G15: Dusk's sun is the ring of light with the Kufic words round it (above, under the sunrise and dusk).
 
 **The mark in one spot** (canvas "Round 3 — the mark in one spot"): `layout.markAnchor` (199)
 is where the centre of the Houna mark, or of the body, orb or gem it's pressed into, sits below
