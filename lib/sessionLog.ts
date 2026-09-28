@@ -1,4 +1,5 @@
 import { generateId, getLocalDb } from './localDb';
+import { SHOWCASE, demoDays, demoSessionsBetween } from './showcase';
 
 /**
  * On-device log of every breathing/meditation session, for Guests and
@@ -44,6 +45,15 @@ interface Row {
 
 /** Sessions that started in [from, to). */
 export async function sessionsBetween(from: Date, to: Date): Promise<LoggedSession[]> {
+  if (SHOWCASE) {
+    const real = await realSessionsBetween(from, to).catch(() => []);
+    // Showcase: the demo month alongside the real log (lib/showcase.ts).
+    return [...real, ...demoSessionsBetween(from, to)].sort((a, b) => a.startedAt - b.startedAt);
+  }
+  return realSessionsBetween(from, to);
+}
+
+async function realSessionsBetween(from: Date, to: Date): Promise<LoggedSession[]> {
   const db = await getLocalDb();
   const rows = await db.getAllAsync<Row>(
     'SELECT * FROM sessions WHERE started_at >= ? AND started_at < ? ORDER BY started_at;',
@@ -64,12 +74,17 @@ export async function sessionsBetween(from: Date, to: Date): Promise<LoggedSessi
  * Built from this log only, so mood/journal activity can never count.
  */
 export async function sessionDays(): Promise<Set<string>> {
-  const db = await getLocalDb();
-  const rows = await db.getAllAsync<{ started_at: number }>('SELECT started_at FROM sessions;');
+  const rows = await getLocalDb()
+    .then((db) => db.getAllAsync<{ started_at: number }>('SELECT started_at FROM sessions;'))
+    .catch((e) => {
+      if (SHOWCASE) return [] as { started_at: number }[];
+      throw e;
+    });
   const days = new Set<string>();
   for (const { started_at } of rows) {
     const d = new Date(started_at);
     days.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`);
   }
+  if (SHOWCASE) for (const d of demoDays()) days.add(d);
   return days;
 }

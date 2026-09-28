@@ -2,6 +2,7 @@ import { supabase } from './supabase';
 import { localDateString } from './journal';
 import { qualifyingBadges, type BadgeCode } from './badges';
 import type { LoggedSession } from './sessionLog';
+import { SHOWCASE, demoBadgeShares, demoBadges, demoLeaderboard, demoStreak } from './showcase';
 
 /**
  * Streaks/leaderboard (Segment 5 of the accounts roadmap) — reads the same
@@ -54,6 +55,7 @@ export function computeStreak(activeDays: Set<string>): StreakInfo {
 }
 
 export async function getMyStreak(): Promise<StreakInfo> {
+  if (SHOWCASE) return demoStreak();
   // Exercise sessions only — mood logging never feeds a streak (CLAUDE.md safety
   // requirement). Older rows with kind 'mood' are still in the table, so filter.
   const { data } = await supabase.from('tanafas_sessions').select('started_at').neq('kind', 'mood');
@@ -67,6 +69,8 @@ export async function getMyStreak(): Promise<StreakInfo> {
  * moment. `UNIQUE (user_id, badge_code)` keeps a repeat insert harmless.
  */
 export async function awardBadges(userId: string, currentStreak: number, sessions: Pick<LoggedSession, 'kind' | 'exercise'>[]): Promise<BadgeCode[]> {
+  // Showcase: the demo practice must never earn real badges.
+  if (SHOWCASE) return [];
   const held = await getMyBadges();
   const due = qualifyingBadges(currentStreak, sessions).filter((code) => !held.has(code));
   if (due.length === 0) return [];
@@ -78,12 +82,14 @@ export async function awardBadges(userId: string, currentStreak: number, session
 
 /** The badges held, each with when it was earned (ISO). */
 export async function getMyBadges(): Promise<Map<string, string>> {
+  if (SHOWCASE) return demoBadges();
   const { data } = await supabase.from('badges_earned').select('badge_code, earned_at');
   return new Map((data ?? []).map((row) => [row.badge_code as string, row.earned_at as string]));
 }
 
 /** Each badge's share of Houna's Aliases, as a whole percentage (get_badge_shares: counts only, no names). */
 export async function getBadgeShares(): Promise<Record<string, number>> {
+  if (SHOWCASE) return demoBadgeShares();
   const { data, error } = await supabase.rpc('get_badge_shares');
   if (error || !data) return {};
   return Object.fromEntries((data as { badge_code: string; share: number }[]).map((r) => [r.badge_code, r.share]));
@@ -96,6 +102,7 @@ export interface LeaderboardRow {
 }
 
 export async function getLeaderboard(period: 'week' | 'all'): Promise<LeaderboardRow[]> {
+  if (SHOWCASE) return demoLeaderboard(period);
   const { data, error } = await supabase.rpc('get_leaderboard', { period });
   if (error || !data) return [];
   return data as LeaderboardRow[];
