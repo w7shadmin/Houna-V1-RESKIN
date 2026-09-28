@@ -28,6 +28,7 @@ import IconButton from '@/components/ui/IconButton';
 import CanvasIcon from '@/components/ui/CanvasIcon';
 import KeyboardSafeView from '@/components/ui/KeyboardSafeView';
 import { useKeyboardScroll } from '@/hooks/useKeyboardScroll';
+import { useDragToClose } from '@/hooks/useDragToClose';
 
 /** Neutral — the starting point when today has no mood yet (never presume "calm"). */
 const DEFAULT_INDEX = BLOOM_ORDER.indexOf('neutral');
@@ -143,6 +144,8 @@ export default function CheckInScreen() {
   }, [mood, savedMood]);
 
   const close = () => sinkThen(() => (router.canGoBack() ? router.back() : router.replace('/(tabs)')));
+  // Drag the sheet down by its top (the grabber, the title, the bloom) to close it.
+  const dragClose = useDragToClose(close);
 
   const save = async () => {
     setSaving(true);
@@ -172,6 +175,10 @@ export default function CheckInScreen() {
   const keyboard = useKeyboardScroll('end');
 
   const sheetY = enter.interpolate({ inputRange: [0, 1], outputRange: [height, 0] });
+  // One screen, no scrolling (the ScrollView stays for the keyboard and the smallest phones): the
+  // sheet starts a little below the status bar, and the bloom takes what room the rest leaves.
+  const sheetTop = insets.top + SHEET_GAP;
+  const bloom = Math.round(Math.max(BLOOM_MIN, Math.min(BLOOM_MAX, height - sheetTop - insets.bottom - FIXED_HEIGHT)));
   const blurTint = isNight ? 'dark' : 'light';
 
   return (
@@ -186,21 +193,23 @@ export default function CheckInScreen() {
           style={[StyleSheet.absoluteFill, { backgroundColor: isNight ? alpha(colors.background, 0.45) : alpha(colors.text, 0.16) }]}
         />
       </Animated.View>
-      <View style={[styles.scrim, { paddingTop: Math.max(insets.top + 56, 76) }]} pointerEvents="box-none">
+      <View style={[styles.scrim, { paddingTop: sheetTop }]} pointerEvents="box-none">
       <KeyboardSafeView>
-        <Animated.View style={[styles.sheet, { borderColor: colors.borderLight, transform: [{ translateY: sheetY }] }]}>
+        <Animated.View style={[styles.sheet, { borderColor: colors.borderLight, transform: [{ translateY: Animated.add(sheetY, dragClose.drag) }] }]}>
           {/* Frosted glass: the blurred screen through a wash of the sheet colour. */}
           <BlurView intensity={isNight ? 40 : 34} tint={blurTint} experimentalBlurMethod="dimezisBlurView" style={StyleSheet.absoluteFill} />
           <View style={[StyleSheet.absoluteFill, { backgroundColor: alpha(colors.sheet, isNight ? 0.8 : 0.76) }]} />
           <ScrollView
             ref={keyboard.scrollRef}
             {...keyboard.scrollProps}
-            contentContainerStyle={[styles.content, { paddingBottom: 36 + insets.bottom }]}
+            contentContainerStyle={[styles.content, { paddingBottom: 16 + insets.bottom }]}
             keyboardShouldPersistTaps="handled"
           >
+            <View style={styles.dragArea} {...dragClose.panHandlers}>
             <Arrive enter={enter} index={0}>
             <View style={styles.header}>
               <View style={[styles.grabber, { backgroundColor: colors.faint }]} />
+              {/* Beside the title, not above it: a row of its own cost the bloom its room. */}
               <View style={styles.closeRow}>
                 <IconButton
                   accessibilityLabel={s.close}
@@ -219,7 +228,7 @@ export default function CheckInScreen() {
 
             <Arrive enter={enter} index={1}>
             <View style={styles.figure}>
-              <BreathingBloom mood={mood} size={250} />
+              <BreathingBloom mood={mood} size={bloom} />
               <Text
                 accessibilityLiveRegion="polite"
                 style={[styles.moodLabel, isRTL && styles.moodLabelArabic, { color: colors.text, fontFamily: fonts.display }]}
@@ -228,6 +237,7 @@ export default function CheckInScreen() {
               </Text>
             </View>
             </Arrive>
+            </View>
 
             <Arrive enter={enter} index={2}>
             <MoodSlider
@@ -304,6 +314,12 @@ export default function CheckInScreen() {
   );
 }
 
+/** The sheet's gap below the status bar; the bloom's size range; everything else on the sheet, its paddings and gaps, which the bloom fits round. */
+const SHEET_GAP = 24;
+const BLOOM_MIN = 152;
+const BLOOM_MAX = 248;
+const FIXED_HEIGHT = 540;
+
 const styles = StyleSheet.create({
   root: {
     flex: 1,
@@ -328,9 +344,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: layout.screenPadding,
     gap: 16,
   },
+  // The header and the bloom: the sheet's handle for dragging (same gap as the rest of the sheet).
+  dragArea: {
+    gap: 16,
+  },
   header: {
     alignItems: 'center',
     gap: 12,
+    minHeight: 56,
   },
   grabber: {
     width: 40,
@@ -338,12 +359,12 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   closeRow: {
-    alignSelf: 'stretch',
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
+    position: 'absolute',
+    top: 4,
+    end: 0,
   },
   title: {
-    maxWidth: 300,
+    maxWidth: 256,
     fontSize: 29,
     lineHeight: 29 * 1.15,
     textAlign: 'center',
@@ -389,9 +410,9 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   note: {
-    minHeight: 76,
+    minHeight: 64,
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingVertical: 12,
     borderRadius: 18,
     borderWidth: 1,
     fontSize: 15,

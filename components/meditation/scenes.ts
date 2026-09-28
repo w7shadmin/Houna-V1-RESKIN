@@ -11,6 +11,11 @@ export interface MeditationScene {
   video?: number;
   /** Real ambient audio — looped, independent of the video track. Only sourced for 'fire', 'rain', and 'forest' so far. */
   audio?: number;
+  /**
+   * Where the video sits. Default: covering the screen. `base`: its whole width shown, resting on
+   * the bottom edge, the night above it (for footage framed too tight to crop further, as fire's).
+   */
+  videoFrame?: { kind: 'base'; ground: string };
 }
 
 /**
@@ -33,6 +38,8 @@ export const MEDITATION_SCENES: MeditationScene[] = [
     gradient: [SCENE_ORBS.fire.c, SCENE_ORBS.fire.lo],
     thumbnail: require('@/assets/images/meditation/fire.jpg'),
     video: require('@/assets/video/fire.mp4'),
+    // The flames fill the frame; covering a tall phone cut a fifth off each side.
+    videoFrame: { kind: 'base', ground: '#050302' },
     // WAV, not AAC — see the note on 'rain' below.
     audio: require('@/assets/audio/fire.wav'),
   },

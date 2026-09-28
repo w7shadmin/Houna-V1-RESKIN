@@ -343,7 +343,7 @@ function PhasePlayer({ exercise, breath, nav, onSessionActive, onInSession, away
             word={inSession ? phaseNow : undefined}
           />
         ) : (
-          <StarStage tone={tone} trace={trace} turn={turn} showTracer={inSession} />
+          <StarStage tone={tone} trace={trace} turn={turn} showTracer={inSession} full={inSession && phases[clock.phase].key === 'hold'} />
         )
       }
       heading={

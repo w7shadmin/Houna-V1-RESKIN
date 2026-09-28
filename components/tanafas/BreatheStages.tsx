@@ -328,19 +328,36 @@ interface StarStageProps {
   showTracer?: boolean;
   /** Holds so far, 0 → 4: the second square turns 22.5° through each hold, and at 2 they make the star. */
   turn: Animated.Value;
+  /** A hold: the squares' edges and the mark light, as the orbs' rims do at the top of a breath. */
+  full?: boolean;
 }
+
+/** The mark pressed into the star's middle: the size 4-7-8's glass mark rests at (72 × 0.6), in the same place, the stage's centre. */
+const STAR_MARK = 44;
 
 /**
  * Box breathing's stage (canvas "Players — box breathing with the star"): the light traces a
  * square, one side a phase; a second square in the tone turns in by 22.5° through each hold, and
- * every other round the two meet as the eight-point star, which lights. The mark sits in the middle.
+ * every other round the two meet as the eight-point star, which lights. The mark is pressed into the
+ * middle, where the other stages' marks sit; through each hold the squares' edges and the mark
+ * light in the tone, as the orbs' rims do (`full`).
  */
-export function StarStage({ tone, trace, showTracer, turn }: StarStageProps) {
+export function StarStage({ tone, trace, showTracer, turn, full = false }: StarStageProps) {
   const { colors, isNight } = useTheme();
   const fg = colors.tones[tone].fg;
   const hue = colors.tones[tone].hue;
   const rotate = turn.interpolate({ inputRange: [0, 4], outputRange: ['0deg', '90deg'] });
   const starOpacity = turn.interpolate({ inputRange: [1.5, 2, 2.5], outputRange: [0, 0.9, 0], extrapolate: 'clamp' });
+  const rim = useRimLight(full);
+  // As the glass is pressed: the tone faintly over the ground.
+  const surface = flatten(alpha(hue, 0.22), colors.background);
+  // An edge lit: a soft wide stroke under a bright one.
+  const litSquare = (
+    <Svg width={SIZE} height={SIZE}>
+      <Polygon points={SQUARE} fill="none" stroke={hue} strokeOpacity={0.35} strokeWidth={7} strokeLinejoin="round" />
+      <Polygon points={SQUARE} fill="none" stroke={fg} strokeWidth={2.5} strokeLinejoin="round" />
+    </Svg>
+  );
 
   return (
     <View style={styles.stage} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
@@ -352,14 +369,20 @@ export function StarStage({ tone, trace, showTracer, turn }: StarStageProps) {
       <Svg width={SIZE} height={SIZE} style={StyleSheet.absoluteFill}>
         <Polygon points={SQUARE} fill="none" stroke={colors.text} strokeOpacity={0.4} strokeWidth={1.2} />
       </Svg>
+      <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { opacity: rim }]}>
+        {litSquare}
+      </Animated.View>
       <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { transform: [{ rotate }] }]}>
         <Svg width={SIZE} height={SIZE}>
           <Polygon points={SQUARE} fill="none" stroke={fg} strokeOpacity={0.85} strokeWidth={1.2} />
         </Svg>
+        <Animated.View style={[StyleSheet.absoluteFill, { opacity: rim }]}>{litSquare}</Animated.View>
       </Animated.View>
-      <View style={[styles.centre, styles.starMark]} pointerEvents="none">
-        <HounaMark size={40} color={fg} />
-      </View>
+      <PressedMark size={STAR_MARK} surface={surface} />
+      {/* The mark lit with the edges: drawn solid and faded as one layer, as the pressed mark is. */}
+      <Animated.View style={[styles.centre, { opacity: rim }]} pointerEvents="none" needsOffscreenAlphaCompositing>
+        <HounaMark size={STAR_MARK} color={fg} />
+      </Animated.View>
       {showTracer && <Tracer trace={trace} color={isNight ? '#FFFFFF' : fg} glow={hue} half={STAR_HALF} />}
     </View>
   );
@@ -490,9 +513,6 @@ const styles = StyleSheet.create({
     fontSize: 28,
     lineHeight: 44,
     textAlign: 'center',
-  },
-  starMark: {
-    opacity: 0.8,
   },
   wordPlace: {
     transform: [{ translateY: WORD_DROP }],

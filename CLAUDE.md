@@ -242,6 +242,11 @@ that mirror in RTL), `Orb`, `ScreenGlow`. Build new UI from these.
 artwork's fills from `colors.logo`; paths untouched) and `HounaMark.tsx`
 (the pin alone). The splash intro uses the same tokens.
 
+**Scene video framing**: a scene's video covers the screen, unless it sets
+`videoFrame: { kind: 'base' }` (`components/meditation/scenes.ts`): its whole width,
+resting on the bottom edge, its top fading into `ground` above. Fire does: its
+9:16 footage is framed tight, and covering a tall phone cut a fifth off each side.
+
 **Meditation player — permanent dark focus mode, decided**: its chrome sits
 over full-screen video, so `components/meditation/MeditationPlayer.tsx`
 uses Nightlight Midnight/Moonlight in both themes (`FOCUS`). Its background
@@ -490,7 +495,17 @@ canvas "Houna — Motion (phase 1)"):
   `expo-blur` (Android uses `experimentalBlurMethod="dimezisBlurView"`) and
   dimmed. The sheet rises on one `enter` value, its parts (`Arrive`) fading up
   in turn on it, and sinks back on close, save, a tap outside or Back
-  (`beforeRemove`).
+  (`beforeRemove`), or when dragged down by its top (the grabber, title and
+  bloom). It fits one screen, no scrolling: the bloom takes what room the rest
+  leaves (`BLOOM_MIN`–`BLOOM_MAX` round `FIXED_HEIGHT`), Close sits beside the title.
+- Drag down to close: `hooks/useDragToClose.ts` (core PanResponder, no native
+  module; only a downward, mostly vertical move claims the touch, so taps,
+  sliders and sideways swipes still work). The check-in uses it, and so does the
+  Tanafas hub, which is now a transparent modal (`app/_layout.tsx`) so Home shows
+  behind as it's dragged: the hub paints its own ground, and `app/tanafas/_layout.tsx`
+  gives its stack a transparent navigation background (the web otherwise paints
+  React Navigation's grey under every screen). Never during a breathing session or
+  with a glass sheet open.
 - Event cards grow into their page: a card measures its photo
   (`measureInWindow`) and passes it as params; `events/[slug].tsx`, a
   transparent modal, flies the photo to its cover (layout animated with
@@ -531,7 +546,10 @@ round sit beneath, and each phase is announced to screen readers
 (`announceForAccessibility`). Box breathing's is `StarStage`: a bead traces
 a square, one side a phase; a second square turns 22.5° through each hold
 (`useHoldTurns` counts them, 0 → 4 then round again unseen), and at two the
-squares make the eight-point star, which lights; it rests as the star.
+squares make the eight-point star, which lights; it rests as the star. The mark is
+pressed into its middle (`STAR_MARK`, the size 4-7-8's rests at, the same centre), and
+through every hold the squares' edges and the mark light in the tone (`full`), as
+the orbs' rims do.
 Grounding and muscle relaxation keep `BreathStage`: a ring of dots around a translucent,
 glassy orb that inflates and deflates, with the Houna mark pressed into its middle
 (one even shape a shade deeper than the orb, scaling with it: `components/ui/PressedMark.tsx`, the

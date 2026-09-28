@@ -68,9 +68,11 @@ function InnerLayout() {
         {/* The first breath, once, before anything is asked (app/index.tsx sends a first launch there). */}
         <Stack.Screen name="welcome" options={{ gestureEnabled: false }} />
         <Stack.Screen name="(tabs)" />
+        {/* Tanafas rises over Home and drags back down to it (app/tanafas/index.tsx), so Home stays
+            beneath: a transparent modal, its hub painting its own ground. */}
         <Stack.Screen
           name="tanafas"
-          options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+          options={{ presentation: 'transparentModal', animation: 'slide_from_bottom', contentStyle: { backgroundColor: 'transparent' } }}
         />
         {/* The check-in is a glass sheet over whatever opened it: the screen behind softens and
             dims, and the sheet rises itself (app/check-in.tsx), so no transition of its own. */}

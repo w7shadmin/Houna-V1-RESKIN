@@ -29,6 +29,18 @@ function VideoAmbient({ scene, animate }: AmbientVisualProps) {
     else player.pause();
   }, [animate, player]);
 
+  const frame = scene.videoFrame;
+  if (frame?.kind === 'base') {
+    // The whole width, on the bottom edge; the dark top of the footage fades into the ground above.
+    return (
+      <View style={[StyleSheet.absoluteFillObject, { backgroundColor: frame.ground }]}>
+        <View style={styles.base}>
+          <VideoView player={player} style={styles.video} contentFit="cover" nativeControls={false} />
+          <LinearGradient colors={[frame.ground, `${frame.ground}00`]} style={styles.baseFade} pointerEvents="none" />
+        </View>
+      </View>
+    );
+  }
   return (
     <View style={StyleSheet.absoluteFillObject}>
       <VideoView
@@ -88,6 +100,21 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     width: '100%',
     height: '100%',
+  },
+  base: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    // The footage's own shape (9:16).
+    aspectRatio: 9 / 16,
+  },
+  baseFade: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    height: '24%',
   },
   glow: {
     position: 'absolute',

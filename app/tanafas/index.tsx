@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Animated, Easing, Platform, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import * as NavigationBar from 'expo-navigation-bar';
@@ -26,6 +26,7 @@ import ScenePicker from '@/components/tanafas/ScenePicker';
 import MinutesWheel from '@/components/tanafas/MinutesWheel';
 import { useControlsAway } from '@/hooks/useControlsAway';
 import { NATIVE, useReduceMotion } from '@/hooks/useCalmLoop';
+import { useDragToClose } from '@/hooks/useDragToClose';
 
 type Tab = 'breathe' | 'meditate' | 'discover';
 
@@ -85,10 +86,21 @@ export default function TanafasHubScreen() {
     setTab(next);
   };
   const close = () => (router.canGoBack() ? router.back() : router.replace('/(tabs)'));
+  // Drag the hub down to close it, Home showing behind (a transparent modal): not during a
+  // breathing session (it would end it), nor with a glass sheet open (that drag is the sheet's).
+  const { height } = useWindowDimensions();
+  const reduceMotion = useReduceMotion();
+  const dragClose = useDragToClose(() => {
+    Animated.timing(dragClose.drag, { toValue: height, duration: reduceMotion ? 0 : 220, easing: Easing.in(Easing.quad), useNativeDriver: NATIVE }).start(close);
+  }, !breathing && sheet === null);
 
   return (
-    <View
-      style={[styles.safe, { backgroundColor: colors.background, paddingTop: insets.top, paddingBottom: insets.bottom }]}
+    <Animated.View
+      {...dragClose.panHandlers}
+      style={[
+        styles.safe,
+        { backgroundColor: colors.background, paddingTop: insets.top, paddingBottom: insets.bottom, transform: [{ translateY: dragClose.drag }] },
+      ]}
       // A touch or click anywhere brings stepped-aside controls back; returning false leaves it for whatever is under it.
       onStartShouldSetResponderCapture={() => {
         away.wake();
@@ -103,6 +115,8 @@ export default function TanafasHubScreen() {
       </Animated.View>
 
       <View style={styles.inner}>
+        {/* The grabber: the hub drags down to close. */}
+        <Animated.View style={[styles.grabber, { backgroundColor: colors.faint, opacity: tabsShown }]} pointerEvents="none" />
         {/* Header: close · tabs · journal (steps aside during a breathing session) */}
         <Animated.View style={[styles.header, { opacity: away.opacity }]} pointerEvents={away.interactive ? 'auto' : 'none'}>
           <IconButton
@@ -182,7 +196,7 @@ export default function TanafasHubScreen() {
         />
       </GlassSheet>
       <StatusBar hidden={breathing} style={isNight ? 'light' : 'dark'} />
-    </View>
+    </Animated.View>
   );
 }
 
@@ -323,6 +337,14 @@ function DiscoverPanel() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
+  },
+  grabber: {
+    position: 'absolute',
+    top: 4,
+    alignSelf: 'center',
+    width: 40,
+    height: 4,
+    borderRadius: 2,
   },
   inner: {
     flex: 1,

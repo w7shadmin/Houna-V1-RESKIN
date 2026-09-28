@@ -1,5 +1,6 @@
 import React from 'react';
 import { Stack } from 'expo-router';
+import { ThemeProvider, useTheme as useNavigationTheme } from '@react-navigation/native';
 import { useTheme } from '@/contexts/ThemeContext';
 import { nightPalette } from '@/constants/theme';
 
@@ -8,7 +9,11 @@ import { nightPalette } from '@/constants/theme';
  * navigator handles hub → journal, meditation, tests and Voices within it. */
 export default function TanafasLayout() {
   const { colors } = useTheme();
+  const navTheme = useNavigationTheme();
+  // No default ground under the screens (the web paints one), so Home shows as the hub is dragged
+  // down; every screen here sets its own (screenOptions.contentStyle, or the hub itself).
   return (
+    <ThemeProvider value={{ ...navTheme, colors: { ...navTheme.colors, background: 'transparent' } }}>
     <Stack
       screenOptions={{
         headerShown: false,
@@ -16,7 +21,8 @@ export default function TanafasLayout() {
         animation: 'fade',
       }}
     >
-      <Stack.Screen name="index" />
+      {/* The hub paints its own ground, so Home shows as it's dragged down (app/_layout.tsx). */}
+      <Stack.Screen name="index" options={{ contentStyle: { backgroundColor: 'transparent' } }} />
       <Stack.Screen name="meditation/index" />
       <Stack.Screen
         name="meditation/[scene]"
@@ -30,5 +36,6 @@ export default function TanafasLayout() {
       <Stack.Screen name="voices/submit" />
       <Stack.Screen name="voices/[id]" />
     </Stack>
+    </ThemeProvider>
   );
 }
