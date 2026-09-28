@@ -1,5 +1,4 @@
 import { supabase } from './supabase';
-import { SHOWCASE, demoActivity } from './showcase';
 import type { CountryCount } from '@/components/community/WorldMap';
 
 export type ActivityPeriod = '24h' | 'week' | 'month';
@@ -21,7 +20,6 @@ export interface CommunityActivity {
  * made-up number.
  */
 export async function fetchCommunityActivity(period: ActivityPeriod): Promise<CommunityActivity | null> {
-  if (SHOWCASE) return demoActivity(period);
   try {
     const { data, error } = await supabase.rpc('get_community_activity', { period });
     if (error || !data) return null;

@@ -193,13 +193,6 @@ session ends with `lib/sessionEndAlert.ts`'s gentle buzz.
 
 ## Current skin — Night / Dusk / Sunrise
 
-**SHOWCASE MODE IS ON (temporary)**: `lib/showcase.ts`'s `SHOWCASE` layers generated demo data
-over the real, for presenting the app: a busier community map (`fetchCommunityActivity`), a full
-practice log in every colour (`sessionsBetween` / `sessionDays`: Profile's graphs, Stats, Recap),
-a long streak, badges, badge shares and a leaderboard (`lib/streaks.ts`). It writes nothing
-(`awardBadges` returns early) and leaves the phone's own log alone. When the showcase is over,
-set it to false, then delete `lib/showcase.ts`, its uses and this paragraph.
-
 Designed on the canvas at https://claude.ai/artifact/EMxmwt7o1Uq6kx32BdAUA7
 (Night row = primary, Dusk row = the light theme once called Daylight,
 Sunrise row = Houna's original brand palette). The scripts that generate its
