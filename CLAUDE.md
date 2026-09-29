@@ -227,6 +227,16 @@ regardless of visual skin:
   and has no streaks or personal bests. The user ends the hold themselves.
 - Crisis resources must never be buried behind a generic label or deep
   navigation.
+- **Crisis numbers are researched data, never typed from memory.** The crisis screen
+  (`app/crisis.tsx`) shows one country's lines from `lib/crisisLines.ts`: the country chosen there
+  (kept as `houna-crisis-country`), else the Alias's, else the phone's region, else it asks. Its
+  emergency numbers sit inside the "in danger" card; then crisis and support lines (or a plain
+  "no confirmed line" that points back to them), children, violence, addiction, refugees and
+  migrant workers. Only lines rated Verified, plus emergency numbers rated Likely, from
+  `research/crisis-lines/` (18 MENA countries, every line sourced, with numbers to avoid; see its
+  README), and `lib/crisisLines.test.ts` enforces it. A review team is phoning the rest. Numbers in
+  Arabic go through the screen's `shownNumber`: Arabic-Indic digit groups separated by spaces
+  otherwise swap places even inside a left-to-right isolate.
 - No streaks or guilt mechanics on mood logging (`lib/streaks.ts` tracks
   exercise-session consistency only, never mood).
 

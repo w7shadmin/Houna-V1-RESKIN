@@ -1,0 +1,3094 @@
+{
+  "checkedOn": "2026-09-29",
+  "confidence": {
+    "V": "Verified: an official or operator page that is current",
+    "L": "Likely: a reputable recent source that is not the operator, or official with older or disputed details",
+    "U": "Uncertain: old, conflicting, or only on aggregator lists"
+  },
+  "kinds": [
+    "emergency",
+    "crisis",
+    "support",
+    "child",
+    "gbv",
+    "addiction",
+    "refugee"
+  ],
+  "countries": [
+    {
+      "code": "AE",
+      "name": "United Arab Emirates",
+      "ar": "الإمارات العربية المتحدة",
+      "region": "Gulf",
+      "dial": "+971",
+      "summary": "Abu Dhabi has the region's clearest 24/7 mental-health line (800-SAKINA). Dubai's line runs 9am to midnight. Elsewhere, and after hours, the emergency numbers are the fallback.",
+      "lines": [
+        {
+          "kind": "emergency",
+          "name": "Police",
+          "ar": "الشرطة",
+          "nums": [
+            "999"
+          ],
+          "by": "Ministry of Interior",
+          "hours": "24/7 · free",
+          "who": "Everyone",
+          "conf": "V",
+          "src": [
+            "https://u.ae/en/information-and-services/justice-safety-and-the-law/Safety/handling-emergencies"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Ambulance",
+          "ar": "الإسعاف",
+          "nums": [
+            "998"
+          ],
+          "by": "National",
+          "hours": "24/7 · free",
+          "who": "Everyone",
+          "conf": "V",
+          "src": [
+            "https://u.ae/en/information-and-services/justice-safety-and-the-law/Safety/handling-emergencies"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Civil Defence (fire)",
+          "ar": "الدفاع المدني",
+          "nums": [
+            "997"
+          ],
+          "by": "National",
+          "hours": "24/7 · free",
+          "who": "Everyone",
+          "conf": "V",
+          "src": [
+            "https://u.ae/en/information-and-services/justice-safety-and-the-law/Safety/handling-emergencies"
+          ]
+        },
+        {
+          "kind": "crisis",
+          "name": "800-SAKINA mental health hotline",
+          "ar": "الخط الساخن \"800-سكينة\"",
+          "nums": [
+            "800 725462"
+          ],
+          "by": "Department of Health Abu Dhabi, with Sakina (PureHealth)",
+          "hours": "24/7 · Arabic, English · toll-free",
+          "who": "Anyone in Abu Dhabi, children and families included",
+          "conf": "V",
+          "src": [
+            "https://www.doh.gov.ae/en/news/doh-activates-247-mental-health-support-hotline-800-sakina-(725462)",
+            "The National, 14 Mar 2026"
+          ]
+        },
+        {
+          "kind": "support",
+          "name": "Itma'en community mental health support line",
+          "ar": "خدمة \"اطمئن\"",
+          "nums": [
+            "800 506"
+          ],
+          "by": "Dubai Health, Community Development Authority, Dubai Health Authority",
+          "hours": "Daily 9am to midnight · Arabic, English · free",
+          "who": "Citizens, residents and visitors of Dubai",
+          "conf": "V",
+          "src": [
+            "dubaihealth.ae (13 Mar 2026)",
+            "The National, 14 Mar 2026"
+          ]
+        },
+        {
+          "kind": "support",
+          "name": "Istijaba support line",
+          "ar": "الاستجابة",
+          "nums": [
+            "800 1717",
+            "+971 800 1717 from abroad"
+          ],
+          "by": "Abu Dhabi DoH Medical Operations Command Center",
+          "hours": "24/7 (as launched) · Arabic, English, Hindi, French, Malayalam, Tamil",
+          "who": "Abu Dhabi residents",
+          "conf": "L",
+          "src": [
+            "addcd.gov.ae (6 Oct 2021)",
+            "u.ae (2026)"
+          ],
+          "note": "Still listed in 2026, but its mental-health role is described only in 2021 sources. 800-SAKINA is now Abu Dhabi's dedicated line."
+        },
+        {
+          "kind": "child",
+          "name": "Child Protection Centre hotline (Ministry of Interior)",
+          "ar": "مركز وزارة الداخلية لحماية الطفل",
+          "nums": [
+            "116111",
+            "Hemayati (حمايتي) app"
+          ],
+          "by": "Ministry of Interior",
+          "hours": "24/7 · free",
+          "who": "Children, and anyone reporting for them",
+          "conf": "V",
+          "src": [
+            "u.ae (2026)",
+            "moi.gov.ae"
+          ]
+        },
+        {
+          "kind": "gbv",
+          "name": "Dubai Foundation for Women and Children",
+          "ar": "مؤسسة دبي لرعاية النساء والأطفال",
+          "nums": [
+            "800 111",
+            "SMS 5111",
+            "WhatsApp +971 800111",
+            "help@dfwac.ae"
+          ],
+          "by": "Government-licensed non-profit",
+          "hours": "Helpline 24/7 · Arabic, English · free",
+          "who": "Women and children: domestic violence, abuse, trafficking",
+          "conf": "V",
+          "src": [
+            "https://www.dfwac.ae",
+            "childhelplineinternational.org"
+          ],
+          "note": "Some lists label 800 111 as a \"DHA mental health helpline\". It isn't: it is this foundation's line."
+        },
+        {
+          "kind": "gbv",
+          "name": "Family Care Authority (Abu Dhabi)",
+          "ar": "هيئة الرعاية الأسرية",
+          "nums": [
+            "800 444"
+          ],
+          "by": "Abu Dhabi government",
+          "hours": "Hours not stated; several centres open 24/7",
+          "who": "Family violence, child and family protection, with psychological counselling",
+          "conf": "V",
+          "src": [
+            "adfca.gov.ae/ar-AE/Contact-us"
+          ]
+        },
+        {
+          "kind": "gbv",
+          "name": "Ewaa shelters for victims of trafficking and violence",
+          "ar": "إيواء",
+          "nums": [
+            "800 7283"
+          ],
+          "by": "Abu Dhabi government",
+          "hours": "Not stated",
+          "who": "Victims of trafficking and violence",
+          "conf": "V",
+          "src": [
+            "u.ae (2026)"
+          ],
+          "note": "Its role may have moved to the Family Care Authority. Prefer 800 444 for family violence in Abu Dhabi."
+        },
+        {
+          "kind": "child",
+          "name": "Community Development Authority hotline (Dubai)",
+          "ar": "هيئة تنمية المجتمع",
+          "nums": [
+            "800 988"
+          ],
+          "by": "Dubai government",
+          "hours": "24/7 (secondary sources) · Arabic, English, sign language",
+          "who": "Children, elderly, people of determination",
+          "conf": "V",
+          "src": [
+            "u.ae (2026)"
+          ]
+        },
+        {
+          "kind": "child",
+          "name": "Sharjah Child & Family Protection Centre",
+          "ar": "مركز حماية الطفل والأسرة",
+          "nums": [
+            "800 700"
+          ],
+          "by": "Sharjah Social Services Department",
+          "hours": "24/7 (secondary sources) · free",
+          "who": "Children, women, families in Sharjah",
+          "conf": "V",
+          "src": [
+            "u.ae (2026)",
+            "sharjah24.ae (30 Jul 2026)"
+          ]
+        },
+        {
+          "kind": "child",
+          "name": "Hemaya Foundation (Ajman)",
+          "ar": "مؤسسة حماية",
+          "nums": [
+            "800 446292"
+          ],
+          "by": "Ajman",
+          "hours": "Not checked",
+          "who": "Children and women in Ajman",
+          "conf": "V",
+          "src": [
+            "u.ae (2026)"
+          ]
+        },
+        {
+          "kind": "child",
+          "name": "Aman Centre for Women and Children (Ras Al Khaimah)",
+          "ar": "مركز أمان للنساء والأطفال",
+          "nums": [
+            "07 235 6666"
+          ],
+          "by": "Ras Al Khaimah",
+          "hours": "Not checked",
+          "who": "Women and children in RAK",
+          "conf": "V",
+          "src": [
+            "u.ae (2026)"
+          ]
+        },
+        {
+          "kind": "addiction",
+          "name": "Hisn addiction helpline",
+          "ar": "خدمة \"حصن\"",
+          "nums": [
+            "80044"
+          ],
+          "by": "National Anti-Narcotics Agency",
+          "hours": "24/7 · free, confidential",
+          "who": "People with addiction and their families. Coming forward voluntarily is exempt from prosecution.",
+          "conf": "L",
+          "src": [
+            "The National (20 Jul 2026)",
+            "Al Khaleej (Jul 2026)"
+          ]
+        },
+        {
+          "kind": "addiction",
+          "name": "National Rehabilitation Centre",
+          "ar": "المركز الوطني للتأهيل",
+          "nums": [
+            "800 2252",
+            "+971 2 306 0000"
+          ],
+          "by": "Federal (Abu Dhabi)",
+          "hours": "Mon–Thu 8–18, Fri 8–12 (office, not a crisis line)",
+          "who": "Addiction treatment",
+          "conf": "V",
+          "src": [
+            "nrc.gov.ae"
+          ]
+        },
+        {
+          "kind": "refugee",
+          "name": "MoHRE Labour Claims and Advisory Centre",
+          "ar": "مركز الاستشارات والمطالبات العمالية",
+          "nums": [
+            "80084 (toll-free)",
+            "MoHRE call centre 600590000"
+          ],
+          "by": "Ministry of Human Resources and Emiratisation",
+          "hours": "24/7 (secondary sources) · over 22 languages",
+          "who": "Workers, migrants included: labour complaints and legal advice, not emotional support",
+          "conf": "V",
+          "src": [
+            "khaleejtimes.com (6 Aug 2026)"
+          ],
+          "note": "The 600590000 call centre (covering domestic workers) is only in search snippets."
+        }
+      ],
+      "avoid": [
+        [
+          "800-HOPE (800 4673)",
+          "COVID-era national support line. Its site no longer loads and the programme was restructured. Confirm by phone before use."
+        ],
+        [
+          "EHS \"Speak and be Heard\" 800 8877",
+          "800 8877 is the general EHS call centre. The mental-health part is unconfirmed after 2022."
+        ],
+        [
+          "800 11111, 800 555, 800 342",
+          "COVID-19 lines."
+        ]
+      ]
+    },
+    {
+      "code": "SA",
+      "name": "Saudi Arabia",
+      "ar": "المملكة العربية السعودية",
+      "region": "Gulf",
+      "dial": "+966",
+      "summary": "No 24/7 dedicated suicide or crisis line was found. The National Center for Mental Health line runs daytime; 937 runs 24/7 for health advice; 911 or 997 for immediate danger. 911 only covers four regions.",
+      "lines": [
+        {
+          "kind": "emergency",
+          "name": "Unified emergency",
+          "ar": "مركز العمليات الأمنية الموحدة",
+          "nums": [
+            "911"
+          ],
+          "by": "Ministry of Interior",
+          "hours": "24/7 · multilingual",
+          "who": "Riyadh, Makkah, Madinah and Eastern Province only",
+          "conf": "V",
+          "src": [
+            "cst.gov.sa/en/about/Numbering",
+            "spa.gov.sa (2025)"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Police",
+          "ar": "الشرطة",
+          "nums": [
+            "999"
+          ],
+          "by": "Ministry of Interior",
+          "hours": "24/7",
+          "who": "Everyone; use outside the 911 regions",
+          "conf": "V",
+          "src": [
+            "cst.gov.sa/en/about/Numbering"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Ambulance (Saudi Red Crescent)",
+          "ar": "الهلال الأحمر",
+          "nums": [
+            "997"
+          ],
+          "by": "Saudi Red Crescent Authority",
+          "hours": "24/7",
+          "who": "Everyone",
+          "conf": "V",
+          "src": [
+            "cst.gov.sa/en/about/Numbering"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Civil Defence",
+          "ar": "الدفاع المدني",
+          "nums": [
+            "998"
+          ],
+          "by": "National",
+          "hours": "24/7",
+          "who": "Everyone",
+          "conf": "V",
+          "src": [
+            "cst.gov.sa/en/about/Numbering"
+          ]
+        },
+        {
+          "kind": "support",
+          "name": "Psychological Consultation Center, National Center for Mental Health Promotion",
+          "ar": "مركز الاستشارات النفسية – المركز الوطني لتعزيز الصحة النفسية",
+          "nums": [
+            "920 033 360"
+          ],
+          "by": "NCMH (chaired by the Minister of Health)",
+          "hours": "Daily 8am–8pm, Saturday 1pm–8pm (MOH page). Not 24/7.",
+          "who": "Everyone, all regions",
+          "conf": "V",
+          "src": [
+            "https://www.moh.gov.sa/en/Ministry/Information-and-services/Pages/psychiatry.aspx"
+          ],
+          "note": "Saudipedia gives different hours (8am–4pm, closed Fri/Sat). Show the Ministry's hours."
+        },
+        {
+          "kind": "support",
+          "name": "Qareboon app",
+          "ar": "تطبيق قريبون",
+          "nums": [
+            "App: iOS and Android"
+          ],
+          "by": "NCMH",
+          "hours": "\"Any time\"",
+          "who": "Everyone: text and voice counselling",
+          "conf": "V",
+          "src": [
+            "https://www.moh.gov.sa/en/Ministry/Information-and-services/Pages/psychiatry.aspx"
+          ]
+        },
+        {
+          "kind": "support",
+          "name": "MOH 937 health call centre",
+          "ar": "مركز 937",
+          "nums": [
+            "937"
+          ],
+          "by": "Ministry of Health",
+          "hours": "24/7 · free",
+          "who": "Everyone: medical advice; psychological consultations added in 2020",
+          "conf": "V",
+          "src": [
+            "https://www.moh.gov.sa/en/937"
+          ],
+          "note": "Verified as a 24/7 medical line. Its psychological counselling is described only in older reports."
+        },
+        {
+          "kind": "child",
+          "name": "Child Helpline",
+          "ar": "خط مساندة الطفل",
+          "nums": [
+            "116111"
+          ],
+          "by": "National Family Safety Program",
+          "hours": "7am–11pm daily (per Child Helpline International) · Arabic, English · toll-free",
+          "who": "Under-18s and caregivers",
+          "conf": "V",
+          "src": [
+            "cst.gov.sa/en/about/Numbering",
+            "childhelplineinternational.org"
+          ]
+        },
+        {
+          "kind": "gbv",
+          "name": "Family Violence Reporting Center 1919",
+          "ar": "مركز بلاغات العنف الأسري ١٩١٩",
+          "nums": [
+            "1919"
+          ],
+          "by": "Ministry of Human Resources & Social Development",
+          "hours": "24/7 · toll-free · female psychologists and social workers",
+          "who": "Women, children, elderly, people with disabilities",
+          "conf": "V",
+          "src": [
+            "cst.gov.sa/en/about/Numbering",
+            "hrsd.gov.sa/en/node/812514"
+          ]
+        },
+        {
+          "kind": "addiction",
+          "name": "Addiction Consultation Center (Nebras)",
+          "ar": "مركز استشارات الإدمان (نبراس)",
+          "nums": [
+            "1955",
+            "WhatsApp 0552001955 (2017)"
+          ],
+          "by": "National Committee for Narcotics Control",
+          "hours": "Sources conflict: 24/7 vs 8am–10pm · free, confidential",
+          "who": "People with addiction and their families",
+          "conf": "L",
+          "src": [
+            "cst.gov.sa/en/about/Numbering",
+            "okaz.com.sa/local/na/1601178"
+          ]
+        },
+        {
+          "kind": "refugee",
+          "name": "HRSD Unified Contact Centre",
+          "ar": "مركز الاتصال الموحد",
+          "nums": [
+            "19911"
+          ],
+          "by": "Ministry of Human Resources & Social Development",
+          "hours": "Sun–Thu 8am–5pm · Arabic, English",
+          "who": "Workers, domestic workers included: labour and social complaints, not emotional support",
+          "conf": "V",
+          "src": [
+            "hrsd.gov.sa/en/media-center/news/22032024 (6 May 2024)"
+          ]
+        }
+      ],
+      "avoid": [
+        [
+          "KFSHRC \"crisis support\" 44107, 7777",
+          "Internal hospital extensions, not public lines."
+        ]
+      ]
+    },
+    {
+      "code": "QA",
+      "name": "Qatar",
+      "ar": "قطر",
+      "region": "Gulf",
+      "dial": "+974",
+      "summary": "The national mental health helpline is 16000, option 4, daytime and closed Fridays. After hours: 999.",
+      "lines": [
+        {
+          "kind": "emergency",
+          "name": "Emergency: police, fire, ambulance",
+          "ar": "الطوارئ",
+          "nums": [
+            "999"
+          ],
+          "by": "Ministry of Interior",
+          "hours": "24/7 · interpreters for English, French, Chinese, Filipino, Urdu · free",
+          "who": "Everyone",
+          "conf": "V",
+          "src": [
+            "portal.moi.gov.qa",
+            "marhaba.qa (Aug 2026)"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Mobile emergency",
+          "ar": "طوارئ الجوال",
+          "nums": [
+            "112"
+          ],
+          "by": "",
+          "hours": "",
+          "who": "Mobiles",
+          "conf": "L",
+          "src": [
+            "marhaba.qa (Aug 2026)"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Emergency for Deaf people",
+          "ar": "طوارئ الصم",
+          "nums": [
+            "992 (SMS, video call)",
+            "992@moi.gov.qa"
+          ],
+          "by": "Ministry of Interior",
+          "hours": "24/7",
+          "who": "Deaf people",
+          "conf": "V",
+          "src": [
+            "portal.moi.gov.qa"
+          ]
+        },
+        {
+          "kind": "crisis",
+          "name": "National Mental Health Helpline",
+          "ar": "خط المساعدة الوطني للصحة النفسية",
+          "nums": [
+            "16000, then option 4"
+          ],
+          "by": "Hamad Medical Corporation, MoPH, PHCC",
+          "hours": "Sat–Thu 8am–6pm (closed Friday) · Arabic, English, Tagalog, Hindi, Urdu, Malayalam · free, anonymous",
+          "who": "Anyone in Qatar: crisis intervention, women's mental health, substance misuse",
+          "conf": "V",
+          "src": [
+            "hamad.qa (21 Apr 2026)",
+            "The Peninsula (21 Apr 2026)"
+          ]
+        },
+        {
+          "kind": "gbv",
+          "name": "Aman Protection & Social Rehabilitation Centre",
+          "ar": "مركز الحماية والتأهيل الاجتماعي \"أمان\"",
+          "nums": [
+            "919",
+            "+974 4409 0999 (office)"
+          ],
+          "by": "Qatar Foundation for Social Work",
+          "hours": "Hotline 24/7 · Arabic, English, French, Hindi, Urdu, Filipino, Nepali · free",
+          "who": "Women and children: domestic violence; social, legal and psychological counselling",
+          "conf": "V",
+          "src": [
+            "aman.org.qa/en/faq",
+            "QNA (1 Dec 2024)"
+          ],
+          "note": "Aman announced a restructuring for 2025. Recheck before launch."
+        },
+        {
+          "kind": "support",
+          "name": "Wifaq Family Consulting Center",
+          "ar": "مركز الاستشارات العائلية \"وفاق\"",
+          "nums": [
+            "16003"
+          ],
+          "by": "Qatar Foundation for Social Work",
+          "hours": "Sun–Thu 7am–2pm · free",
+          "who": "Individuals and families: family, psychological and behavioural counselling",
+          "conf": "L",
+          "src": [
+            "wifaq.org.qa/en/faq (2023)"
+          ]
+        },
+        {
+          "kind": "addiction",
+          "name": "Naufar",
+          "ar": "نوفر",
+          "nums": [
+            "+974 4494 6000"
+          ],
+          "by": "National addiction treatment service",
+          "hours": "Not stated · confidential",
+          "who": "Admissions and information, not a crisis line",
+          "conf": "V",
+          "src": [
+            "naufar.com"
+          ]
+        },
+        {
+          "kind": "refugee",
+          "name": "Ministry of Labour hotline",
+          "ar": "الخط الساخن لوزارة العمل",
+          "nums": [
+            "16008",
+            "SMS \"5\" + QID or visa number to 92727",
+            "Accommodation complaints 40280660"
+          ],
+          "by": "Ministry of Labour",
+          "hours": "24/7, multilingual (2020 press)",
+          "who": "Workers, migrants included: labour complaints, not emotional support. For emotional support, 16000 option 4 speaks Tagalog, Hindi, Urdu and Malayalam.",
+          "conf": "L",
+          "src": [
+            "gulf-times.com (31 Mar 2020)",
+            "Migrant-Rights.org (6 Aug 2024)"
+          ]
+        }
+      ],
+      "avoid": [
+        [
+          "Aman WhatsApp 3385 0022 and apps",
+          "From a March 2020 COVID notice; unconfirmed now."
+        ]
+      ]
+    },
+    {
+      "code": "LB",
+      "name": "Lebanon",
+      "ar": "لبنان",
+      "region": "Levant",
+      "dial": "+961",
+      "summary": "The region's strongest crisis line: Embrace's National Lifeline 1564, 24/7, run with the Ministry of Public Health.",
+      "lines": [
+        {
+          "kind": "crisis",
+          "name": "National Lifeline for Emotional Support & Suicide Prevention",
+          "ar": "الخط الوطني الساخن للدعم النفسي والوقاية من الإنتحار",
+          "nums": [
+            "1564"
+          ],
+          "by": "Embrace, with the MoPH National Mental Health Programme",
+          "hours": "24/7 · Arabic, English, French · free, confidential",
+          "who": "Everyone in Lebanon",
+          "conf": "V",
+          "src": [
+            "https://embracelebanon.org/what-we-do/the-national-lifeline/",
+            "help.unhcr.org/lebanon (30 Apr 2026)"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Lebanese Red Cross ambulance",
+          "ar": "الصليب الأحمر اللبناني",
+          "nums": [
+            "140"
+          ],
+          "by": "Lebanese Red Cross",
+          "hours": "Toll-free, nationwide",
+          "who": "Everyone",
+          "conf": "V",
+          "src": [
+            "help.unhcr.org/lebanon/en/emergency/"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Civil Defence",
+          "ar": "الدفاع المدني",
+          "nums": [
+            "125"
+          ],
+          "by": "State",
+          "hours": "",
+          "who": "Everyone",
+          "conf": "V",
+          "src": [
+            "help.unhcr.org/lebanon/en/emergency/"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Police (ISF)",
+          "ar": "قوى الأمن الداخلي",
+          "nums": [
+            "112"
+          ],
+          "by": "Internal Security Forces",
+          "hours": "24/7",
+          "who": "Everyone",
+          "conf": "L",
+          "src": [
+            "um.dk/libanon"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Fire brigade",
+          "ar": "فوج الإطفاء",
+          "nums": [
+            "175"
+          ],
+          "by": "",
+          "hours": "",
+          "who": "Everyone",
+          "conf": "L",
+          "src": [
+            "um.dk/libanon"
+          ]
+        },
+        {
+          "kind": "support",
+          "name": "Step-by-Step (WHO guided self-help)",
+          "ar": "خطوة بخطوة",
+          "nums": [
+            "WhatsApp 81820474",
+            "step-by-step-program.com"
+          ],
+          "by": "WHO with the MoPH",
+          "hours": "Five-week programme with weekly phone support · free",
+          "who": "Depression and stress; not for crisis",
+          "conf": "V",
+          "src": [
+            "help.unhcr.org/lebanon (14 Apr 2026)"
+          ]
+        },
+        {
+          "kind": "gbv",
+          "name": "ABAAD Emergency Safe Line",
+          "ar": "أبعاد",
+          "nums": [
+            "81 78 81 78"
+          ],
+          "by": "ABAAD",
+          "hours": "24/7 (per findahelpline)",
+          "who": "Gender-based violence",
+          "conf": "V",
+          "src": [
+            "abaadmena.org/ops/"
+          ]
+        },
+        {
+          "kind": "gbv",
+          "name": "ABAAD Men Centre helpline",
+          "ar": "مركز الرجال – أبعاد",
+          "nums": [
+            "71 28 38 20"
+          ],
+          "by": "ABAAD",
+          "hours": "",
+          "who": "Men and families: anger, violence prevention",
+          "conf": "V",
+          "src": [
+            "abaadmena.org/ops/"
+          ]
+        },
+        {
+          "kind": "gbv",
+          "name": "KAFA helpline",
+          "ar": "كفى",
+          "nums": [
+            "03 018 019"
+          ],
+          "by": "KAFA",
+          "hours": "24/7 (per findahelpline)",
+          "who": "Gender-based and family violence, child protection",
+          "conf": "V",
+          "src": [
+            "kafa.org.lb/en"
+          ]
+        },
+        {
+          "kind": "child",
+          "name": "Child protection hotlines (by region)",
+          "ar": "خطوط حماية الطفل",
+          "nums": [
+            "North 79 300 410 (Himaya)",
+            "Beirut / Mount Lebanon 81 559 495 (Caritas)",
+            "Bekaa / Baalbek-Hermel 81 600 048 (IRC)",
+            "South / Nabatieh 81 616 637 (Terre des Hommes)"
+          ],
+          "by": "NGOs, listed by UNHCR",
+          "hours": "",
+          "who": "Children",
+          "conf": "V",
+          "src": [
+            "help.unhcr.org/lebanon/en/emergency/"
+          ],
+          "note": "Likely donor-funded; recheck periodically."
+        },
+        {
+          "kind": "addiction",
+          "name": "Skoun addiction centre",
+          "ar": "سكون",
+          "nums": [
+            "01 845 512"
+          ],
+          "by": "Skoun (NGO)",
+          "hours": "Not stated",
+          "who": "Addiction treatment",
+          "conf": "V",
+          "src": [
+            "skoun.org"
+          ]
+        },
+        {
+          "kind": "refugee",
+          "name": "UNHCR National Call Center",
+          "ar": "مركز اتصال المفوضية",
+          "nums": [
+            "04 726 111"
+          ],
+          "by": "UNHCR",
+          "hours": "Mon–Fri 8am–5pm",
+          "who": "Refugees",
+          "conf": "V",
+          "src": [
+            "help.unhcr.org/lebanon/en/emergency/"
+          ]
+        },
+        {
+          "kind": "support",
+          "name": "Ministry of Public Health hotline",
+          "ar": "الخط الساخن لوزارة الصحة",
+          "nums": [
+            "1214",
+            "1787"
+          ],
+          "by": "Ministry of Public Health",
+          "hours": "",
+          "who": "General health, not mental health",
+          "conf": "V",
+          "src": [
+            "moph.gov.lb"
+          ]
+        }
+      ],
+      "avoid": [
+        [
+          "Embrace \"international\" +961 1 341 941",
+          "Only in secondary lists."
+        ],
+        [
+          "Skoun hotline 78 824 730",
+          "Only in search snippets."
+        ],
+        [
+          "Helem +961 81 478 450",
+          "Aggregator only (LGBTQIA+ helpline)."
+        ]
+      ]
+    },
+    {
+      "code": "JO",
+      "name": "Jordan",
+      "ar": "الأردن",
+      "region": "Levant",
+      "dial": "+962",
+      "summary": "No government mental-health crisis line. The Jordanian Clinical Psychologists Association line is the main option (hours disputed); 911 for danger; 110 for children and families.",
+      "lines": [
+        {
+          "kind": "emergency",
+          "name": "Unified emergency",
+          "ar": "الطوارئ الموحد",
+          "nums": [
+            "911",
+            "911 app (audio and video)"
+          ],
+          "by": "Public Security Directorate",
+          "hours": "24/7",
+          "who": "Everyone",
+          "conf": "V",
+          "src": [
+            "jordantimes.com (31 Dec 2024)"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Emergency for Deaf and hard-of-hearing people",
+          "ar": "تطبيق 114 للصم",
+          "nums": [
+            "114 app"
+          ],
+          "by": "Public Security Directorate",
+          "hours": "",
+          "who": "Deaf and hard-of-hearing people",
+          "conf": "L",
+          "src": [
+            "jordantimes.com (Dec 2024)"
+          ]
+        },
+        {
+          "kind": "crisis",
+          "name": "JCPA hotline",
+          "ar": "الخط الساخن لجمعية الأخصائيين النفسيين الإكلينيكيين",
+          "nums": [
+            "0795440416 (calls and SMS)"
+          ],
+          "by": "Jordanian Clinical Psychologists Association (Lifeline International member)",
+          "hours": "Sources conflict: 24/7 vs 9am–9pm daily · free",
+          "who": "Mental health and suicide",
+          "conf": "L",
+          "src": [
+            "findahelpline.com/organizations/jcpa-hotline-jcpa",
+            "WHO EMRO MHPSS page"
+          ]
+        },
+        {
+          "kind": "child",
+          "name": "110 Family & Child Helpline",
+          "ar": "خط 110 للأسرة والطفل",
+          "nums": [
+            "110"
+          ],
+          "by": "Jordan River Foundation",
+          "hours": "Sun–Thu 8am–8pm, Fri–Sat 9am–5pm · Arabic · toll-free",
+          "who": "Children and families, psychological wellbeing",
+          "conf": "V",
+          "src": [
+            "jordanriver.jo",
+            "childhelplineinternational.org"
+          ]
+        },
+        {
+          "kind": "gbv",
+          "name": "Family Protection Department",
+          "ar": "إدارة حماية الأسرة والأحداث",
+          "nums": [
+            "911",
+            "06-5815826 (office)"
+          ],
+          "by": "Public Security Directorate",
+          "hours": "911 is 24/7",
+          "who": "Domestic violence, gender-based violence, children",
+          "conf": "V",
+          "src": [
+            "help.unhcr.org/jordan",
+            "women.jo (Dec 2025)"
+          ],
+          "note": "Its WhatsApp number differs between sources (+962 790 193 193 vs 0797 911 911). Confirm before listing either."
+        },
+        {
+          "kind": "gbv",
+          "name": "Arab Women's Organization",
+          "ar": "منظمة النساء العربيات",
+          "nums": [
+            "077 111 2013"
+          ],
+          "by": "AWO (NGO)",
+          "hours": "Sun–Thu 8am–4pm",
+          "who": "Gender-based violence",
+          "conf": "V",
+          "src": [
+            "help.unhcr.org/jordan"
+          ]
+        },
+        {
+          "kind": "support",
+          "name": "Noor Al Hussein Foundation, Institute for Family Health",
+          "ar": "مؤسسة نور الحسين – معهد العناية بصحة الأسرة",
+          "nums": [
+            "Amman 0790211701 / 06-5344190",
+            "Irbid 0798758201",
+            "Zaatari 0791565082",
+            "Azraq 0795595762"
+          ],
+          "by": "NHF (NGO)",
+          "hours": "Sun–Thu 8/9am–3:30pm",
+          "who": "Psychosocial support and gender-based violence",
+          "conf": "V",
+          "src": [
+            "help.unhcr.org/jordan"
+          ]
+        },
+        {
+          "kind": "gbv",
+          "name": "ARDD legal aid emergency line",
+          "ar": "النهضة العربية للديمقراطية والتنمية",
+          "nums": [
+            "0777387221"
+          ],
+          "by": "ARDD (NGO)",
+          "hours": "24/7",
+          "who": "Legal help, gender-based violence",
+          "conf": "L",
+          "src": [
+            "women.jo (Dec 2025)"
+          ]
+        },
+        {
+          "kind": "refugee",
+          "name": "UNHCR Helpline",
+          "ar": "خط مساعدة المفوضية",
+          "nums": [
+            "06 400 8000"
+          ],
+          "by": "UNHCR",
+          "hours": "24/7 (voice menu)",
+          "who": "Refugees",
+          "conf": "V",
+          "src": [
+            "help.unhcr.org/jordan"
+          ]
+        }
+      ],
+      "avoid": [
+        [
+          "0795785095 (MoH with IMC)",
+          "COVID-era line."
+        ],
+        [
+          "IMC \"Relax\" app",
+          "Launched 2021; current operation unknown."
+        ]
+      ]
+    },
+    {
+      "code": "PS",
+      "name": "Palestine",
+      "ar": "فلسطين",
+      "region": "Levant",
+      "dial": "+970",
+      "summary": "Sawa's 24/7 line is now 164 (it replaced 121, which many lists still print). In Gaza every line is subject to network and power cuts.",
+      "lines": [
+        {
+          "kind": "emergency",
+          "name": "Police",
+          "ar": "الشرطة",
+          "nums": [
+            "100"
+          ],
+          "by": "Palestinian Authority",
+          "hours": "Free",
+          "who": "West Bank; Gaza (capacity severely degraded)",
+          "conf": "V",
+          "src": [
+            "info.wafa.ps/pages/details/33948"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Ambulance",
+          "ar": "الإسعاف",
+          "nums": [
+            "101"
+          ],
+          "by": "PRCS / Ministry of Health",
+          "hours": "",
+          "who": "West Bank; Gaza (capacity severely degraded)",
+          "conf": "V",
+          "src": [
+            "info.wafa.ps/pages/details/33948"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Civil Defence",
+          "ar": "الدفاع المدني",
+          "nums": [
+            "102"
+          ],
+          "by": "Palestinian Authority",
+          "hours": "",
+          "who": "West Bank; Gaza (capacity severely degraded)",
+          "conf": "V",
+          "src": [
+            "info.wafa.ps/pages/details/33948"
+          ]
+        },
+        {
+          "kind": "crisis",
+          "name": "Sawa helpline",
+          "ar": "مؤسسة سوا",
+          "nums": [
+            "164 (toll-free)",
+            "East Jerusalem 1-800-500-121",
+            "Web chat: chat.sawa164.org",
+            "help@sawa.ps",
+            "Sawa app"
+          ],
+          "by": "Sawa (NGO, Child Helpline International member)",
+          "hours": "24/7 · Arabic · free",
+          "who": "Everyone: psychosocial support, gender-based violence, children. In use in Gaza in 2025.",
+          "conf": "V",
+          "src": [
+            "https://sawa.ps/en",
+            "childhelplineinternational.org",
+            "OCHA Gaza update (3–16 Aug 2025)"
+          ]
+        },
+        {
+          "kind": "support",
+          "name": "GCMHP free telephone counselling (Gaza)",
+          "ar": "برنامج غزة للصحة النفسية",
+          "nums": [
+            "1800 222 333 (toll-free)"
+          ],
+          "by": "Gaza Community Mental Health Programme",
+          "hours": "8am–8pm daily (as stated in 2020) · free",
+          "who": "Gaza",
+          "conf": "L",
+          "src": [
+            "gcmhp.org/services/13"
+          ],
+          "note": "Number is on the operator's site; whether it has operated since October 2023 is unconfirmed."
+        },
+        {
+          "kind": "support",
+          "name": "Palestinian Counseling Center",
+          "ar": "المركز الفلسطيني للإرشاد",
+          "nums": [
+            "02 298 9788 (office)"
+          ],
+          "by": "PCC (NGO)",
+          "hours": "",
+          "who": "Counselling; not a crisis line",
+          "conf": "L",
+          "src": [
+            "TELUS Health list (June 2025)"
+          ]
+        }
+      ],
+      "avoid": [
+        [
+          "Sawa 121",
+          "Replaced by 164."
+        ],
+        [
+          "Sawa WhatsApp +972 59 404 0121",
+          "Not on Sawa's site; may predate the change to 164."
+        ],
+        [
+          "Alkhat 072-2220202",
+          "Aggregators only (LGBTQ+ helpline)."
+        ]
+      ]
+    },
+    {
+      "code": "SY",
+      "name": "Syria",
+      "ar": "سوريا",
+      "region": "Levant",
+      "dial": "+963",
+      "summary": "Institutions changed after December 2024. Only the ambulance number and UNICEF's helpline are confirmed now; the Ministry of Health psychological hotlines from 2024 need re-confirmation.",
+      "lines": [
+        {
+          "kind": "emergency",
+          "name": "Ambulance",
+          "ar": "منظومة الإسعاف",
+          "nums": [
+            "110"
+          ],
+          "by": "Ministry of Health",
+          "hours": "",
+          "who": "Everyone",
+          "conf": "V",
+          "src": [
+            "moh.gov.sy"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Police",
+          "ar": "شرطة النجدة",
+          "nums": [
+            "112"
+          ],
+          "by": "Ministry of Interior",
+          "hours": "",
+          "who": "Everyone",
+          "conf": "U",
+          "src": [
+            "Secondary lists; some swap 110, 112 and 113"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Fire",
+          "ar": "الإطفاء",
+          "nums": [
+            "113"
+          ],
+          "by": "",
+          "hours": "",
+          "who": "Everyone",
+          "conf": "U",
+          "src": [
+            "Secondary lists"
+          ]
+        },
+        {
+          "kind": "child",
+          "name": "UNICEF Syria helpline",
+          "ar": "خط مساعدة اليونيسف",
+          "nums": [
+            "0952 535 262"
+          ],
+          "by": "UNICEF and partners",
+          "hours": "Sun–Thu 9am–7pm · free",
+          "who": "Child protection, child mental health and psychosocial support, referrals",
+          "conf": "V",
+          "src": [
+            "unicef.org/syria (updated 28 Sep 2025)",
+            "syriaishome.org"
+          ]
+        },
+        {
+          "kind": "crisis",
+          "name": "Ministry of Health psychological consultation hotline",
+          "ar": "الخط الساخن للاستشارات النفسية",
+          "nums": [
+            "Damascus (Ibn Rushd): 0952384449, 0952384447, 011 4443745",
+            "Aleppo (Ibn Khaldun): 0940088846, 0940088847"
+          ],
+          "by": "Ministry of Health with WHO",
+          "hours": "24h (as stated Oct 2024)",
+          "who": "Everyone",
+          "conf": "U",
+          "src": [
+            "archive.sana.sy (1 Oct 2024)"
+          ],
+          "note": "Last confirmed before the change of government. Not on the new Ministry site. Do not ship until confirmed by phone."
+        },
+        {
+          "kind": "refugee",
+          "name": "UNHCR community centres",
+          "ar": "المراكز المجتمعية للمفوضية",
+          "nums": [
+            "14 centre mobiles, e.g. Al Tadamoun 0948333847"
+          ],
+          "by": "UNHCR partners",
+          "hours": "Mostly Sun–Thu 9am–4pm",
+          "who": "Refugees and displaced people: walk-in and referral",
+          "conf": "V",
+          "src": [
+            "help.unhcr.org/syria/contact-us/contact-for-syrians/"
+          ]
+        }
+      ],
+      "avoid": [
+        [
+          "\"SARC Mental Health Helpline +963 944 868 444\"",
+          "Aggregator only; not on any official page."
+        ],
+        [
+          "\"UNICEF Mental Health Line +963 11 611 3366\"",
+          "Aggregator only."
+        ],
+        [
+          "\"UNFPA GBV line +963 944 987 000\"",
+          "Aggregator only."
+        ],
+        [
+          "\"Save the Children +963 11 334 5555\"",
+          "Aggregator only."
+        ],
+        [
+          "Fadfada online support",
+          "Site offline (Sep 2026)."
+        ],
+        [
+          "Syrian Center for Mental Health",
+          "Its site shows a service-suspension banner."
+        ]
+      ]
+    },
+    {
+      "code": "IQ",
+      "name": "Iraq",
+      "ar": "العراق",
+      "region": "Iraq",
+      "dial": "+964",
+      "summary": "No federal suicide or crisis line. 911 is Baghdad's unified emergency centre; the Kurdistan Region has a 24/7 violence hotline, 119. UNHCR's psychosocial partnerships ended in June 2025.",
+      "lines": [
+        {
+          "kind": "emergency",
+          "name": "Unified emergency (federal Iraq)",
+          "ar": "الطوارئ الموحد",
+          "nums": [
+            "911"
+          ],
+          "by": "Ministry of Interior",
+          "hours": "24/7",
+          "who": "Baghdad; rollout elsewhere not confirmed. UNHCR tells people in South/Central Iraq to call it for mental-health emergencies.",
+          "conf": "L",
+          "src": [
+            "iraqinews.com (15 Aug 2025)",
+            "help.unhcr.org/iraq"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Police (Najda)",
+          "ar": "النجدة",
+          "nums": [
+            "104"
+          ],
+          "by": "Ministry of Interior",
+          "hours": "Free",
+          "who": "Federal Iraq and Kurdistan Region",
+          "conf": "L",
+          "src": [
+            "iq.zain.com",
+            "help.krd (Jun 2026)"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Ambulance",
+          "ar": "الإسعاف",
+          "nums": [
+            "122"
+          ],
+          "by": "Ministry of Health / KRG Directorates of Health",
+          "hours": "Free",
+          "who": "Federal Iraq and Kurdistan Region. UNHCR also routes mental-health emergencies in the Kurdistan Region to 122.",
+          "conf": "L",
+          "src": [
+            "iq.zain.com",
+            "help.krd (Jun 2026)",
+            "help.unhcr.org/iraq/en/help/health-services/"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Civil Defence",
+          "ar": "الدفاع المدني",
+          "nums": [
+            "115"
+          ],
+          "by": "",
+          "hours": "Free",
+          "who": "Everyone",
+          "conf": "L",
+          "src": [
+            "iq.zain.com",
+            "help.krd"
+          ],
+          "note": "An older INA report gives 122 for civil defence."
+        },
+        {
+          "kind": "gbv",
+          "name": "Family & Child Protection from Domestic Violence",
+          "ar": "مديرية حماية الأسرة والطفل من العنف الأسري",
+          "nums": [
+            "139"
+          ],
+          "by": "Ministry of Interior",
+          "hours": "",
+          "who": "Domestic violence, children",
+          "conf": "L",
+          "src": [
+            "ina.iq (2021)"
+          ]
+        },
+        {
+          "kind": "gbv",
+          "name": "119 Hotline, Directorate for Combating Violence against Women & Families (Kurdistan Region)",
+          "ar": "الخط الساخن 119",
+          "nums": [
+            "119"
+          ],
+          "by": "KRG (set up with UNFPA)",
+          "hours": "24/7 · free",
+          "who": "Domestic violence, with psychological, legal and social counselling",
+          "conf": "V",
+          "src": [
+            "kurdistan24.net (26 Nov 2024)",
+            "iraq.un.org (2018)"
+          ]
+        },
+        {
+          "kind": "support",
+          "name": "Youth health helpline",
+          "ar": "خط الاستشارة للمراهقين والشباب",
+          "nums": [
+            "80000111 (Arabic)",
+            "80000777 (Kurdish)"
+          ],
+          "by": "Federal and KRG Ministries of Health, with UNFPA and the NGO Together",
+          "hours": "Sun–Thu 9am–10pm (2020; \"hours may vary\") · free on Asiacell, Korek, Zain",
+          "who": "Adolescents and young people: confidential counselling including mental health; not a crisis line",
+          "conf": "L",
+          "src": [
+            "iraq.unfpa.org (29 Nov 2020)",
+            "togethereco.org/projects/helpline.php (2026)"
+          ],
+          "note": "The Arabic line 80000111 is listed as current in 2026. The Kurdish line 80000777 is only in the 2020 source."
+        },
+        {
+          "kind": "child",
+          "name": "116 Child Helpline (Kurdistan Region)",
+          "ar": "خط نجدة الطفل 116",
+          "nums": [
+            "116"
+          ],
+          "by": "KRG Ministry of Labour and Social Affairs",
+          "hours": "Sun–Thu 9am–6pm · Arabic, Kurdish · free",
+          "who": "Children in the Kurdistan Region (not federal Iraq)",
+          "conf": "L",
+          "src": [
+            "childhelplineinternational.org/iraq-116-child-helpline-kurdistan-region/"
+          ],
+          "note": "Undated listing; no confirmation from 2023 or later."
+        }
+      ],
+      "avoid": [
+        [
+          "Asuda hotline +964 53 339 0840",
+          "Not confirmed on any opened page."
+        ],
+        [
+          "SEMA Foundation +964 750 309 6649",
+          "Could not be confirmed anywhere."
+        ]
+      ]
+    },
+    {
+      "code": "KW",
+      "name": "Kuwait",
+      "ar": "الكويت",
+      "region": "Gulf",
+      "dial": "+965",
+      "summary": "No dedicated suicide line. The Ministry of Health hotline 151 has taken psychological-support calls around the clock since March 2026; the psychiatric hospital's emergency unit is open 24/7.",
+      "lines": [
+        {
+          "kind": "emergency",
+          "name": "Emergency: police, ambulance, fire",
+          "ar": "الطوارئ",
+          "nums": [
+            "112"
+          ],
+          "by": "Government",
+          "hours": "24/7 · free",
+          "who": "Everyone",
+          "conf": "V",
+          "src": [
+            "e.gov.kw (Emergencies)",
+            "gov.uk Kuwait travel advice"
+          ]
+        },
+        {
+          "kind": "support",
+          "name": "Ministry of Health hotline: psychological support",
+          "ar": "الخط الساخن لوزارة الصحة – خدمة الدعم النفسي",
+          "nums": [
+            "151"
+          ],
+          "by": "Ministry of Health / Kuwait Center for Mental Health",
+          "hours": "24/7 (2026 press) · calls passed to mental-health specialists",
+          "who": "Citizens and residents",
+          "conf": "L",
+          "src": [
+            "moh.gov.kw/en/Pages/ContactUs.aspx",
+            "Al-Seyassah (13 and 26 Mar 2026)"
+          ],
+          "note": "The number is official. Its psychological-support role was announced \"given current circumstances\" and may be temporary."
+        },
+        {
+          "kind": "crisis",
+          "name": "Kuwait Center for Mental Health (psychiatric hospital)",
+          "ar": "مركز الكويت للصحة النفسية",
+          "nums": [
+            "24621000"
+          ],
+          "by": "Ministry of Health",
+          "hours": "Emergency unit 24/7; clinics 7:30–13:00 and 14:00–18:00",
+          "who": "Everyone",
+          "conf": "L",
+          "src": [
+            "kuwaitpsych.com/KCMH"
+          ],
+          "note": "Aggregators give other numbers (24843900, 24622000)."
+        },
+        {
+          "kind": "child",
+          "name": "Child Support Line 147",
+          "ar": "خط مساندة الطفل",
+          "nums": [
+            "147"
+          ],
+          "by": "Ministry of Health Child Protection Office (line donated by Zain)",
+          "hours": "24/7 · free · Arabic · social workers and psychological counsellors",
+          "who": "Under-18s and parents",
+          "conf": "L",
+          "src": [
+            "Al-Rai (8 May 2024)",
+            "kuwaitnews.com (1 Dec 2024)",
+            "childhelplineinternational.org"
+          ],
+          "note": "Reported suspended in 2019; restored by 2024."
+        },
+        {
+          "kind": "support",
+          "name": "Etman Centre",
+          "ar": "مركز اطمئن",
+          "nums": [
+            "1899000",
+            "HQ 22052165 / 22052166"
+          ],
+          "by": "Patients Helping Fund Society (NGO) with KCMH",
+          "hours": "By appointment (2021) · free",
+          "who": "Psychological and family counselling; not a crisis line",
+          "conf": "L",
+          "src": [
+            "phf.org.kw/etman/about"
+          ]
+        }
+      ],
+      "avoid": [
+        [
+          "Domestic violence 22564588 / 22541588",
+          "Aggregator only. A new hotline is required by Decree-Law 11/2026 and may launch soon."
+        ],
+        [
+          "KCMH line 24621770",
+          "COVID-era (2020)."
+        ],
+        [
+          "2020 MOH and Kuwait Psychological Association mobiles",
+          "COVID-era personal numbers."
+        ],
+        [
+          "Drug Control 1884141",
+          "Police drug enforcement, not treatment. Don't list it as help."
+        ]
+      ]
+    },
+    {
+      "code": "BH",
+      "name": "Bahrain",
+      "ar": "البحرين",
+      "region": "Gulf",
+      "dial": "+973",
+      "summary": "No mental-health or suicide helpline found. Strong family, child and domestic-violence lines are listed on the official portal. The Psychiatric Hospital is the mental-health route.",
+      "lines": [
+        {
+          "kind": "emergency",
+          "name": "Ambulance, civil defence, police",
+          "ar": "الإسعاف والدفاع المدني وشرطة النجدة",
+          "nums": [
+            "999"
+          ],
+          "by": "Government",
+          "hours": "24/7 · free",
+          "who": "Everyone",
+          "conf": "V",
+          "src": [
+            "bahrain.bh Directory of Emergency Hotline Numbers (30 Aug 2026)"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Police hotline (non-emergency)",
+          "ar": "الخط الساخن للشرطة",
+          "nums": [
+            "80008008"
+          ],
+          "by": "Ministry of Interior",
+          "hours": "",
+          "who": "Everyone",
+          "conf": "V",
+          "src": [
+            "bahrain.bh directory (30 Aug 2026)"
+          ]
+        },
+        {
+          "kind": "crisis",
+          "name": "Psychiatric Hospital",
+          "ar": "مستشفى الطب النفسي",
+          "nums": [
+            "+973 17288888 (switchboard)",
+            "17279311 (appointments, referrals)",
+            "8000 8100 (customer service)"
+          ],
+          "by": "Ministry of Health",
+          "hours": "Emergency hours not stated",
+          "who": "Residents",
+          "conf": "V",
+          "src": [
+            "moh.gov.bh psychiatric hospital page"
+          ]
+        },
+        {
+          "kind": "child",
+          "name": "Child Helpline 998",
+          "ar": "خط نجدة ومساندة الطفل 998",
+          "nums": [
+            "998",
+            "17103280",
+            "998@social.gov.bh"
+          ],
+          "by": "Ministry of Social Development, Child Protection Centre",
+          "hours": "24/7 · toll-free · counselling, listening, referral",
+          "who": "Children up to 18, or anyone reporting for them",
+          "conf": "V",
+          "src": [
+            "social.gov.bh/home/subservices_sections/18"
+          ]
+        },
+        {
+          "kind": "child",
+          "name": "Online child abuse reports",
+          "ar": "بلاغات حماية الطفل في الفضاء الإلكتروني",
+          "nums": [
+            "992"
+          ],
+          "by": "Anti-Corruption and Electronic Security (police)",
+          "hours": "",
+          "who": "Everyone",
+          "conf": "V",
+          "src": [
+            "bahrain.bh directory"
+          ]
+        },
+        {
+          "kind": "gbv",
+          "name": "Domestic violence line",
+          "ar": "العنف الأسري",
+          "nums": [
+            "17430515"
+          ],
+          "by": "Listed by the government portal (Aisha Yateem Centre's second number)",
+          "hours": "",
+          "who": "Everyone",
+          "conf": "V",
+          "src": [
+            "bahrain.bh directory (30 Aug 2026)",
+            "bahrain.bh Women Safety & Protection (26 Aug 2026)"
+          ]
+        },
+        {
+          "kind": "gbv",
+          "name": "MoSD Family Counselling Centre / Dar Al-Aman shelter",
+          "ar": "مركز الإرشاد الأسري – دار الأمان",
+          "nums": [
+            "80008001 (toll-free)",
+            "Dar Al-Aman 17874614 / 39635619"
+          ],
+          "by": "Ministry of Social Development",
+          "hours": "",
+          "who": "Women and children facing domestic violence",
+          "conf": "V",
+          "src": [
+            "bahrain.bh Women Safety & Protection",
+            "social.gov.bh"
+          ]
+        },
+        {
+          "kind": "gbv",
+          "name": "Women's Support Center, Supreme Council for Women",
+          "ar": "مركز دعم المرأة – المجلس الأعلى للمرأة",
+          "nums": [
+            "80008006",
+            "App (iOS, Android)"
+          ],
+          "by": "Supreme Council for Women",
+          "hours": "",
+          "who": "Bahraini women",
+          "conf": "V",
+          "src": [
+            "bahrain.bh Women Safety & Protection (26 Aug 2026)"
+          ]
+        },
+        {
+          "kind": "gbv",
+          "name": "Aisha Yateem Family Counselling Centre",
+          "ar": "مركز عائشة يتيم للإرشاد الأسري",
+          "nums": [
+            "17430488",
+            "17430515"
+          ],
+          "by": "Bahrain Young Ladies Association (NGO)",
+          "hours": "Confidential",
+          "who": "Women and families: psychological, social, legal counselling",
+          "conf": "V",
+          "src": [
+            "bahrain.bh Women Safety & Protection"
+          ],
+          "note": "A toll-free 80001488 (24/7) appears only in search snippets."
+        },
+        {
+          "kind": "gbv",
+          "name": "Shamsaha",
+          "ar": "شمسة",
+          "nums": [
+            "Shamsaha app (24/7 chat)",
+            "English +973 3844 7588",
+            "Arabic +973 6671 0901"
+          ],
+          "by": "Shamsaha (NGO)",
+          "hours": "24/7 · free, confidential",
+          "who": "Women: domestic and sexual violence crisis support",
+          "conf": "L",
+          "src": [
+            "newsofbahrain.com (18 Nov 2025, app)",
+            "The National (4 Aug 2021)"
+          ],
+          "note": "The app is current. The phone numbers were last confirmed in 2021."
+        },
+        {
+          "kind": "gbv",
+          "name": "Other family and violence centres (official list)",
+          "ar": "مراكز أخرى",
+          "nums": [
+            "Women's Union Family Support 17141180",
+            "Batelco Family Violence Care 17597777",
+            "Awal Legal Aid 17467037 / 17678947",
+            "Eslah Family Counselling 17322842",
+            "MoJ Family Reconciliation 17513371"
+          ],
+          "by": "NGOs; Ministry of Justice",
+          "hours": "",
+          "who": "",
+          "conf": "V",
+          "src": [
+            "bahrain.bh Women Safety & Protection"
+          ]
+        },
+        {
+          "kind": "refugee",
+          "name": "Expat Protection Centre and anti-trafficking hotline",
+          "ar": "مركز حماية العمالة الوافدة",
+          "nums": [
+            "995",
+            "995@lmra.gov.bh"
+          ],
+          "by": "LMRA",
+          "hours": "24 hours",
+          "who": "Expatriate and domestic workers: protection and shelter (not emotional support)",
+          "conf": "V",
+          "src": [
+            "lmra.gov.bh/en/page/show/95"
+          ]
+        }
+      ],
+      "avoid": [
+        [
+          "Drug hotline 996",
+          "Mainly for reporting trafficking to police, not for getting help."
+        ],
+        [
+          "\"+973 17812222\" psychiatry helpline",
+          "A private hospital; search results only."
+        ]
+      ]
+    },
+    {
+      "code": "OM",
+      "name": "Oman",
+      "ar": "عُمان",
+      "region": "Gulf",
+      "dial": "+968",
+      "summary": "No mental-health helpline. The route for a crisis is 9999 or Al Masarra Hospital's 24/7 psychiatric emergency line. Children: 1100. Addiction: Hayah 1110.",
+      "lines": [
+        {
+          "kind": "emergency",
+          "name": "Emergency: police, ambulance, fire",
+          "ar": "الطوارئ",
+          "nums": [
+            "9999"
+          ],
+          "by": "Royal Oman Police Operations Center",
+          "hours": "24/7 · free",
+          "who": "Everyone",
+          "conf": "V",
+          "src": [
+            "rop.gov.om/english/contactus.aspx",
+            "gov.om/en/emergency-numbers1"
+          ]
+        },
+        {
+          "kind": "crisis",
+          "name": "Al Masarra Hospital: psychiatry and addiction emergency",
+          "ar": "مستشفى المسرة – طوارئ الطب النفسي وطب الإدمان",
+          "nums": [
+            "24873268 (+968 2487 3268)"
+          ],
+          "by": "Ministry of Health",
+          "hours": "24/7 (hospital emergency)",
+          "who": "Adults, adolescents, addiction",
+          "conf": "V",
+          "src": [
+            "moh.gov.om/en/hospitals-directorates/hospitals/al-masarra-hospital/ (6 Nov 2025)"
+          ],
+          "note": "A hospital emergency line, not a helpline. Other Al Masarra numbers (main 24873000, outpatient clinics) are for appointments."
+        },
+        {
+          "kind": "child",
+          "name": "Child Protection Line",
+          "ar": "خط حماية الطفل",
+          "nums": [
+            "1100"
+          ],
+          "by": "Ministry of Social Development, Family Protection Department",
+          "hours": "24/7 · free, confidential",
+          "who": "Under-18s, parents, teachers, the public",
+          "conf": "V",
+          "src": [
+            "gov.om/en/emergency-numbers1",
+            "omandaily.om/ampArticle/1185038 (25 Aug 2025)"
+          ]
+        },
+        {
+          "kind": "gbv",
+          "name": "Domestic violence reporting",
+          "ar": "الإبلاغ عن العنف الأسري",
+          "nums": [
+            "80077788 (toll-free)"
+          ],
+          "by": "Listed by the government portal (reportedly the Ministry of Social Development)",
+          "hours": "Not stated",
+          "who": "Victims and witnesses of domestic violence",
+          "conf": "L",
+          "src": [
+            "gov.om/en/emergency-numbers1"
+          ],
+          "note": "Label it as reporting, not counselling, until the ministry confirms what it offers."
+        },
+        {
+          "kind": "addiction",
+          "name": "Hayah national addiction platform: free consultation line",
+          "ar": "منصة \"حياة\" – رقم الاستشارات المجاني",
+          "nums": [
+            "1110",
+            "Live chat on hayah.om"
+          ],
+          "by": "Seven ministries, including Health and Social Development",
+          "hours": "Hours not stated · free, confidential · Arabic",
+          "who": "People struggling with addiction and their families: treatment and support, not police",
+          "conf": "V",
+          "src": [
+            "omannews.gov.om/topics/ar/3/show/456669/ (17 Sep 2025)",
+            "hayah.om"
+          ]
+        },
+        {
+          "kind": "gbv",
+          "name": "Royal Oman Police hotline (trafficking, blackmail)",
+          "ar": "الخط الساخن لشرطة عمان السلطانية",
+          "nums": [
+            "80077444"
+          ],
+          "by": "Royal Oman Police",
+          "hours": "Not stated",
+          "who": "Human trafficking and online blackmail",
+          "conf": "V",
+          "src": [
+            "fm.gov.om/policy/human-trafficking/ (10 Sep 2026)",
+            "rop.gov.om/english/contactus.aspx"
+          ]
+        },
+        {
+          "kind": "support",
+          "name": "Ministry of Social Development communication centre",
+          "ar": "مركز الاتصال بوزارة التنمية الاجتماعية",
+          "nums": [
+            "1555"
+          ],
+          "by": "Ministry of Social Development",
+          "hours": "Not stated",
+          "who": "Reports and family consultations; not a crisis line",
+          "conf": "L",
+          "src": [
+            "omandaily.om/ampArticle/1185038 (25 Aug 2025)"
+          ]
+        },
+        {
+          "kind": "refugee",
+          "name": "Ministry of Labour workplace complaints",
+          "ar": "شكاوى وزارة العمل",
+          "nums": [
+            "80077000"
+          ],
+          "by": "Ministry of Labour",
+          "hours": "",
+          "who": "Workers, migrants included: labour complaints, not emotional support",
+          "conf": "V",
+          "src": [
+            "gov.om/en/emergency-numbers1"
+          ]
+        }
+      ],
+      "avoid": [
+        [
+          "24603552, 24607555",
+          "Aggregator-only \"Ministry of Health mental health\" numbers."
+        ],
+        [
+          "24873760 / 24873761",
+          "COVID-era Al Masarra support lines, not on the hospital's current page."
+        ],
+        [
+          "93494584, 93597549, 25570141",
+          "COVID-era North Sharqiyah lines; two are personal mobiles."
+        ],
+        [
+          "24343666",
+          "Labelled \"in case of emergency\" but its service is unclear. Use 9999."
+        ],
+        [
+          "1444",
+          "Police narcotics reporting. Never present it as addiction help."
+        ],
+        [
+          "MOH contact centre 1212",
+          "General enquiries, no mental-health option."
+        ]
+      ]
+    },
+    {
+      "code": "EG",
+      "name": "Egypt",
+      "ar": "مصر",
+      "region": "North Africa",
+      "dial": "+20",
+      "summary": "The Ministry of Health mental-health hotline 16328 is the national line (24/7 per 2026 reports). Egypt has strong child, women's and addiction lines.",
+      "lines": [
+        {
+          "kind": "emergency",
+          "name": "Police",
+          "ar": "شرطة النجدة",
+          "nums": [
+            "122"
+          ],
+          "by": "Government",
+          "hours": "24/7 · free",
+          "who": "Everyone",
+          "conf": "V",
+          "src": [
+            "orange.eg/en/help/emergency-numbers"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Ambulance",
+          "ar": "الإسعاف",
+          "nums": [
+            "123"
+          ],
+          "by": "Government",
+          "hours": "24/7 · free",
+          "who": "Everyone",
+          "conf": "V",
+          "src": [
+            "orange.eg/en/help/emergency-numbers"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Fire",
+          "ar": "المطافئ",
+          "nums": [
+            "180"
+          ],
+          "by": "Government",
+          "hours": "24/7 · free",
+          "who": "Everyone",
+          "conf": "V",
+          "src": [
+            "orange.eg/en/help/emergency-numbers"
+          ]
+        },
+        {
+          "kind": "crisis",
+          "name": "Mental health hotline, General Secretariat of Mental Health & Addiction Treatment",
+          "ar": "الخط الساخن للأمانة العامة للصحة النفسية وعلاج الإدمان",
+          "nums": [
+            "16328",
+            "0220816831 (+20 2 20816831)"
+          ],
+          "by": "Ministry of Health and Population",
+          "hours": "24/7 (2026 reports; one says set daily hours) · free, confidential · Arabic",
+          "who": "Everyone",
+          "conf": "V",
+          "src": [
+            "help.unhcr.org/egypt/en/health-services/mental-health/",
+            "elwatannews.com (12 and 18 Apr 2026)"
+          ]
+        },
+        {
+          "kind": "support",
+          "name": "Mental health hotline: additional numbers",
+          "ar": "أرقام إضافية للخط الساخن",
+          "nums": [
+            "105 (added Mar 2026)",
+            "08008880700 (toll-free)"
+          ],
+          "by": "Ministry of Health and Population",
+          "hours": "",
+          "who": "Everyone",
+          "conf": "L",
+          "src": [
+            "youm7.com (14 Apr 2026)",
+            "akhbarelyom (13 Apr 2026)"
+          ],
+          "note": "Show these after 16328. 105 is also the ministry's general line."
+        },
+        {
+          "kind": "addiction",
+          "name": "Fund for Drug Control & Treatment of Addiction",
+          "ar": "صندوق مكافحة وعلاج الإدمان والتعاطي",
+          "nums": [
+            "16023"
+          ],
+          "by": "Ministry of Social Solidarity",
+          "hours": "24/7 incl. holidays · free, confidential · no legal liability for voluntary patients",
+          "who": "Everyone",
+          "conf": "L",
+          "src": [
+            "youm7 (21 Jul 2026)"
+          ]
+        },
+        {
+          "kind": "child",
+          "name": "Child Helpline",
+          "ar": "خط نجدة الطفل",
+          "nums": [
+            "16000",
+            "WhatsApp 01102121600"
+          ],
+          "by": "National Council for Childhood & Motherhood",
+          "hours": "Reports 24/7; counselling unit Sun–Thu 9:00–14:00 · free",
+          "who": "Under-18s and parents",
+          "conf": "L",
+          "src": [
+            "dostor.org (27 Apr 2026)"
+          ]
+        },
+        {
+          "kind": "gbv",
+          "name": "Women's Complaints Office",
+          "ar": "مكتب شكاوى المرأة – المجلس القومي للمرأة",
+          "nums": [
+            "15115",
+            "WhatsApp 01007525600"
+          ],
+          "by": "National Council for Women",
+          "hours": "Sources conflict: 9:00–21:00 vs round the clock",
+          "who": "Women: legal and psychological support",
+          "conf": "L",
+          "src": [
+            "youm7 (29 May 2026)",
+            "elwatannews (23 Mar 2025)"
+          ]
+        },
+        {
+          "kind": "support",
+          "name": "Egyptian Red Crescent psychological support",
+          "ar": "الهلال الأحمر المصري – وحدة الدعم النفسي",
+          "nums": [
+            "15322 (24/7 operations)",
+            "01144144446 (psychological unit)"
+          ],
+          "by": "Egyptian Red Crescent",
+          "hours": "24/7 on 15322 · confidential",
+          "who": "Everyone: psychological support, crisis intervention",
+          "conf": "L",
+          "src": [
+            "elwatannews (12 Apr 2026)"
+          ]
+        },
+        {
+          "kind": "refugee",
+          "name": "Etijah gender-based violence line (refugees)",
+          "ar": "اتجاه",
+          "nums": [
+            "Emergency WhatsApp 01015450440 (24/7)",
+            "Infoline 01500093801 (Sun–Thu 9–17)"
+          ],
+          "by": "Etijah (UNHCR partner)",
+          "hours": "See numbers · free",
+          "who": "Refugees in Greater Cairo, Alexandria, North Coast",
+          "conf": "V",
+          "src": [
+            "help.unhcr.org/egypt/en/protection/gbv/"
+          ]
+        },
+        {
+          "kind": "refugee",
+          "name": "CARE gender-based violence line (refugees, Aswan)",
+          "ar": "كير مصر",
+          "nums": [
+            "01039202357 (Sun–Thu 9–17)",
+            "01039205952 (after hours)"
+          ],
+          "by": "CARE",
+          "hours": "",
+          "who": "Refugees in Aswan",
+          "conf": "V",
+          "src": [
+            "help.unhcr.org/egypt/en/protection/gbv/"
+          ]
+        },
+        {
+          "kind": "refugee",
+          "name": "Child protection (refugees)",
+          "ar": "حماية الطفل للاجئين",
+          "nums": [
+            "Plan International 01064551183 (24/7)",
+            "Save the Children 01015933433 (Sun–Thu 9–17)"
+          ],
+          "by": "INGOs (UNHCR partners)",
+          "hours": "",
+          "who": "Refugee children, Greater Cairo (Save the Children also Alexandria, North Coast)",
+          "conf": "V",
+          "src": [
+            "help.unhcr.org/egypt/en/protection/child-protection/"
+          ]
+        },
+        {
+          "kind": "refugee",
+          "name": "UNHCR Egypt Infoline",
+          "ar": "خط معلومات المفوضية",
+          "nums": [
+            "0231330000"
+          ],
+          "by": "UNHCR",
+          "hours": "Sun–Wed 8:15–15:30, Thu 8:15–14:00",
+          "who": "Refugees; information, not crisis",
+          "conf": "V",
+          "src": [
+            "help.unhcr.org/egypt/en/contacts/"
+          ]
+        }
+      ],
+      "avoid": [
+        [
+          "Befrienders Cairo 762 1602 / 1603",
+          "Old 7-digit Cairo numbers, aggregators only."
+        ],
+        [
+          "Al-Azhar 19906",
+          "A general line, not a crisis service."
+        ],
+        [
+          "Mersal Foundation",
+          "Three conflicting numbers; refugees should use the one on UNHCR's page."
+        ],
+        [
+          "112",
+          "Not confirmed as an Egyptian emergency number."
+        ]
+      ]
+    },
+    {
+      "code": "SD",
+      "name": "Sudan",
+      "ar": "السودان",
+      "region": "North Africa",
+      "dial": "+249",
+      "summary": "War since April 2023: every line may fail through network outages or insecurity. No national mental-health or suicide line exists. UN humanitarian lines are the most reliable routes.",
+      "lines": [
+        {
+          "kind": "emergency",
+          "name": "Emergency",
+          "ar": "الطوارئ",
+          "nums": [
+            "999"
+          ],
+          "by": "Government",
+          "hours": "Often unresponsive (UK Foreign Office)",
+          "who": "Everyone",
+          "conf": "L",
+          "src": [
+            "gov.uk/foreign-travel-advice/sudan/getting-help"
+          ]
+        },
+        {
+          "kind": "refugee",
+          "name": "Interagency toll-free call centre",
+          "ar": "مركز الاتصال المشترك",
+          "nums": [
+            "1460"
+          ],
+          "by": "UNHCR and WFP",
+          "hours": "Toll-free · may be intermittently unavailable",
+          "who": "Humanitarian help and referral",
+          "conf": "V",
+          "src": [
+            "help.unhcr.org/sudan/contact-our-hotlines/"
+          ]
+        },
+        {
+          "kind": "refugee",
+          "name": "UNHCR Sudan WhatsApp",
+          "ar": "واتساب المفوضية",
+          "nums": [
+            "+249 90 093 4472"
+          ],
+          "by": "UNHCR",
+          "hours": "Four languages",
+          "who": "Refugees and displaced people",
+          "conf": "V",
+          "src": [
+            "help.unhcr.org/sudan/ar/"
+          ]
+        },
+        {
+          "kind": "refugee",
+          "name": "UNHCR state lines",
+          "ar": "خطوط المفوضية في الولايات",
+          "nums": [
+            "Khartoum 0900934474",
+            "Kassala / Girba 0912363436, 0912155648",
+            "Gedaref 0123154969",
+            "Blue Nile 0912177814",
+            "Wadi Halfa 0123184293, 0912179237",
+            "Wad Madani 0900284866"
+          ],
+          "by": "UNHCR",
+          "hours": "Varies",
+          "who": "Refugee protection, by state",
+          "conf": "V",
+          "src": [
+            "help.unhcr.org/sudan/contact-our-hotlines/"
+          ],
+          "note": "Darfur and Kordofan activities are suspended."
+        },
+        {
+          "kind": "gbv",
+          "name": "ADRA gender-based violence support",
+          "ar": "أدرا",
+          "nums": [
+            "0912480565"
+          ],
+          "by": "ADRA (NGO)",
+          "hours": "Not stated",
+          "who": "Location not stated",
+          "conf": "L",
+          "src": [
+            "help.unhcr.org/sudan/services-by-location/"
+          ]
+        },
+        {
+          "kind": "child",
+          "name": "Child Helpline 9696",
+          "ar": "خط نجدة الطفل",
+          "nums": [
+            "9696"
+          ],
+          "by": "Child and Family Protection Unit",
+          "hours": "Not stated · free · Arabic",
+          "who": "Children",
+          "conf": "U",
+          "src": [
+            "childhelplineinternational.org/sudan-child-helpline-9696/"
+          ],
+          "note": "No confirmation that it has run during the war."
+        }
+      ],
+      "avoid": [
+        [
+          "progress.guide Sudan entries",
+          "Placeholder numbers such as +249 900 123 456."
+        ],
+        [
+          "Befrienders Khartoum (249) 11-555-253",
+          "Malformed, aggregator only."
+        ],
+        [
+          "Tamona / Ahfad Trauma Centre +249 90 922 5265",
+          "Seen only in conflicting search snippets."
+        ],
+        [
+          "Nada Al-Azhar psychosocial lines",
+          "Pre-war locations; the English page is gone."
+        ],
+        [
+          "333, 998",
+          "Ambulance and fire numbers seen only in aggregators."
+        ]
+      ]
+    },
+    {
+      "code": "LY",
+      "name": "Libya",
+      "ar": "ليبيا",
+      "region": "North Africa",
+      "dial": "+218",
+      "summary": "The only emergency number confirmed on an official Libyan source is 1412. The psychosocial hotline 1417 is Libya's only dedicated line, but nothing confirms it since 2021.",
+      "lines": [
+        {
+          "kind": "emergency",
+          "name": "Emergency Medicine & Support Centre",
+          "ar": "مركز طب الطوارئ والدعم",
+          "nums": [
+            "1412"
+          ],
+          "by": "Ministry of Health",
+          "hours": "24/7 · toll-free",
+          "who": "Everyone",
+          "conf": "V",
+          "src": [
+            "emsc.gov.ly (2025–2026)",
+            "help.unhcr.org/libya/topics/health/"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Ambulance & Emergency Service",
+          "ar": "جهاز الإسعاف والطوارئ",
+          "nums": [
+            "191",
+            "0921910191",
+            "0931911191"
+          ],
+          "by": "Ministry of Health",
+          "hours": "",
+          "who": "Everyone",
+          "conf": "L",
+          "src": [
+            "eanlibya.com (6 Sep 2026)"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Tripoli 1415 call centre",
+          "ar": "مركز اتصال 1415",
+          "nums": [
+            "1415"
+          ],
+          "by": "Civil society (EU-supported)",
+          "hours": "24/7 · toll-free",
+          "who": "Tripoli and about 13 western municipalities",
+          "conf": "L",
+          "src": [
+            "eeas.europa.eu (3 Feb 2021)",
+            "gov.uk Libya travel advice"
+          ]
+        },
+        {
+          "kind": "support",
+          "name": "Psychosocial Support Hotline 1417",
+          "ar": "الخط الساخن للدعم النفسي الاجتماعي",
+          "nums": [
+            "1417"
+          ],
+          "by": "PSS Team and Ministry of Social Affairs, UNFPA-funded",
+          "hours": "Toll-free, anonymous · hours conflict (8:00–20:00 closed Fridays vs 8:00–24:00)",
+          "who": "Everyone in Libya, any nationality",
+          "conf": "U",
+          "src": [
+            "libya.unfpa.org (4 Dec 2019)",
+            "febp.ly (1 Dec 2020)"
+          ],
+          "note": "All sources are 2019–2021. Confirm it still runs before shipping."
+        },
+        {
+          "kind": "refugee",
+          "name": "UNHCR Tawasul call centre",
+          "ar": "مركز تواصل",
+          "nums": [
+            "1504"
+          ],
+          "by": "UNHCR",
+          "hours": "Sun–Thu 09:00–23:00",
+          "who": "Refugees: information and referral",
+          "conf": "V",
+          "src": [
+            "help.unhcr.org/libya/important-contacts-hotlines/"
+          ]
+        },
+        {
+          "kind": "refugee",
+          "name": "UNHCR protection hotline",
+          "ar": "خط الحماية",
+          "nums": [
+            "0917127644"
+          ],
+          "by": "UNHCR",
+          "hours": "Sun–Thu 08:30–16:30",
+          "who": "Refugees",
+          "conf": "V",
+          "src": [
+            "help.unhcr.org/libya/important-contacts-hotlines/"
+          ]
+        }
+      ],
+      "avoid": [
+        [
+          "Police 1515, ambulance 193",
+          "Aggregators only; prefer 1412."
+        ],
+        [
+          "Libyan Red Crescent +218 21 340 6665",
+          "Undated, not a crisis line."
+        ]
+      ]
+    },
+    {
+      "code": "TN",
+      "name": "Tunisia",
+      "ar": "تونس",
+      "region": "Maghreb",
+      "dial": "+216",
+      "summary": "The Ministry of Health psychological line 80 105 050 is free but daytime only (Mon–Sat 08:30–14:30). Out of hours: SAMU 190.",
+      "lines": [
+        {
+          "kind": "emergency",
+          "name": "SAMU (ambulance)",
+          "ar": "الإسعاف",
+          "nums": [
+            "190"
+          ],
+          "by": "State",
+          "hours": "24/7 · free",
+          "who": "Everyone",
+          "conf": "V",
+          "src": [
+            "diplomatie.gouv.fr Tunisie (15 Sep 2026)",
+            "gov.uk"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Police",
+          "ar": "شرطة النجدة",
+          "nums": [
+            "197"
+          ],
+          "by": "Ministry of Interior",
+          "hours": "24/7",
+          "who": "Towns",
+          "conf": "V",
+          "src": [
+            "diplomatie.gouv.fr Tunisie (15 Sep 2026)"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Civil protection",
+          "ar": "الحماية المدنية",
+          "nums": [
+            "198"
+          ],
+          "by": "State",
+          "hours": "24/7",
+          "who": "Everyone",
+          "conf": "V",
+          "src": [
+            "diplomatie.gouv.fr Tunisie (15 Sep 2026)"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "National Guard",
+          "ar": "الحرس الوطني",
+          "nums": [
+            "193"
+          ],
+          "by": "State",
+          "hours": "24/7",
+          "who": "Rural areas",
+          "conf": "V",
+          "src": [
+            "gov.uk",
+            "tuniscope.com (21 Jan 2026)"
+          ]
+        },
+        {
+          "kind": "support",
+          "name": "Free psychological consultation line",
+          "ar": "الخلية المركزية للإحاطة النفسية الطارئة",
+          "nums": [
+            "80 105 050"
+          ],
+          "by": "Ministry of Health, national mental health programme",
+          "hours": "Mon–Sat 08:30–14:30 only · free, confidential",
+          "who": "Adults under stress, anxiety or depression not already in treatment: assessment, advice, referral",
+          "conf": "L",
+          "src": [
+            "webmanagercenter.com (26 Feb 2025)",
+            "lapresse.tn (27 Feb 2025)"
+          ]
+        },
+        {
+          "kind": "child",
+          "name": "Green line 1809",
+          "ar": "الخط الأخضر 1809",
+          "nums": [
+            "1809"
+          ],
+          "by": "Ministry of Family, Women, Children & Seniors",
+          "hours": "Around the clock · psychologists",
+          "who": "Children and families: listening, violence reports",
+          "conf": "L",
+          "src": [
+            "lemaghreb.tn (Jun 2024)"
+          ]
+        },
+        {
+          "kind": "child",
+          "name": "Child-protection delegates line",
+          "ar": "الرقم الأخضر 192 لمندوبي حماية الطفولة",
+          "nums": [
+            "192"
+          ],
+          "by": "Ministry of Family",
+          "hours": "24/7",
+          "who": "Children at risk",
+          "conf": "L",
+          "src": [
+            "lemaghreb.tn (launched 6 Jun 2024)"
+          ],
+          "note": "One source lists 192 as a civil-protection number. Don't present it as an emergency number."
+        },
+        {
+          "kind": "gbv",
+          "name": "Green line 1899 for women victims of violence",
+          "ar": "الخط الأخضر 1899",
+          "nums": [
+            "1899"
+          ],
+          "by": "Ministry of Family",
+          "hours": "24/7 · free, anonymous",
+          "who": "Women: listening, psychological support, legal guidance, referral",
+          "conf": "V",
+          "src": [
+            "businessnews.com.tn (2 Mar 2026)"
+          ]
+        }
+      ],
+      "avoid": [
+        [
+          "80 10 19 19",
+          "The rabies line, not mental health."
+        ]
+      ]
+    },
+    {
+      "code": "MA",
+      "name": "Morocco",
+      "ar": "المغرب",
+      "region": "Maghreb",
+      "dial": "+212",
+      "summary": "No national suicide or crisis line. Stop Silence (Sourire de Reda) closed in 2025. For danger: 19 (police in towns), 177 (gendarmerie), 15 (civil protection), 141 (SAMU).",
+      "lines": [
+        {
+          "kind": "emergency",
+          "name": "Police (towns)",
+          "ar": "الشرطة",
+          "nums": [
+            "19"
+          ],
+          "by": "National police (DGSN)",
+          "hours": "24/7 · free",
+          "who": "Urban areas",
+          "conf": "V",
+          "src": [
+            "diplomatie.gouv.fr Maroc (15 Sep 2026)"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Royal Gendarmerie",
+          "ar": "الدرك الملكي",
+          "nums": [
+            "177"
+          ],
+          "by": "Gendarmerie",
+          "hours": "24/7",
+          "who": "Outside towns",
+          "conf": "V",
+          "src": [
+            "diplomatie.gouv.fr Maroc (15 Sep 2026)"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Civil protection (fire and ambulance)",
+          "ar": "الوقاية المدنية",
+          "nums": [
+            "15"
+          ],
+          "by": "Civil protection",
+          "hours": "24/7",
+          "who": "Everyone",
+          "conf": "V",
+          "src": [
+            "diplomatie.gouv.fr Maroc (15 Sep 2026)"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "SAMU (medical emergency)",
+          "ar": "الإسعاف الطبي",
+          "nums": [
+            "141"
+          ],
+          "by": "Ministry of Health",
+          "hours": "24/7 · free",
+          "who": "Everyone",
+          "conf": "L",
+          "src": [
+            "h24info (15 Mar 2020)"
+          ]
+        },
+        {
+          "kind": "crisis",
+          "name": "Poison centre (CAPM)",
+          "ar": "المركز المغربي لمحاربة التسمم واليقظة الدوائية",
+          "nums": [
+            "0801 000 180",
+            "05 37 68 64 64"
+          ],
+          "by": "Ministry of Health",
+          "hours": "24/7 · low cost",
+          "who": "Poisoning and overdose, including self-poisoning",
+          "conf": "L",
+          "src": [
+            "sante.gov.ma communiqué (2017)"
+          ]
+        },
+        {
+          "kind": "child",
+          "name": "Child listening centre 2511",
+          "ar": "مركز الاستماع 2511 – المرصد الوطني لحقوق الطفل",
+          "nums": [
+            "2511",
+            "2511.ma",
+            "Mobile app"
+          ],
+          "by": "National Observatory for Children's Rights",
+          "hours": "Free, confidential",
+          "who": "Children",
+          "conf": "L",
+          "src": [
+            "snrtnews.com (8 Nov 2024)"
+          ]
+        },
+        {
+          "kind": "gbv",
+          "name": "Kolonamaak platform for women",
+          "ar": "كلنا معاك",
+          "nums": [
+            "8350",
+            "Kolonamaak app"
+          ],
+          "by": "National Union of Moroccan Women (UNFM)",
+          "hours": "24/7 (as announced)",
+          "who": "Women and girls: listening, guidance, referral",
+          "conf": "L",
+          "src": [
+            "maroc.ma (2020)"
+          ],
+          "note": "No confirmation from 2024–2026."
+        },
+        {
+          "kind": "child",
+          "name": "Espace Maroc Cyberconfiance",
+          "ar": "فضاء المغرب للثقة السيبرانية",
+          "nums": [
+            "+212 6 24 40 58 89 (calls, WhatsApp, SMS)"
+          ],
+          "by": "CMRPI",
+          "hours": "24/7 · Arabic, French",
+          "who": "Online harm to children, youth and women",
+          "conf": "L",
+          "src": [
+            "childhelplineinternational.org/morocco"
+          ]
+        },
+        {
+          "kind": "refugee",
+          "name": "UNHCR partner psychologist line",
+          "ar": "خط الأخصائي النفسي",
+          "nums": [
+            "0800 004 146"
+          ],
+          "by": "UNHCR partner",
+          "hours": "Free",
+          "who": "Refugees and asylum seekers",
+          "conf": "L",
+          "src": [
+            "help.unhcr.org/morocco/en/services/health-services/"
+          ]
+        },
+        {
+          "kind": "refugee",
+          "name": "UNHCR protection line (woman counsellor)",
+          "ar": "خط الحماية",
+          "nums": [
+            "+212 767 052 043"
+          ],
+          "by": "UNHCR",
+          "hours": "Mondays 14:00–17:00 only",
+          "who": "Refugee women facing violence",
+          "conf": "L",
+          "src": [
+            "help.unhcr.org/morocco/en/services/health-services/"
+          ]
+        }
+      ],
+      "avoid": [
+        [
+          "Stop Silence (Sourire de Reda)",
+          "The association dissolved in February 2025."
+        ],
+        [
+          "sahha.ma \"psychological distress hotline\" 0801 000 180",
+          "That is the poison centre."
+        ],
+        [
+          "Moroccan Psychiatric Association 0639099552 / 0639099533",
+          "COVID-era (2020), two hours a day."
+        ],
+        [
+          "Allo Yakada 080 100 47 47",
+          "COVID-era."
+        ],
+        [
+          "PsyPhone +212 529 045 656",
+          "Private, paid."
+        ],
+        [
+          "150 / 190",
+          "Emergency numbers from an outdated source."
+        ]
+      ]
+    },
+    {
+      "code": "DZ",
+      "name": "Algeria",
+      "ar": "الجزائر",
+      "region": "Maghreb",
+      "dial": "+213",
+      "summary": "No confirmed mental-health or suicide helpline. Child line 1111 runs 24/7 with psychologists; 1026 supports women facing violence.",
+      "lines": [
+        {
+          "kind": "emergency",
+          "name": "Civil protection (fire and ambulance)",
+          "ar": "الحماية المدنية",
+          "nums": [
+            "14",
+            "1021"
+          ],
+          "by": "Civil Protection",
+          "hours": "24/7 · free",
+          "who": "Everyone",
+          "conf": "L",
+          "src": [
+            "gov.uk",
+            "Wikipedia"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Police",
+          "ar": "الأمن الوطني",
+          "nums": [
+            "17",
+            "1548"
+          ],
+          "by": "National police (DGSN)",
+          "hours": "24/7",
+          "who": "Towns",
+          "conf": "L",
+          "src": [
+            "gov.uk",
+            "reseauwassila-avife.com"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Gendarmerie",
+          "ar": "الدرك الوطني",
+          "nums": [
+            "1055"
+          ],
+          "by": "Gendarmerie",
+          "hours": "24/7",
+          "who": "Rural areas",
+          "conf": "L",
+          "src": [
+            "reseauwassila-avife.com"
+          ]
+        },
+        {
+          "kind": "child",
+          "name": "Green number 1111 (ONPPE)",
+          "ar": "الهيئة الوطنية لحماية وترقية الطفولة",
+          "nums": [
+            "1111"
+          ],
+          "by": "National Body for the Protection and Promotion of Children (state)",
+          "hours": "24/7 · free · psychologists, sociologists, lawyers",
+          "who": "Children, parents, schools",
+          "conf": "V",
+          "src": [
+            "education.gov.dz (25 Nov 2025)",
+            "aps.dz (Nov 2025)"
+          ]
+        },
+        {
+          "kind": "child",
+          "name": "Je t'écoute 3033 (Réseau NADA)",
+          "ar": "الشبكة الجزائرية للدفاع عن حقوق الطفل \"ندى\"",
+          "nums": [
+            "3033",
+            "SMS +213 781 006 065"
+          ],
+          "by": "Réseau NADA (NGO)",
+          "hours": "Sun–Thu 09:00–16:30 · toll-free",
+          "who": "Children and adolescents, including psychological distress",
+          "conf": "L",
+          "src": [
+            "childhelplineinternational.org/algeria-je-tecoute-3033/"
+          ]
+        },
+        {
+          "kind": "gbv",
+          "name": "Green number 1026",
+          "ar": "الرقم الأخضر 1026",
+          "nums": [
+            "1026"
+          ],
+          "by": "Ministry of National Solidarity, Family & Women's Condition",
+          "hours": "Free · Arabic, French",
+          "who": "Women facing violence: listening, psychological and legal support",
+          "conf": "L",
+          "src": [
+            "algerie360.com (17 Mar 2025)"
+          ]
+        },
+        {
+          "kind": "gbv",
+          "name": "Réseau Wassila listening line",
+          "ar": "شبكة وسيلة",
+          "nums": [
+            "0560 100 105",
+            "0770 286 529"
+          ],
+          "by": "Réseau Wassila–AVIFE (NGO)",
+          "hours": "Sun–Thu",
+          "who": "Women and children facing violence",
+          "conf": "L",
+          "src": [
+            "reseauwassila-avife.com/adresses-utiles"
+          ]
+        },
+        {
+          "kind": "refugee",
+          "name": "UNHCR Algeria emergency line",
+          "ar": "خط طوارئ المفوضية",
+          "nums": [
+            "+213 661 69 68 41"
+          ],
+          "by": "UNHCR",
+          "hours": "Sun–Thu 08:30–16:30; SMS or voicemail out of hours",
+          "who": "Refugees: arrest, refoulement",
+          "conf": "L",
+          "src": [
+            "help.unhcr.org/algeria"
+          ]
+        }
+      ],
+      "avoid": [
+        [
+          "Algerian Red Crescent 1005",
+          "COVID-era psychological line (2020)."
+        ],
+        [
+          "SAMU 16 / 3016",
+          "Aggregators only."
+        ],
+        [
+          "15-27",
+          "Old social-action number, superseded by 1026."
+        ],
+        [
+          "1078",
+          "Ministry of Justice call centre, not addiction."
+        ]
+      ]
+    },
+    {
+      "code": "YE",
+      "name": "Yemen",
+      "ar": "اليمن",
+      "region": "Yemen",
+      "dial": "+967",
+      "summary": "No line runs 24/7. Help comes from UN and NGO lines, mostly for refugees and displaced people, tied to Sana'a (north) or Aden (south). Lines in the north are fragile after UN operations were cut back in 2025.",
+      "lines": [
+        {
+          "kind": "emergency",
+          "name": "Ambulance and fire",
+          "ar": "الإسعاف والإطفاء",
+          "nums": [
+            "191"
+          ],
+          "by": "Authorities",
+          "hours": "Unreliable; almost none in rural areas",
+          "who": "Urban areas",
+          "conf": "L",
+          "src": [
+            "gov.uk",
+            "Wikipedia"
+          ]
+        },
+        {
+          "kind": "emergency",
+          "name": "Police",
+          "ar": "الشرطة",
+          "nums": [
+            "199 or 194"
+          ],
+          "by": "Authorities",
+          "hours": "Unreliable",
+          "who": "Urban areas",
+          "conf": "U",
+          "src": [
+            "gov.uk",
+            "Wikipedia (sources conflict)"
+          ]
+        },
+        {
+          "kind": "refugee",
+          "name": "UNHCR mental health hotline, Sana'a",
+          "ar": "الخط الساخن للمفوضية – صنعاء",
+          "nums": [
+            "712 225 038 (+967 712 225 038)"
+          ],
+          "by": "UNHCR with QRCS and SDF",
+          "hours": "Sun–Wed 08:00–16:00, Thu 08:00–14:30 · free",
+          "who": "Refugees and asylum seekers, north",
+          "conf": "L",
+          "src": [
+            "help.unhcr.org/yemen (MHPSS page)"
+          ],
+          "note": "Possibly intermittent after UN operations in the north were cut back."
+        },
+        {
+          "kind": "refugee",
+          "name": "UNHCR mental health hotline, Aden",
+          "ar": "الخط الساخن للمفوضية – عدن",
+          "nums": [
+            "771 070 368 (+967 771 070 368)"
+          ],
+          "by": "UNHCR with Human Access and SDF",
+          "hours": "Sun–Wed 08:00–16:00, Thu 08:00–14:30 · free",
+          "who": "Refugees and asylum seekers, south (also Kharaz camp)",
+          "conf": "L",
+          "src": [
+            "help.unhcr.org/yemen (MHPSS page)"
+          ]
+        },
+        {
+          "kind": "support",
+          "name": "YGUSSWP psychosocial line",
+          "ar": "الاتحاد العام لعلماء الاجتماع والأخصائيين الاجتماعيين والنفسيين",
+          "nums": [
+            "800 0234",
+            "+967 776 263 815"
+          ],
+          "by": "NGO (UNHCR partner)",
+          "hours": "Sun–Thu 08:30–16:00 · toll-free",
+          "who": "Displaced people, Sana'a area",
+          "conf": "L",
+          "src": [
+            "help.unhcr.org/yemen/external-partners"
+          ]
+        },
+        {
+          "kind": "support",
+          "name": "Human Access",
+          "ar": "هيومن أكسس",
+          "nums": [
+            "800 0078",
+            "WhatsApp +967 737 902 897",
+            "+967 780 481 701",
+            "+967 718 038 157",
+            "+967 781 222 629 (Aden refugees)"
+          ],
+          "by": "NGO (UNHCR partner)",
+          "hours": "Sun–Thu 08:00–16:00 · toll-free",
+          "who": "Displaced people and refugees, Aden area and Marib",
+          "conf": "L",
+          "src": [
+            "help.unhcr.org/yemen/external-partners"
+          ],
+          "note": "UNHCR's page prints the WhatsApp with +976 (Mongolia). The correct code is +967."
+        },
+        {
+          "kind": "support",
+          "name": "Sustainable Development Foundation",
+          "ar": "مؤسسة التنمية المستدامة",
+          "nums": [
+            "8001155",
+            "+967 739 255 512"
+          ],
+          "by": "NGO (UNHCR partner)",
+          "hours": "Sun–Thu 08:00–15:30 · toll-free",
+          "who": "Refugees, Sana'a area",
+          "conf": "L",
+          "src": [
+            "help.unhcr.org/yemen/external-partners"
+          ]
+        },
+        {
+          "kind": "gbv",
+          "name": "Yemen Al-Khair (YARD)",
+          "ar": "يمن الخير",
+          "nums": [
+            "8000656",
+            "WhatsApp +967 712 280 253"
+          ],
+          "by": "NGO (UNHCR partner)",
+          "hours": "Sat–Wed 08:30–16:00 · toll-free",
+          "who": "Displaced people, Sana'a area: protection, gender-based violence, psychological support",
+          "conf": "L",
+          "src": [
+            "help.unhcr.org/yemen/external-partners"
+          ]
+        },
+        {
+          "kind": "support",
+          "name": "Qatar Red Crescent (Yemen)",
+          "ar": "الهلال الأحمر القطري",
+          "nums": [
+            "800 0077",
+            "+967 776 100 160 / 188",
+            "+967 771 149 233"
+          ],
+          "by": "QRCS",
+          "hours": "Sat–Wed 08:00–14:00, Thu to 13:00 · toll-free",
+          "who": "Refugees, Sana'a: health, including psychiatrists",
+          "conf": "L",
+          "src": [
+            "help.unhcr.org/yemen/external-partners"
+          ]
+        },
+        {
+          "kind": "support",
+          "name": "Family Counselling & Development Foundation",
+          "ar": "مؤسسة التنمية والإرشاد الأسري",
+          "nums": [
+            "8000136"
+          ],
+          "by": "NGO, Sana'a",
+          "hours": "Sat–Thu 08:00–20:00 · toll-free",
+          "who": "Psychological and social counselling, including survivors of gender-based violence",
+          "conf": "U",
+          "src": [
+            "findahelpline"
+          ]
+        },
+        {
+          "kind": "support",
+          "name": "Psychiatric Care Developmental Foundation",
+          "ar": "مؤسسة الرعاية النفسية التنموية",
+          "nums": [
+            "8000202 (calls and WhatsApp)"
+          ],
+          "by": "NGO",
+          "hours": "Unknown · free",
+          "who": "Psychological support across Yemen (as stated)",
+          "conf": "U",
+          "src": [
+            "findahelpline"
+          ],
+          "note": "The foundation's own site lists a different number (1444992)."
+        }
+      ],
+      "avoid": [
+        [
+          "Yemen Women's Union 8000999",
+          "Search summary only."
+        ]
+      ]
+    }
+  ]
+}
