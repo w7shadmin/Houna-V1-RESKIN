@@ -84,12 +84,15 @@ the foreground from `icon.png` if the mark changes, keeping it inside the
   Function's auto-injected `SUPABASE_SERVICE_ROLE_KEY` env var is the new
   `sb_secret_...` format, not the legacy JWT — don't assume which format
   you're comparing against.
-- **Google sign-in requires dashboard setup, not just code**: the Google
-  provider must be enabled in the Supabase dashboard (Authentication →
-  Providers → Google) with a client ID/secret. It's currently disabled on
-  this project, which produces an `"Unsupported provider: provider is not
-  enabled"` error at sign-in — that's a project setting, not a bug in
-  `components/account/GoogleButton.tsx` or the auth call.
+- **Google sign-in is dashboard setup, not just code** (enabled 29 Sep 2026): one **Web** OAuth
+  client in Google Cloud (Google Auth Platform, published, scopes openid/email/profile only, no
+  logo, so no Google review), its redirect URI Supabase's
+  `https://jzvwbfvimjdjlikseqec.supabase.co/auth/v1/callback`, its ID and secret in Authentication →
+  Providers → Google (nonce checks on). The app signs in through the browser on every platform
+  (`signInWithOAuth` + PKCE), so no Android or iOS client is needed; the app's return address
+  (`houna://`, and the web preview's localhost) must be in Authentication → URL Configuration →
+  Redirect URLs, or Google lands people on the website. `"Unsupported provider: provider is not
+  enabled"` means the provider was switched off, not a bug in `GoogleButton.tsx`.
 
 ### Security baseline (pre-release audit, 28 Sep 2026)
 
@@ -149,9 +152,8 @@ here has run on an iPhone yet; builds go through EAS Build, testers through Test
 - Not needed: the nav-bar plugin and `NavigationBar` calls (iOS has no nav bar); ATS (every
   image is `https://houna.org`; `http` links open in the browser, which ATS doesn't cover).
 - Still to do: `ios.bundleIdentifier` (with the domain, alongside the Android package); Apple
-  Developer account, EAS credentials and an APNs key for push; Google and Sign in with Apple
-  together (Apple requires the second wherever the first is offered; Google is switched off in the
-  dashboard for now); optionally hiding the home indicator in immersive sessions (a native module).
+  Developer account, EAS credentials and an APNs key for push; Sign in with Apple
+  before the App Store (Apple requires it wherever Google sign-in is offered, which it now is); optionally hiding the home indicator in immersive sessions (a native module).
 
 ### Deleting an Alias
 
