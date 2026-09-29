@@ -48,6 +48,7 @@ export const profileStrings = {
       body: 'Claim an alias — no real name or email needed — to keep your streak and results in one place.',
       signIn: 'Sign in',
       createAlias: 'Create alias',
+      deleted: 'Your Alias has been deleted.',
     },
     settings: {
       language: 'Language',
@@ -115,6 +116,7 @@ export const profileStrings = {
       body: 'اختر اسماً مستعاراً — دون اسم حقيقي أو بريد إلكتروني — لتحتفظ بسلسلتك ونتائجك في مكان واحد.',
       signIn: 'تسجيل الدخول',
       createAlias: 'إنشاء اسم مستعار',
+      deleted: 'حُذف اسمك المستعار.',
     },
     settings: {
       language: 'اللغة',

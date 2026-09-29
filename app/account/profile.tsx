@@ -142,6 +142,11 @@ export default function AccountProfileScreen() {
         <Text style={[styles.signOutText, { color: colors.danger, fontFamily: fonts.semiBold }]}>{s.signOut}</Text>
       </Pressable>
 
+      {/* Deleting the Alias: findable (the App Store asks), but a quiet link rather than a second button beside Sign out. */}
+      <Pressable onPress={() => router.push('/account/delete')} accessibilityRole="link" hitSlop={8} style={({ pressed }) => [styles.deleteLink, pressed && styles.pressed]}>
+        <Text style={[styles.deleteLinkText, { color: colors.danger, fontFamily: fonts.medium }]}>{s.deleteLink}</Text>
+      </Pressable>
+
       <ConfirmDialog
         visible={confirmSignOut}
         title={s.signOutConfirmTitle}
@@ -269,6 +274,13 @@ const styles = StyleSheet.create({
   },
   signOutText: {
     fontSize: 16,
+  },
+  deleteLink: {
+    alignSelf: 'center',
+    paddingVertical: grid(1),
+  },
+  deleteLinkText: {
+    fontSize: 14,
   },
   modalSafe: {
     flex: 1,

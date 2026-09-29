@@ -149,9 +149,23 @@ here has run on an iPhone yet; builds go through EAS Build, testers through Test
 - Not needed: the nav-bar plugin and `NavigationBar` calls (iOS has no nav bar); ATS (every
   image is `https://houna.org`; `http` links open in the browser, which ATS doesn't cover).
 - Still to do: `ios.bundleIdentifier` (with the domain, alongside the Android package); Apple
-  Developer account, EAS credentials and an APNs key for push; account deletion in the app and Sign
-  in with Apple if Google sign-in is switched on (App Store rules); optionally hiding the home
-  indicator in immersive sessions (a native module).
+  Developer account, EAS credentials and an APNs key for push; Google and Sign in with Apple
+  together (Apple requires the second wherever the first is offered; Google is switched off in the
+  dashboard for now); optionally hiding the home indicator in immersive sessions (a native module).
+
+### Deleting an Alias
+
+Account settings → Delete my Alias (a quiet link under Sign out) opens `app/account/delete.tsx`:
+what goes, what stays on the phone (the journal, mood check-ins and Recap's practice were never
+the Alias's), and the Alias name typed to confirm (capitals don't matter; a password wouldn't cover
+Google accounts). `AuthContext.deleteAlias` calls the `delete-account` Edge Function
+(`supabase/functions/delete-account`), which deletes only the caller, from their token: their
+`avatars/` and `voices/` folders first (storage doesn't cascade; it stops there if that fails),
+then the auth user, and every table follows by `ON DELETE CASCADE`. **Any new table holding a
+person's data must reference `auth.users` (or `profiles`) with `ON DELETE CASCADE`, and any new
+owner-folder bucket must be added to the function's `BUCKETS`**, or deleting leaves it behind.
+Immediate, no grace period. Afterwards Profile shows the guest card with "Your Alias has been
+deleted" (`deleted=1`).
 
 ### Bilingual & RTL infrastructure
 

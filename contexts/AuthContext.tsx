@@ -49,6 +49,8 @@ interface AuthContextValue {
   signInWithEmail: (email: string, password: string) => Promise<AuthResult>;
   signInWithGoogle: () => Promise<AuthResult>;
   signOut: () => Promise<void>;
+  /** Deletes the signed-in Alias and everything Houna keeps for it (the `delete-account` Edge Function), then signs out here. */
+  deleteAlias: () => Promise<AuthResult>;
   claimUsername: (username: string) => Promise<AuthResult>;
   /** Renames the signed-in Alias. Voices and the leaderboard read names from `profiles`, so they follow. */
   changeUsername: (username: string) => Promise<AuthResult>;
@@ -148,6 +150,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setProfile(null);
   }, []);
 
+  const deleteAlias = useCallback(async (): Promise<AuthResult> => {
+    // The function deletes whoever the session belongs to: it takes no id.
+    const { error } = await supabase.functions.invoke('delete-account', { method: 'POST' });
+    if (error) return { error: 'unknown' };
+    // The account is gone on the server, so only this phone's copy of the session is left to drop.
+    await supabase.auth.signOut({ scope: 'local' }).catch(() => {});
+    setProfile(null);
+    return { error: null };
+  }, []);
+
   const claimUsername = useCallback(
     async (username: string): Promise<AuthResult> => {
       if (!session) return { error: 'unknown' };
@@ -211,12 +223,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signInWithEmail,
       signInWithGoogle,
       signOut,
+      deleteAlias,
       claimUsername,
       changeUsername,
       updateProfile,
       refreshProfile,
     }),
-    [loading, session, profile, signUpWithEmail, signInWithEmail, signInWithGoogle, signOut, claimUsername, changeUsername, updateProfile, refreshProfile],
+    [loading, session, profile, signUpWithEmail, signInWithEmail, signInWithGoogle, signOut, deleteAlias, claimUsername, changeUsername, updateProfile, refreshProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

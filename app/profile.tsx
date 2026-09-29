@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { Animated, Image, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
-import { useFocusEffect, useRouter, type Href } from 'expo-router';
+import { useFocusEffect, useLocalSearchParams, useRouter, type Href } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Polygon } from 'react-native-svg';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -59,6 +59,8 @@ export default function ProfileScreen() {
   const { width } = useWindowDimensions();
   const { t, fonts, isRTL, language, setLanguage } = useLanguage();
   const { profile, signOut, isGuest, needsUsername } = useAuth();
+  // Arriving from Account settings → Delete my Alias, once it's gone.
+  const { deleted } = useLocalSearchParams<{ deleted?: string }>();
   const p = t.profile;
   const b = t.badges;
   const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
@@ -210,6 +212,11 @@ export default function ProfileScreen() {
           </Pressable>
         ) : (
           <View style={[styles.guest, card]}>
+            {deleted === '1' && (
+              <Text accessibilityLiveRegion="polite" style={[styles.guestBody, { color: colors.primary, fontFamily: fonts.medium }]}>
+                {p.guest.deleted}
+              </Text>
+            )}
             <Text style={[styles.guestTitle, isRTL && styles.guestTitleArabic, { color: colors.text, fontFamily: fonts.display }]}>{p.guest.title}</Text>
             <Text style={[styles.guestBody, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{p.guest.body}</Text>
             <View style={styles.guestButtons}>
