@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { spacing, radius, typography } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
 import { submitPost } from '@/lib/voices';
+import { canPickPhotos } from '@/lib/photoAccess';
 
 export default function VoicesSubmitScreen() {
   const { colors } = useTheme();
@@ -28,8 +29,7 @@ export default function VoicesSubmitScreen() {
   const [done, setDone] = useState(false);
 
   const handlePickImage = async () => {
-    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!perm.granted) return;
+    if (!(await canPickPhotos())) return;
     const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.7, allowsEditing: true });
     if (result.canceled || !result.assets[0]) return;
     setImage(result.assets[0]);

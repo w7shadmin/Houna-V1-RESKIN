@@ -14,6 +14,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { GCC_CODES, getCountryList, getCountryName } from '@/lib/countries';
 import { imageExtension, uploadToBucket } from '@/lib/storageUpload';
+import { canPickPhotos } from '@/lib/photoAccess';
 import { alpha, grid, layout, radius } from '@/constants/theme';
 
 const AVATAR = 96;
@@ -50,8 +51,7 @@ export default function AccountProfileScreen() {
   if (!session || !profile) return null;
 
   const handlePickAvatar = async () => {
-    const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (!perm.granted) return;
+    if (!(await canPickPhotos())) return;
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],

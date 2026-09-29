@@ -103,7 +103,9 @@ Keep these when changing anything nearby:
   name is still `com.anonymous.houna`, to change once the domain is bought (a new app for
   Android, same key).
 - **Permissions**: only what's used. `app.json` `blockedPermissions` strips microphone, camera,
-  draw-over-apps and legacy storage (the picker uses Android's photo picker).
+  draw-over-apps and legacy storage (the picker uses Android's photo picker); on iOS the plugins
+  declare no microphone or camera (`microphonePermission: false`, `cameraPermission: false`), so the
+  photo library is the only usage string.
 - **Database** (`supabase/migrations/20260928160000_security_hardening.sql`):
   - sessions: 0–8h, `completed_at` after `started_at`, inserted within a day of starting, never
     overlapping one another (`refuse_overlapping_session`), so the leaderboard can't be forged;
@@ -121,6 +123,35 @@ Keep these when changing anything nearby:
   tel), including links inside articles (`RenderHTML`'s `renderersProps`); an image handed over in a
   deep link loads only from houna.org (`trustedImageUrl`); route slugs are encoded
   (`encodeURIComponent`) before reaching the proxy.
+
+### iOS parity
+
+Every Android-specific change needs its iOS counterpart. What's in place (checked by
+`npx expo config --type introspect`: Expo can't generate the iOS project on Windows, so nothing
+here has run on an iPhone yet; builds go through EAS Build, testers through TestFlight):
+
+- `ios.infoPlist.UIBackgroundModes: ["audio"]`: meditation keeps playing locked (Android's
+  lock-screen player). expo-audio's own option for it would add Android microphone services.
+- `ios.requireFullScreen`: iPad stays portrait, as Android tablets do; without it Apple requires
+  every orientation.
+- `ios.privacyManifests`: the required-reason APIs, no tracking. `ITSAppUsesNonExemptEncryption:
+  false` (HTTPS only).
+- `locales/` (`app.json` `locales`): the iOS permission prompt in both languages. It also makes
+  iOS treat the app as Arabic-localized, so its own sheets and pickers follow an Arabic phone. Don't
+  set expo-localization's `supportsRTL`: on iOS it re-forces the direction from the phone's
+  language at launch, over the person's choice in the app.
+- Photos: `lib/photoAccess.ts`'s `canPickPhotos()`. iOS's picker needs no permission, so it doesn't
+  ask there.
+- Already equal: the blur (`experimentalBlurMethod` is Android's; iOS blurs natively), the
+  session-end haptic, `KeyboardSafeView`, the `direction: 'ltr'` fix for measured offsets (iOS
+  swaps left/right in RTL too), and iOS's edge swipe back (it works under `animation: 'fade'`,
+  sliding during the gesture; the scenes turn it off). The icon is opaque, as iOS requires.
+- Not needed: the nav-bar plugin and `NavigationBar` calls (iOS has no nav bar); ATS (every
+  image is `https://houna.org`; `http` links open in the browser, which ATS doesn't cover).
+- Still to do: `ios.bundleIdentifier` (with the domain, alongside the Android package); Apple
+  Developer account, EAS credentials and an APNs key for push; account deletion in the app and Sign
+  in with Apple if Google sign-in is switched on (App Store rules); optionally hiding the home
+  indicator in immersive sessions (a native module).
 
 ### Bilingual & RTL infrastructure
 

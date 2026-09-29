@@ -1,0 +1,5 @@
+{
+  "ios": {
+    "NSPhotoLibraryUsageDescription": "Houna opens your photos only when you choose one: an avatar for your Alias, or a photo for a Voices post."
+  }
+}
