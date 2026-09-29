@@ -1,14 +1,10 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
-  fetchArticles,
-  fetchEvents,
-  fetchOrganizations,
-  fetchPodcasts,
+  fetchProfessionalsInCountry,
+  fetchSearchBundle,
   fetchSearchIndex,
-  fetchSpeakers,
-  fetchTherapists,
-  fetchWellnessCenters,
   type CountryOption,
+  type SearchBundle,
   type Therapist,
 } from './hounaApi';
 import { getCountry } from './countries';
@@ -17,12 +13,12 @@ import { SearchIndex } from './searchRank';
 import type { ProfessionalProfile } from './searchHighlight';
 
 /**
- * Unified directory search, phase 1 (FEATURES_BRIEF §3): everything is
- * fetched from the existing list endpoints once per language, turned into
- * `SearchItem`s, cached in memory for the session, and matched and ranked on
- * the device (`searchRank.ts`: typos, word forms, the bilingual meaning map).
- * Queries never leave the phone. Phase 2 (a server-side `search` route in
- * houna-proxy) needs that Edge Function's source, which isn't in this repo.
+ * Unified directory search (FEATURES_BRIEF §3): every list comes in one call per language
+ * (`fetchSearchBundle`, the `houna-search-bundle` Edge Function, which assembles houna-proxy's
+ * lists for everyone every few hours), is turned into `SearchItem`s, kept on the phone, and
+ * matched and ranked on the device (`searchRank.ts`: typos, word forms, the bilingual meaning
+ * map). Queries never leave the phone. A search costs three calls a day at most (this language's
+ * lists, the other language's for names, the professionals' profiles), where it was ~60.
  */
 
 export type SearchType = 'topic' | 'tanafas' | 'article' | 'professional' | 'podcast' | 'organization' | 'wellness' | 'event' | 'speaker';
@@ -53,15 +49,6 @@ export interface LocalTopic {
 }
 
 type Lang = 'en' | 'ar';
-
-/**
- * Professionals come 15 to a page; there were 20 pages (286 people) in September 2026. The
- * proxy's `lastPage` is always the current page + 1, so it can't say when to stop: pages are
- * fetched a few at a time until one comes back empty or brings no one new. Never more than this.
- */
-const MAX_PROFESSIONAL_PAGES = 40;
-/** Pages fetched at once. */
-const PAGE_BATCH = 10;
 
 function item(
   type: SearchType,
@@ -99,8 +86,8 @@ interface ProfessionalsResult {
   countries: CountryOption[];
 }
 
-/** Bump when a saved list's shape changes, so old copies are ignored. */
-const STORE_VERSION = 1;
+/** Bump when a saved list's shape changes, so old copies are ignored (and cleared: `clearOldVersions`). */
+const STORE_VERSION = 2;
 /** A saved list this recent is used as is; an older one is used while a fresh one loads for next time. */
 const FRESH_MS = 24 * 60 * 60 * 1000;
 /** A saved list older than this isn't shown at all: the search waits for a fresh one. */
@@ -121,6 +108,19 @@ function save<T>(key: string, data: T) {
   AsyncStorage.setItem(`directory-search:v${STORE_VERSION}:${key}`, JSON.stringify({ at: Date.now(), data })).catch(() => {});
 }
 
+let cleared = false;
+/** Once a launch: removes lists saved by an older version (v1 kept one per list), so they don't linger. */
+function clearOldVersions() {
+  if (cleared) return;
+  cleared = true;
+  AsyncStorage.getAllKeys()
+    .then((keys) => {
+      const old = keys.filter((k) => k.startsWith('directory-search:v') && !k.startsWith(`directory-search:v${STORE_VERSION}:`));
+      return old.length ? AsyncStorage.multiRemove(old) : undefined;
+    })
+    .catch(() => {});
+}
+
 /**
  * One list, loaded once per session and kept on the phone between sessions,
  * so a search after the first is instant: a copy under a day old is used as
@@ -131,6 +131,7 @@ function save<T>(key: string, data: T) {
 function kept<T>(key: string, load: () => Promise<T>): Promise<T> {
   let p = memory.get(key) as Promise<T> | undefined;
   if (p) return p;
+  clearOldVersions();
   const fetchAndSave = () =>
     load().then((data) => {
       save(key, data);
@@ -154,67 +155,31 @@ function kept<T>(key: string, load: () => Promise<T>): Promise<T> {
   return p;
 }
 
-async function allTherapists(lang: Lang, country = ''): Promise<{ therapists: Therapist[]; countries: CountryOption[] }> {
-  const first = await fetchTherapists(1, { country }, lang);
-  const therapists = [...first.therapists];
-  const seen = new Set(therapists.map((t) => t.slug));
-  let next = 2;
-  let more = first.therapists.length > 0;
-  while (more && next <= MAX_PROFESSIONAL_PAGES) {
-    const pages = Array.from({ length: Math.min(PAGE_BATCH, MAX_PROFESSIONAL_PAGES - next + 1) }, (_, i) => next + i);
-    next += pages.length;
-    const results = await Promise.all(pages.map((p) => fetchTherapists(p, { country }, lang)));
-    for (const r of results) {
-      const fresh = r.therapists.filter((t) => !seen.has(t.slug));
-      fresh.forEach((t) => seen.add(t.slug));
-      therapists.push(...fresh);
-      if (fresh.length === 0) more = false;
-    }
-  }
-  return { therapists, countries: first.countries };
-}
+/** One language's lists, in one call, kept on the phone as one copy. */
+const bundle = (lang: Lang) => kept<SearchBundle>(`bundle:${lang}`, () => fetchSearchBundle(lang));
 
 const professionalItem = (p: Therapist) => item('professional', p.slug, p.name, p.role, p.imageUrl, [p.summary]);
 
 export const SOURCES: Record<SourceKey, (lang: Lang) => Promise<SearchItem[] | ProfessionalsResult>> = {
-  articles: (lang) =>
-    kept(`articles:${lang}`, async () =>
-      (await fetchArticles(lang)).articles.map((a) =>
-        item('article', a.url, a.title, a.blurb, a.imageUrl, [], a.sourceDomain),
-      ),
+  articles: async (lang) =>
+    (await bundle(lang)).articles.articles.map((a) => item('article', a.url, a.title, a.blurb, a.imageUrl, [], a.sourceDomain)),
+  podcasts: async (lang) =>
+    (await bundle(lang)).podcasts.podcasts.map((p) =>
+      item('podcast', p.url, p.title, p.host, p.imageUrl, [p.description], p.sourceDomain),
     ),
-  podcasts: (lang) =>
-    kept(`podcasts:${lang}`, async () =>
-      (await fetchPodcasts(lang)).podcasts.map((p) =>
-        item('podcast', p.url, p.title, p.host, p.imageUrl, [p.description], p.sourceDomain),
-      ),
-    ),
-  professionals: (lang) =>
-    kept(`professionals:${lang}`, async () => {
-      const { therapists, countries } = await allTherapists(lang);
-      return { items: therapists.map(professionalItem), countries };
-    }),
-  organizations: (lang) =>
-    kept(`organizations:${lang}`, async () =>
-      (await fetchOrganizations(undefined, lang)).organizations.map((o) =>
-        item('organization', o.id, o.name, o.summary, o.imageUrl),
-      ),
-    ),
-  wellness: (lang) =>
-    kept(`wellness:${lang}`, async () =>
-      (await fetchWellnessCenters(undefined, lang)).centers.map((c) =>
-        item('wellness', c.id, c.name, c.summary, c.imageUrl, c.services),
-      ),
-    ),
+  professionals: async (lang) => {
+    const { therapists, countries } = (await bundle(lang)).professionals;
+    return { items: therapists.map(professionalItem), countries };
+  },
+  organizations: async (lang) =>
+    (await bundle(lang)).organizations.organizations.map((o) => item('organization', o.id, o.name, o.summary, o.imageUrl)),
+  wellness: async (lang) =>
+    (await bundle(lang)).wellness.centers.map((c) => item('wellness', c.id, c.name, c.summary, c.imageUrl, c.services)),
   // The subtitle is the site's raw date; the results format it (lib/eventDate.ts).
-  events: (lang) =>
-    kept(`events:${lang}`, async () =>
-      (await fetchEvents(lang)).events.map((e) => item('event', e.slug, e.title, e.date, e.imageUrl, [e.description])),
-    ),
-  speakers: (lang) =>
-    kept(`speakers:${lang}`, async () =>
-      (await fetchSpeakers(lang)).speakers.map((s) => item('speaker', s.slug, s.name, s.role, s.imageUrl, [s.bio])),
-    ),
+  events: async (lang) =>
+    (await bundle(lang)).events.events.map((e) => item('event', e.slug, e.title, e.date, e.imageUrl, [e.description])),
+  speakers: async (lang) =>
+    (await bundle(lang)).speakers.speakers.map((s) => item('speaker', s.slug, s.name, s.role, s.imageUrl, [s.bio])),
 };
 
 /**
@@ -271,10 +236,10 @@ export function proxyCountryId(iso: string | null | undefined, options: CountryO
   return options.find((o) => normalizeForSearch(o.label) === want)?.value ?? null;
 }
 
-/** Slugs of professionals in one proxy country (all pages, capped). */
+/** Slugs of professionals in one proxy country (all pages, in one call). */
 export function professionalsInCountry(lang: Lang, countryId: string): Promise<Set<string>> {
   return kept(`professionals:${lang}:${countryId}`, async () => {
-    const { therapists } = await allTherapists(lang, countryId);
+    const { therapists } = await fetchProfessionalsInCountry(lang, countryId);
     return therapists.map((p) => p.slug);
   }).then((slugs) => new Set(slugs));
 }

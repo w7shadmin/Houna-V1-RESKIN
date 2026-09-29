@@ -459,3 +459,42 @@ export async function fetchSearchIndex(lang: 'en' | 'ar' = 'en'): Promise<Search
   if (!resp.ok) throw new Error(`Failed to load the search index (${resp.status})`);
   return resp.json();
 }
+
+/** Every professional, and their countries, as one list (the bundle below assembles all the pages). */
+export interface AllProfessionals {
+  therapists: Therapist[];
+  countries: CountryOption[];
+}
+
+/** Directory search's lists for one language, each as its own list route returns it. */
+export interface SearchBundle {
+  professionals: AllProfessionals;
+  articles: ArticleListResponse;
+  podcasts: PodcastListResponse;
+  organizations: OrgListResponse;
+  wellness: WellnessCenterListResponse;
+  events: EventListResponse;
+  speakers: SpeakerListResponse;
+}
+
+async function searchBundleFetch<T>(params: Record<string, string>): Promise<T> {
+  const url = new URL(`${SUPABASE_URL}/functions/v1/houna-search-bundle`);
+  Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+  const resp = await fetch(url.toString(), { headers });
+  if (!resp.ok) throw new Error(`Failed to load the directory for search (${resp.status})`);
+  return resp.json();
+}
+
+/**
+ * Everything directory search needs in one language, in one call (the `houna-search-bundle` Edge
+ * Function keeps it for everyone, rebuilt from houna-proxy's lists every few hours), instead of a
+ * call per list and per page of professionals.
+ */
+export function fetchSearchBundle(lang: 'en' | 'ar' = 'en'): Promise<SearchBundle> {
+  return searchBundleFetch({ lang });
+}
+
+/** Every professional in one of houna.org's countries (its numeric id), all pages in one call. */
+export function fetchProfessionalsInCountry(lang: 'en' | 'ar', country: string): Promise<AllProfessionals> {
+  return searchBundleFetch({ lang, country });
+}

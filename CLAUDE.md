@@ -155,6 +155,25 @@ here has run on an iPhone yet; builds go through EAS Build, testers through Test
   Developer account, EAS credentials and an APNs key for push; Sign in with Apple
   before the App Store (Apple requires it wherever Google sign-in is offered, which it now is); optionally hiding the home indicator in immersive sessions (a native module).
 
+### Capacity (Supabase free plan, 29 Sep 2026)
+
+About a thousand people a day before the free plan's limits bind, more now that search is one
+call; Pro ($25/month: backups, no pausing after a quiet week, 2M function calls) takes it to
+several thousand. What keeps it there, and must stay that way:
+
+- **Function calls** (500,000 a month) are the first limit: anything a phone fetches from an Edge
+  Function often (every open, every search) is bundled and kept on the phone, as directory search
+  is (`houna-search-bundle`, below).
+- **The community figures are computed once and shared** (`stats_cache`, migration
+  `20260929180000_stats_cache.sql`): `get_community_activity`, `get_leaderboard` and
+  `get_badge_shares` keep their result for 2 minutes (10 for badge shares) instead of recounting
+  every session on each Home open, and `tanafas_sessions` is indexed on `started_at`. A new
+  figure over all users follows the same pattern. The functions write, so call them with POST
+  (supabase-js `rpc()`'s default), never `{ get: true }`.
+- **Email sign-up needs its own email service before launch.** Confirmation is on and Supabase's
+  built-in sender only mails the project's team (a few an hour): set up custom SMTP (Resend,
+  Postmark) once the domain exists, or switch confirmation off.
+
 ### Deleting an Alias
 
 Account settings → Delete my Alias (a quiet link under Sign out) opens `app/account/delete.tsx`:
@@ -779,9 +798,18 @@ every-word matches first) and `lib/searchConcepts.ts`, the bilingual meaning
 map ("sad" → depression, English ↔ Arabic; content, edit freely). It covers
 the directory lists, events and speakers, the topics, and Tanafas' exercises
 and scenes (a result opens `/tanafas` with `tab` + `exercise`/`scene`). The
-lists are saved on the phone (AsyncStorage, `directory-search:v1:*`: used as
-is under a day old, shown while refreshing up to two weeks), and each item
-also carries its name in the other language (`aliases`), loaded after.
+lists come in **one call per language** (`fetchSearchBundle`, the
+`houna-search-bundle` Edge Function: it assembles houna-proxy's own list routes,
+every page of professionals included, keeps the result in `houna_cache` for 6
+hours and serves everyone that copy, a stale one at once while one caller
+rebuilds it in the background; `?country=` gives one country's professionals for
+"near you"). A search used to cost ~60 proxy calls a phone a day, the free plan's
+first limit; now it's three at most (this language, the other one's names, the
+profiles). A new list for search goes in the bundle, not a call of its own.
+They're saved on the phone as one copy (AsyncStorage, `directory-search:v2:bundle:*`,
+older versions' keys cleared: used as is under a day old, shown while refreshing
+up to two weeks), and each item also carries its name in the other language
+(`aliases`), loaded after.
 Professionals also carry what their own page says (location, languages, who
 they work with, specialties: `facts`), from the `houna-search-index` Edge
 Function (`supabase/functions/houna-search-index`), which reads every
