@@ -41,3 +41,7 @@ yarn-error.*
 
 # Android Studio / JetBrains project settings
 .idea/
+
+# Built app packages (shared by hand, never committed)
+*.apk
+*.aab
