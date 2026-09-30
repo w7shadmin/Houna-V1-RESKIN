@@ -100,7 +100,9 @@ Keep these when changing anything nearby:
 
 - **Release signing**: Android releases are signed with Houna's own upload key, never the public
   debug key (`plugins/withReleaseSigning.js`). The keystore and passwords live outside the repo
-  (`D:/houna-keys/`, wired through `~/.gradle/gradle.properties`, `HOUNA_UPLOAD_*`). A machine
+  (`D:/houna-keys/`, wired through the Gradle user home's `gradle.properties`, `HOUNA_UPLOAD_*`: on this PC
+  `GRADLE_USER_HOME` is `D:/GradleUserHome`, so that's the one read, not `~/.gradle`; check the build log
+  for the debug-key warning before sharing any APK). A machine
   without them builds with the debug key and a loud Gradle warning: never share that build.
   Losing the key means testers must uninstall (and lose their journal) to update. The package
   name is still `com.anonymous.houna`, to change once the domain is bought (a new app for
