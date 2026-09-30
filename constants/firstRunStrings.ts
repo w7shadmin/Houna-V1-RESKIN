@@ -8,6 +8,7 @@ export const firstRunStrings = {
     tagline: 'Breathe · rest · return',
     welcome: {
       notNow: 'Not now',
+      adults: 'Houna is for adults, 18 and over.',
       language: 'Language',
       continue: 'Continue',
       // Each in its own language, in both catalogues.
@@ -26,6 +27,7 @@ export const firstRunStrings = {
     tagline: 'تنفّس · استرح · عُد',
     welcome: {
       notNow: 'ليس الآن',
+      adults: 'هُنا مخصّص للبالغين، من سن ١٨ فما فوق.',
       language: 'اللغة',
       continue: 'متابعة',
       languageNames: { en: 'English', ar: 'العربية' },

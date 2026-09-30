@@ -24,7 +24,7 @@ Feature-level description, independent of how any of it is currently styled:
   audio/video scenes, and a private on-device journal with mood tracking.
 - A lightweight social layer: streaks and badges for exercise consistency,
   and an opt-in country-level community map. (Voices, a moderated community post/photo forum,
-  was taken out of the app for launch on 30 Sep 2026; it returns in phase II.)
+  was removed from the app and the server on 30 Sep 2026; phase II may bring it back.)
 - Local and remote push notifications for reminders and broadcasts.
 
 ## Foundation — do not casually change
@@ -72,7 +72,7 @@ the foreground from `icon.png` if the mark changes, keeping it inside the
   doesn't own, because `profiles` RLS only allows reading your own row.
   Don't rely on embedded joins across tables with owner-scoped RLS — write
   a `SECURITY DEFINER` RPC that pre-joins and returns only the safe fields
-  instead (see `get_voice_feed`, `get_leaderboard`, `get_country_counts`
+  instead (see `get_leaderboard`, `get_community_activity`, `get_badge_shares`
   for the pattern).
 - **Storage buckets** follow an owner-folder-scoped convention:
   `{bucket}/{user_id}/{filename}`, public read, write restricted to the
@@ -114,16 +114,26 @@ Keep these when changing anything nearby:
 - **Database** (`supabase/migrations/20260928160000_security_hardening.sql`):
   - sessions: 0–8h, `completed_at` after `started_at`, inserted within a day of starting, never
     overlapping one another (`refuse_overlapping_session`), so the leaderboard can't be forged;
+    and since `20260930200000_launch_hardening.sql` (`check_session_values`) at least 10 seconds
+    (`MIN_SESSION_SECONDS`; the app doesn't send shorter ones), `completed_at` required and agreeing
+    with `duration_seconds`, not in the future, at most 50 a day per Alias;
   - badges: only the app's codes;
-  - `get_leaderboard`: signed-in only;
-  - storage: images only (5 MB avatars, 10 MB Voices), no public listing (public links still work),
-    and `image_url` / `avatar_url` must point into the owner's own folder.
+  - `get_leaderboard`, `get_badge_shares`, `is_username_available`: signed-in only;
+  - profiles: a country is a 2-letter code; the app's roles can write only `id` and `username` on
+    insert and `username`, `avatar_url`, `country`, `show_on_leaderboard` on update (column
+    grants: a new editable column needs its own `GRANT UPDATE (col)`);
+  - the public roles have no TRUNCATE, TRIGGER or REFERENCES on any table;
+  - storage: images only (5 MB avatars), no public listing (public links still work),
+    and `avatar_url` must point into the owner's own folder.
 - **Directory proxy**: only the filter values the app sends (`AVAILABILITY`, `SORTS`, small numeric
   ids, pages 1–60), slugs validated on every detail route, expired cache rows purged. Add a new
   filter value to both `constants/directoryStrings.ts` and the proxy.
 - **Sign-in**: PKCE (`flowType: 'pkce'`, `exchangeCodeForSession`), so a redirect caught by another
   app registering `houna://` is useless. Passwords at least 8; sign-up doesn't confirm which emails
-  have an account. Sign-out removes this phone's push token.
+  have an account. Sign-out removes this phone's push token. The saved session is encrypted on the
+  phone (`lib/secureSessionStorage.ts`: AES-256 in AsyncStorage, its key in expo-secure-store,
+  Keychain / Keystore; a plain session from before is read once and re-saved encrypted). The web,
+  and a dev client built before expo-secure-store, keep plain storage (lazy import).
 - **Links and images from outside**: scraped links open only through `safeUrl` (http(s), mailto,
   tel), including links inside articles (`RenderHTML`'s `renderersProps`); an image handed over in a
   deep link loads only from houna.org (`trustedImageUrl`); route slugs are encoded
@@ -175,7 +185,9 @@ several thousand. What keeps it there, and must stay that way:
   the account), the map counts each actor in the country of its latest ping, and changing country
   moves that phone's recent pings (`move_my_activity`, from `AuthContext.updateProfile`),
   migration `20260930100000_activity_actor.sql`. Pings from before it (no actor) count as
-  sessions only. A new
+  sessions only. Pings go only through `record_activity` (the table takes no direct inserts): no
+  actor, no ping; at most one a minute and 60 a day per actor. Changing country never adds a ping.
+  A new
   figure over all users follows the same pattern. The functions write, so call them with POST
   (supabase-js `rpc()`'s default), never `{ get: true }`.
 - **Email sign-up needs its own email service before launch.** Confirmation is on and Supabase's
@@ -189,7 +201,7 @@ what goes, what stays on the phone (the journal, mood check-ins and Recap's prac
 the Alias's), and the Alias name typed to confirm (capitals don't matter; a password wouldn't cover
 Google accounts). `AuthContext.deleteAlias` calls the `delete-account` Edge Function
 (`supabase/functions/delete-account`), which deletes only the caller, from their token: their
-`avatars/` and `voices/` folders first (storage doesn't cascade; it stops there if that fails),
+`avatars/` folder first (storage doesn't cascade; it stops there if that fails),
 then the auth user, and every table follows by `ON DELETE CASCADE`. **Any new table holding a
 person's data must reference `auth.users` (or `profiles`) with `ON DELETE CASCADE`, and any new
 owner-folder bucket must be added to the function's `BUCKETS`**, or deleting leaves it behind.
@@ -212,15 +224,14 @@ terms, store forms and laws). Migration `20260930160000_store_compliance.sql`. K
   `houna-purge-activity-pings`).
 - **The leaderboard is opt-in**: `profiles.show_on_leaderboard`, off by default, switched in account
   settings under Privacy; `get_leaderboard` shows only those who chose it.
-- **Voices is out of the app until phase II, post launch** (removed 30 Sep 2026; the screens,
-  `lib/voices.ts` and `constants/voicesStrings.ts` are in git history, the commit just after
-  645a909). The server side stays as built: `voice_posts`, the `voices` bucket (still emptied by
-  `delete-account`) and the report/block machinery. A post never exposes its author's id
-  (`get_voice_post` returns `is_mine`; approved rows are read only through the feed functions).
-  Anyone, Guests too, could report a post (hidden for them at once; three reports from different
-  phones send it back to moderation) or block its author (`voice_reports`, `voice_blocks`, keyed
-  by the phone's anonymous `actor` id; `get_voice_feed(p_actor)` leaves both out). Bringing it back
-  means the policy, terms, store forms (user content, age rating) and a way in from More again.
+- **Voices is gone, app and server** (30 Sep 2026). The screens, `lib/voices.ts` and
+  `constants/voicesStrings.ts` are in git history (448eac7 removed them); the tables, functions and
+  storage policies were dropped by `20260930200000_launch_hardening.sql` (its report/block design
+  is in `20260930160000_store_compliance.sql`). Bringing it back means the tables, a bucket in
+  `delete-account`'s `BUCKETS`, the policy, terms, store forms (user content, age rating) and a
+  way in from More.
+- **18+**: the welcome screen says so under Continue (`t.firstRun.welcome.adults`), and sign-up's
+  agreement line has the person confirm it. The policy, terms and store ratings say 18.
 - **Policies**: `lib/legalLinks.ts` points at houna.org's own pages (`/en/privacy-policy`,
   `/en/terms-of-use`, and `/ar/…`), linked from More, account settings and sign-up. Their text is
   still the old website's (it claims ad networks, analytics, payments, chat), which contradicts the

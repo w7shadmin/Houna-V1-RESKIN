@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import { activityActor } from './activityActor';
+import { MIN_SESSION_SECONDS } from './sessionLog';
 
 /** Exercise sessions only — mood/journal activity is never recorded here (it would feed streaks). */
 export type TanafasSessionKind = 'breathing' | 'meditation';
@@ -10,8 +11,9 @@ export type TanafasSessionKind = 'breathing' | 'meditation';
  * beyond the device" promise exactly as stated, so this silently no-ops
  * when there's no signed-in session. Records on any session end, not just a
  * natural completion (finishing all cycles or reaching the target
- * duration) — someone stopping early is still usage. Only genuinely
- * negative durations (a caller bug) are rejected.
+ * duration) — someone stopping early is still usage, as long as it lasted the
+ * app-wide minimum (MIN_SESSION_SECONDS): the database refuses shorter ones, so
+ * the leaderboard can't be padded with empty sessions.
  *
  * Fire-and-forget by design: a failed write must never interrupt the
  * breathing/meditation UI, so errors are swallowed here rather than left
@@ -28,7 +30,7 @@ export async function recordTanafasSession(
     if (!userId) return;
 
     const duration_seconds = Math.round((endedAt.getTime() - startedAt.getTime()) / 1000);
-    if (duration_seconds < 0) return;
+    if (duration_seconds < MIN_SESSION_SECONDS) return;
 
     await supabase.from('tanafas_sessions').insert({
       user_id: userId,
@@ -49,7 +51,9 @@ export async function recordTanafasSession(
  * `actor` id, so the map counts each person once, where they are now (lib/activityActor.ts).
  * Unlike `recordTanafasSession`, it never feeds streaks or the leaderboard.
  *
- * Fire-and-forget; a no-op until the table exists.
+ * Sent through `record_activity`, which keeps at most one ping a minute per phone (the table
+ * itself takes no inserts). Changing country never sends one: `move_my_activity` moves the
+ * pings already there. Fire-and-forget.
  */
 export async function pingActivity(kind: 'breathing' | 'meditation'): Promise<void> {
   try {
@@ -60,9 +64,9 @@ export async function pingActivity(kind: 'breathing' | 'meditation'): Promise<vo
       const { data: profile } = await supabase.from('profiles').select('country').eq('id', userId).maybeSingle();
       country = profile?.country ?? null;
     }
-    // No `.select()` after the insert — there's deliberately no SELECT policy (CLAUDE.md).
     const actor = await activityActor();
-    await supabase.from('activity_pings').insert({ kind, country, actor });
+    if (!actor) return;
+    await supabase.rpc('record_activity', { p_kind: kind, p_actor: actor, p_country: country });
   } catch {
     // Non-fatal, like recordTanafasSession.
   }

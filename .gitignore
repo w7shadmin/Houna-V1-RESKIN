@@ -45,3 +45,7 @@ yarn-error.*
 # Built app packages (shared by hand, never committed)
 *.apk
 *.aab
+
+# Firebase / Google config files (if prebuild output ever moves out of /android)
+google-services.json
+GoogleService-Info.plist

@@ -116,6 +116,8 @@ export default function Welcome() {
         </View>
         {/* Keyed on the language: on the web, where no reload happens, the breath begins again. */}
         <Breath key={language} onContinue={leave} isRTL={isRTL} />
+        {/* Houna is 18+ (store ratings, policy and terms): said once, before anything else. */}
+        <Text style={[styles.adults, { color: colors.textTertiary, fontFamily: fonts.regular }]}>{w.adults}</Text>
       </View>
     </View>
   );
@@ -284,6 +286,12 @@ const styles = StyleSheet.create({
   action: {
     paddingHorizontal: grid(2),
     paddingTop: grid(2),
-    paddingBottom: grid(3),
+    paddingBottom: grid(1.5),
+  },
+  adults: {
+    fontSize: 12,
+    lineHeight: 16,
+    textAlign: 'center',
+    paddingBottom: grid(2),
   },
 });

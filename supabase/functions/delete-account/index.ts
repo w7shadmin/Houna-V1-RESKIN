@@ -9,11 +9,11 @@ import { createClient } from "npm:@supabase/supabase-js@2.45.4";
  *   401 not signed in · 500 something failed (nothing, or only photos, deleted: safe to retry)
  *
  * Only ever the caller: who to delete comes from their token, never from the request, so nobody
- * can delete anyone else. Their photos go first (`avatars/<id>/`, `voices/<id>/`: storage has no
+ * can delete anyone else. Their photos go first (`avatars/<id>/`: storage has no
  * cascade, and a photo left behind would keep its public link); if that fails it stops, before the
  * account. Then the auth user, and every table holding their data follows by `ON DELETE CASCADE`
- * (profiles → voice_posts, tanafas_sessions, badges_earned, psychometric_results, push_tokens,
- * username_changes). The anonymous counters (activity_pings, mood_pings) carry no user id and stay.
+ * (profiles → tanafas_sessions, badges_earned, push_tokens, username_changes). The anonymous
+ * community pings (activity_pings) carry no user id and stay.
  */
 
 const corsHeaders = {
@@ -29,7 +29,7 @@ const admin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
 });
 
 /** The owner-folder buckets (CLAUDE.md: `{bucket}/{user_id}/{filename}`). */
-const BUCKETS = ["avatars", "voices"];
+const BUCKETS = ["avatars"];
 
 function json(status: number, body: Record<string, unknown>): Response {
   return new Response(JSON.stringify(body), {
