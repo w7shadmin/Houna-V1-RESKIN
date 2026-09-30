@@ -212,7 +212,8 @@ deleted" (`deleted=1`).
 
 - **Project**: Expo account `w7sh`, project `houna` (`app.json` `owner` and `extra.eas.projectId`). Android
   delivery goes through Firebase Cloud Messaging: project "Houna", Analytics **off** (the privacy forms
-  say no analytics); its `google-services.json` sits next to `app.json` (`android.googleServicesFile`),
+  say no analytics); its `google-services.json` (project `houna-5d89a`) sits next to `app.json` (`android.googleServicesFile`;
+  gitignored, so a fresh checkout or an EAS cloud build needs it supplied; a copy is kept with the keys),
   and its FCM V1 service-account key lives only in Expo's credentials, never in this repo. iOS needs
   an APNs key through EAS once the Apple organization account and bundle ID exist.
 - **Opt-in**: the daily reminder is local (Guests too). Broadcasts are for Aliases, one switch per

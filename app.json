@@ -119,7 +119,8 @@
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.CAMERA",
         "com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE"
-      ]
+      ],
+      "googleServicesFile": "./google-services.json"
     },
     "androidNavigationBar": {
       "enforceContrast": false
