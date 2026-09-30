@@ -111,7 +111,6 @@ export const COUNTRIES: Country[] = [
   { code: 'IR', en: 'Iran', ar: 'إيران', lat: 35.7, lon: 51.4 },
   { code: 'IQ', en: 'Iraq', ar: 'العراق', lat: 33.3, lon: 44.4 },
   { code: 'IE', en: 'Ireland', ar: 'أيرلندا', lat: 53.3, lon: -6.3 },
-  { code: 'IL', en: 'Israel', ar: 'إسرائيل', lat: 31.8, lon: 35.2 },
   { code: 'IT', en: 'Italy', ar: 'إيطاليا', lat: 41.9, lon: 12.5 },
   { code: 'JM', en: 'Jamaica', ar: 'جامايكا', lat: 18.0, lon: -76.8 },
   { code: 'JP', en: 'Japan', ar: 'اليابان', lat: 35.7, lon: 139.7 },

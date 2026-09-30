@@ -149,11 +149,11 @@ export const tanafasStrings = {
         next: 'Next',
         finish: 'Finish',
         groups: [
-          { name: 'Hands & Fists', tensePrompt: 'Squeeze your hands into tight fists. Press your fingers into your palms and feel the tension build.', releasePrompt: 'Now let your hands go completely loose. Feel the tension drain away as your fingers uncurl.' },
+          { name: 'Hands and Fists', tensePrompt: 'Squeeze your hands into tight fists. Press your fingers into your palms and feel the tension build.', releasePrompt: 'Now let your hands go completely loose. Feel the tension drain away as your fingers uncurl.' },
           { name: 'Arms', tensePrompt: 'Bend your elbows and tense your biceps and forearms. Hold the tightness firmly.', releasePrompt: 'Release your arms and let them fall heavy and relaxed. Notice the warmth spreading through them.' },
           { name: 'Shoulders', tensePrompt: 'Pull your shoulders up toward your ears. Squeeze them tight and hold the tension.', releasePrompt: 'Let your shoulders drop away from your ears. Feel the weight lift and the tightness melt.' },
           { name: 'Face', tensePrompt: 'Scrunch your face — squeeze your eyes shut, wrinkle your nose, and clench your jaw.', releasePrompt: 'Release every part of your face. Let your jaw soften, your eyes gently close, your forehead smooth.' },
-          { name: 'Chest & Stomach', tensePrompt: 'Tighten your chest and stomach muscles. Hold your core firm and feel the tension gather.', releasePrompt: 'Let your chest and belly soften completely. Allow each breath to rise and fall without effort.' },
+          { name: 'Chest and Stomach', tensePrompt: 'Tighten your chest and stomach muscles. Hold your core firm and feel the tension gather.', releasePrompt: 'Let your chest and belly soften completely. Allow each breath to rise and fall without effort.' },
           { name: 'Legs', tensePrompt: 'Tense your thighs and calves. Straighten your legs and squeeze the muscles tight.', releasePrompt: 'Release your legs and let them grow heavy and warm. Feel the tension flow down and away.' },
           { name: 'Feet', tensePrompt: 'Curl your toes and tense your feet. Hold the tightness right down to the tips of your toes.', releasePrompt: 'Let your feet go completely limp. Feel any last tension drain out through your toes.' },
         ],

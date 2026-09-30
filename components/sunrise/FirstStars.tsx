@@ -9,7 +9,8 @@ const TWINKLE_MS = 9000;
  * starfield's turning sky (a lap every eight minutes) high above its moon.
  */
 const DRIFT_MS = 80000;
-const COUNT = 72;
+/** Raised from 72 (Sep 2026: "more stars in the Dusk scene"); each is two views (the strip is doubled). */
+const COUNT = 120;
 
 /** A fixed seed, so the same stars come out every visit. */
 function seeded(seed: number) {
@@ -40,13 +41,15 @@ export default function FirstStars({ width, height, color, shown }: FirstStarsPr
   const stars = useMemo(() => {
     const rand = seeded(23);
     const strip = Array.from({ length: COUNT }, (_, i) => {
-      const r = (rand() < 0.8 ? 1 + rand() * 0.8 : 1.8 + rand() * 0.6) / 2;
-      const o = 0.3 + rand() * 0.4;
-      // Down to four-fifths of the sky, most high up, thinning and fainter toward the warm horizon.
-      const depth = Math.pow(rand(), 1.25);
+      // Mostly fine points, a few brighter ones (about one in twelve) so the sky has depth.
+      const bright = rand() < 0.08;
+      const r = (bright ? 2.4 + rand() * 0.6 : rand() < 0.8 ? 1 + rand() * 0.8 : 1.8 + rand() * 0.6) / 2;
+      const o = bright ? 0.75 + rand() * 0.25 : 0.4 + rand() * 0.4;
+      // Down to nearly nine-tenths of the sky, most high up, thinning and fainter toward the warm horizon.
+      const depth = Math.pow(rand(), 1.2);
       return {
         x: rand() * width,
-        y: height * (0.02 + depth * 0.8),
+        y: height * (0.02 + depth * 0.86),
         r,
         o: o * (1 - 0.45 * depth),
         phase: (i * 0.37) % 1,

@@ -358,10 +358,13 @@ export default function MeditationPlayer({
   // Infinite sessions have no "remaining" to count down — show elapsed
   // time counting up instead, with a matching "elapsed" label below.
   const displaySeconds = isInfiniteSession ? elapsed : Math.max(totalSeconds - elapsed, 0);
-  const mins = Math.floor(displaySeconds / 60);
+  const hours = Math.floor(displaySeconds / 3600);
+  const mins = Math.floor((displaySeconds % 3600) / 60);
   const secs = displaySeconds % 60;
   const num = (n: number | string) => (isRTL ? arabicNumber(n) : String(n));
-  const timeLabel = `${num(mins)}:${num(String(secs).padStart(2, '0'))}`;
+  const two = (n: number) => num(String(n).padStart(2, '0'));
+  // An hour or more (typed lengths go up to 8 hours) reads h:mm:ss.
+  const timeLabel = hours > 0 ? `${num(hours)}:${two(mins)}:${two(secs)}` : `${num(mins)}:${two(secs)}`;
 
   return (
     <View style={styles.container}>

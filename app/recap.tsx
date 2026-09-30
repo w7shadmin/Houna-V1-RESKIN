@@ -1,11 +1,12 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { AccessibilityInfo, Animated, Easing, Pressable, Share, StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Animated, Pressable, Share, StyleSheet, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle } from 'react-native-svg';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useStarfield } from '@/contexts/StarfieldContext';
 import { alpha, dayPalette, layout, nightPalette, sunrisePalette } from '@/constants/theme';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { loadEntries, type MoodTag } from '@/lib/journal';
@@ -86,6 +87,7 @@ const EXERCISE_KEYS = {
  * card never includes journal text or moods.
  */
 export default function RecapScreen() {
+  const insets = useSafeAreaInsets();
   const { colors, isNight, scheme } = useTheme();
   const router = useRouter();
   const { t, fonts, isRTL, language } = useLanguage();
@@ -196,20 +198,24 @@ export default function RecapScreen() {
   );
 
   let body: React.ReactNode = null;
-  if (slide === 'intro') {
-    const empty = recap !== null && slides.length === 1;
-    body = (
-      <>
+  const introEmpty = recap !== null && slides.length === 1;
+  const intro =
+    slide === 'intro' ? (
+      <View style={[styles.introLayer, { paddingTop: insets.top + layout.markAnchor - MARK_BOX / 2 }]} pointerEvents="box-none">
         <BreathingMark />
-        <Text style={[styles.introTitle, isRTL && styles.introTitleArabic, { color: colors.text, fontFamily: fonts.display }]}>
-          {r.intro.title[period]}
-        </Text>
-        <Text style={[styles.introBody, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-          {empty ? r.intro.empty : r.intro.body}
-        </Text>
-        {empty && <Button label={r.share.done} variant="secondary" onPress={close} />}
-      </>
-    );
+        <View style={styles.introWords} pointerEvents="box-none">
+          <Text style={[styles.introTitle, isRTL && styles.introTitleArabic, { color: colors.text, fontFamily: fonts.display }]}>
+            {r.intro.title[period]}
+          </Text>
+          <Text style={[styles.introBody, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
+            {introEmpty ? r.intro.empty : r.intro.body}
+          </Text>
+          {introEmpty && <Button label={r.share.done} variant="secondary" onPress={close} />}
+        </View>
+      </View>
+    ) : null;
+  if (slide === 'intro') {
+    // Drawn by the intro layer, on the mark's anchor.
   } else if (slide === 'breathing' && recap) {
     const goTo = exerciseTitle(recap.goToExercise);
     body = (
@@ -301,6 +307,7 @@ export default function RecapScreen() {
   }
 
   return (
+    <View style={styles.root}>
     <SafeAreaView style={[styles.safe, { backgroundColor: style[scheme] }]} edges={['top', 'bottom']}>
       {style.glows.map((g) => (
         <ScreenGlow key={`${g.cx}-${g.cy}`} color={alpha(GLOW[scheme === 'sunrise' ? 'sunrise' : 'nightlight'][g.c], g.a)} rx={g.rx} ry={g.ry} cx={g.cx} cy={g.cy} fade={0.7} />
@@ -344,38 +351,32 @@ export default function RecapScreen() {
         )}
       </View>
     </SafeAreaView>
+    {intro}
+    </View>
   );
 }
 
-/** The mark in its glow, breathing on the canvas's 6s loop (still with Reduce Motion). */
+/** The intro mark's box: its glow's reach. The mark sits in the middle, on the app's anchor. */
+const MARK_BOX = 150;
+
+/**
+ * The mark in its glow, on Home's breath (the shared clock in StarfieldContext, so it matches
+ * Home's and never restarts mid-breath): the glow swells and brightens, the mark stays still, as
+ * on Home. It used to run its own loop, which snapped back to half a breath on every repeat.
+ */
 function BreathingMark() {
-  const breath = useRef(new Animated.Value(0.5)).current;
-  useEffect(() => {
-    let loop: Animated.CompositeAnimation | null = null;
-    AccessibilityInfo.isReduceMotionEnabled()
-      .then((reduce) => {
-        if (reduce) return;
-        loop = Animated.loop(
-          Animated.sequence([
-            Animated.timing(breath, { toValue: 1, duration: 3000, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-            Animated.timing(breath, { toValue: 0, duration: 3000, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
-          ]),
-        );
-        loop.start();
-      })
-      .catch(() => {});
-    return () => loop?.stop();
-  }, [breath]);
-  const scale = breath.interpolate({ inputRange: [0, 1], outputRange: [0.95, 1.05] });
+  const breath = useStarfield()?.clock.breath;
+  const scale = breath ? breath.interpolate({ inputRange: [0, 1], outputRange: [0.92, 1.08] }) : 1;
+  const opacity = breath ? breath.interpolate({ inputRange: [0, 1], outputRange: [0.65, 1] }) : 1;
   return (
-    <Animated.View style={[styles.markHalo, { transform: [{ scale }] }]} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-      <Orb size={150} fx={0.5} fy={0.5} stops={[[alpha(N.hounaGlow, 0.45), 0], [alpha(N.hounaGlow, 0), 0.7]]} />
-      <View style={StyleSheet.absoluteFill}>
-        <View style={styles.markCenter}>
-          <HounaMark size={92} />
-        </View>
+    <View style={styles.markHalo} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+      <Animated.View style={[StyleSheet.absoluteFill, { opacity, transform: [{ scale }] }]}>
+        <Orb size={MARK_BOX} fx={0.5} fy={0.5} stops={[[alpha(N.hounaGlow, 0.45), 0], [alpha(N.hounaGlow, 0), 0.7]]} />
+      </Animated.View>
+      <View style={styles.markCenter}>
+        <HounaMark size={92} />
       </View>
-    </Animated.View>
+    </View>
   );
 }
 
@@ -599,8 +600,22 @@ const styles = StyleSheet.create({
     flex: 270,
   },
   markHalo: {
-    width: 150,
-    height: 150,
+    width: MARK_BOX,
+    height: MARK_BOX,
+  },
+  root: {
+    flex: 1,
+  },
+  /** Over the whole screen (below the header's controls in reach, above the tap zones only for its button). */
+  introLayer: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  introWords: {
+    alignItems: 'center',
+    gap: 16,
+    marginTop: 24,
   },
   markCenter: {
     flex: 1,

@@ -498,3 +498,33 @@ export function fetchSearchBundle(lang: 'en' | 'ar' = 'en'): Promise<SearchBundl
 export function fetchProfessionalsInCountry(lang: 'en' | 'ar', country: string): Promise<AllProfessionals> {
   return searchBundleFetch({ lang, country });
 }
+
+/** A link as a key for spotting the same item in both languages' lists. */
+const sameLink = (url: string) => url.trim().replace(/^https?:\/\/(www\.)?/i, '').replace(/[?#].*$/, '').replace(/\/+$/, '').toLowerCase();
+
+/** One language's list, then what only the other language has (houna.org splits them by language). */
+export function mergeLanguages<T extends { url: string }>(mine: T[], other: T[]): T[] {
+  const seen = new Set(mine.map((i) => sameLink(i.url)));
+  return [...mine, ...other.filter((i) => !seen.has(sameLink(i.url)))];
+}
+
+/**
+ * Articles in every language, the reader's first: houna.org lists each language's separately, and
+ * Houna shows them all until they're translated. If one language fails to load, the other still shows.
+ */
+export async function fetchAllArticles(lang: 'en' | 'ar' = 'en'): Promise<ArticleListResponse> {
+  const other = lang === 'en' ? 'ar' : 'en';
+  const [mine, theirs] = await Promise.allSettled([fetchArticles(lang), fetchArticles(other)]);
+  if (mine.status === 'rejected' && theirs.status === 'rejected') throw mine.reason;
+  const list = (r: PromiseSettledResult<ArticleListResponse>) => (r.status === 'fulfilled' ? r.value.articles : []);
+  return { articles: mergeLanguages(list(mine), list(theirs)) };
+}
+
+/** Podcasts in every language, the reader's first (as `fetchAllArticles`). */
+export async function fetchAllPodcasts(lang: 'en' | 'ar' = 'en'): Promise<PodcastListResponse> {
+  const other = lang === 'en' ? 'ar' : 'en';
+  const [mine, theirs] = await Promise.allSettled([fetchPodcasts(lang), fetchPodcasts(other)]);
+  if (mine.status === 'rejected' && theirs.status === 'rejected') throw mine.reason;
+  const list = (r: PromiseSettledResult<PodcastListResponse>) => (r.status === 'fulfilled' ? r.value.podcasts : []);
+  return { podcasts: mergeLanguages(list(mine), list(theirs)) };
+}

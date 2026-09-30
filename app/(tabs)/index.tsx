@@ -25,7 +25,8 @@ import NightStars from '@/components/home/NightStars';
 import { useBadgeCheck } from '@/hooks/useBadgeCheck';
 
 /** Canvas: the period (and its line) advances every 4.5s until someone picks one. */
-const ROTATE_MS = 4500;
+// Each line (and its period on the map) stays this long: slow enough to read and settle before the next.
+const ROTATE_MS = 9000;
 
 /**
  * Home — one screen, no scroll on a typical phone (canvas "Home — English"

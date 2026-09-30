@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { activityActor } from './activityActor';
 
 /** Exercise sessions only — mood/journal activity is never recorded here (it would feed streaks). */
 export type TanafasSessionKind = 'breathing' | 'meditation';
@@ -44,7 +45,8 @@ export async function recordTanafasSession(
 /**
  * Anonymous "someone just started a session" ping for Home's community
  * counter (`activity_pings`, FEATURES_BRIEF §1). Sent for Guests and Aliases
- * alike, with no user id — only the Alias's opted-in country, if any.
+ * alike, with no user id: the Alias's opted-in country, if any, and this install's anonymous
+ * `actor` id, so the map counts each person once, where they are now (lib/activityActor.ts).
  * Unlike `recordTanafasSession`, it never feeds streaks or the leaderboard.
  *
  * Fire-and-forget; a no-op until the table exists.
@@ -59,7 +61,8 @@ export async function pingActivity(kind: 'breathing' | 'meditation'): Promise<vo
       country = profile?.country ?? null;
     }
     // No `.select()` after the insert — there's deliberately no SELECT policy (CLAUDE.md).
-    await supabase.from('activity_pings').insert({ kind, country });
+    const actor = await activityActor();
+    await supabase.from('activity_pings').insert({ kind, country, actor });
   } catch {
     // Non-fatal, like recordTanafasSession.
   }

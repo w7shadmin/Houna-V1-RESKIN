@@ -22,6 +22,9 @@ export const discoverStrings = {
       custom: 'Custom',
       fewerMinutes: 'A minute less',
       moreMinutes: 'A minute more',
+      hours: 'Hours',
+      minutes: 'Minutes',
+      customLimit: 'From 1 minute to {max} hours',
       on: 'On',
       off: 'Off',
       patterns: {
@@ -112,6 +115,9 @@ export const discoverStrings = {
       custom: 'مدة مخصّصة',
       fewerMinutes: 'دقيقة أقل',
       moreMinutes: 'دقيقة أكثر',
+      hours: 'الساعات',
+      minutes: 'الدقائق',
+      customLimit: 'من دقيقة واحدة حتى {max} ساعات',
       on: 'مفعّل',
       off: 'غير متاح',
       patterns: {

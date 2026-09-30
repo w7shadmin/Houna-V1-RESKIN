@@ -2,8 +2,8 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import { Animated, StyleProp, StyleSheet, Text, TextStyle, View } from 'react-native';
 import { NATIVE, useReduceMotion } from '@/hooks/useCalmLoop';
 
-const LETTER_MS = 40;
-const WORD_MS = 260;
+const LETTER_MS = 55;
+const WORD_MS = 380;
 const RISE = 8;
 
 interface ArrivingTextProps {
@@ -39,7 +39,7 @@ export default function ArrivingText({ children, isRTL, style, align = 'center',
     const step = isRTL ? WORD_MS : LETTER_MS;
     const anim = Animated.stagger(
       step,
-      vs.map((v) => Animated.timing(v, { toValue: 1, duration: isRTL ? 900 : 700, useNativeDriver: NATIVE })),
+      vs.map((v) => Animated.timing(v, { toValue: 1, duration: isRTL ? 1300 : 1000, useNativeDriver: NATIVE })),
     );
     const id = setTimeout(() => anim.start(), delay);
     return () => {

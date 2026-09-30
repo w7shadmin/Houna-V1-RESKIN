@@ -80,6 +80,6 @@ export const RELEASE_MS = 7000;
 
 /** Meditation lengths offered on the hub; null is "no limit". */
 export const MEDITATION_MINUTES: readonly (number | null)[] = [3, 5, 10, 15, 20, 30, 45, 60, null];
-/** A custom length, set on the wheel's last row: from 1 minute to 2 hours. */
-export const MEDITATION_CUSTOM_RANGE = [1, 120] as const;
+/** A custom length, typed on the wheel's last row: from 1 minute to 8 hours (a session's most in the database). */
+export const MEDITATION_CUSTOM_RANGE = [1, 480] as const;
 export const DEFAULT_MEDITATION_MINUTES = 10;

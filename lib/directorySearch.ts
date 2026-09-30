@@ -3,6 +3,7 @@ import {
   fetchProfessionalsInCountry,
   fetchSearchBundle,
   fetchSearchIndex,
+  mergeLanguages,
   type CountryOption,
   type SearchBundle,
   type Therapist,
@@ -158,13 +159,25 @@ function kept<T>(key: string, load: () => Promise<T>): Promise<T> {
 /** One language's lists, in one call, kept on the phone as one copy. */
 const bundle = (lang: Lang) => kept<SearchBundle>(`bundle:${lang}`, () => fetchSearchBundle(lang));
 
+/** A list from the other language's bundle, or nothing if it can't load (the reader's own still shows). */
+async function otherLanguage<T>(lang: Lang, pick: (b: SearchBundle) => T[]): Promise<T[]> {
+  try {
+    return pick(await bundle(lang === 'en' ? 'ar' : 'en'));
+  } catch {
+    return [];
+  }
+}
+
 const professionalItem = (p: Therapist) => item('professional', p.slug, p.name, p.role, p.imageUrl, [p.summary]);
 
 export const SOURCES: Record<SourceKey, (lang: Lang) => Promise<SearchItem[] | ProfessionalsResult>> = {
+  // Articles and podcasts in both languages, the reader's first (houna.org splits them; Houna shows all).
   articles: async (lang) =>
-    (await bundle(lang)).articles.articles.map((a) => item('article', a.url, a.title, a.blurb, a.imageUrl, [], a.sourceDomain)),
+    mergeLanguages((await bundle(lang)).articles.articles, await otherLanguage(lang, (b) => b.articles.articles)).map((a) =>
+      item('article', a.url, a.title, a.blurb, a.imageUrl, [], a.sourceDomain),
+    ),
   podcasts: async (lang) =>
-    (await bundle(lang)).podcasts.podcasts.map((p) =>
+    mergeLanguages((await bundle(lang)).podcasts.podcasts, await otherLanguage(lang, (b) => b.podcasts.podcasts)).map((p) =>
       item('podcast', p.url, p.title, p.host, p.imageUrl, [p.description], p.sourceDomain),
     ),
   professionals: async (lang) => {

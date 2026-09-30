@@ -167,7 +167,13 @@ several thousand. What keeps it there, and must stay that way:
 - **The community figures are computed once and shared** (`stats_cache`, migration
   `20260929180000_stats_cache.sql`): `get_community_activity`, `get_leaderboard` and
   `get_badge_shares` keep their result for 2 minutes (10 for badge shares) instead of recounting
-  every session on each Home open, and `tanafas_sessions` is indexed on `started_at`. A new
+  every session on each Home open, and `tanafas_sessions` is indexed on `started_at`. The
+  community map and its headline count **people, once each, where they are now**: every ping
+  carries its install's random, anonymous `actor` id (`lib/activityActor.ts`, never linked to
+  the account), the map counts each actor in the country of its latest ping, and changing country
+  moves that phone's recent pings (`move_my_activity`, from `AuthContext.updateProfile`),
+  migration `20260930100000_activity_actor.sql`. Pings from before it (no actor) count as
+  sessions only. A new
   figure over all users follows the same pattern. The functions write, so call them with POST
   (supabase-js `rpc()`'s default), never `{ get: true }`.
 - **Email sign-up needs its own email service before launch.** Confirmation is on and Supabase's
@@ -468,8 +474,9 @@ compressed bundle (the page stays blank with no error, though `curl` without
 `Accept-Encoding` gets it at once): restart the server.
 
 **Two Home styles, both kept while the client decides** (More → Appearance →
-Home: "Sun & moon" · "Classic"; `HomeStyle` in `contexts/ThemeContext.tsx`,
-persisted as `houna-home-style`, "Sun & moon" until changed). In both, the
+Home: "Celestial" (فلكي; called "Sun & moon" in code comments and canvases, `sky` in code) ·
+"Classic"; `HomeStyle` in `contexts/ThemeContext.tsx`, persisted as `houna-home-style`,
+"Celestial" until changed). Night's name in Arabic is العَتَمَة. In both, the
 wordmark is the appearance toggle (`components/home/AppearanceToggle.tsx`, a
 strip of sun · setting sun · moon above it, the current one lit, tapping moves
 to the next in `APPEARANCE_OPTIONS` order). Classic is the mark in its ring,
@@ -535,14 +542,17 @@ the week (Monday to Monday, as the leaderboard's) and each day practised.
   the words come and the orb stays at rest. Strings in
   `constants/firstRunStrings.ts` (`t.firstRun`); the Arabic breathes in the
   first person plural, as the exercises do.
-- The splash, each theme's body (`components/splash/BodySplash.tsx`): built,
-  **not switched on** while the client decides (`SPLASH` in `app/_layout.tsx`,
-  'intro' today). The theme's body (`Body` from `HomeBody.tsx`) rises into the
+- **Splash, while the client decides: every variant in turn**, one per cold start, labelled
+  "Variant N" at the bottom for testers (`components/splash/SplashCycle.tsx`, `houna-splash-next`):
+  1 the wordmark drawn from the logo (`SplashIntro`), 2 the doodle (`SplashIntroDoodle`), 3 the
+  bloom (`SplashIntroBloom`), 4 the theme's body (`BodySplash`). Once one is chosen, render it
+  in `app/_layout.tsx` and delete SplashCycle and the others.
+- The splash, each theme's body (`components/splash/BodySplash.tsx`, variant 4). The theme's body (`Body` from `HomeBody.tsx`) rises into the
   middle, the wordmark and "Breathe · rest · return" settle beneath, about 3s;
   on "Sun & moon" it then glides to Home's body (`homeBody`, Home's measured
   mark or body in `StarfieldContext`) while Home's own steps aside
   (`haloHidden`) until it lands; Classic, the first run (no Home beneath) and
-  Reduce Motion fade. When one splash is chosen, delete the other and `SPLASH`.
+  Reduce Motion fade.
   `useCalmLoop` works outside a screen for it (always "focused" there).
 
 **Account & badges** (phase 6, canvas "Houna — Account & badges (phase 6)"; the
@@ -556,10 +566,19 @@ Explorations' section E with the held Profile & badges plan):
   the circle), because react-native-svg's textPath doesn't join Arabic. Then, for an Alias: three numbers (the phone's
   practice streak, sessions this month, badges) and the badges card (gems held,
   the next streak badge unlit with the days to go), opening `app/account/badges.tsx`.
-  For everyone, from the phone's own log (`hooks/useMonthPractice.ts`): Your sky
-  (`components/profile/YourSky.tsx`, a star per day practised this month, placed by
-  its date so it keeps its place, joined in order, the newest pulsing; whole in
-  `app/your-sky.tsx`, tap a star for its day) and Your month in breath
+  For everyone, from the phone's own log: **Your sky, a constellation the person chooses and
+  lights** ("What constellation would you like to breathe life into?"): ten real ones
+  (`lib/constellations.ts`: stars from their real positions, projected as seen looking up, east to
+  the left; the figure's lines; traditional star names, Arabic where known), easiest first, from the
+  Southern Cross and Cassiopeia (5 stars) to Scorpius (15), the star count being the difficulty. Each
+  breathing or meditation session logged after choosing lights the next star
+  (`hooks/useConstellation.ts`, `lib/constellationProgress.ts`, kept on the phone as
+  `houna-constellation`: the current one, when it was chosen, and those finished); the figure is
+  traced faintly, lit stars glow, lines between two lit stars light, the next star breathes
+  (`components/profile/ConstellationSky.tsx`, physical, `direction: 'ltr'` on native). Profile's
+  card shows it (or the question); `app/your-sky.tsx` shows it whole, a tapped star's name and
+  when it lit, and the picker (choosing another starts it from its first star). Then Your month in
+  breath (`hooks/useMonthPractice.ts`)
   (`components/profile/MonthRidges.tsx`: minutes by part of practice as ridges, a
   seven-day average through today, `smoothed` in `lib/practice.ts`). Then My
   results, Recap and Stats as rows, and the settings. Both graphs run from the
@@ -638,7 +657,7 @@ is where the centre of the Houna mark, or of the body, orb or gem it's pressed i
 the top inset, horizontally centred, on every screen where it's the centrepiece, so it never
 jumps between them. Home draws it there; the Tanafas stage is pinned to it (`STAGE_TOP` in
 `PlayerFrame`, from the hub's header; 4-7-8's mark no longer lifts in a session, its word sits
-lower, `WORD_DROP`), and so are Profile's ring, the first breath's orb, a new badge's gem and the
+lower, `WORD_DROP`), and so are Profile's ring, the first breath's orb, Recap's opening mark (its glow on Home's breath, the shared clock), a new badge's gem and the
 scenes' moon and suns (they grow where Home's body was, or are it, as Night's moon is). Measure any new screen against it on the web
 preview at 390×844 (the centre at 199 with no inset).
 
@@ -753,7 +772,9 @@ opens the full-screen player. Its Scene and Length rows open
 `components/ui/GlassSheet.tsx` (the check-in's glass, for choices made in
 place, and dragged down to close, `useDragToClose` over the whole sheet): `ScenePicker` and
 `MinutesWheel` (a wheel that scrolls and settles on a row: `MEDITATION_MINUTES`, 3 to 60 minutes and no
-limit, then Custom, which sets 1 to 120 minutes with − and +, `MEDITATION_CUSTOM_RANGE`). On the web a short drag that ends on a row can still pick it (the browser's click
+limit, then Custom, where the length is typed as hours and minutes, 1 minute to 8 hours,
+`MEDITATION_CUSTOM_RANGE`, 8 hours being a session's most in the database; the player's clock reads
+h:mm:ss past an hour). On the web a short drag that ends on a row can still pick it (the browser's click
 follows the pointer with the sheet); on the phone the drag takes the touch from the row. The scene sheet (canvas "Round 2 — the scene
 sheet") is being tried two ways, `SCENE_SHEET` in `ScenePicker.tsx`: 'rows' (option C, on: each
 scene a row, a round window of it, its name and line, the chosen row lit in its scene's light)
@@ -789,6 +810,8 @@ PHQ/GAD free (Pfizer); ASRS-5 free as a plain total, NYU licence for cut-offs
 or commercial use; PCL-5 public domain; WHO-5 CC BY-NC-SA (non-commercial, with
 WHO's translation disclaimer). Profile shows no scores at all (shared phones):
 every result is one tap away in My results (`app/results.tsx`).
+
+**Articles and podcasts show every language** (`fetchAllArticles` / `fetchAllPodcasts` in `lib/hounaApi.ts`, and in search): houna.org lists each language's separately; Houna shows the reader's first, then what only the other has (matched by link), until they're translated.
 
 **Directory pages** are all in the canvas language now: list pages use
 `components/directory/PageHeader.tsx`; the professional / organization /
@@ -863,6 +886,32 @@ own loading/error state instead of the shared `LoadingState`/`ErrorState`/
 `InlineError` components (`components/directory/AsyncState.tsx`) used in
 ~13 others. Cosmetic only — worth normalizing next time one of those
 screens is touched.
+
+## Houna Console (planned 29 Sep 2026)
+
+The internal command center for the Houna team: the CMS for the rebuilt website, the
+moderation desk for Voices, the push desk, the remote control for the app (flags, minimum
+version, crisis lines, announcements), the inbox, the social-media desk, later the shop. The
+plan is `CONSOLE_BRIEF.md` (entry point) and `docs/console/01..11-*.md`; the wireflow, system
+map, lifecycles and key screens are on the canvas linked from `design/console/README.md`. It
+is built as its own Next.js app on this Supabase project (a new `houna-platform` monorepo that
+also takes over `supabase/`; only one repo ever holds migrations). Rules that bind this app:
+
+- **Today's `public` tables stay where they are**; new domains get their own schemas
+  (`content`, `community`, `notify`, `config`, `inbox`, `staff`, `social`, `insights`).
+- **Health-data wall**: no console role, ever, may `SELECT` from `psychometric_results` or
+  `mood_pings`; the only figures leave through SECURITY DEFINER aggregates with a minimum
+  group size of ten and no join to `profiles`. Any migration that relaxes this is wrong.
+- **The console never holds the service role**; staff act under their own JWT with a
+  `houna_role` claim and MFA, and every rule (publishing, the clinical gate, two-person
+  approval) lives in Postgres, not in the console's code.
+- **Three app releases** carry the plan: A (report and block on Voices, rejection reasons,
+  `lib/remoteConfig.ts` with bundled fallbacks, crisis lines from config, announcements,
+  minimum-version and maintenance screens), B (EAS project id, token registration on launch,
+  the notification tap handler; can ship with A), C (direct PostgREST reads of `content.*`,
+  ISO country ids, the scrapers and `houna_cache` deleted). Until C, `houna-proxy` v2 must
+  return `lib/hounaApi.ts`'s JSON byte for byte, houna.org's numeric ids included.
+- Breath timings, badges and questionnaires never move into remote config.
 
 ## How to reskin
 

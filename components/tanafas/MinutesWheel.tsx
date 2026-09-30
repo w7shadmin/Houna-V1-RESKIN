@@ -1,12 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Minus, Plus } from 'lucide-react-native';
+import { NativeScrollEvent, NativeSyntheticEvent, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type TextStyle } from 'react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { MEDITATION_CUSTOM_RANGE, MEDITATION_MINUTES } from '@/constants/breathPatterns';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import Button from '@/components/ui/Button';
-import IconButton from '@/components/ui/IconButton';
+import { radius } from '@/constants/theme';
 
 const ROW = 56;
 /** Five rows show: the chosen one in the middle, two either side. */
@@ -21,11 +20,19 @@ const ROWS: readonly Row[] = [...MEDITATION_MINUTES, CUSTOM];
 
 const clampCustom = (m: number) => Math.min(MEDITATION_CUSTOM_RANGE[1], Math.max(MEDITATION_CUSTOM_RANGE[0], Math.round(m)));
 
+/** Digits as typed (an Arabic keyboard types ٠–٩), as a number; empty is 0. */
+export function typedNumber(text: string): number {
+  const latin = text.replace(/[٠-٩]/g, (d) => String('٠١٢٣٤٥٦٧٨٩'.indexOf(d))).replace(/D/g, '');
+  return latin ? parseInt(latin, 10) : 0;
+}
+
+const WEB_NO_OUTLINE = Platform.OS === 'web' ? ({ outlineStyle: 'none' } as unknown as TextStyle) : null;
+
 /**
  * The meditation lengths on a wheel (canvas "Players — choosing a length"): the chosen one large
  * in the middle with its unit, its neighbours smaller and fainter above and below. Scroll it (it
- * settles on a row) or tap a length; the last row, Custom, sets any length from 1 to 120 minutes
- * with − and +. Done takes it.
+ * settles on a row) or tap a length; the last row, Custom, takes a typed length in hours and
+ * minutes, from 1 minute to 8 hours (MEDITATION_CUSTOM_RANGE). Done takes it.
  */
 export default function MinutesWheel({ value, onDone }: { value: number | null; onDone: (m: number | null) => void }) {
   const { colors } = useTheme();
@@ -37,13 +44,28 @@ export default function MinutesWheel({ value, onDone }: { value: number | null; 
   };
   const [picked, setPicked] = useState(indexOf(value));
   const [custom, setCustom] = useState(() => (value !== null && !MEDITATION_MINUTES.includes(value) ? value : 25));
+  // What's in the two boxes, as typed; `custom` follows them.
+  const [hoursText, setHoursText] = useState(() => String(Math.floor(custom / 60)));
+  const [minutesText, setMinutesText] = useState(() => String(custom % 60));
+  const typed = typedNumber(hoursText) * 60 + typedNumber(minutesText);
+  const typedOk = typed >= MEDITATION_CUSTOM_RANGE[0] && typed <= MEDITATION_CUSTOM_RANGE[1];
+  useEffect(() => {
+    if (typedOk) setCustom(typed);
+  }, [typed, typedOk]);
+  const setBoxes = (m: number) => {
+    setHoursText(String(Math.floor(m / 60)));
+    setMinutesText(String(m % 60));
+  };
   const scroll = useRef<ScrollView>(null);
 
   // Open on the current length.
   useEffect(() => {
     const i = indexOf(value);
     setPicked(i);
-    if (value !== null && !MEDITATION_MINUTES.includes(value)) setCustom(value);
+    if (value !== null && !MEDITATION_MINUTES.includes(value)) {
+      setCustom(value);
+      setBoxes(value);
+    }
     requestAnimationFrame(() => scroll.current?.scrollTo({ y: i * ROW, animated: false }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
@@ -104,29 +126,44 @@ export default function MinutesWheel({ value, onDone }: { value: number | null; 
         </ScrollView>
       </View>
       {isCustom && (
-        // Any length: a minute at a time.
-        <View style={styles.stepper}>
-          <IconButton
-            variant="control"
-            accessibilityLabel={h.fewerMinutes}
-            onPress={() => setCustom((m) => clampCustom(m - 1))}
-            disabled={custom <= MEDITATION_CUSTOM_RANGE[0]}
-            renderIcon={(c) => <Minus size={20} strokeWidth={1.8} color={c} />}
-          />
-          <View style={styles.customValue} accessibilityLiveRegion="polite">
-            <Text style={[styles.numberOn, { color: colors.text, fontFamily: isRTL ? fonts.display : fonts.numeral }]}>{num(custom)}</Text>
-            <Text style={[styles.unit, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{unit(custom)}</Text>
+        // Any length, typed: hours and minutes.
+        <View style={styles.customWrap}>
+          <View style={styles.boxes}>
+            {(
+              [
+                [h.hours, hoursText, 'hours', 1],
+                [h.minutes, minutesText, 'minutes', 2],
+              ] as const
+            ).map(([label, text, which, maxLength]) => (
+              <View key={label} style={styles.box}>
+                <TextInput
+                  value={text}
+                  onChangeText={(v) => (which === 'hours' ? setHoursText(v) : setMinutesText(v))}
+                  keyboardType="number-pad"
+                  maxLength={maxLength}
+                  selectTextOnFocus
+                  accessibilityLabel={label}
+                  style={[
+                    styles.boxInput,
+                    WEB_NO_OUTLINE,
+                    { color: colors.text, borderColor: colors.border, backgroundColor: colors.card, fontFamily: fonts.numeral },
+                  ]}
+                />
+                <Text style={[styles.boxLabel, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{label}</Text>
+              </View>
+            ))}
           </View>
-          <IconButton
-            variant="control"
-            accessibilityLabel={h.moreMinutes}
-            onPress={() => setCustom((m) => clampCustom(m + 1))}
-            disabled={custom >= MEDITATION_CUSTOM_RANGE[1]}
-            renderIcon={(c) => <Plus size={20} strokeWidth={1.8} color={c} />}
-          />
+          <Text style={[styles.limit, { color: typedOk ? colors.textTertiary : colors.danger, fontFamily: fonts.regular }]} accessibilityLiveRegion="polite">
+            {h.customLimit.replace('{max}', num(MEDITATION_CUSTOM_RANGE[1] / 60))}
+          </Text>
         </View>
       )}
-      <Button block label={h.done} onPress={() => onDone(isCustom ? custom : (chosen as number | null))} />
+      <Button
+        block
+        label={h.done}
+        disabled={isCustom && !typedOk}
+        onPress={() => onDone(isCustom ? clampCustom(typed) : (chosen as number | null))}
+      />
     </View>
   );
 }
@@ -163,17 +200,31 @@ const styles = StyleSheet.create({
   customOn: {
     fontSize: 28,
   },
-  stepper: {
-    flexDirection: 'row',
+  customWrap: {
     alignItems: 'center',
+    gap: 8,
+  },
+  boxes: {
+    flexDirection: 'row',
     justifyContent: 'center',
     gap: 24,
   },
-  customValue: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
+  box: {
+    alignItems: 'center',
     gap: 8,
-    minWidth: 128,
-    justifyContent: 'center',
+  },
+  boxInput: {
+    width: 96,
+    height: 64,
+    borderWidth: 1,
+    borderRadius: radius.card,
+    fontSize: 32,
+    textAlign: 'center',
+  },
+  boxLabel: {
+    fontSize: 14,
+  },
+  limit: {
+    fontSize: 13,
   },
 });

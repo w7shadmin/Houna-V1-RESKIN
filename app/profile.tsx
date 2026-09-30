@@ -26,10 +26,11 @@ import { DirectionalIcon } from '@/components/ui/CanvasIcon';
 import HounaMark from '@/components/HounaMark';
 import NightStars from '@/components/home/NightStars';
 import BadgeGem from '@/components/badges/BadgeGem';
-import YourSky from '@/components/profile/YourSky';
+import ConstellationSky from '@/components/profile/ConstellationSky';
 import MonthRidges from '@/components/profile/MonthRidges';
 import MoonDisc, { MOON_DISC } from '@/components/starfield/MoonDisc';
 import { useMonthPractice } from '@/hooks/useMonthPractice';
+import { useConstellation } from '@/hooks/useConstellation';
 import { useBadgeCheck } from '@/hooks/useBadgeCheck';
 
 /** The theme's own body: its sun as a lit disc with the mark pressed in (pressed-kit's discs); Night's is the pearl moon, the glow its light. */
@@ -71,6 +72,7 @@ export default function ProfileScreen() {
   const [resultCount, setResultCount] = useState(0);
   const [exportFailed, setExportFailed] = useState(false);
   const month = useMonthPractice();
+  const sky = useConstellation();
 
   const loadBadges = useCallback(() => {
     if (!profile) return;
@@ -106,9 +108,21 @@ export default function ProfileScreen() {
   };
 
   const country = profile?.country ? getCountryName(profile.country, language) : null;
-  const since = profile ? p.since.replace('{month}', t.journal.dateNames.monthsLong[new Date(profile.created_at).getMonth()]) : '';
+  // The month from the timestamp's own text ("2026-09-22T16:10:14.105348+00:00"): the phone's engine
+  // can fail to parse Postgres' microseconds, which left "معنا منذ" with no month.
+  const joinedMonth = profile ? parseInt(profile.created_at.slice(5, 7), 10) - 1 : NaN;
+  const since =
+    profile && joinedMonth >= 0 && joinedMonth < 12
+      ? p.since.replace('{month}', t.journal.dateNames.monthsLong[joinedMonth])
+      : '';
   const avatar = resolveImageUrl(profile?.avatar_url ?? null);
   const disc = DISC[scheme];
+  const pc = p.constellation;
+  const skyTitle = !sky?.constellation
+    ? pc.prompt
+    : sky.complete
+      ? pc.complete.replace('{name}', sky.constellation.name[language])
+      : pc.lit.replace('{lit}', num(sky.lit.length)).replace('{n}', num(sky.constellation.stars.length));
   const earned = BADGE_ORDER.filter((c) => held?.has(c));
   const next = held ? nextStreakBadge(held, serverStreak) : null;
   // The cards' inner width, for the sky and the ridges.
@@ -169,7 +183,7 @@ export default function ProfileScreen() {
               </Text>
               <View style={styles.countryRow}>
                 <Text style={[styles.country, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-                  {country ? `${country} · ${since}` : since}
+                  {[country, since].filter(Boolean).join(' · ')}
                 </Text>
                 <Pressable accessibilityRole="link" onPress={go('/account/profile')} hitSlop={8}>
                   <Text style={[styles.country, { color: colors.primary, fontFamily: fonts.medium }]}>{country ? p.edit : p.addCountry}</Text>
@@ -272,13 +286,10 @@ export default function ProfileScreen() {
           </Pressable>
         )}
 
-        {/* Your sky: everyone, from the phone's own log. */}
+        {/* Your sky: a constellation the person chose, a star lit per session (everyone: the phone's own log). */}
         <Pressable
           accessibilityRole="link"
-          accessibilityLabel={p.sky.open.replace(
-            '{n}',
-            month && month.practised.length > 0 ? arabicPlural(month.practised.length, p.sky.stars).replace('{n}', num(month.practised.length)) : p.sky.empty,
-          )}
+          accessibilityLabel={`${pc.eyebrow}: ${skyTitle}`}
           onPress={go('/your-sky')}
           style={({ pressed }) => [styles.card, card, styles.skyCard, pressed && styles.pressed]}
         >
@@ -288,13 +299,15 @@ export default function ProfileScreen() {
             </View>
           )}
           <View style={styles.cardHead}>
-            {eyebrow(p.sky.eyebrow.replace('{month}', monthName), colors.primary)}
+            {eyebrow(sky?.constellation ? `${pc.eyebrow} · ${sky.constellation.name[language]}` : pc.eyebrow, colors.primary)}
             <DirectionalIcon isRTL={isRTL} name="chevron" size={16} color={colors.textTertiary} />
           </View>
-          <Text style={[styles.cardTitle, isRTL && styles.cardTitleArabic, { color: colors.text, fontFamily: fonts.display }]}>
-            {month && month.practised.length > 0 ? arabicPlural(month.practised.length, p.sky.stars).replace('{n}', num(month.practised.length)) : p.sky.empty}
-          </Text>
-          {month && <YourSky dates={month.practised.map((d) => d.date)} days={month.days} width={inner} height={140} isRTL={isRTL} />}
+          <Text style={[styles.cardTitle, isRTL && styles.cardTitleArabic, { color: colors.text, fontFamily: fonts.display }]}>{skyTitle}</Text>
+          {sky?.constellation ? (
+            <ConstellationSky constellation={sky.constellation} lit={sky.lit.length} width={inner} height={140} />
+          ) : (
+            <Text style={[styles.cardNote, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{pc.promptBody}</Text>
+          )}
         </Pressable>
 
         {/* Your month in breath: the month's minutes by part, as ridges. */}

@@ -5,6 +5,7 @@ import * as AuthSession from 'expo-auth-session';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { unregisterPushToken } from '@/lib/notifications';
+import { activityActor } from '@/lib/activityActor';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -206,6 +207,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!session) return { error: 'unknown' };
       const { error } = await supabase.from('profiles').update(fields).eq('id', session.user.id);
       if (error) return { error: 'unknown' };
+      // A new country moves this phone's recent pings with it, so the community map shows the
+      // person once, where they are now (not also where they were). Best effort.
+      if ('country' in fields) {
+        const actor = await activityActor();
+        if (actor) await supabase.rpc('move_my_activity', { p_actor: actor, p_country: fields.country ?? null }).then(undefined, () => {});
+      }
       await refreshProfile();
       return { error: null };
     },

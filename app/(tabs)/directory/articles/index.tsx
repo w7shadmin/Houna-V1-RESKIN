@@ -6,7 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { grid, layout } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
-import { fetchArticles, safeUrl, type Article } from '@/lib/hounaApi';
+import { fetchAllArticles, safeUrl, type Article } from '@/lib/hounaApi';
 import { LoadingState, ErrorState, InlineError } from '@/components/directory/AsyncState';
 import ListItemCard from '@/components/directory/ListItemCard';
 import PageHeader from '@/components/directory/PageHeader';
@@ -25,7 +25,7 @@ export default function ArticlesListScreen() {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchArticles(language);
+      const data = await fetchAllArticles(language);
       setArticles(data.articles);
     } catch (err) {
       setError(err instanceof Error ? err.message : s.error);

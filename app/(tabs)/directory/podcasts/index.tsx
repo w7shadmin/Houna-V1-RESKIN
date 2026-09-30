@@ -6,7 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { grid, layout } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
 import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
-import { fetchPodcasts, safeUrl, type Podcast } from '@/lib/hounaApi';
+import { fetchAllPodcasts, safeUrl, type Podcast } from '@/lib/hounaApi';
 import { LoadingState, ErrorState, InlineError } from '@/components/directory/AsyncState';
 import ListItemCard from '@/components/directory/ListItemCard';
 import PageHeader from '@/components/directory/PageHeader';
@@ -25,7 +25,7 @@ export default function PodcastsListScreen() {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchPodcasts(language);
+      const data = await fetchAllPodcasts(language);
       setPodcasts(data.podcasts);
     } catch (err) {
       setError(err instanceof Error ? err.message : s.error);
