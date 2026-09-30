@@ -43,7 +43,9 @@ export const dayPalette = {
   haze: '#646A8E', // Tertiary text, inactive icons
   hounaDeepTeal: '#237873', // Brand accent text on light
   hounaTeal: '#3BAAA7', // Brand teal — logo, glows
-  dawnDeep: '#A8621F', // Warmth & urgent support
+  // Warmth & urgent support. #A8621F on the canvas, darkened a touch (30 Sep 2026) so it reads at
+  // WCAG AA (4.5:1) as small text on the Dusk ground and its tinted tiles.
+  dawnDeep: '#9E5C1D',
   duskDeep: '#6353C9', // Secondary accent
   /** Deep rose for the bloom tone on light (added after the sheet). */
   bloomDeep: '#B24B6B',
@@ -72,14 +74,18 @@ export const sunrisePalette = {
   sky: '#0A91BB', // From Light Cyan — icons, secondary accent
   skyText: '#08799B',
   /** Raspberry, deepened for the bloom tone. */
-  raspberryDeep: '#C2475A',
+  // #C2475A on the canvas; darkened a touch for AA as small text on the ground and its tiles.
+  raspberryDeep: '#BA4456',
   /** The brand's light hues, for glows and tile fills. */
   peach: '#F9A980',
   lightCyan: '#20C4F4',
   raspberry: '#F37B83',
   /** Late-morning gold for the tide tone: Sunrise spends its blue on dusk. Not a brand colour. */
   gold: '#C98A12',
-  goldText: '#A06C0A',
+  // #A06C0A before; darkened a touch for AA as small text on the ground and its tiles.
+  goldText: '#966509',
+  // The tide tone's icons: gold itself is 2.7:1 on the pale ground, under the 3:1 icons need.
+  goldIcon: '#BB8011',
   lightGold: '#F4C35A',
   /** Pale fill (swatch cards, topic stage). */
   paleFill: '#E6F2EF',
@@ -473,7 +479,8 @@ export const dayColors: ColorTokens = {
   },
 
   crisis: { bg: alpha(N.dawn, 0.08), border: alpha(N.dawn, 0.4), borderSoft: alpha(N.dawn, 0.35), icon: D.dawnDeep },
-  danger: '#C2503F',
+  // AA (4.5:1) as the small Sign out / Delete text on the light grounds; was #C2503F.
+  danger: '#B54B3B',
   onDanger: '#FFFFFF',
 
   tabBarBackground: D.paper,
@@ -563,11 +570,12 @@ function sunriseColorsWith(accent: SunriseAccent): ColorTokens {
       dawn: { fg: S.coral, text: S.coralText, hue: S.peach, bg: alpha(S.peach, 0.12), border: alpha(S.peach, 0.28) },
       dusk: { fg: S.sky, text: S.skyText, hue: S.lightCyan, bg: alpha(S.lightCyan, 0.12), border: alpha(S.lightCyan, 0.3) },
       bloom: { fg: S.raspberryDeep, text: S.raspberryDeep, hue: S.raspberry, bg: alpha(S.raspberry, 0.12), border: alpha(S.raspberry, 0.3) },
-      tide: { fg: S.gold, text: S.goldText, hue: S.lightGold, bg: alpha(S.lightGold, 0.14), border: alpha(S.lightGold, 0.34) },
+      tide: { fg: S.goldIcon, text: S.goldText, hue: S.lightGold, bg: alpha(S.lightGold, 0.14), border: alpha(S.lightGold, 0.34) },
     },
 
     crisis: { bg: alpha(S.peach, 0.08), border: alpha(S.peach, 0.4), borderSoft: alpha(S.peach, 0.35), icon: S.coral },
-    danger: '#C2503F',
+    // AA (4.5:1) as the small Sign out / Delete text on the light grounds; was #C2503F.
+  danger: '#B54B3B',
     onDanger: '#FFFFFF',
 
     tabBarBackground: S.paper,

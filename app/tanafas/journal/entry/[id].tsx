@@ -66,6 +66,8 @@ export default function JournalEntryScreen() {
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [saved, setSaved] = useState(false);
+  // Focus shows as the accent border while writing (the browser's own ring is off).
+  const [textFocused, setTextFocused] = useState(false);
   const [savedEntry, setSavedEntry] = useState<JournalEntry | null>(null);
 
   useEffect(() => {
@@ -209,6 +211,8 @@ export default function JournalEntryScreen() {
               if (grew) keyboard.reveal();
             }}
             editable={isEditing}
+            onFocus={() => setTextFocused(true)}
+            onBlur={() => setTextFocused(false)}
             multiline
             textAlign={isRTL ? 'right' : 'left'}
             placeholder={isEditing ? e.placeholder : ''}
@@ -219,7 +223,7 @@ export default function JournalEntryScreen() {
               isEditing && styles.textAreaEditing,
               WEB_NO_OUTLINE,
               isEditing
-                ? { borderColor: colors.borderControl, backgroundColor: colors.inputBackground }
+                ? { borderColor: textFocused ? colors.primary : colors.borderControl, backgroundColor: colors.inputBackground }
                 : styles.textRead,
               { color: colors.text, fontFamily: fonts.regular },
             ]}

@@ -34,6 +34,9 @@ export default function SceneCard({ scene, title, description, fontBold, fontReg
   return (
     <Pressable
       onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      accessibilityHint={description}
       onHoverIn={showPreview}
       onHoverOut={hidePreview}
       onPressIn={showPreview}

@@ -80,7 +80,8 @@ export default function BadgeUnlock() {
   if (!code) return null;
   const share = shares[code];
   return (
-    <Animated.View style={[StyleSheet.absoluteFill, { opacity: veil }]}>
+    // The screen behind is blurred and out of a screen reader's reach until "Lovely".
+    <Animated.View style={[StyleSheet.absoluteFill, { opacity: veil }]} accessibilityViewIsModal>
       <BlurView intensity={isNight ? 30 : 24} tint={isNight ? 'dark' : 'light'} experimentalBlurMethod="dimezisBlurView" style={StyleSheet.absoluteFill} />
       <View style={[StyleSheet.absoluteFill, { backgroundColor: alpha(colors.background, isNight ? 0.62 : 0.7) }]} />
       <Moment

@@ -384,7 +384,13 @@ export default function MeditationPlayer({
           doesn't reliably decide stacking here on web, so the zIndex on
           both this and the overlay below is load-bearing, not decorative —
           don't remove it. */}
-      <Pressable style={[StyleSheet.absoluteFillObject, styles.tapCatcher]} onPress={handleScreenTap} />
+      <Pressable
+        style={[StyleSheet.absoluteFillObject, styles.tapCatcher]}
+        onPress={handleScreenTap}
+        accessible={false}
+        importantForAccessibility="no"
+        focusable={false}
+      />
 
       <Animated.View
         style={[styles.overlay, { opacity: controlsOpacity }]}
@@ -394,6 +400,8 @@ export default function MeditationPlayer({
         <View style={styles.header}>
           <Pressable
             onPress={handleExit}
+            accessibilityRole="button"
+            accessibilityLabel={p.exit}
             hitSlop={16}
             style={({ pressed }) => [
               styles.iconBtn,
@@ -414,6 +422,7 @@ export default function MeditationPlayer({
               styles.iconBtn,
               pressed && { backgroundColor: alpha(FOCUS.moonlight, 0.15), borderRadius: radius.full },
             ]}
+            accessibilityRole="button"
             accessibilityLabel={isFullscreen ? p.exitFullscreen : p.fullscreen}
           >
             {isFullscreen ? (
@@ -450,6 +459,7 @@ export default function MeditationPlayer({
             <Pressable
               onPress={handleToggleAudioOnly}
               style={({ pressed }) => [styles.smallIconBtn, pressed && { backgroundColor: alpha(FOCUS.moonlight, 0.24) }]}
+              accessibilityRole="button"
               accessibilityLabel={visualEnabled ? p.audioOnly : p.videoOn}
             >
               {visualEnabled ? (
@@ -463,6 +473,7 @@ export default function MeditationPlayer({
           {isActive && (
             <Pressable
               onPress={handlePause}
+              accessibilityRole="button"
               style={({ pressed }) => [styles.primaryBtn, pressed && { backgroundColor: alpha(FOCUS.moonlight, 0.32) }]}
             >
               <Pause size={22} color={FOCUS.moonlight} fill={FOCUS.moonlight} />
@@ -473,6 +484,7 @@ export default function MeditationPlayer({
           {isPaused && (
             <Pressable
               onPress={handleResume}
+              accessibilityRole="button"
               style={({ pressed }) => [styles.primaryBtn, pressed && { backgroundColor: alpha(FOCUS.moonlight, 0.32) }]}
             >
               <Play size={22} color={FOCUS.moonlight} fill={FOCUS.moonlight} />
@@ -483,6 +495,7 @@ export default function MeditationPlayer({
           {isComplete && (
             <Pressable
               onPress={handleStart}
+              accessibilityRole="button"
               style={({ pressed }) => [styles.primaryBtn, pressed && { backgroundColor: alpha(FOCUS.moonlight, 0.32) }]}
             >
               <RotateCcw size={20} color={FOCUS.moonlight} />
@@ -494,6 +507,7 @@ export default function MeditationPlayer({
             <Pressable
               onPress={handleRestart}
               style={({ pressed }) => [styles.smallIconBtn, pressed && { backgroundColor: alpha(FOCUS.moonlight, 0.24) }]}
+              accessibilityRole="button"
               accessibilityLabel={p.startAgain}
             >
               <RotateCcw size={18} color={FOCUS.moonlight} />

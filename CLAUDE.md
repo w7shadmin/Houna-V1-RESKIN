@@ -332,6 +332,34 @@ here: subpages that are conceptually always children of a hub
 `router.replace('/directory')` explicitly instead of `router.back()` —
 deterministic regardless of entry point or platform.
 
+### Accessibility baseline (audit, 30 Sep 2026)
+
+Keep these when adding screens:
+
+- **Every Pressable has a role**, and a label when it has no visible text (icon buttons). Prefer the
+  primitives, which set both. Choices that are one-of-several are `radio` / `radiogroup` with
+  `aria-checked` (read on native and the web; `accessibilityState` isn't on the web). A full-screen
+  tap catcher is hidden from screen readers (`accessible={false}`, as the meditation player's).
+- **Anything that changes on its own or in place is announced** (`announceForAccessibility`): the
+  timed exercises' phases, grounding's steps, muscle relaxation's tense and release, the countdown.
+- **Overlays keep the screen reader inside**: `accessibilityViewIsModal` on the check-in, the badge
+  moment and `GlassSheet` (iOS; RN's `Modal`, as in `ConfirmDialog`, does it itself).
+- **44 points to the touch**: controls drawn smaller reach it by `hitSlop` (Chip, retry buttons,
+  `IconButton` automatically), never by changing their designed size.
+- **Text can grow**: nothing turns font scaling off. Buttons and chips have minimum heights so
+  large text grows them; only the tab bar's labels keep their size (`maxFontSizeMultiplier={1}`, as
+  system tab bars do; each tab is named to screen readers).
+- **Contrast**: text 4.5:1, icons and large text 3:1 on every ground, card and tinted tile, in all
+  three themes. `node scripts/contrast-audit.js --fails` checks the tokens after any palette change.
+  Night and Dusk pass throughout; Sunrise's default accent passes (its tone icons are 3.1 to 3.6).
+  Sunrise's "mixed" and "turquoise" accents don't, which is one more reason to pick "dark". Four
+  swatches were darkened slightly from the canvas to get there (`dawnDeep`, `raspberryDeep`,
+  `goldText`, the light themes' `danger`, plus `goldIcon` for the tide tone's icons).
+- **Reduce Motion** is honoured by every ambient loop (`useReduceMotion` / `useCalmLoop`); the
+  breathing orbs still move, as the exercise needs.
+- **Web focus**: inputs that switch off the browser's focus ring show focus with the accent border
+  instead.
+
 ### Pressed-state convention
 
 Pressing a card or control dims it — `pressed && { opacity: 0.85 }` — as

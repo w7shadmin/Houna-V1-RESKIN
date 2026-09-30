@@ -66,8 +66,11 @@ export default function TabBar({ state, descriptors, navigation, insets }: Botto
         style={({ pressed }) => [styles.slot, pressed && styles.pressed]}
       >
         <CanvasIcon name={ROUTE_ICONS[route.name] ?? 'home'} size={ICON} color={color} />
+        {/* Tab labels keep their size, as the system's own tab bars do: the bar is a fixed 64, and
+            each tab is also named to screen readers (accessibilityLabel). */}
         <Text
           numberOfLines={1}
+          maxFontSizeMultiplier={1}
           style={[styles.label, { color, fontFamily: focused ? fonts.semiBold : fonts.medium }]}
         >
           {label}
@@ -95,6 +98,7 @@ export default function TabBar({ state, descriptors, navigation, insets }: Botto
       </View>
       <Text
         numberOfLines={1}
+        maxFontSizeMultiplier={1}
         style={[styles.label, { color: colors.tabBarInactive, fontFamily: fonts.medium }]}
       >
         {t.tabs.tanafas}

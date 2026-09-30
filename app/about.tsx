@@ -107,6 +107,8 @@ export default function AboutScreen() {
         <Text style={[styles.stateText, { color: colors.text, fontFamily: fonts.semiBold }]}>{error}</Text>
         <Pressable
           onPress={handleRetry}
+          accessibilityRole="button"
+          hitSlop={{ top: 5, bottom: 5 }}
           style={({ pressed }) => [
             styles.retryBtn,
             { backgroundColor: colors.primary },
@@ -160,7 +162,7 @@ export default function AboutScreen() {
         {!!(error && data) && (
           <View style={[styles.inlineError, { backgroundColor: colors.accent + '14', borderColor: colors.accent + '30' }]}>
             <Text style={[styles.inlineErrorText, { color: colors.accent, fontFamily: fonts.regular }]}>{error}</Text>
-            <Pressable onPress={handleRetry} style={({ pressed }) => pressed && { opacity: 0.6 }}>
+            <Pressable onPress={handleRetry} accessibilityRole="button" hitSlop={12} style={({ pressed }) => pressed && { opacity: 0.6 }}>
               <Text style={[styles.inlineRetryText, { color: colors.primary, fontFamily: fonts.semiBold }]}>
                 {s.retry}
               </Text>

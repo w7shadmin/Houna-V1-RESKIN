@@ -147,7 +147,8 @@ export default function CheckInScreen() {
   const blurTint = isNight ? 'dark' : 'light';
 
   return (
-    <View style={styles.root}>
+    // The screen behind stays drawn but out of a screen reader's reach while the sheet is up.
+    <View style={styles.root} accessibilityViewIsModal>
       {/* The screen behind, softened and dimmed; tapping it closes. */}
       <Animated.View style={[StyleSheet.absoluteFill, { opacity: enter }]}>
         <BlurView intensity={isNight ? 30 : 24} tint={blurTint} experimentalBlurMethod="dimezisBlurView" style={StyleSheet.absoluteFill} />

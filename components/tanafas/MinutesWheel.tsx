@@ -47,6 +47,8 @@ export default function MinutesWheel({ value, onDone }: { value: number | null; 
   // What's in the two boxes, as typed; `custom` follows them.
   const [hoursText, setHoursText] = useState(() => String(Math.floor(custom / 60)));
   const [minutesText, setMinutesText] = useState(() => String(custom % 60));
+  // The box being typed in takes the accent border (the browser's own focus ring is off, below).
+  const [focusedBox, setFocusedBox] = useState<'hours' | 'minutes' | null>(null);
   const typed = typedNumber(hoursText) * 60 + typedNumber(minutesText);
   const typedOk = typed >= MEDITATION_CUSTOM_RANGE[0] && typed <= MEDITATION_CUSTOM_RANGE[1];
   useEffect(() => {
@@ -142,11 +144,13 @@ export default function MinutesWheel({ value, onDone }: { value: number | null; 
                   keyboardType="number-pad"
                   maxLength={maxLength}
                   selectTextOnFocus
+                  onFocus={() => setFocusedBox(which)}
+                  onBlur={() => setFocusedBox((f) => (f === which ? null : f))}
                   accessibilityLabel={label}
                   style={[
                     styles.boxInput,
                     WEB_NO_OUTLINE,
-                    { color: colors.text, borderColor: colors.border, backgroundColor: colors.card, fontFamily: fonts.numeral },
+                    { color: colors.text, borderColor: focusedBox === which ? colors.primary : colors.border, backgroundColor: colors.card, fontFamily: fonts.numeral },
                   ]}
                 />
                 <Text style={[styles.boxLabel, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{label}</Text>

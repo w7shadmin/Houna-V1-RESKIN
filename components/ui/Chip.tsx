@@ -27,6 +27,8 @@ export default function Chip({ label, selected = false, size = 'md', onPress, st
       onPress={onPress}
       accessibilityRole="button"
       aria-selected={selected}
+      // 44 tall to the touch (the 40 and 36 pills as drawn); only up and down, so chips side by side never overlap.
+      hitSlop={size === 'sm' ? { top: 4, bottom: 4 } : { top: 2, bottom: 2 }}
       style={({ pressed }) => [
         styles.base,
         size === 'sm' && styles.baseSm,
@@ -59,8 +61,9 @@ export default function Chip({ label, selected = false, size = 'md', onPress, st
 }
 
 const styles = StyleSheet.create({
+  // Minimum heights, so very large text grows the pill instead of clipping it.
   base: {
-    height: 40,
+    minHeight: 40,
     paddingHorizontal: 16,
     borderRadius: radius.full,
     borderWidth: 1,
@@ -74,7 +77,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   baseSm: {
-    height: 36,
+    minHeight: 36,
     paddingHorizontal: 12,
   },
   labelLatinSm: {

@@ -121,7 +121,7 @@ export default function AccountProfileScreen() {
           </View>
         </Pressable>
         <Text style={[styles.username, { color: colors.text, fontFamily: fonts.semiBold }]}>{profile.username}</Text>
-        <Pressable onPress={handlePickAvatar} disabled={uploading} hitSlop={8} style={({ pressed }) => pressed && styles.pressed}>
+        <Pressable onPress={handlePickAvatar} disabled={uploading} accessibilityRole="button" hitSlop={12} style={({ pressed }) => pressed && styles.pressed}>
           <Text style={[styles.changePhoto, { color: colors.primary, fontFamily: fonts.medium }]}>{s.changePhoto}</Text>
         </Pressable>
       </View>

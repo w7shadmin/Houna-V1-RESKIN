@@ -93,6 +93,7 @@ export default function MoreScreen() {
             {t.more.language.toUpperCase()}
           </Text>
           <View
+            accessibilityRole="radiogroup"
             style={[
               styles.languageSwitcher,
               { backgroundColor: colors.surface, borderColor: colors.border },
@@ -104,6 +105,9 @@ export default function MoreScreen() {
                 <Pressable
                   key={option.value}
                   onPress={() => setLanguage(option.value)}
+                  accessibilityRole="radio"
+                  aria-checked={active}
+                  accessibilityLanguage={option.value}
                   style={({ pressed }) => [
                     styles.languageOption,
                     active && { backgroundColor: colors.primary },
@@ -269,6 +273,7 @@ export default function MoreScreen() {
               <Pressable
                 key={item.href ?? item.legal}
                 onPress={() => (item.legal ? openLegal(item.legal, language) : item.href && router.push(item.href))}
+                accessibilityRole={item.legal ? 'link' : 'button'}
                 style={({ pressed }) => [
                   styles.menuItem,
                   !isLast && { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.borderLight },

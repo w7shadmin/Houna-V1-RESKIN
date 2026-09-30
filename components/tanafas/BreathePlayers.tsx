@@ -524,6 +524,11 @@ function GroundingPlayer({ exercise, breath, nav, onInSession }: PlayerProps) {
   const countdown = useCountdown();
   const counting = countdown.active;
   useReportActive(running || counting, onInSession);
+  // Each step is a new prompt in place: say it to a screen reader as it arrives, as the timed player does.
+  useEffect(() => {
+    if (running) AccessibilityInfo.announceForAccessibility(`${ex.stepCounter(step + 1, steps.length, current.sense)}. ${current.prompt}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [running, step]);
 
   return (
     <PlayerFrame
@@ -729,6 +734,13 @@ function TensionPlayer({ exercise, breath, nav, onSessionActive, onInSession, aw
   const counting = countdown.active;
   useReportActive(status === 'running', onSessionActive);
   useReportActive(inSession || counting, onInSession);
+  // Tense and release change on their own: say each as it comes, with its muscle group and prompt.
+  useEffect(() => {
+    if (status === 'running') {
+      AccessibilityInfo.announceForAccessibility(`${current.name}. ${isTense ? ex.tense : ex.release}. ${isTense ? current.tensePrompt : current.releasePrompt}`);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, group, phase]);
 
   return (
     <PlayerFrame

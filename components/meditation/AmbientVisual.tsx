@@ -3,6 +3,7 @@ import { View, Animated, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import type { MeditationScene } from './scenes';
+import { useReduceMotion } from '@/hooks/useCalmLoop';
 
 interface AmbientVisualProps {
   scene: MeditationScene;
@@ -56,8 +57,15 @@ function VideoAmbient({ scene, animate }: AmbientVisualProps) {
 /** Placeholder ambient background for scenes without real video yet — a soft, slowly-breathing gradient tinted per scene. */
 function GradientAmbient({ scene, animate }: AmbientVisualProps) {
   const pulse = useRef(new Animated.Value(0)).current;
+  // Under Reduce Motion the glow rests at its middle instead of breathing.
+  const reduceMotion = useReduceMotion();
 
   useEffect(() => {
+    if (reduceMotion) {
+      pulse.stopAnimation();
+      pulse.setValue(0.5);
+      return;
+    }
     if (!animate) {
       pulse.stopAnimation();
       return;
@@ -70,7 +78,7 @@ function GradientAmbient({ scene, animate }: AmbientVisualProps) {
     );
     loop.start();
     return () => loop.stop();
-  }, [animate, pulse]);
+  }, [animate, pulse, reduceMotion]);
 
   const scale = pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.15] });
   const opacity = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.5, 0.85] });

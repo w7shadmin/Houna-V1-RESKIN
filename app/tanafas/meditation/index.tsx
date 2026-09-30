@@ -20,6 +20,7 @@ export default function MeditationSceneListScreen() {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <Pressable
           onPress={() => router.back()}
+          accessibilityRole="button"
           hitSlop={12}
           style={({ pressed }) => [styles.backRow, pressed && { opacity: 0.6 }]}
         >

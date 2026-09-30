@@ -141,8 +141,9 @@ function GlowButton({ label, onPress, disabled, loading, block, style }: Omit<Bu
 }
 
 const styles = StyleSheet.create({
+  // At least 52: at the largest text sizes the pill grows rather than clipping its label.
   base: {
-    height: 52,
+    minHeight: 52,
     borderRadius: radius.full,
     alignItems: 'center',
     justifyContent: 'center',
