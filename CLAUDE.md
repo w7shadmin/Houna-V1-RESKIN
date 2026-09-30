@@ -218,8 +218,10 @@ terms, store forms and laws). Migration `20260930160000_store_compliance.sql`. K
   moderation) or block its author (`voice_reports`, `voice_blocks`, keyed by the phone's
   anonymous `actor` id; `get_voice_feed(p_actor)` leaves both out); the feed's footer has the house
   rules and "Unblock everyone".
-- **Policies**: `lib/legalLinks.ts` (houna.org/privacy and /terms, Arabic under /ar), linked from
-  More, account settings and sign-up. The website must publish those pages before release.
+- **Policies**: `lib/legalLinks.ts` points at houna.org's own pages (`/en/privacy-policy`,
+  `/en/terms-of-use`, and `/ar/…`), linked from More, account settings and sign-up. Their text is
+  still the old website's (it claims ad networks, analytics, payments, chat), which contradicts the
+  store forms: before release the website replaces it with the compliance pack's drafts.
 - **Android manifest**: `plugins/withoutRecordingService.js` removes expo-audio's microphone
   foreground service, and `blockedPermissions` the install-referrer permission. Firebase stays
   (push).
