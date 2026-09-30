@@ -54,6 +54,13 @@ export const strings = {
       subheading: 'You are Houna',
       explore: 'Explore Houna',
     },
+    // Shown over the whole app when this version is too old (components/UpdateRequired.tsx).
+    update: {
+      title: 'Time to update Houna',
+      body: 'This version of Houna is no longer supported. Update to keep breathing with us.',
+      bodyNoStore: 'This version of Houna is no longer supported. Please install the new version you were sent.',
+      update: 'Update Houna',
+    },
     home: homeStrings.en,
     crisis: crisisStrings.en,
     checkIn: checkInStrings.en,
@@ -122,6 +129,12 @@ export const strings = {
     entry: {
       subheading: 'أنت هُنا',
       explore: 'استكشف هُنا',
+    },
+    update: {
+      title: 'حان وقت تحديث هُنا',
+      body: 'لم يعد هذا الإصدار من هُنا مدعومًا. حدّثه لتواصل التنفّس معنا.',
+      bodyNoStore: 'لم يعد هذا الإصدار من هُنا مدعومًا. يُرجى تثبيت الإصدار الجديد الذي أُرسل إليك.',
+      update: 'تحديث هُنا',
     },
     home: homeStrings.ar,
     crisis: crisisStrings.ar,

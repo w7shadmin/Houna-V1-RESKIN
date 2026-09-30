@@ -117,7 +117,10 @@ Keep these when changing anything nearby:
     and since `20260930200000_launch_hardening.sql` (`check_session_values`) at least 10 seconds
     (`MIN_SESSION_SECONDS`; the app doesn't send shorter ones), `completed_at` required and agreeing
     with `duration_seconds`, not in the future, at most 50 a day per Alias;
-  - badges: only the app's codes;
+  - badges: only the app's codes, awarded only through `claim_badges(p_codes, p_tz)` (no direct
+    inserts): streak badges only when the stored sessions show that many days in a row in the phone's
+    timezone; the first-session and exploring badges as the app claims them, since which exercise
+    was done stays on the phone (the privacy policy says so);
   - `get_leaderboard`, `get_badge_shares`, `is_username_available`: signed-in only;
   - profiles: a country is a 2-letter code; the app's roles can write only `id` and `username` on
     insert and `username`, `avatar_url`, `country`, `show_on_leaderboard` on update (column
@@ -207,6 +210,26 @@ person's data must reference `auth.users` (or `profiles`) with `ON DELETE CASCAD
 owner-folder bucket must be added to the function's `BUCKETS`**, or deleting leaves it behind.
 Immediate, no grace period. Afterwards Profile shows the guest card with "Your Alias has been
 deleted" (`deleted=1`).
+
+### Launch settings (`app_config`, 30 Sep 2026)
+
+A public table (read by everyone, written only in the dashboard or SQL: never a secret) the app
+reads once per launch (`lib/remoteConfig.ts`, `useRemoteConfig`), falling back to the last copy on
+the phone, then to bundled defaults, so nothing is blocked when it can't be read. The Console will
+manage it later (its `config` schema). Change a value with an UPDATE:
+
+- `min_version`: `{ android, ios, android_url, ios_url }`. A version older than its platform's minimum
+  (`lib/version.ts`, tested) covers the app with `components/UpdateRequired.tsx`, whose Update opens
+  the store URL when one is set (until then it says to install the new version sent); the crisis
+  lines stay reachable (the root layout lifts it while /crisis is open). "0.0.0" = no minimum. The
+  web preview never shows it. `app.json`'s `version` is what's compared: bump it every build.
+- `turnstile`: `{ site_key }`, Cloudflare Turnstile's public key. While it's set, sign-in and sign-up
+  show the bot check (`components/account/Captcha.tsx`, folded away unless Cloudflare asks the
+  person to tick a box) and send its token; Supabase Auth checks it once its Attack Protection has the
+  secret. **Order: set the site key here first, then switch Supabase's CAPTCHA on** (the other way round
+  blocks every email sign-in). The widget's hostnames must include houna.org (the phone's web view
+  poses as it) and localhost (the web preview). Cloudflare's test key `1x00000000000000000000AA` always
+  passes. Google sign-in isn't checked.
 
 ### Push notifications (set up 30 Sep 2026)
 

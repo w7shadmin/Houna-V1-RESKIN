@@ -26,7 +26,7 @@ export function useBadgeCheck(onAwarded?: () => void) {
       checking = true;
       let alive = true;
       Promise.all([getMyStreak(), sessionsBetween(new Date(0), new Date(Date.now() + 86400000))])
-        .then(([streak, sessions]) => awardBadges(userId, streak.current, sessions))
+        .then(([streak, sessions]) => awardBadges(streak.current, sessions))
         .then((fresh) => {
           if (!alive || fresh.length === 0) return;
           onAwarded?.();

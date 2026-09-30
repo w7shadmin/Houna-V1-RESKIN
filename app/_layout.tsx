@@ -5,7 +5,8 @@ import 'react-native-url-polyfill/auto';
 import { useEffect, useState } from 'react';
 import { I18nManager, Platform } from 'react-native';
 import * as NavigationBar from 'expo-navigation-bar';
-import { Stack } from 'expo-router';
+import { Stack, usePathname } from 'expo-router';
+import Constants from 'expo-constants';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import {
@@ -32,6 +33,9 @@ import { StarfieldProvider } from '@/contexts/StarfieldContext';
 import SplashCycle from '@/components/splash/SplashCycle';
 import { IntroDoneContext } from '@/hooks/useIntroDone';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { useRemoteConfig } from '@/hooks/useRemoteConfig';
+import { isBelowMinimum } from '@/lib/version';
+import UpdateRequired from '@/components/UpdateRequired';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -42,6 +46,11 @@ function InnerLayout() {
   const { colors, isNight } = useTheme();
   // Re-saves an opted-in Alias's push token on launch; a tapped notification opens its screen.
   usePushNotifications();
+  // Too old a version (app_config min_version) covers the app with UpdateRequired, except while the
+  // crisis lines are open: they're never behind it.
+  const { minVersion, updateUrl } = useRemoteConfig();
+  const pathname = usePathname();
+  const tooOld = Platform.OS !== 'web' && isBelowMinimum(Constants.expoConfig?.version, minVersion);
 
   // Android system buttons follow the theme. With edge-to-edge and
   // `androidNavigationBar.enforceContrast: false` (app.json) the bar itself is
@@ -113,6 +122,7 @@ function InnerLayout() {
         <Stack.Screen name="account" />
         <Stack.Screen name="+not-found" />
       </Stack>
+      {tooOld && !pathname.startsWith('/crisis') && <UpdateRequired updateUrl={updateUrl} />}
       <StatusBar style={isNight ? 'light' : 'dark'} />
     </>
   );

@@ -31,6 +31,8 @@ export type AuthErrorCode =
   | 'invalid_username'
   /** Renamed twice in the last 30 days already (enforced by a trigger on `profiles`). */
   | 'username_change_limit'
+  /** The bot check (Turnstile) failed or expired: get a fresh one and try again. */
+  | 'captcha_failed'
   | 'cancelled'
   | 'unknown';
 
@@ -48,8 +50,9 @@ interface AuthContextValue {
   isGuest: boolean;
   /** Signed in but hasn't claimed a username yet — the one moment sign-up is incomplete. */
   needsUsername: boolean;
-  signUpWithEmail: (email: string, password: string) => Promise<AuthResult>;
-  signInWithEmail: (email: string, password: string) => Promise<AuthResult>;
+  /** `captchaToken`: the bot check's token (components/account/Captcha.tsx), when it's on. */
+  signUpWithEmail: (email: string, password: string, captchaToken?: string) => Promise<AuthResult>;
+  signInWithEmail: (email: string, password: string, captchaToken?: string) => Promise<AuthResult>;
   signInWithGoogle: () => Promise<AuthResult>;
   signOut: () => Promise<void>;
   /** Deletes the signed-in Alias and everything Houna keeps for it (the `delete-account` Edge Function), then signs out here. */
@@ -67,6 +70,7 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 function mapAuthError(message: string | undefined): AuthErrorCode {
   const m = (message ?? '').toLowerCase();
+  if (m.includes('captcha')) return 'captcha_failed';
   if (m.includes('already registered') || m.includes('already exists')) return 'email_in_use';
   if (m.includes('password')) return 'weak_password';
   if (m.includes('invalid') && m.includes('email')) return 'invalid_email';
@@ -112,14 +116,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     refreshProfile();
   }, [refreshProfile]);
 
-  const signUpWithEmail = useCallback(async (email: string, password: string): Promise<AuthResult> => {
-    const { data, error } = await supabase.auth.signUp({ email, password });
+  const signUpWithEmail = useCallback(async (email: string, password: string, captchaToken?: string): Promise<AuthResult> => {
+    const { data, error } = await supabase.auth.signUp({ email, password, options: captchaToken ? { captchaToken } : undefined });
     if (error) return { error: mapAuthError(error.message) };
     return { error: null, needsEmailConfirmation: !data.session };
   }, []);
 
-  const signInWithEmail = useCallback(async (email: string, password: string): Promise<AuthResult> => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const signInWithEmail = useCallback(async (email: string, password: string, captchaToken?: string): Promise<AuthResult> => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password, options: captchaToken ? { captchaToken } : undefined });
     if (error) return { error: mapAuthError(error.message) };
     return { error: null };
   }, []);

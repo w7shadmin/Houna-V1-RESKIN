@@ -61,19 +61,30 @@ export async function getMyStreak(): Promise<StreakInfo> {
   return computeStreak(activeDays);
 }
 
+/** The phone's timezone (IANA), so the server counts days as the person lives them. */
+function deviceTimeZone(): string {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+  } catch {
+    return 'UTC';
+  }
+}
+
 /**
- * Awards every badge the practice now qualifies for (lib/badges.ts: the streak, and what's been
- * tried, from the phone's own session log) and returns the ones that are new, for the unlock
- * moment. `UNIQUE (user_id, badge_code)` keeps a repeat insert harmless.
+ * Claims every badge the practice now qualifies for (lib/badges.ts: the streak, and what's been
+ * tried, from the phone's own session log) and returns the ones newly awarded, for the unlock
+ * moment. The server awards them (`claim_badges`): streak badges only when the sessions it holds
+ * show that many days in a row, in this phone's timezone; the first-session and exploring badges as
+ * claimed, since which exercise was done stays on the phone.
  */
-export async function awardBadges(userId: string, currentStreak: number, sessions: Pick<LoggedSession, 'kind' | 'exercise'>[]): Promise<BadgeCode[]> {
+export async function awardBadges(currentStreak: number, sessions: Pick<LoggedSession, 'kind' | 'exercise'>[]): Promise<BadgeCode[]> {
   const held = await getMyBadges();
   const due = qualifyingBadges(currentStreak, sessions).filter((code) => !held.has(code));
   if (due.length === 0) return [];
-  const { error } = await supabase
-    .from('badges_earned')
-    .upsert(due.map((code) => ({ user_id: userId, badge_code: code })), { onConflict: 'user_id,badge_code', ignoreDuplicates: true });
-  return error ? [] : due;
+  const { data, error } = await supabase.rpc('claim_badges', { p_codes: due, p_tz: deviceTimeZone() });
+  if (error || !Array.isArray(data)) return [];
+  const awarded = new Set(data as string[]);
+  return due.filter((code) => awarded.has(code));
 }
 
 /** The badges held, each with when it was earned (ISO). */

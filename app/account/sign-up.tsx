@@ -3,6 +3,8 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MailCheck } from 'lucide-react-native';
 import { AccountScreen, Field, FormMessage, OrDivider, SwitchLink } from '@/components/account/AccountKit';
+import Captcha from '@/components/account/Captcha';
+import { useRemoteConfig } from '@/hooks/useRemoteConfig';
 import GoogleButton from '@/components/account/GoogleButton';
 import { openLegal } from '@/lib/legalLinks';
 import Button from '@/components/ui/Button';
@@ -24,13 +26,21 @@ export default function SignUpScreen() {
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  // The bot check, when app_config has its key: a token per try, then a fresh widget.
+  const { turnstileSiteKey } = useRemoteConfig();
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaRound, setCaptchaRound] = useState(0);
   const [checkEmail, setCheckEmail] = useState(false);
 
   const handleSubmit = async () => {
     setError('');
     setSubmitting(true);
-    const result = await signUpWithEmail(email.trim(), password);
+    const result = await signUpWithEmail(email.trim(), password, captchaToken ?? undefined);
     setSubmitting(false);
+    if (turnstileSiteKey) {
+      setCaptchaToken(null);
+      setCaptchaRound((r) => r + 1);
+    }
     if (result.error) {
       setError(errors[result.error]);
       return;
@@ -50,7 +60,7 @@ export default function SignUpScreen() {
     }
   };
 
-  const canSubmit = email.trim().length > 0 && password.length >= 8;
+  const canSubmit = email.trim().length > 0 && password.length >= 8 && (!turnstileSiteKey || !!captchaToken);
 
   if (checkEmail) {
     return (
@@ -87,6 +97,9 @@ export default function SignUpScreen() {
         autoCapitalize="none"
         autoComplete="new-password"
       />
+      {!!turnstileSiteKey && (
+        <Captcha key={captchaRound} siteKey={turnstileSiteKey} onToken={setCaptchaToken} onError={() => setError(errors.captcha_failed)} />
+      )}
       {!!error && <FormMessage message={error} />}
       <Text style={[styles.agree, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
         {s.agreeText}{' '}

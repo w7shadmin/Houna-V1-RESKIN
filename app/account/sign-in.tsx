@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { AccountScreen, Field, FormMessage, OrDivider, SwitchLink } from '@/components/account/AccountKit';
+import Captcha from '@/components/account/Captcha';
+import { useRemoteConfig } from '@/hooks/useRemoteConfig';
 import GoogleButton from '@/components/account/GoogleButton';
 import Button from '@/components/ui/Button';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -17,12 +19,20 @@ export default function SignInScreen() {
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  // The bot check, when app_config has its key: a token per try, then a fresh widget.
+  const { turnstileSiteKey } = useRemoteConfig();
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaRound, setCaptchaRound] = useState(0);
 
   const handleSubmit = async () => {
     setError('');
     setSubmitting(true);
-    const result = await signInWithEmail(email.trim(), password);
+    const result = await signInWithEmail(email.trim(), password, captchaToken ?? undefined);
     setSubmitting(false);
+    if (turnstileSiteKey) {
+      setCaptchaToken(null);
+      setCaptchaRound((r) => r + 1);
+    }
     if (result.error) {
       setError(errors[result.error]);
       return;
@@ -39,7 +49,7 @@ export default function SignInScreen() {
     }
   };
 
-  const canSubmit = email.trim().length > 0 && password.length > 0;
+  const canSubmit = email.trim().length > 0 && password.length > 0 && (!turnstileSiteKey || !!captchaToken);
 
   return (
     <AccountScreen title={s.title} subtitle={s.subtitle}>
@@ -61,6 +71,9 @@ export default function SignInScreen() {
         autoCapitalize="none"
         autoComplete="password"
       />
+      {!!turnstileSiteKey && (
+        <Captcha key={captchaRound} siteKey={turnstileSiteKey} onToken={setCaptchaToken} onError={() => setError(errors.captcha_failed)} />
+      )}
       {!!error && <FormMessage message={error} />}
       <Button block label={s.submit} onPress={handleSubmit} disabled={!canSubmit} loading={submitting} />
       <OrDivider label={s.or} />
