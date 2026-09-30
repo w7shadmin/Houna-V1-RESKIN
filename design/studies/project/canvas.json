@@ -114,6 +114,62 @@
       "w": 1760,
       "h": 1034,
       "title": "G · G13 + G7 in the Tanafas scene"
+    },
+    "H-moods.dc.html": {
+      "x": 0,
+      "y": 18162,
+      "w": 3050,
+      "h": 1074,
+      "title": "H · Your emotional landscape (Recap’s moods)"
+    },
+    "H-moods-ar.dc.html": {
+      "x": 0,
+      "y": 19356,
+      "w": 1760,
+      "h": 1014,
+      "title": "H · Your emotional landscape, in Arabic"
+    },
+    "I-i0-today.dc.html": {
+      "x": 0,
+      "y": 20750,
+      "w": 1560,
+      "h": 956,
+      "title": "I · I0 Today: nine skies set in gems"
+    },
+    "I-i1-pearl-moons.dc.html": {
+      "x": 1640,
+      "y": 20750,
+      "w": 1560,
+      "h": 956,
+      "title": "I · I1 Pearl moons: the month waxing"
+    },
+    "I-i2-constellations.dc.html": {
+      "x": 3280,
+      "y": 20750,
+      "w": 1560,
+      "h": 956,
+      "title": "I · I2 Constellations"
+    },
+    "I-i3-khatam-medallions.dc.html": {
+      "x": 0,
+      "y": 21826,
+      "w": 1560,
+      "h": 956,
+      "title": "I · I3 Khatam medallions"
+    },
+    "I-i4-an-orrery.dc.html": {
+      "x": 1640,
+      "y": 21826,
+      "w": 1560,
+      "h": 956,
+      "title": "I · I4 An orrery"
+    },
+    "I-i5-the-mark-lit.dc.html": {
+      "x": 3280,
+      "y": 21826,
+      "w": 1560,
+      "h": 956,
+      "title": "I · I5 The mark, lit"
     }
   },
   "order": [
@@ -131,7 +187,15 @@
     "G-dusk-home-2.dc.html",
     "G-dusk-scene-2.dc.html",
     "G-dusk-combo-home.dc.html",
-    "G-dusk-combo-scene.dc.html"
+    "G-dusk-combo-scene.dc.html",
+    "H-moods.dc.html",
+    "H-moods-ar.dc.html",
+    "I-i0-today.dc.html",
+    "I-i1-pearl-moons.dc.html",
+    "I-i2-constellations.dc.html",
+    "I-i3-khatam-medallions.dc.html",
+    "I-i4-an-orrery.dc.html",
+    "I-i5-the-mark-lit.dc.html"
   ],
   "notes": {
     "row1": {
@@ -196,6 +260,22 @@
       "x": 0,
       "y": 15354,
       "maxW": 2000,
+      "w": 240
+    },
+    "row14": {
+      "kind": "title1",
+      "text": "H · Your emotional landscape (Recap’s moods slide)",
+      "x": 0,
+      "y": 17922,
+      "maxW": 3050,
+      "w": 240
+    },
+    "row16": {
+      "kind": "title1",
+      "text": "I · Badges and Profile’s icons",
+      "x": 0,
+      "y": 20510,
+      "maxW": 4840,
       "w": 240
     }
   },

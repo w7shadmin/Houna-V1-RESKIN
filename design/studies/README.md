@@ -10,7 +10,8 @@ canvas and the app, as the Explorations picks did.
   `canvas.json`). The live canvas is the source of truth; re-read it before
   publishing over it.
 - `scripts/make-studies.js` rebuilds every board and the layout (and reports
-  overlaps): `node design/studies/scripts/make-studies.js`. It reuses the
+  overlaps): `node design/studies/scripts/make-studies.js`. Rows H and I are drawn
+  in `scripts/study-hi.js`, which it calls. It reuses the
   Explorations kit (`design/explorations/scripts/kit.js`), the canvas helpers
   (`make-appicons.js`, `map-data.json`) and the app's own values
   (`constants/kuficRing.ts`, the theme's scene colours).
@@ -25,3 +26,5 @@ canvas and the app, as the Explorations picks did.
 | E | `E-imprint-night.dc.html`, `E-imprint-day.dc.html` | The mark imprinted on plain pages |
 | F | `F-moon.dc.html`, `F-moon-close.dc.html` | A new moon for Night |
 | G | `G-dusk-home.dc.html`, `G-dusk-scene.dc.html`, `G-dusk-home-2.dc.html`, `G-dusk-scene-2.dc.html`, `G-dusk-combo-home.dc.html`, `G-dusk-combo-scene.dc.html` | The Dusk sun, on Home and in its Tanafas scene (one column per variant; G0–G6, G7–G13, then G14–G17, G13 + G7) |
+| H | `H-moods.dc.html`, `H-moods-ar.dc.html` | Recap’s moods slide, “Your emotional landscape”: six new ways to draw the month’s feelings (H1–H6) beside today’s orbs (H0), in Night; four in Arabic |
+| I | `I-i0-today.dc.html` … `I-i5-the-mark-lit.dc.html` | The nine badges and Profile’s three number icons: five directions (I1–I5) beside today’s gems (I0), each in Night and Sunrise or Dusk, earned and not yet |

@@ -1,7 +1,8 @@
 // "Houna — Design studies" (https://claude.ai/artifact/5DqkLLhgEWF1bS4vFcf7EL): six visual questions
 // explored as variants before anything is built. A · the Sunrise scene's glow; B · two different
 // suns; C · Classic Home with the Kufic ring; D · a calmer Home date; E · the mark imprinted on plain
-// pages; F · a new moon; G · the Dusk sun, on Home and in its scene. Built from the Explorations kit and the app's own values, so the boards
+// pages; F · a new moon; G · the Dusk sun, on Home and in its scene; H · Recap's moods slide; I · the
+// badges and Profile's icons (rows H and I live in study-hi.js). Built from the Explorations kit and the app's own values, so the boards
 // match the app. `node design/studies/scripts/make-studies.js` writes every board and canvas.json.
 const fs = require('fs');
 const path = require('path');
@@ -115,13 +116,15 @@ const bowl = (id) => `<svg width="190" height="190" viewBox="0 0 240 240" style=
     ['E · The mark on plain pages', 'The Directory and Events have no art of their own. Five ways to imprint the mark very faintly behind them, by night and by day.'],
     ['F · A new moon', 'A better moon for the starfield, the mark pressed in, tonight’s real phase kept. Five surfaces beside today’s teal disc.'],
     ['G · The Dusk sun', 'Dusk’s sun is a plain amber disc beside Sunrise’s turning stars and Night’s bowl. Twelve ways to give it its own (two rows of six or seven), each drawn on Home and in its Tanafas scene.'],
+    ['H · Your emotional landscape', 'Recap’s moods slide shows the month’s feelings as a few glossy balls. Six gentler landscapes of them (a sky, hills, a nebula, the month of moons, a woven panel, an aurora), in Night, four in Arabic. No scores, no good or bad.'],
+    ['I · Badges and Profile’s icons', 'Five directions for the nine badges and Profile’s three number icons, beside today’s gems: pearl moons, constellations, khatam tiles, an orrery, the mark itself. Each in Night and a light theme, earned and not yet.'],
   ];
   const body = `<div style="position: absolute; inset: 0; padding: 72px; box-sizing: border-box; display: flex; flex-direction: column; gap: 40px">
 <div style="display: flex; flex-direction: column; gap: 16px">${K.label('Houna · design studies', '#6FD6CF', 12)}
-<span style="font-family: ${K.F.display}; font-size: 64px; line-height: 1.05; color: ${M.moonlight}">Seven questions, in variants</span>
+<span style="font-family: ${K.F.display}; font-size: 64px; line-height: 1.05; color: ${M.moonlight}">Nine questions, in variants</span>
 <span style="max-width: 1040px; font-size: 17px; line-height: 1.55; color: ${M.mist}">Each row below is one question, every phone one answer, most of them moving. Nothing here is in the app yet. Pick by selecting the boards you like (or comment on one: “this, but slower”), and it goes to the Houna Redesign canvas, then the app, as before. Numbers, colours and sizes are the app’s own.</span></div>
 <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px">${ROWS.map(([t, d]) => `<div style="padding: 24px; border-radius: 22px; background: rgba(242,236,221,0.045); border: 1px solid rgba(242,236,221,0.1); display: flex; flex-direction: column; gap: 10px"><span style="font-size: 18px; font-weight: 600; color: ${M.moonlight}">${t}</span><span style="font-size: 14.5px; line-height: 1.55; color: ${M.mist}">${d}</span></div>`).join('')}</div>
-<span style="font-size: 14.5px; line-height: 1.55; color: ${M.haze}">And the sky clock: yes, it’s in the app (phase 3, app/sky.tsx). A long press on Home’s mark or body opens it, the only way in until its entry is decided.</span>
+<span style="font-size: 14.5px; line-height: 1.55; color: ${M.haze}">The sky clock (phase 3) was taken out of the app on 28 Sep 2026, with its long press on Home’s mark.</span>
 </div>`;
   out.push(K.board('Main.dc.html', { title: 'Houna — design studies', w: 1400, h: 980, root: `background: ${M.midnight}`, body, dir: DIR }));
 })();
@@ -501,9 +504,12 @@ ${SPIN}
   });
 })();
 
+/* ══════════ H · Your emotional landscape; I · Badges and Profile's icons (study-hi.js) ══════════ */
+const HI = require('./study-hi.js')({ K, row, out, DIR, M, ROOT });
+
 /* ── The canvas: Direction on top, then a row per study ── */
-const ROWS = [['Main.dc.html'], ['A-sunglow.dc.html'], ['B-suns.dc.html'], ['C-kufic.dc.html'], ['D-date.dc.html'], ['E-imprint-night.dc.html'], ['E-imprint-day.dc.html'], ['F-moon.dc.html', 'F-moon-close.dc.html'], ['G-dusk-home.dc.html'], ['G-dusk-scene.dc.html'], ['G-dusk-home-2.dc.html'], ['G-dusk-scene-2.dc.html'], ['G-dusk-combo-home.dc.html'], ['G-dusk-combo-scene.dc.html']];
-const TITLES = { 1: 'A · The Sunrise scene’s glow', 2: 'B · Two different suns', 3: 'C · Classic Home with the Kufic ring', 4: 'D · A calmer Home date', 5: 'E · The mark on plain pages', 7: 'F · A new moon', 8: 'G · The Dusk sun, on Home and in its scene', 12: 'G · G13 + G7: the ring of light and the Kufic words' };
+const ROWS = [['Main.dc.html'], ['A-sunglow.dc.html'], ['B-suns.dc.html'], ['C-kufic.dc.html'], ['D-date.dc.html'], ['E-imprint-night.dc.html'], ['E-imprint-day.dc.html'], ['F-moon.dc.html', 'F-moon-close.dc.html'], ['G-dusk-home.dc.html'], ['G-dusk-scene.dc.html'], ['G-dusk-home-2.dc.html'], ['G-dusk-scene-2.dc.html'], ['G-dusk-combo-home.dc.html'], ['G-dusk-combo-scene.dc.html'], ...HI.hRows, ...HI.iRows];
+const TITLES = { 1: 'A · The Sunrise scene’s glow', 2: 'B · Two different suns', 3: 'C · Classic Home with the Kufic ring', 4: 'D · A calmer Home date', 5: 'E · The mark on plain pages', 7: 'F · A new moon', 8: 'G · The Dusk sun, on Home and in its scene', 12: 'G · G13 + G7: the ring of light and the Kufic words', 14: 'H · Your emotional landscape (Recap’s moods slide)', 16: 'I · Badges and Profile’s icons' };
 const byFile = Object.fromEntries(out.map((b) => [b.file, b]));
 const boards = {}, notes = {}, order = [];
 let y = 0;
