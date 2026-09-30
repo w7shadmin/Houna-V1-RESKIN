@@ -85,7 +85,7 @@ export default function ResultsScreen() {
                   <View style={styles.rowText}>
                     <Text style={[styles.rowTitle, { color: colors.text, fontFamily: fonts.semiBold }]}>{testText(test.title, language)}</Text>
                     <Text style={[styles.rowNote, { color: colors.textTertiary, fontFamily: fonts.regular }]}>
-                      {res.savedToProfile ? `${date} · ${r.saved}` : date}
+                      {date}
                     </Text>
                   </View>
                   <Text numberOfLines={1} style={[styles.band, { color: colors.textSecondary, borderColor: colors.border, fontFamily: fonts.regular }]}>

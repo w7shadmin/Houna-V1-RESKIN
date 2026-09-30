@@ -14,8 +14,12 @@ import {
   Phone,
   Bell,
   ChevronRight,
+  MessageCircle,
+  ShieldCheck,
+  FileText,
   type LucideIcon,
 } from 'lucide-react-native';
+import { openLegal } from '@/lib/legalLinks';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { Language } from '@/constants/strings';
 import { spacing, typography, radius, shadows, latinFontFamily, arabicFontFamily } from '@/constants/theme';
@@ -26,7 +30,9 @@ import { SUNRISE_ACCENTS } from '@/constants/theme';
 interface MenuItem {
   icon: LucideIcon;
   label: string;
-  href: '/about' | '/get-involved' | '/contact' | '/account/notifications';
+  /** A screen in the app, or a page on houna.org (the policies). */
+  href?: '/about' | '/get-involved' | '/contact' | '/account/notifications' | '/tanafas/voices';
+  legal?: 'privacy' | 'terms';
 }
 
 export default function MoreScreen() {
@@ -37,10 +43,15 @@ export default function MoreScreen() {
   // About / Get Involved / Contact ported from the old MVP's MoreScreen.
   // Account lives behind Home's top-right Profile button, not here.
   const menuItems: MenuItem[] = [
+    // Voices, the community's posts: a way in from the app's own screens (Apple rejects features
+    // reachable only by a link).
+    { icon: MessageCircle, label: t.more.voices, href: '/tanafas/voices' },
     { icon: Bell, label: t.account.notifications.title, href: '/account/notifications' },
     { icon: Info, label: t.more.about, href: '/about' },
     { icon: HandHeart, label: t.more.getInvolved, href: '/get-involved' },
     { icon: Phone, label: t.more.contact, href: '/contact' },
+    { icon: ShieldCheck, label: t.more.privacy, legal: 'privacy' },
+    { icon: FileText, label: t.more.terms, legal: 'terms' },
   ];
 
   const languageOptions: { value: Language; label: string }[] = [
@@ -260,8 +271,8 @@ export default function MoreScreen() {
 
             return (
               <Pressable
-                key={item.href}
-                onPress={() => router.push(item.href)}
+                key={item.href ?? item.legal}
+                onPress={() => (item.legal ? openLegal(item.legal, language) : item.href && router.push(item.href))}
                 style={({ pressed }) => [
                   styles.menuItem,
                   !isLast && { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.borderLight },

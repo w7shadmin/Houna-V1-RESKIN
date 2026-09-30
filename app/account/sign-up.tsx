@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { MailCheck } from 'lucide-react-native';
 import { AccountScreen, Field, FormMessage, OrDivider, SwitchLink } from '@/components/account/AccountKit';
 import GoogleButton from '@/components/account/GoogleButton';
+import { openLegal } from '@/lib/legalLinks';
 import Button from '@/components/ui/Button';
 import IconTile from '@/components/ui/IconTile';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -14,7 +15,7 @@ import { grid, radius } from '@/constants/theme';
 export default function SignUpScreen() {
   const { colors } = useTheme();
   const router = useRouter();
-  const { t, fonts, isRTL } = useLanguage();
+  const { t, fonts, isRTL, language } = useLanguage();
   const { signUpWithEmail, signInWithGoogle } = useAuth();
   const s = t.account.signUp;
   const errors = t.account.errors;
@@ -87,6 +88,17 @@ export default function SignUpScreen() {
         autoComplete="new-password"
       />
       {!!error && <FormMessage message={error} />}
+      <Text style={[styles.agree, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
+        {s.agreeText}{' '}
+        <Text style={{ color: colors.primary, fontFamily: fonts.semiBold }} onPress={() => openLegal('terms', language)}>
+          {t.account.profile.terms}
+        </Text>{' '}
+        {s.agreeAnd}{' '}
+        <Text style={{ color: colors.primary, fontFamily: fonts.semiBold }} onPress={() => openLegal('privacy', language)}>
+          {t.account.profile.privacyPolicy}
+        </Text>
+        .
+      </Text>
       <Button block label={s.submit} onPress={handleSubmit} disabled={!canSubmit} loading={submitting} />
       <OrDivider label={s.or} />
       <GoogleButton label={s.google} onPress={handleGoogle} />
@@ -96,6 +108,10 @@ export default function SignUpScreen() {
 }
 
 const styles = StyleSheet.create({
+  agree: {
+    fontSize: 13,
+    lineHeight: 19,
+  },
   sent: {
     alignItems: 'center',
     gap: grid(1.5),

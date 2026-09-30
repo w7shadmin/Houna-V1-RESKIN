@@ -8,7 +8,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { spacing, radius, typography, shadows } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
-import { fetchApprovedPosts, fetchMyPosts, type VoicePost } from '@/lib/voices';
+import { countBlocked, fetchApprovedPosts, fetchMyPosts, unblockAll, type VoicePost } from '@/lib/voices';
+import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import IconButton from '@/components/ui/IconButton';
 import { DirectionalIcon } from '@/components/ui/CanvasIcon';
 
@@ -25,11 +26,13 @@ export default function VoicesScreen() {
   const [feed, setFeed] = useState<VoicePost[]>([]);
   const [mine, setMine] = useState<VoicePost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [blocked, setBlocked] = useState(0);
 
   const load = useCallback(async () => {
     setLoading(true);
     const posts = await fetchApprovedPosts();
     setFeed(posts);
+    setBlocked(await countBlocked());
     if (session) setMine(await fetchMyPosts(session.user.id));
     setLoading(false);
   }, [session]);
@@ -146,6 +149,30 @@ export default function VoicesScreen() {
             );
           })
         )}
+
+        {/* The house rules, and a way back from blocking (store requirements for community posts). */}
+        {tab === 'feed' && !loading && (
+          <View style={styles.footer}>
+            <Text style={[styles.footerText, { color: colors.textTertiary, fontFamily: fonts.regular }]}>{s.guidelines}</Text>
+            {blocked > 0 && (
+              <View style={styles.footerRow}>
+                <Text style={[styles.footerText, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
+                  {arabicPlural(blocked, s.blockedCount).replace('{n}', isRTL ? arabicNumber(blocked) : String(blocked))}
+                </Text>
+                <Pressable
+                  accessibilityRole="button"
+                  hitSlop={8}
+                  onPress={async () => {
+                    await unblockAll();
+                    load();
+                  }}
+                >
+                  <Text style={[styles.footerText, { color: colors.primary, fontFamily: fonts.semiBold }]}>{s.unblockAll}</Text>
+                </Pressable>
+              </View>
+            )}
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -209,6 +236,20 @@ const styles = StyleSheet.create({
     fontSize: typography.fontSize.sm,
     textAlign: 'center',
     paddingHorizontal: spacing.xl,
+  },
+  footer: {
+    gap: spacing.sm,
+    paddingTop: spacing.lg,
+  },
+  footerRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  footerText: {
+    fontSize: typography.fontSize.sm,
+    lineHeight: typography.lineHeight.body,
   },
   card: {
     flexDirection: 'row',

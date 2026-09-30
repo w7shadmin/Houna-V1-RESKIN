@@ -4,11 +4,10 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { useAuth } from '@/contexts/AuthContext';
 import { alpha, layout } from '@/constants/theme';
 import { arabicNumber } from '@/lib/arabicNumerals';
 import { getTest } from '@/constants/psychometrics';
-import { getResult, saveResultToProfile, type StoredResult } from '@/lib/psychometrics/results';
+import { getResult, type StoredResult } from '@/lib/psychometrics/results';
 import Button from '@/components/ui/Button';
 import IconButton from '@/components/ui/IconButton';
 import ScreenGlow from '@/components/ui/ScreenGlow';
@@ -19,7 +18,7 @@ import RadarChart from '@/components/discover/RadarChart';
  * Self-reflection results (canvas "Self-reflection — results"): radar,
  * one card per trait (highest first) with its band, the not-a-diagnosis
  * disclaimer, then "Find a professional" as the primary action. Results
- * stay on the phone; "Save to my profile" is an explicit, Alias-only opt-in.
+ * stay on the phone, and only there (health data: they're never sent to the server).
  * Screeners (`sum` / `count` scoring) also show the score out of its range
  * and what the band means; a band marked `concern` puts talking to someone
  * first, with the crisis line a tap away (crisis resources are never buried).
@@ -28,13 +27,10 @@ export default function ResultScreen() {
   const { colors } = useTheme();
   const router = useRouter();
   const { t, fonts, isRTL, language } = useLanguage();
-  const { profile } = useAuth();
   const r = t.discover.results;
   const { resultId } = useLocalSearchParams<{ resultId: string }>();
 
   const [result, setResult] = useState<StoredResult | null | undefined>(undefined);
-  const [saving, setSaving] = useState(false);
-  const [saveFailed, setSaveFailed] = useState(false);
 
   useEffect(() => {
     getResult(resultId ?? '')
@@ -80,14 +76,6 @@ export default function ResultScreen() {
 
   const concern = traits.some((tr) => tr.score.concern);
 
-  const save = async () => {
-    setSaving(true);
-    setSaveFailed(false);
-    const ok = await saveResultToProfile(result);
-    setSaving(false);
-    if (ok) setResult({ ...result, savedToProfile: true });
-    else setSaveFailed(true);
-  };
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
@@ -163,18 +151,8 @@ export default function ResultScreen() {
 
         <View style={styles.actions}>
           <Button label={r.findProfessional} onPress={() => router.navigate('/directory/professionals')} block style={styles.primary} />
-          {profile ? (
-            <Button
-              label={result.savedToProfile ? r.savedToProfile : r.saveToProfile}
-              variant="secondary"
-              onPress={save}
-              disabled={result.savedToProfile}
-              loading={saving}
-              block
-            />
-          ) : null}
-          <Text style={[styles.caption, { color: saveFailed ? colors.accent : colors.textTertiary, fontFamily: fonts.regular }]}>
-            {saveFailed ? r.saveFailed : profile ? r.staysOnPhone : `${r.staysOnPhone} ${r.signInToSave}`}
+          <Text style={[styles.caption, { color: colors.textTertiary, fontFamily: fonts.regular }]}>
+            {r.staysOnPhone}
           </Text>
         </View>
       </ScrollView>

@@ -17,10 +17,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { alpha, layout } from '@/constants/theme';
 import { NATIVE, useReduceMotion } from '@/hooks/useCalmLoop';
-import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
-import { currentMood, getTodayEntry, logMoodForToday, localDateString, type MoodTag } from '@/lib/journal';
-import { pingMoodAndGetCount } from '@/lib/moodPings';
-import { supabase } from '@/lib/supabase';
+import { currentMood, getTodayEntry, logMoodForToday, type MoodTag } from '@/lib/journal';
 import { BLOOM_ORDER, BreathingBloom } from '@/components/mood/MoodBloom';
 import MoodSlider from '@/components/mood/MoodSlider';
 import Button from '@/components/ui/Button';
@@ -106,9 +103,6 @@ export default function CheckInScreen() {
   const [note, setNote] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(false);
-  const [othersToday, setOthersToday] = useState<number | null>(null);
-  /** The mood already logged today, if any — its own anonymous ping is in the count. */
-  const [savedMood, setSavedMood] = useState<MoodTag | null>(null);
 
   const mood = BLOOM_ORDER[index];
   const moodLabel = t.journal.moodLabelsFull[mood];
@@ -118,30 +112,11 @@ export default function CheckInScreen() {
     getTodayEntry()
       .then((entry) => {
         if (!entry) return;
-        setSavedMood(entry.mood);
         // An older entry may hold a retired mood; start from its place on today's scale.
         setIndex(BLOOM_ORDER.indexOf(currentMood(entry.mood)));
       })
       .catch(() => {});
   }, []);
-
-  // "You're not alone": how many others logged this mood today. Read-only
-  // here — the anonymous ping itself is only sent on save.
-  useEffect(() => {
-    let alive = true;
-    setOthersToday(null);
-    const id = setTimeout(() => {
-      supabase
-        .rpc('get_mood_ping_count', { p_mood_tag: mood, p_date: localDateString(new Date()) })
-        .then(({ data, error: rpcError }) => {
-          if (alive && !rpcError && typeof data === 'number') setOthersToday(data - (savedMood === mood ? 1 : 0));
-        });
-    }, 250);
-    return () => {
-      alive = false;
-      clearTimeout(id);
-    };
-  }, [mood, savedMood]);
 
   const close = () => sinkThen(() => (router.canGoBack() ? router.back() : router.replace('/(tabs)')));
   // Drag the sheet down by its top (the grabber, the title, the bloom) to close it.
@@ -151,24 +126,14 @@ export default function CheckInScreen() {
     setSaving(true);
     setError(false);
     try {
+      // Kept on this phone only (health data never leaves it: CLAUDE.md, the compliance pack).
       await logMoodForToday(mood, note);
-      // One anonymous ping per mood per day — re-saving the same mood must not
-      // inflate the "you're not alone" count.
-      if (savedMood !== mood) pingMoodAndGetCount(mood).catch(() => {});
       close();
     } catch {
       setError(true);
       setSaving(false);
     }
   };
-
-  const notAlone =
-    othersToday !== null && othersToday > 0
-      ? arabicPlural(othersToday, t.home.mood.notAlone).replace(
-          '{n}',
-          isRTL ? arabicNumber(othersToday) : String(othersToday),
-        )
-      : null;
 
   const labelLatin = fonts.labelTracked;
   // The note sits near the end of the sheet: scroll to the end so it and Save clear the keyboard.
@@ -252,17 +217,6 @@ export default function CheckInScreen() {
             </Arrive>
 
             <Arrive enter={enter} index={3}>
-            <View style={styles.notAlone}>
-              {notAlone && (
-                <>
-                  <View style={[styles.notAloneDot, { backgroundColor: colors.tones.dusk.fg }]} />
-                  <Text style={[styles.notAloneText, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-                    {notAlone}
-                  </Text>
-                </>
-              )}
-            </View>
-
             <View style={styles.noteWrap}>
               <Text
                 nativeID="checkInNoteLabel"
@@ -318,7 +272,7 @@ export default function CheckInScreen() {
 const SHEET_GAP = 24;
 const BLOOM_MIN = 152;
 const BLOOM_MAX = 248;
-const FIXED_HEIGHT = 540;
+const FIXED_HEIGHT = 520;
 
 const styles = StyleSheet.create({
   root: {
@@ -382,21 +336,6 @@ const styles = StyleSheet.create({
   },
   moodLabelArabic: {
     lineHeight: 46,
-  },
-  notAlone: {
-    minHeight: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  notAloneDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-  },
-  notAloneText: {
-    fontSize: 13.5,
   },
   noteWrap: {
     gap: 8,

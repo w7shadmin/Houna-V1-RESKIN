@@ -88,6 +88,7 @@
       "expo-navigation-bar",
       "./plugins/withNavigationBarContrastOff",
       "./plugins/withReleaseSigning",
+      "./plugins/withoutRecordingService",
       [
         "expo-image-picker",
         {
@@ -115,7 +116,8 @@
         "android.permission.SYSTEM_ALERT_WINDOW",
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE",
-        "android.permission.CAMERA"
+        "android.permission.CAMERA",
+        "com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE"
       ]
     },
     "androidNavigationBar": {

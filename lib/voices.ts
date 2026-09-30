@@ -1,11 +1,15 @@
 import { supabase } from './supabase';
 import { imageExtension, uploadToBucket } from './storageUpload';
+import { activityActor } from './activityActor';
 
 export type VoicePostStatus = 'pending' | 'approved' | 'rejected';
 
 export interface VoicePost {
   id: string;
-  user_id: string;
+  /** Only on the person's own posts (fetchMyPosts); the feed never says whose a post is. */
+  user_id?: string;
+  /** From get_voice_post: whether it's the caller's own. */
+  is_mine?: boolean;
   title: string | null;
   body: string | null;
   image_url: string | null;
@@ -25,7 +29,9 @@ export interface VoicePost {
  * the caller's own row regardless of status).
  */
 export async function fetchApprovedPosts(): Promise<VoicePost[]> {
-  const { data, error } = await supabase.rpc('get_voice_feed');
+  // Less what this phone blocked or reported (keyed by its anonymous id, so Guests have it too).
+  const actor = await activityActor();
+  const { data, error } = await supabase.rpc('get_voice_feed', { p_actor: actor });
   if (error || !data) return [];
   return data as VoicePost[];
 }
@@ -94,4 +100,40 @@ export async function deletePost(id: string): Promise<void> {
     const path = decodeURIComponent(url.slice(at + marker.length).split('?')[0]);
     await supabase.storage.from('voices').remove([path]).catch(() => {});
   }
+}
+
+export const REPORT_REASONS = ['harmful', 'harassment', 'spam', 'personal', 'other'] as const;
+export type ReportReason = (typeof REPORT_REASONS)[number];
+
+/**
+ * Reports a post: it's hidden from this phone's feed at once, and three reports from different
+ * phones send it back to moderation (report_voice_post). Returns false on failure.
+ */
+export async function reportPost(postId: string, reason: ReportReason): Promise<boolean> {
+  const actor = await activityActor();
+  if (!actor) return false;
+  const { error } = await supabase.rpc('report_voice_post', { p_post_id: postId, p_actor: actor, p_reason: reason });
+  return !error;
+}
+
+/** Blocks the author of a post: none of their posts show on this phone. Returns false on failure. */
+export async function blockAuthor(postId: string): Promise<boolean> {
+  const actor = await activityActor();
+  if (!actor) return false;
+  const { error } = await supabase.rpc('block_voice_author', { p_post_id: postId, p_actor: actor });
+  return !error;
+}
+
+/** How many authors this phone has blocked. */
+export async function countBlocked(): Promise<number> {
+  const actor = await activityActor();
+  if (!actor) return 0;
+  const { data, error } = await supabase.rpc('count_voice_blocks', { p_actor: actor });
+  return error || typeof data !== 'number' ? 0 : data;
+}
+
+/** Unblocks everyone this phone blocked. */
+export async function unblockAll(): Promise<void> {
+  const actor = await activityActor();
+  if (actor) await supabase.rpc('unblock_voice_authors', { p_actor: actor });
 }

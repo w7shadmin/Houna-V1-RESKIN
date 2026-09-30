@@ -4,7 +4,8 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { Camera, Check } from 'lucide-react-native';
-import { AccountScreen, SettingsGroup, SettingsRow } from '@/components/account/AccountKit';
+import { AccountScreen, SettingsGroup, SettingsRow, ThemedSwitch } from '@/components/account/AccountKit';
+import { openLegal } from '@/lib/legalLinks';
 import ConfirmDialog from '@/components/journal/ConfirmDialog';
 import IconButton from '@/components/ui/IconButton';
 import CanvasIcon from '@/components/ui/CanvasIcon';
@@ -132,6 +133,22 @@ export default function AccountProfileScreen() {
 
       <SettingsGroup label={s.activity}>
         <SettingsRow title={s.streakStats} onPress={() => router.push('/account/stats')} />
+      </SettingsGroup>
+
+      <SettingsGroup label={s.privacy}>
+        <SettingsRow
+          title={s.onLeaderboard}
+          body={s.onLeaderboardBody}
+          trailing={
+            <ThemedSwitch
+              value={!!profile.show_on_leaderboard}
+              onValueChange={(on) => updateProfile({ show_on_leaderboard: on })}
+              label={s.onLeaderboard}
+            />
+          }
+        />
+        <SettingsRow title={s.privacyPolicy} onPress={() => openLegal('privacy', language)} />
+        <SettingsRow title={s.terms} onPress={() => openLegal('terms', language)} />
       </SettingsGroup>
 
       <Pressable

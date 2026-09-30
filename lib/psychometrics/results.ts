@@ -1,13 +1,10 @@
-import { supabase } from '@/lib/supabase';
 import { generateId, getLocalDb } from '@/lib/localDb';
 import type { TestScores } from './types';
 
 /**
- * Self-reflection results. On-device by default (same local database as
- * the journal). "Save to my profile" is a separate, explicit opt-in that
- * copies one result to Supabase `psychometric_results`, readable only by
- * its owner (FEATURES_BRIEF §5). Sensitive, health-adjacent data: never
- * join it into any public RPC.
+ * Self-reflection results: on this phone only (the same local database as the journal). They're
+ * health data, so they never leave it; the old "Save to my profile" copy to the server was removed
+ * (30 Sep 2026, the store compliance pack). `savedToProfile` only marks results saved that way before.
  */
 export interface StoredResult {
   id: string;
@@ -64,28 +61,3 @@ export async function deleteResult(id: string): Promise<void> {
   await db.runAsync('DELETE FROM psychometric_results WHERE id = ?;', [id]);
 }
 
-/**
- * The explicit opt-in. Requires a signed-in Alias; returns false (never
- * throws) on any failure so the screen can say so plainly.
- */
-export async function saveResultToProfile(result: StoredResult): Promise<boolean> {
-  try {
-    const { data } = await supabase.auth.getSession();
-    const userId = data.session?.user.id;
-    if (!userId) return false;
-    // No `.select()` chained — only the owner has a SELECT policy, and we don't need the row back.
-    const { error } = await supabase.from('psychometric_results').insert({
-      user_id: userId,
-      test_id: result.testId,
-      version: result.version,
-      scores: result.scores,
-      taken_at: new Date(result.takenAt).toISOString(),
-    });
-    if (error) return false;
-    const db = await getLocalDb();
-    await db.runAsync('UPDATE psychometric_results SET saved_to_profile = 1 WHERE id = ?;', [result.id]);
-    return true;
-  } catch {
-    return false;
-  }
-}

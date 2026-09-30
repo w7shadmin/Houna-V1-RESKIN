@@ -1,30 +1,59 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, Pressable, ScrollView, ActivityIndicator, Alert, StyleSheet } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Sparkles, Trash2 } from 'lucide-react-native';
+import { Flag, Sparkles, Trash2, UserX } from 'lucide-react-native';
 import DetailScreen from '@/components/DetailScreen';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useAuth } from '@/contexts/AuthContext';
 import { spacing, radius, typography } from '@/constants/theme';
 import { useTheme } from '@/contexts/ThemeContext';
-import { fetchPost, deletePost, type VoicePost } from '@/lib/voices';
+import { fetchPost, deletePost, reportPost, blockAuthor, REPORT_REASONS, type VoicePost, type ReportReason } from '@/lib/voices';
 
 export default function VoicePostScreen() {
   const { colors } = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { t, fonts } = useLanguage();
-  const { session } = useAuth();
   const s = t.tanafas.voices;
 
   const [post, setPost] = useState<VoicePost | null | undefined>(undefined);
+  // Report: choosing a reason, then sent or failed. Block: done.
+  const [reporting, setReporting] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     if (!id) return;
     fetchPost(id).then(setPost);
   }, [id]);
 
-  const isOwnPending = !!post && !!session && post.user_id === session.user.id && post.status === 'pending';
+  const isOwnPending = !!post && !!post.is_mine && post.status === 'pending';
+  // Anyone (Guests too) can report or block someone else's approved post.
+  const canReport = !!post && !post.is_mine && post.status === 'approved';
+
+  const sendReport = async (reason: ReportReason) => {
+    if (!post || busy) return;
+    setBusy(true);
+    const ok = await reportPost(post.id, reason);
+    setBusy(false);
+    setReporting(false);
+    setNotice(ok ? s.reportSent : s.reportFailed);
+  };
+
+  const handleBlock = () => {
+    if (!post) return;
+    const name = post.username ?? '';
+    Alert.alert(s.blockConfirmTitle.replace('{name}', name), s.blockConfirmBody, [
+      { text: s.cancel, style: 'cancel' },
+      {
+        text: s.block.replace('{name}', name),
+        style: 'destructive',
+        onPress: async () => {
+          const ok = await blockAuthor(post.id);
+          setNotice(ok ? s.blocked : s.reportFailed);
+        },
+      },
+    ]);
+  };
 
   const handleWithdraw = () => {
     if (!post) return;
@@ -91,6 +120,49 @@ export default function VoicePostScreen() {
             <Text style={[styles.withdrawText, { color: colors.accent, fontFamily: fonts.semiBold }]}>{s.withdraw}</Text>
           </Pressable>
         )}
+
+        {canReport && !notice && (
+          <View style={styles.safety}>
+            {reporting ? (
+              <>
+                <Text style={[styles.safetyTitle, { color: colors.text, fontFamily: fonts.semiBold }]}>{s.reportTitle}</Text>
+                {REPORT_REASONS.map((reason) => (
+                  <Pressable
+                    key={reason}
+                    accessibilityRole="button"
+                    disabled={busy}
+                    onPress={() => sendReport(reason)}
+                    style={({ pressed }) => [styles.reason, { borderColor: colors.border }, pressed && { opacity: 0.85 }]}
+                  >
+                    <Text style={[styles.reasonText, { color: colors.text, fontFamily: fonts.regular }]}>{s.reportReasons[reason]}</Text>
+                  </Pressable>
+                ))}
+                <Pressable accessibilityRole="button" onPress={() => setReporting(false)} hitSlop={8}>
+                  <Text style={[styles.safetyLink, { color: colors.textSecondary, fontFamily: fonts.medium }]}>{s.cancel}</Text>
+                </Pressable>
+              </>
+            ) : (
+              <View style={styles.safetyRow}>
+                <Pressable accessibilityRole="button" onPress={() => setReporting(true)} hitSlop={8} style={({ pressed }) => [styles.safetyAction, pressed && { opacity: 0.85 }]}>
+                  <Flag size={16} color={colors.textSecondary} strokeWidth={1.8} />
+                  <Text style={[styles.safetyLink, { color: colors.textSecondary, fontFamily: fonts.medium }]}>{s.report}</Text>
+                </Pressable>
+                <Pressable accessibilityRole="button" onPress={handleBlock} hitSlop={8} style={({ pressed }) => [styles.safetyAction, pressed && { opacity: 0.85 }]}>
+                  <UserX size={16} color={colors.textSecondary} strokeWidth={1.8} />
+                  <Text style={[styles.safetyLink, { color: colors.textSecondary, fontFamily: fonts.medium }]}>
+                    {s.block.replace('{name}', post.username ?? '')}
+                  </Text>
+                </Pressable>
+              </View>
+            )}
+          </View>
+        )}
+
+        {!!notice && (
+          <Text accessibilityLiveRegion="polite" style={[styles.notice, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
+            {notice}
+          </Text>
+        )}
       </ScrollView>
     </DetailScreen>
   );
@@ -151,5 +223,39 @@ const styles = StyleSheet.create({
   },
   withdrawText: {
     fontSize: typography.fontSize.sm,
+  },
+  safety: {
+    marginTop: spacing.xl,
+    gap: spacing.sm,
+  },
+  safetyRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.lg,
+  },
+  safetyAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  safetyTitle: {
+    fontSize: typography.fontSize.body,
+  },
+  safetyLink: {
+    fontSize: typography.fontSize.sm,
+  },
+  reason: {
+    borderWidth: 1,
+    borderRadius: radius.md,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+  },
+  reasonText: {
+    fontSize: typography.fontSize.sm,
+  },
+  notice: {
+    marginTop: spacing.xl,
+    fontSize: typography.fontSize.sm,
+    lineHeight: typography.lineHeight.md,
   },
 });

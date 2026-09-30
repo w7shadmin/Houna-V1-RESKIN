@@ -196,6 +196,35 @@ owner-folder bucket must be added to the function's `BUCKETS`**, or deleting lea
 Immediate, no grace period. Afterwards Profile shows the guest card with "Your Alias has been
 deleted" (`deleted=1`).
 
+### Store compliance (decided 30 Sep 2026)
+
+From the "Houna app — store compliance pack" (a Claude Doc:
+https://claude.ai/code/artifact/a8bb02b5-d414-4284-9fcb-2acddebc9da8, with the privacy policy,
+terms, store forms and laws). Migration `20260930160000_store_compliance.sql`. Keep these:
+
+- **Health data never leaves the phone.** Mood check-ins are saved to the journal only (no mood
+  pings, no "others felt this today" count; `mood_pings` is dropped), and questionnaire results
+  stay in the phone's database (no "Save to my profile"; `psychometric_results` is dropped). Never
+  add a server write of a mood, a journal entry or a score; the policy and store forms say so.
+- **Google sign-in keeps the email only**: triggers on `auth.users` and `auth.identities`
+  (`strip_identity_profile`) drop the name, picture and locale as they arrive.
+- **Retention**: activity pings are deleted after 13 months, nightly (pg_cron job
+  `houna-purge-activity-pings`).
+- **The leaderboard is opt-in**: `profiles.show_on_leaderboard`, off by default, switched in account
+  settings under Privacy; `get_leaderboard` shows only those who chose it.
+- **Voices**: reachable from More; a post never exposes its author's id (`get_voice_post` returns
+  `is_mine`; approved rows are read only through the feed functions). Anyone, Guests too, can
+  report a post (hidden for them at once; three reports from different phones send it back to
+  moderation) or block its author (`voice_reports`, `voice_blocks`, keyed by the phone's
+  anonymous `actor` id; `get_voice_feed(p_actor)` leaves both out); the feed's footer has the house
+  rules and "Unblock everyone".
+- **Policies**: `lib/legalLinks.ts` (houna.org/privacy and /terms, Arabic under /ar), linked from
+  More, account settings and sign-up. The website must publish those pages before release.
+- **Android manifest**: `plugins/withoutRecordingService.js` removes expo-audio's microphone
+  foreground service, and `blockedPermissions` the install-referrer permission. Firebase stays
+  (push).
+- `houna-push-broadcast` is retired (a stub answering 410); delete it in the dashboard.
+
 ### Bilingual & RTL infrastructure
 
 The *mechanism* is foundation; the *copy* is content, and belongs to
@@ -262,6 +291,8 @@ not synced. No PIN or biometric lock for the MVP.
   isn't built in (a dev client from before it, the web) the same page goes out as an HTML file.
 - Never write copy claiming the journal "never leaves the device" — it's
   included in the phone's normal OS backup.
+- Mood check-ins are journal entries only: nothing about a mood is sent to Houna's server (see
+  "Store compliance").
 
 ### Navigation shape
 
@@ -811,7 +842,8 @@ total with no cut-off (the weighted cut-offs need NYU's permission). Licences:
 PHQ/GAD free (Pfizer); ASRS-5 free as a plain total, NYU licence for cut-offs
 or commercial use; PCL-5 public domain; WHO-5 CC BY-NC-SA (non-commercial, with
 WHO's translation disclaimer). Profile shows no scores at all (shared phones):
-every result is one tap away in My results (`app/results.tsx`).
+every result is one tap away in My results (`app/results.tsx`). Results stay on the phone only:
+the server copy ("Save to my profile") was removed on 30 Sep 2026 (see "Store compliance").
 
 **Articles and podcasts show every language** (`fetchAllArticles` / `fetchAllPodcasts` in `lib/hounaApi.ts`, and in search): houna.org lists each language's separately; Houna shows the reader's first, then what only the other has (matched by link), until they're translated.
 
@@ -901,9 +933,11 @@ also takes over `supabase/`; only one repo ever holds migrations). Rules that bi
 
 - **Today's `public` tables stay where they are**; new domains get their own schemas
   (`content`, `community`, `notify`, `config`, `inbox`, `staff`, `social`, `insights`).
-- **Health-data wall**: no console role, ever, may `SELECT` from `psychometric_results` or
-  `mood_pings`; the only figures leave through SECURITY DEFINER aggregates with a minimum
-  group size of ten and no join to `profiles`. Any migration that relaxes this is wrong.
+- **Health-data wall**: mood check-ins and questionnaire results never reach the server (both
+  tables were dropped on 30 Sep 2026; see "Store compliance"), so the console has no health data
+  to read. If any health figure is ever collected, it leaves only through SECURITY DEFINER
+  aggregates with a minimum group size of ten and no join to `profiles`. Any migration that
+  relaxes this is wrong.
 - **The console never holds the service role**; staff act under their own JWT with a
   `houna_role` claim and MFA, and every rule (publishing, the clinical gate, two-person
   approval) lives in Postgres, not in the console's code.

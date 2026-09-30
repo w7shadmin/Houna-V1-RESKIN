@@ -141,6 +141,8 @@ export default function StatsScreen() {
       <View style={styles.section}>
         <GroupLabel>{s.leaderboardTitle}</GroupLabel>
         <Text style={[styles.note, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{s.leaderboardSubtitle}</Text>
+        {/* The leaderboard is opt-in: say so to anyone not on it. */}
+        {!!profile && !profile.show_on_leaderboard && <FormMessage message={s.leaderboardOff} tone="muted" />}
         <View style={styles.chips}>
           <Chip size="sm" label={s.thisWeek} selected={period === 'week'} onPress={() => setPeriod('week')} />
           <Chip size="sm" label={s.allTime} selected={period === 'all'} onPress={() => setPeriod('all')} />

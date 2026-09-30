@@ -16,6 +16,8 @@ export interface Profile {
   username: string;
   avatar_url: string | null;
   country: string | null;
+  /** On the leaderboard only when they choose to be (off until then). */
+  show_on_leaderboard: boolean;
   created_at: string;
 }
 
@@ -55,7 +57,7 @@ interface AuthContextValue {
   claimUsername: (username: string) => Promise<AuthResult>;
   /** Renames the signed-in Alias. Voices and the leaderboard read names from `profiles`, so they follow. */
   changeUsername: (username: string) => Promise<AuthResult>;
-  updateProfile: (fields: Partial<Pick<Profile, 'avatar_url' | 'country'>>) => Promise<AuthResult>;
+  updateProfile: (fields: Partial<Pick<Profile, 'avatar_url' | 'country' | 'show_on_leaderboard'>>) => Promise<AuthResult>;
   refreshProfile: () => Promise<void>;
 }
 
@@ -203,7 +205,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const updateProfile = useCallback(
-    async (fields: Partial<Pick<Profile, 'avatar_url' | 'country'>>): Promise<AuthResult> => {
+    async (fields: Partial<Pick<Profile, 'avatar_url' | 'country' | 'show_on_leaderboard'>>): Promise<AuthResult> => {
       if (!session) return { error: 'unknown' };
       const { error } = await supabase.from('profiles').update(fields).eq('id', session.user.id);
       if (error) return { error: 'unknown' };
