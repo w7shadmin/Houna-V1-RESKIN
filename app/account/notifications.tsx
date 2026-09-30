@@ -7,12 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { grid, radius } from '@/constants/theme';
-import {
-  isDailyReminderEnabled,
-  setDailyReminderEnabled,
-  registerPushToken,
-  updatePushPrefs,
-} from '@/lib/notifications';
+import { getRemotePushPrefs, isDailyReminderEnabled, setDailyReminderEnabled, setRemotePushPrefs } from '@/lib/notifications';
 
 export default function NotificationSettingsScreen() {
   const { colors } = useTheme();
@@ -23,12 +18,23 @@ export default function NotificationSettingsScreen() {
 
   const [reminderOn, setReminderOn] = useState(false);
   const [permissionBlocked, setPermissionBlocked] = useState(false);
-  const [storyHighlights, setStoryHighlights] = useState(true);
-  const [communityStats, setCommunityStats] = useState(true);
+  // Off until the person chooses (broadcasts are opt-in); then whatever the Alias saved.
+  const [storyHighlights, setStoryHighlights] = useState(false);
+  const [communityStats, setCommunityStats] = useState(false);
 
   useEffect(() => {
     isDailyReminderEnabled().then(setReminderOn);
   }, []);
+
+  useEffect(() => {
+    if (!session) return;
+    getRemotePushPrefs(session.user.id)
+      .then((p) => {
+        setStoryHighlights(p.wantsStoryHighlights);
+        setCommunityStats(p.wantsCommunityStats);
+      })
+      .catch(() => {});
+  }, [session]);
 
   const handleReminderToggle = async (value: boolean) => {
     setPermissionBlocked(false);
@@ -44,19 +50,22 @@ export default function NotificationSettingsScreen() {
   };
 
   const handleRemoteToggle = async (key: 'story' | 'stats', value: boolean) => {
-    if (key === 'story') setStoryHighlights(value);
-    else setCommunityStats(value);
     if (!session) return;
-
+    setPermissionBlocked(false);
+    const before = { wantsStoryHighlights: storyHighlights, wantsCommunityStats: communityStats };
     const prefs = {
       wantsStoryHighlights: key === 'story' ? value : storyHighlights,
       wantsCommunityStats: key === 'stats' ? value : communityStats,
     };
-    // Either path upserts/updates the same row — registerPushToken covers a
-    // device that hasn't registered a token yet, updatePushPrefs is the
-    // lighter path once one exists. Both are safe to call redundantly.
-    await registerPushToken(session.user.id, prefs);
-    await updatePushPrefs(session.user.id, prefs);
+    setStoryHighlights(prefs.wantsStoryHighlights);
+    setCommunityStats(prefs.wantsCommunityStats);
+    // Registers this phone when something is on (asking for permission), removes the tokens when all is off.
+    const applied = await setRemotePushPrefs(session.user.id, prefs);
+    if (!applied) {
+      setStoryHighlights(before.wantsStoryHighlights);
+      setCommunityStats(before.wantsCommunityStats);
+      setPermissionBlocked(true);
+    }
   };
 
   return (

@@ -31,6 +31,7 @@ import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { StarfieldProvider } from '@/contexts/StarfieldContext';
 import SplashCycle from '@/components/splash/SplashCycle';
 import { IntroDoneContext } from '@/hooks/useIntroDone';
+import { usePushNotifications } from '@/hooks/usePushNotifications';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -39,6 +40,8 @@ I18nManager.allowRTL(true);
 
 function InnerLayout() {
   const { colors, isNight } = useTheme();
+  // Re-saves an opted-in Alias's push token on launch; a tapped notification opens its screen.
+  usePushNotifications();
 
   // Android system buttons follow the theme. With edge-to-edge and
   // `androidNavigationBar.enforceContrast: false` (app.json) the bar itself is

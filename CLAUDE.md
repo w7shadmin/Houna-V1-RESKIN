@@ -208,6 +208,25 @@ owner-folder bucket must be added to the function's `BUCKETS`**, or deleting lea
 Immediate, no grace period. Afterwards Profile shows the guest card with "Your Alias has been
 deleted" (`deleted=1`).
 
+### Push notifications (set up 30 Sep 2026)
+
+- **Project**: Expo account `w7sh`, project `houna` (`app.json` `owner` and `extra.eas.projectId`). Android
+  delivery goes through Firebase Cloud Messaging: project "Houna", Analytics **off** (the privacy forms
+  say no analytics); its `google-services.json` sits next to `app.json` (`android.googleServicesFile`),
+  and its FCM V1 service-account key lives only in Expo's credentials, never in this repo. iOS needs
+  an APNs key through EAS once the Apple organization account and bundle ID exist.
+- **Opt-in**: the daily reminder is local (Guests too). Broadcasts are for Aliases, one switch per
+  kind (`wants_story_highlights`, `wants_community_stats`), off until switched on (Apple 4.5.4; the
+  columns default to false). The choices are the Alias's, applied to every phone it registered;
+  everything off deletes its tokens. `lib/notifications.ts` (`setRemotePushPrefs`).
+- **On launch** (`hooks/usePushNotifications.ts`, in the root layout): an opted-in Alias's token is
+  saved again without asking for permission; sign-out removes this phone's.
+- **A tap** opens `data.url`, only if it's one of Houna's own paths (`lib/pushPath.ts`, tested); the
+  daily reminder opens Tanafas.
+- **Sending**, until the Console: `node scripts/send-push.js`, one phone with `--to`, or a broadcast
+  by `--kind` with `SUPABASE_SERVICE_ROLE_KEY` in the environment only. It removes tokens Expo reports
+  as unregistered.
+
 ### Store compliance (decided 30 Sep 2026)
 
 From the "Houna app — store compliance pack" (a Claude Doc:

@@ -123,6 +123,12 @@
     },
     "androidNavigationBar": {
       "enforceContrast": false
+    },
+    "owner": "w7sh",
+    "extra": {
+      "eas": {
+        "projectId": "6f3a96a6-db94-4bed-bce9-34f0e084cafa"
+      }
     }
   }
 }
