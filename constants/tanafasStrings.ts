@@ -12,7 +12,6 @@
  */
 
 import { meditationStrings } from './meditationStrings';
-import { voicesStrings } from './voicesStrings';
 
 export const tanafasStrings = {
   en: {
@@ -160,7 +159,6 @@ export const tanafasStrings = {
       },
     },
     meditation: meditationStrings.en,
-    voices: voicesStrings.en,
   },
   ar: {
     hub: {
@@ -307,7 +305,6 @@ export const tanafasStrings = {
       },
     },
     meditation: meditationStrings.ar,
-    voices: voicesStrings.ar,
   },
 } as const;
 

@@ -14,7 +14,6 @@ import {
   Phone,
   Bell,
   ChevronRight,
-  MessageCircle,
   ShieldCheck,
   FileText,
   type LucideIcon,
@@ -31,7 +30,7 @@ interface MenuItem {
   icon: LucideIcon;
   label: string;
   /** A screen in the app, or a page on houna.org (the policies). */
-  href?: '/about' | '/get-involved' | '/contact' | '/account/notifications' | '/tanafas/voices';
+  href?: '/about' | '/get-involved' | '/contact' | '/account/notifications';
   legal?: 'privacy' | 'terms';
 }
 
@@ -43,9 +42,6 @@ export default function MoreScreen() {
   // About / Get Involved / Contact ported from the old MVP's MoreScreen.
   // Account lives behind Home's top-right Profile button, not here.
   const menuItems: MenuItem[] = [
-    // Voices, the community's posts: a way in from the app's own screens (Apple rejects features
-    // reachable only by a link).
-    { icon: MessageCircle, label: t.more.voices, href: '/tanafas/voices' },
     { icon: Bell, label: t.account.notifications.title, href: '/account/notifications' },
     { icon: Info, label: t.more.about, href: '/about' },
     { icon: HandHeart, label: t.more.getInvolved, href: '/get-involved' },

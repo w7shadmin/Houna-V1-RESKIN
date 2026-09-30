@@ -55,7 +55,7 @@ interface AuthContextValue {
   /** Deletes the signed-in Alias and everything Houna keeps for it (the `delete-account` Edge Function), then signs out here. */
   deleteAlias: () => Promise<AuthResult>;
   claimUsername: (username: string) => Promise<AuthResult>;
-  /** Renames the signed-in Alias. Voices and the leaderboard read names from `profiles`, so they follow. */
+  /** Renames the signed-in Alias. The leaderboard reads names from `profiles`, so it follows. */
   changeUsername: (username: string) => Promise<AuthResult>;
   updateProfile: (fields: Partial<Pick<Profile, 'avatar_url' | 'country' | 'show_on_leaderboard'>>) => Promise<AuthResult>;
   refreshProfile: () => Promise<void>;

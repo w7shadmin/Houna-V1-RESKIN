@@ -23,8 +23,8 @@ Feature-level description, independent of how any of it is currently styled:
 - Tanafas: a bundle of breathing exercises, guided meditation with ambient
   audio/video scenes, and a private on-device journal with mood tracking.
 - A lightweight social layer: streaks and badges for exercise consistency,
-  an opt-in country-level community map, and Voices — a moderated
-  community post/photo forum.
+  and an opt-in country-level community map. (Voices, a moderated community post/photo forum,
+  was taken out of the app for launch on 30 Sep 2026; it returns in phase II.)
 - Local and remote push notifications for reminders and broadcasts.
 
 ## Foundation — do not casually change
@@ -212,12 +212,15 @@ terms, store forms and laws). Migration `20260930160000_store_compliance.sql`. K
   `houna-purge-activity-pings`).
 - **The leaderboard is opt-in**: `profiles.show_on_leaderboard`, off by default, switched in account
   settings under Privacy; `get_leaderboard` shows only those who chose it.
-- **Voices**: reachable from More; a post never exposes its author's id (`get_voice_post` returns
-  `is_mine`; approved rows are read only through the feed functions). Anyone, Guests too, can
-  report a post (hidden for them at once; three reports from different phones send it back to
-  moderation) or block its author (`voice_reports`, `voice_blocks`, keyed by the phone's
-  anonymous `actor` id; `get_voice_feed(p_actor)` leaves both out); the feed's footer has the house
-  rules and "Unblock everyone".
+- **Voices is out of the app until phase II, post launch** (removed 30 Sep 2026; the screens,
+  `lib/voices.ts` and `constants/voicesStrings.ts` are in git history, the commit just after
+  645a909). The server side stays as built: `voice_posts`, the `voices` bucket (still emptied by
+  `delete-account`) and the report/block machinery. A post never exposes its author's id
+  (`get_voice_post` returns `is_mine`; approved rows are read only through the feed functions).
+  Anyone, Guests too, could report a post (hidden for them at once; three reports from different
+  phones send it back to moderation) or block its author (`voice_reports`, `voice_blocks`, keyed
+  by the phone's anonymous `actor` id; `get_voice_feed(p_actor)` leaves both out). Bringing it back
+  means the policy, terms, store forms (user content, age rating) and a way in from More again.
 - **Policies**: `lib/legalLinks.ts` points at houna.org's own pages (`/en/privacy-policy`,
   `/en/terms-of-use`, and `/ar/…`), linked from More, account settings and sign-up. Their text is
   still the old website's (it claims ad networks, analytics, payments, chat), which contradicts the
@@ -421,7 +424,7 @@ fills 42% of it, about the size of the animated splash's "o" (iOS gets
 if the mark changes.
 
 **Legacy, still to migrate**: the old `palette` export and older styling
-(`shadows.card`, `primaryLightest`) remain on About, More's leftovers, Voices
+(`shadows.card`, `primaryLightest`) remain on About, More's leftovers
 and `ComingSoon`. Move them onto the primitives and tokens when touched, then
 delete `palette`.
 
@@ -432,7 +435,7 @@ eyebrow, display title), `Field`, `FormMessage`, `OrDivider`, `SwitchLink`,
 account or settings screen. `app/account/username.tsx` is both the one-time
 claim at sign-up and, once a name exists, the rename (Your Alias → Username;
 `AuthContext.changeUsername`, an update under `profiles_update_own`). Nothing
-else stores a copy of the name: Voices and the leaderboard read it from
+else stores a copy of the name: the leaderboard (and Voices, in phase II) reads it from
 `profiles`. Availability is case-insensitive, so a change of case only is
 allowed as the person's own name. Renames are limited to two in any 30 days,
 in the database, not the app: a trigger on `profiles` logs each change to

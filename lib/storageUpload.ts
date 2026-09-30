@@ -3,8 +3,7 @@ import { supabase } from './supabase';
 /**
  * Uploads a local file (picked via expo-image-picker) to a Supabase Storage
  * bucket and returns its public URL. Shared by anything that uploads a
- * user-picked image — avatar upload (app/account/profile.tsx) and Voices
- * post photos (lib/voices.ts) both do this identical sequence.
+ * user-picked image (today the avatar upload, app/account/profile.tsx).
  */
 /** The image types the buckets accept (they refuse anything else server-side too). */
 const IMAGE_TYPES: Record<string, string> = {

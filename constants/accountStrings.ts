@@ -62,7 +62,7 @@ export const accountStrings = {
       invalid: '3–20 characters — letters, numbers, and underscore only',
       submit: 'Continue',
       changeTitle: 'Change username',
-      changeSubtitle: "Your new name shows everywhere you appear in Houna, including Voices and the leaderboard. Your old one becomes free for someone else.",
+      changeSubtitle: "Your new name shows everywhere you appear in Houna, including the leaderboard. Your old one becomes free for someone else.",
       same: 'This is your username now',
       limitTwo: 'You can change your username twice every 30 days.',
       limitOne: 'You can change it once more in these 30 days.',
@@ -100,7 +100,6 @@ export const accountStrings = {
       items: [
         'Your Alias name, photo and country',
         'Your practice history, streak, badges and place on the leaderboard',
-        'Your Voices posts and their photos',
         "This Alias's notification sign-ups",
       ],
       staysTitle: 'Stays on this phone',
@@ -244,7 +243,7 @@ export const accountStrings = {
       invalid: '٣–٢٠ حرفًا — أحرف إنجليزية وأرقام وشرطة سفلية فقط',
       submit: 'متابعة',
       changeTitle: 'تغيير اسم المستخدم',
-      changeSubtitle: 'سيظهر اسمك الجديد في كل مكان تظهر فيه في هُنا، ومنه «أصوات» وقائمة المتصدرين. ويصبح اسمك القديم متاحًا لغيرك.',
+      changeSubtitle: 'سيظهر اسمك الجديد في كل مكان تظهر فيه في هُنا، ومنه قائمة المتصدرين. ويصبح اسمك القديم متاحًا لغيرك.',
       same: 'هذا اسم المستخدم الحالي',
       limitTwo: 'يمكنك تغيير اسم المستخدم مرتين كل ٣٠ يومًا.',
       limitOne: 'يمكنك تغييره مرة أخرى واحدة خلال هذه الأيام الثلاثين.',
@@ -281,7 +280,6 @@ export const accountStrings = {
       items: [
         'اسمك المستعار وصورتك ودولتك',
         'سجلّ ممارستك وسلسلتك وشاراتك ومكانك في قائمة المتصدرين',
-        'منشوراتك في «أصوات» وصورها',
         'اشتراكات الإشعارات لهذا الاسم المستعار',
       ],
       staysTitle: 'يبقى على هذا الهاتف',

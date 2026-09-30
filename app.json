@@ -92,7 +92,7 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Houna opens your photos only when you choose one: an avatar for your Alias, or a photo for a Voices post.",
+          "photosPermission": "Houna opens your photos only when you choose one as the picture for your Alias.",
           "cameraPermission": false,
           "microphonePermission": false
         }

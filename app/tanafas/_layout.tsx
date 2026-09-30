@@ -6,7 +6,7 @@ import { nightPalette } from '@/constants/theme';
 
 /** Internal stack for everything opened from the raised Tanafas button — the
  * whole group is presented as one modal (see app/_layout.tsx), and this
- * navigator handles hub → journal, meditation, tests and Voices within it. */
+ * navigator handles hub → journal, meditation and tests within it. */
 export default function TanafasLayout() {
   const { colors } = useTheme();
   const navTheme = useNavigationTheme();
@@ -32,9 +32,6 @@ export default function TanafasLayout() {
       <Stack.Screen name="discover/result/[resultId]" />
       <Stack.Screen name="journal/index" />
       <Stack.Screen name="journal/entry/[id]" />
-      <Stack.Screen name="voices/index" />
-      <Stack.Screen name="voices/submit" />
-      <Stack.Screen name="voices/[id]" />
     </Stack>
     </ThemeProvider>
   );
