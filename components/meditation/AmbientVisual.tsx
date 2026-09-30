@@ -32,12 +32,21 @@ function VideoAmbient({ scene, animate }: AmbientVisualProps) {
 
   const frame = scene.videoFrame;
   if (frame?.kind === 'base') {
-    // The whole width, on the bottom edge; the dark top of the footage fades into the ground above.
+    // The whole width (or `scale` of it, centred), on the bottom edge; the dark top of the footage
+    // fades into the ground above, and when it's drawn narrower, its sides do too.
+    const scale = frame.scale ?? 1;
+    const clear = `${frame.ground}00`;
     return (
       <View style={[StyleSheet.absoluteFillObject, { backgroundColor: frame.ground }]}>
-        <View style={styles.base}>
+        <View style={[styles.base, { width: `${scale * 100}%`, left: `${((1 - scale) / 2) * 100}%` }]}>
           <VideoView player={player} style={styles.video} contentFit="cover" nativeControls={false} />
-          <LinearGradient colors={[frame.ground, `${frame.ground}00`]} style={styles.baseFade} pointerEvents="none" />
+          <LinearGradient colors={[frame.ground, clear]} style={styles.baseFade} pointerEvents="none" />
+          {scale < 1 && (
+            <>
+              <LinearGradient colors={[frame.ground, `${frame.ground}AA`, clear]} locations={[0, 0.4, 1]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={[styles.sideFade, styles.sideStart]} pointerEvents="none" />
+              <LinearGradient colors={[clear, `${frame.ground}AA`, frame.ground]} locations={[0, 0.6, 1]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={[styles.sideFade, styles.sideEnd]} pointerEvents="none" />
+            </>
+          )}
         </View>
       </View>
     );
@@ -112,10 +121,24 @@ const styles = StyleSheet.create({
   base: {
     position: 'absolute',
     left: 0,
-    right: 0,
+    width: '100%',
     bottom: 0,
     // The footage's own shape (9:16).
     aspectRatio: 9 / 16,
+  },
+  // Physical sides (the footage doesn't mirror in Arabic; the fades are symmetrical anyway).
+  sideFade: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    // Wide and eased (dark for the first stretch), or the flames at the footage's edge show a seam.
+    width: '30%',
+  },
+  sideStart: {
+    left: 0,
+  },
+  sideEnd: {
+    right: 0,
   },
   baseFade: {
     position: 'absolute',

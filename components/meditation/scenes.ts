@@ -15,7 +15,13 @@ export interface MeditationScene {
    * Where the video sits. Default: covering the screen. `base`: its whole width shown, resting on
    * the bottom edge, the night above it (for footage framed too tight to crop further, as fire's).
    */
-  videoFrame?: { kind: 'base'; ground: string };
+  videoFrame?: {
+    kind: 'base';
+    ground: string;
+    /** Below 1, the footage is drawn that fraction of the screen's width, centred, its sides fading into
+     *  the ground too: a close-up seen from a step back. */
+    scale?: number;
+  };
 }
 
 /**
@@ -38,8 +44,9 @@ export const MEDITATION_SCENES: MeditationScene[] = [
     gradient: [SCENE_ORBS.fire.c, SCENE_ORBS.fire.lo],
     thumbnail: require('@/assets/images/meditation/fire.jpg'),
     video: require('@/assets/video/fire.mp4'),
-    // The flames fill the frame; covering a tall phone cut a fifth off each side.
-    videoFrame: { kind: 'base', ground: '#050302' },
+    // The footage is a close-up (the camera against the logs): covering a tall phone cut a fifth off
+    // each side, and even its whole width read as too close, so it's drawn at 80%, fading all round.
+    videoFrame: { kind: 'base', ground: '#050302', scale: 0.8 },
     // WAV, not AAC — see the note on 'rain' below.
     audio: require('@/assets/audio/fire.wav'),
   },

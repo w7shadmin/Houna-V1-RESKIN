@@ -440,8 +440,10 @@ artwork's fills from `colors.logo`; paths untouched) and `HounaMark.tsx`
 
 **Scene video framing**: a scene's video covers the screen, unless it sets
 `videoFrame: { kind: 'base' }` (`components/meditation/scenes.ts`): its whole width,
-resting on the bottom edge, its top fading into `ground` above. Fire does: its
-9:16 footage is framed tight, and covering a tall phone cut a fifth off each side.
+resting on the bottom edge, its top fading into `ground` above, and with `scale` below 1 drawn that
+fraction of the width, centred, its sides fading too (wide, eased fades: a narrow one leaves a
+seam). Fire does, at 0.8: its 9:16 footage is a close-up, covering a tall phone cut a fifth off
+each side, and even its full width read as too close.
 
 **Meditation player — permanent dark focus mode, decided**: its chrome sits
 over full-screen video, so `components/meditation/MeditationPlayer.tsx`
