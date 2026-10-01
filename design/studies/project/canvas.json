@@ -14,162 +14,197 @@
       "x": 0,
       "y": 0,
       "w": 1400,
-      "h": 980,
+      "h": 1220,
       "title": "Houna — design studies"
     },
     "A-sunglow.dc.html": {
       "x": 0,
-      "y": 1360,
+      "y": 1600,
       "w": 3050,
       "h": 994,
       "title": "A · The Sunrise scene’s glow"
     },
     "B-suns.dc.html": {
       "x": 0,
-      "y": 2734,
+      "y": 2974,
       "w": 2190,
       "h": 994,
       "title": "B · Two different suns"
     },
     "C-kufic.dc.html": {
       "x": 0,
-      "y": 4108,
+      "y": 4348,
       "w": 2190,
       "h": 994,
       "title": "C · Classic Home with the Kufic ring"
     },
     "D-date.dc.html": {
       "x": 0,
-      "y": 5482,
+      "y": 5722,
       "w": 3480,
       "h": 994,
       "title": "D · A calmer Home date"
     },
     "E-imprint-night.dc.html": {
       "x": 0,
-      "y": 6856,
+      "y": 7096,
       "w": 2190,
       "h": 994,
       "title": "E · The mark on plain pages (Night)"
     },
     "E-imprint-day.dc.html": {
       "x": 0,
-      "y": 7970,
+      "y": 8210,
       "w": 2190,
       "h": 994,
       "title": "E · The mark on plain pages (Sunrise)"
     },
     "F-moon.dc.html": {
       "x": 0,
-      "y": 9344,
+      "y": 9584,
       "w": 2620,
       "h": 994,
       "title": "F · A new moon (the starfield)"
     },
     "F-moon-close.dc.html": {
       "x": 2700,
-      "y": 9344,
+      "y": 9584,
       "w": 1480,
       "h": 760,
       "title": "F · the moons, close"
     },
     "G-dusk-home.dc.html": {
       "x": 0,
-      "y": 10718,
+      "y": 10958,
       "w": 3050,
       "h": 1034,
       "title": "G · The Dusk sun, on Home"
     },
     "G-dusk-scene.dc.html": {
       "x": 0,
-      "y": 11872,
+      "y": 12112,
       "w": 3050,
       "h": 1034,
       "title": "G · The Dusk sun, in its Tanafas scene"
     },
     "G-dusk-home-2.dc.html": {
       "x": 0,
-      "y": 13026,
+      "y": 13266,
       "w": 3050,
       "h": 1034,
       "title": "G · More Dusk suns, on Home"
     },
     "G-dusk-scene-2.dc.html": {
       "x": 0,
-      "y": 14180,
+      "y": 14420,
       "w": 3050,
       "h": 1034,
       "title": "G · More Dusk suns, in the Tanafas scene"
     },
     "G-dusk-combo-home.dc.html": {
       "x": 0,
-      "y": 15594,
+      "y": 15834,
       "w": 1760,
       "h": 1034,
       "title": "G · G13 + G7 on Home"
     },
     "G-dusk-combo-scene.dc.html": {
       "x": 0,
-      "y": 16748,
+      "y": 16988,
       "w": 1760,
       "h": 1034,
       "title": "G · G13 + G7 in the Tanafas scene"
     },
     "H-moods.dc.html": {
       "x": 0,
-      "y": 18162,
+      "y": 18402,
       "w": 3050,
       "h": 1074,
       "title": "H · Your emotional landscape (Recap’s moods)"
     },
     "H-moods-ar.dc.html": {
       "x": 0,
-      "y": 19356,
+      "y": 19596,
       "w": 1760,
       "h": 1014,
       "title": "H · Your emotional landscape, in Arabic"
     },
     "I-i0-today.dc.html": {
       "x": 0,
-      "y": 20750,
+      "y": 20990,
       "w": 1560,
       "h": 956,
       "title": "I · I0 Today: nine skies set in gems"
     },
     "I-i1-pearl-moons.dc.html": {
       "x": 1640,
-      "y": 20750,
+      "y": 20990,
       "w": 1560,
       "h": 956,
       "title": "I · I1 Pearl moons: the month waxing"
     },
     "I-i2-constellations.dc.html": {
       "x": 3280,
-      "y": 20750,
+      "y": 20990,
       "w": 1560,
       "h": 956,
       "title": "I · I2 Constellations"
     },
     "I-i3-khatam-medallions.dc.html": {
       "x": 0,
-      "y": 21826,
+      "y": 22066,
       "w": 1560,
       "h": 956,
       "title": "I · I3 Khatam medallions"
     },
     "I-i4-an-orrery.dc.html": {
       "x": 1640,
-      "y": 21826,
+      "y": 22066,
       "w": 1560,
       "h": 956,
       "title": "I · I4 An orrery"
     },
     "I-i5-the-mark-lit.dc.html": {
       "x": 3280,
-      "y": 21826,
+      "y": 22066,
       "w": 1560,
       "h": 956,
       "title": "I · I5 The mark, lit"
+    },
+    "J-suns-1.dc.html": {
+      "x": 0,
+      "y": 23402,
+      "w": 2190,
+      "h": 994,
+      "title": "J · A glass sun for Sunrise (J0–J4)"
+    },
+    "J-suns-2.dc.html": {
+      "x": 0,
+      "y": 24516,
+      "w": 1760,
+      "h": 994,
+      "title": "J · A glass sun for Sunrise (J5–J8)"
+    },
+    "J-suns-close.dc.html": {
+      "x": 1840,
+      "y": 24516,
+      "w": 2160,
+      "h": 760,
+      "title": "J · the suns, close"
+    },
+    "K-rays-1.dc.html": {
+      "x": 0,
+      "y": 25890,
+      "w": 2190,
+      "h": 994,
+      "title": "K · The sun’s rays (K0–K4)"
+    },
+    "K-rays-2.dc.html": {
+      "x": 0,
+      "y": 27004,
+      "w": 2190,
+      "h": 994,
+      "title": "K · The sun’s rays (K5–K9)"
     }
   },
   "order": [
@@ -195,14 +230,19 @@
     "I-i2-constellations.dc.html",
     "I-i3-khatam-medallions.dc.html",
     "I-i4-an-orrery.dc.html",
-    "I-i5-the-mark-lit.dc.html"
+    "I-i5-the-mark-lit.dc.html",
+    "J-suns-1.dc.html",
+    "J-suns-2.dc.html",
+    "J-suns-close.dc.html",
+    "K-rays-1.dc.html",
+    "K-rays-2.dc.html"
   ],
   "notes": {
     "row1": {
       "kind": "title1",
       "text": "A · The Sunrise scene’s glow",
       "x": 0,
-      "y": 1120,
+      "y": 1360,
       "maxW": 3050,
       "w": 240
     },
@@ -210,7 +250,7 @@
       "kind": "title1",
       "text": "B · Two different suns",
       "x": 0,
-      "y": 2494,
+      "y": 2734,
       "maxW": 2190,
       "w": 240
     },
@@ -218,7 +258,7 @@
       "kind": "title1",
       "text": "C · Classic Home with the Kufic ring",
       "x": 0,
-      "y": 3868,
+      "y": 4108,
       "maxW": 2190,
       "w": 240
     },
@@ -226,7 +266,7 @@
       "kind": "title1",
       "text": "D · A calmer Home date",
       "x": 0,
-      "y": 5242,
+      "y": 5482,
       "maxW": 3480,
       "w": 240
     },
@@ -234,7 +274,7 @@
       "kind": "title1",
       "text": "E · The mark on plain pages",
       "x": 0,
-      "y": 6616,
+      "y": 6856,
       "maxW": 2190,
       "w": 240
     },
@@ -242,7 +282,7 @@
       "kind": "title1",
       "text": "F · A new moon",
       "x": 0,
-      "y": 9104,
+      "y": 9344,
       "maxW": 4180,
       "w": 240
     },
@@ -250,7 +290,7 @@
       "kind": "title1",
       "text": "G · The Dusk sun, on Home and in its scene",
       "x": 0,
-      "y": 10478,
+      "y": 10718,
       "maxW": 3050,
       "w": 240
     },
@@ -258,7 +298,7 @@
       "kind": "title1",
       "text": "G · G13 + G7: the ring of light and the Kufic words",
       "x": 0,
-      "y": 15354,
+      "y": 15594,
       "maxW": 2000,
       "w": 240
     },
@@ -266,7 +306,7 @@
       "kind": "title1",
       "text": "H · Your emotional landscape (Recap’s moods slide)",
       "x": 0,
-      "y": 17922,
+      "y": 18162,
       "maxW": 3050,
       "w": 240
     },
@@ -274,8 +314,24 @@
       "kind": "title1",
       "text": "I · Badges and Profile’s icons",
       "x": 0,
-      "y": 20510,
+      "y": 20750,
       "maxW": 4840,
+      "w": 240
+    },
+    "row18": {
+      "kind": "title1",
+      "text": "J · A glass sun for Sunrise",
+      "x": 0,
+      "y": 23162,
+      "maxW": 2190,
+      "w": 240
+    },
+    "row20": {
+      "kind": "title1",
+      "text": "K · The sun’s rays",
+      "x": 0,
+      "y": 25650,
+      "maxW": 2190,
       "w": 240
     }
   },
