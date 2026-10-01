@@ -631,7 +631,12 @@ phase and date, tonight faintly ringed, and the days to the next new moon. The
 nights practised glow softly behind their moons, and a tap on one says its minutes.
 
 **Home's map** sits straight on the sky, with its periods and count (canvas "Round 2 — Home's map
-without its card"): the card's box went, its padding stayed, so nothing on Home moved.
+without its card"): the card's box went, its padding stayed, so nothing on Home moved. While testing
+(1 Oct 2026) it shows the past month only (`SHOWN_PERIOD` in `app/(tabs)/index.tsx`; the 24-hour and
+week choices come back after launch, their strings kept), so every phone shows the same figure. The
+rotating line under "You're not alone" now turns on its own; tapping it shows the next and stops the
+turning. The figure counts installs (each has its own anonymous `actor`), so one person on a phone and
+two browsers counts as three; it's cached for 2 minutes.
 
 **Graphs** (phase 4, canvas "Houna — Graphs (phase 4)"), all from the phone's own
 session log (`lib/sessionLog.ts`: breathing and meditation only, so mood never

@@ -69,11 +69,7 @@ export const homeStrings = {
       // The logo as the appearance toggle (Home style "Sun & moon").
       appearanceToggle: 'Appearance: {current}. Double-tap for {next}.',
     },
-    /**
-     * Rotating line under "You're not alone" — one per community period, in
-     * the same order as `community.periods`. DRAFT copy from the canvas;
-     * awaiting final lines.
-     */
+    /** Rotating line under "You're not alone". DRAFT copy from the canvas; awaiting final lines. */
     lines: [
       'Someone, somewhere, is breathing with you.',
       'Small pauses, taken together, change a day.',
@@ -83,6 +79,8 @@ export const homeStrings = {
       a11yLabel: 'Houna community',
       label: 'Breathing together',
       periodsLabel: 'Time period',
+      /** Screen readers: tapping the rotating line shows the next one and stops the rotation. */
+      nextLine: 'Shows the next line',
       periods: ['24H', 'Week', 'Month'],
       periodText: ['in the last 24 hours', 'this week', 'this month'],
       /** Follows the large count. `{period}` is one of `periodText`. */
@@ -215,7 +213,7 @@ export const homeStrings = {
       logo: 'هُنا',
       appearanceToggle: 'المظهر: {current}. انقر مرتين للتبديل إلى {next}.',
     },
-    /** DRAFT copy from the canvas; awaiting final lines. Same order as `community.periods`. */
+    /** DRAFT copy from the canvas; awaiting final lines. */
     lines: [
       'في مكانٍ ما، أحدٌ يتنفّس معك.',
       'لحظات هدوء صغيرة، معاً، تغيّر يوماً كاملاً.',
@@ -225,6 +223,7 @@ export const homeStrings = {
       a11yLabel: 'مجتمع هُنا',
       label: 'نتنفّس معاً',
       periodsLabel: 'الفترة',
+      nextLine: 'يعرض السطر التالي',
       periods: ['٢٤ ساعة', 'أسبوع', 'شهر'],
       periodText: ['خلال آخر ٢٤ ساعة', 'هذا الأسبوع', 'هذا الشهر'],
       people: {

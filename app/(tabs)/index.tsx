@@ -24,9 +24,13 @@ import CanvasIcon from '@/components/ui/CanvasIcon';
 import NightStars from '@/components/home/NightStars';
 import { useBadgeCheck } from '@/hooks/useBadgeCheck';
 
-/** Canvas: the period (and its line) advances every 4.5s until someone picks one. */
-// Each line (and its period on the map) stays this long: slow enough to read and settle before the next.
+// Each rotating line stays this long: slow enough to read and settle before the next.
 const ROTATE_MS = 9000;
+/**
+ * The map shows the past month only while testing (1 Oct 2026; 24 hours and the week come back
+ * after launch: their strings and `ACTIVITY_PERIODS` stay). One figure, so every phone shows the same.
+ */
+const SHOWN_PERIOD = ACTIVITY_PERIODS.indexOf('month');
 
 /**
  * Home — one screen, no scroll on a typical phone (canvas "Home — English"
@@ -60,9 +64,10 @@ export default function HomeScreen() {
   useBadgeCheck();
   const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
 
-  const [period, setPeriod] = useState(0);
+  const period = SHOWN_PERIOD;
+  const [line, setLine] = useState(0);
   const [autoRotate, setAutoRotate] = useState(true);
-  const [activity, setActivity] = useState<(CommunityActivity | null | undefined)[]>([]);
+  const [current, setCurrent] = useState<CommunityActivity | null | undefined>(undefined);
   const [moodPending, setMoodPending] = useState(false);
 
   // Soft amber dot on the mood button only when today has no entry — never
@@ -80,7 +85,7 @@ export default function HomeScreen() {
   );
 
   // Auto-advancing content must be stoppable (WCAG 2.2.2): it stops once the
-  // person picks a period, and never starts with Reduce Motion on.
+  // person taps the line, and never starts with Reduce Motion on.
   useEffect(() => {
     AccessibilityInfo.isReduceMotionEnabled()
       .then((reduce) => reduce && setAutoRotate(false))
@@ -89,28 +94,17 @@ export default function HomeScreen() {
 
   useEffect(() => {
     if (!autoRotate) return;
-    const id = setInterval(() => setPeriod((p) => (p + 1) % ACTIVITY_PERIODS.length), ROTATE_MS);
+    const id = setInterval(() => setLine((l) => (l + 1) % h.lines.length), ROTATE_MS);
     return () => clearInterval(id);
-  }, [autoRotate]);
+  }, [autoRotate, h.lines.length]);
 
   useEffect(() => {
     let alive = true;
-    ACTIVITY_PERIODS.forEach((p, i) => {
-      fetchCommunityActivity(p).then((a) => {
-        if (!alive) return;
-        setActivity((prev) => {
-          const next = [...prev];
-          next[i] = a;
-          return next;
-        });
-      });
-    });
+    fetchCommunityActivity(ACTIVITY_PERIODS[SHOWN_PERIOD]).then((a) => alive && setCurrent(a));
     return () => {
       alive = false;
     };
   }, []);
-
-  const current = activity[period];
   const lit = useMemo(() => current?.countries.map((c) => c.country) ?? [], [current]);
 
   // The Houna starfield (Night), sunrise (Sunrise) and dusk (Dusk): tapping the mark fades
@@ -193,9 +187,9 @@ export default function HomeScreen() {
     });
   };
 
-  const pickPeriod = (i: number) => {
+  const nextLine = () => {
     setAutoRotate(false);
-    setPeriod(i);
+    setLine((l) => (l + 1) % h.lines.length);
   };
 
   const accent = colors.primary;
@@ -291,14 +285,20 @@ export default function HomeScreen() {
             </Text>
           </View>
           {/* Each line arrives: letter by letter in English, word by word in Arabic. */}
-          <View accessibilityLiveRegion={autoRotate ? 'none' : 'polite'} style={styles.lineBox}>
+          <Pressable
+            onPress={nextLine}
+            accessibilityRole="button"
+            accessibilityHint={h.community.nextLine}
+            accessibilityLiveRegion={autoRotate ? 'none' : 'polite'}
+            style={styles.lineBox}
+          >
             <ArrivingText
               isRTL={isRTL}
               style={[isRTL ? styles.lineArabic : styles.lineLatin, { color: colors.text, fontFamily: fonts.display }]}
             >
-              {h.lines[period]}
+              {h.lines[line]}
             </ArrivingText>
-          </View>
+          </Pressable>
           </Animated.View>
         </View>
 
@@ -315,36 +315,18 @@ export default function HomeScreen() {
             >
               {h.community.label}
             </Text>
-            <View
-              accessibilityRole="tablist"
-              accessibilityLabel={h.community.periodsLabel}
-              style={[styles.periods, { backgroundColor: colors.control }]}
-            >
-              {h.community.periods.map((label, i) => {
-                const selected = i === period;
-                return (
-                  <Pressable
-                    key={label}
-                    accessibilityRole="tab"
-                    aria-selected={selected}
-                    onPress={() => pickPeriod(i)}
-                    hitSlop={{ top: 8, bottom: 8 }}
-                    style={[styles.period, selected && { backgroundColor: colors.action }]}
-                  >
-                    <Text
-                      style={[
-                        labelLatin ? styles.periodLatin : styles.periodArabic,
-                        {
-                          color: selected ? colors.onAction : colors.textTertiary,
-                          fontFamily: labelLatin ? fonts.labelRegular : fonts.label,
-                        },
-                      ]}
-                    >
-                      {label}
-                    </Text>
-                  </Pressable>
-                );
-              })}
+            {/* The period chooser (24H · Week · Month) is off while testing: the month only. */}
+            <View style={[styles.periods, { backgroundColor: colors.control }]}>
+              <View style={[styles.period, { backgroundColor: colors.action }]}>
+                <Text
+                  style={[
+                    labelLatin ? styles.periodLatin : styles.periodArabic,
+                    { color: colors.onAction, fontFamily: labelLatin ? fonts.labelRegular : fonts.label },
+                  ]}
+                >
+                  {h.community.periods[period]}
+                </Text>
+              </View>
             </View>
           </View>
 
