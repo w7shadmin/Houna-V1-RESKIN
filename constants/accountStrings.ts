@@ -12,7 +12,6 @@ export const accountStrings = {
     more: {
       heading: 'ACCOUNT',
       guestTitle: "You're browsing as a guest",
-      guestBody: 'Nothing you do is stored beyond this device. Create an Alias to save your journal to the cloud, join the community map, and more.',
       signIn: 'Sign In',
       createAlias: 'Create an Alias',
       manageProfile: 'Manage Profile',
@@ -145,7 +144,7 @@ export const accountStrings = {
         many: '{n} days',
       },
       leaderboardTitle: 'Leaderboard',
-      leaderboardSubtitle: 'Anonymous and username-only — no one sees more than that.',
+      leaderboardSubtitle: 'Only Aliases who choose to appear, and only their username and sessions.',
       leaderboardOff: 'You’re not on the leaderboard. Turn it on in your account settings, under Privacy.',
       thisWeek: 'This week',
       allTime: 'All time',
@@ -194,7 +193,6 @@ export const accountStrings = {
     more: {
       heading: 'الحساب',
       guestTitle: 'أنت تتصفح كزائر',
-      guestBody: 'كل ما تفعله لا يُخزَّن إلا على هذا الجهاز. أنشئ اسمًا مستعارًا لحفظ يومياتك في السحابة، والانضمام لخريطة المجتمع، والمزيد.',
       signIn: 'تسجيل الدخول',
       createAlias: 'إنشاء اسم مستعار',
       manageProfile: 'إدارة الملف الشخصي',
@@ -324,7 +322,7 @@ export const accountStrings = {
         many: '{n} يومًا',
       },
       leaderboardTitle: 'المتصدرون',
-      leaderboardSubtitle: 'مجهول وباسم المستخدم فقط — لا أحد يرى أكثر من ذلك.',
+      leaderboardSubtitle: 'لا يظهر فيها إلا من اختار ذلك، باسمه المستعار وجلساته فقط.',
       leaderboardOff: 'أنت لست في قائمة المتصدرين. شغّلها من إعدادات حسابك، تحت «الخصوصية».',
       thisWeek: 'هذا الأسبوع',
       allTime: 'كل الأوقات',

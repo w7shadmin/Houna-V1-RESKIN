@@ -66,7 +66,7 @@ export const profileStrings = {
     },
     guest: {
       title: "You're browsing as a guest",
-      body: 'Claim an alias — no real name or email needed — to keep your streak and results in one place.',
+      body: 'Houna works without an account. An Alias keeps your streak and badges, shows the country you choose on the community map (never your location), and more.',
       signIn: 'Sign in',
       createAlias: 'Create alias',
       deleted: 'Your Alias has been deleted.',
@@ -154,7 +154,7 @@ export const profileStrings = {
     },
     guest: {
       title: 'أنت تتصفّح كضيف',
-      body: 'اختر اسماً مستعاراً — دون اسم حقيقي أو بريد إلكتروني — لتحتفظ بسلسلتك ونتائجك في مكان واحد.',
+      body: 'يعمل هُنا من دون حساب. يحفظ لك الاسم المستعار أيام ممارستك المتتالية وأوسمتك، ويُظهر البلد الذي تختاره على خريطة المجتمع (لا موقعك الفعلي)، والمزيد.',
       signIn: 'تسجيل الدخول',
       createAlias: 'إنشاء اسم مستعار',
       deleted: 'حُذف اسمك المستعار.',

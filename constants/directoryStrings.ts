@@ -70,9 +70,9 @@ export const directoryStrings = {
     },
     hub: {
       title: 'Directory',
-      subtitle: 'Find the right support for your mental health journey.',
+      subtitle: 'Find people and places that can support you.',
       professionalsTitle: 'Mental Health Professionals',
-      professionalsSubtitle: 'Therapists, psychiatrists, and doctors ready to help',
+      professionalsSubtitle: 'Therapists, psychiatrists and doctors listed on houna.org',
       organizationsTitle: 'Organizations',
       organizationsSubtitle: 'Mental health organizations across the region',
       wellnessTitle: 'Wellness Centers',
@@ -245,9 +245,9 @@ export const directoryStrings = {
     },
     hub: {
       title: 'الدليل',
-      subtitle: 'اعثر على الدعم المناسب لرحلتك في الصحة النفسية.',
+      subtitle: 'اعثر على أشخاص وأماكن يمكنهم دعمك.',
       professionalsTitle: 'المختصون في الصحة النفسية',
-      professionalsSubtitle: 'معالجون وأطباء نفسيون مستعدون للمساعدة',
+      professionalsSubtitle: 'معالجون وأطباء نفسيون مدرجون على houna.org',
       organizationsTitle: 'المنظمات',
       organizationsSubtitle: 'منظمات الصحة النفسية في المنطقة',
       wellnessTitle: 'مراكز العافية',

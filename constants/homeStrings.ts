@@ -75,7 +75,7 @@ export const homeStrings = {
      * awaiting final lines.
      */
     lines: [
-      'Every breath here is shared with someone, somewhere.',
+      'Someone, somewhere, is breathing with you.',
       'Small pauses, taken together, change a day.',
       'You are one light among many.',
     ],
@@ -217,7 +217,7 @@ export const homeStrings = {
     },
     /** DRAFT copy from the canvas; awaiting final lines. Same order as `community.periods`. */
     lines: [
-      'كل نفَس هنا يشاركك فيه أحدٌ ما، في مكانٍ ما.',
+      'في مكانٍ ما، أحدٌ يتنفّس معك.',
       'لحظات هدوء صغيرة، معاً، تغيّر يوماً كاملاً.',
       'أنت نورٌ بين أنوارٍ كثيرة.',
     ],

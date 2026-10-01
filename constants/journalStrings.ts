@@ -19,7 +19,7 @@ export const journalStrings = {
     list: {
       badge: 'Private journal',
       title: 'Your journal',
-      subtitle: 'A private space for your thoughts. Only you can see what you write here.',
+      subtitle: 'A private space for your thoughts. What you write stays on this phone and isn’t shared with Houna.',
       newEntry: 'New entry',
       emptyTitle: 'Your journal is empty',
       emptyBody: "Write your first entry whenever you're ready. There's no pressure — this is your space.",
@@ -115,7 +115,7 @@ export const journalStrings = {
     list: {
       badge: 'يوميات شخصية',
       title: 'يومياتك',
-      subtitle: 'مساحة خاصة لأفكارك. أنت وحدك تستطيع رؤية ما تكتبه هنا.',
+      subtitle: 'مساحة خاصة لأفكارك. ما تكتبه يبقى على هذا الهاتف ولا يُشارك مع هُنا.',
       newEntry: 'مدخل جديد',
       emptyTitle: 'يومياتك فارغة',
       emptyBody: 'اكتب أول مدخل عندما تكون مستعداً. لا ضغط — هذه مساحتك.',

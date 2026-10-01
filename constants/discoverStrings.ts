@@ -59,7 +59,7 @@ export const discoverStrings = {
     discover: {
       eyebrow: 'Short self-reflections',
       title: 'A gentle look inward',
-      body: 'Short questionnaires to understand yourself a little better. Your results can be added to your profile.',
+      body: 'Short questionnaires to understand yourself a little better. Your answers and results stay on this phone.',
       disclaimer: "These aren't a diagnosis — just a peek inward. If something here resonates, a professional can help.",
       findProfessional: 'Find a professional',
       questions: { one: '{n} question', few: '{n} questions' },
@@ -145,7 +145,7 @@ export const discoverStrings = {
     discover: {
       eyebrow: 'تأمّلات ذاتية قصيرة',
       title: 'نظرة لطيفة إلى الداخل',
-      body: 'استبيانات قصيرة لتفهم نفسك أكثر قليلاً. يمكنك إضافة نتائجك إلى ملفك الشخصي.',
+      body: 'استبيانات قصيرة لتفهم نفسك أكثر قليلاً. تبقى إجاباتك ونتائجك على هذا الهاتف.',
       disclaimer: 'هذه ليست تشخيصاً — بل نظرة سريعة إلى الداخل. إن لامسك شيء هنا، يمكن لمختص أن يساعدك.',
       findProfessional: 'ابحث عن مختص',
       questions: { one: 'سؤال واحد', two: 'سؤالان', few: '{n} أسئلة', many: '{n} سؤالاً' },

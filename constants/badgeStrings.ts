@@ -111,7 +111,7 @@ export const resultsStrings = {
   en: {
     eyebrow: 'Your reflections',
     title: 'My results',
-    body: 'Every questionnaire you’ve taken. They stay on this phone unless you save them to your profile.',
+    body: 'Every questionnaire you’ve taken. They’re kept on this phone only.',
     traits: { one: '{n} trait', few: '{n} traits' },
     holdToDelete: 'Press and hold a result to delete it.',
     deleteTitle: 'Delete this result?',
@@ -126,7 +126,7 @@ export const resultsStrings = {
   ar: {
     eyebrow: 'تأمّلاتك',
     title: 'نتائجي',
-    body: 'كل استبيان أجبته. تبقى على هذا الهاتف ما لم تحفظها في ملفك.',
+    body: 'كل استبيان أجبته. تبقى نتائجه على هذا الهاتف فقط.',
     traits: { one: 'سمة واحدة', two: 'سمتان', few: '{n} سمات', many: '{n} سمة' },
     holdToDelete: 'اضغط مطوّلًا على نتيجة لحذفها.',
     deleteTitle: 'حذف هذه النتيجة؟',
