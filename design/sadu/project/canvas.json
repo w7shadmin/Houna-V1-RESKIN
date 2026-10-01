@@ -14,64 +14,78 @@
       "x": 0,
       "y": 0,
       "w": 1600,
-      "h": 1320,
+      "h": 1420,
       "title": "Sadu in Houna"
     },
     "H-inspiration.dc.html": {
       "x": 0,
-      "y": 1700,
+      "y": 1800,
       "w": 2620,
       "h": 1004,
       "title": "H · From your inspiration"
     },
     "A-rays.dc.html": {
       "x": 0,
-      "y": 3084,
+      "y": 3184,
       "w": 2620,
       "h": 1004,
       "title": "A · The sun’s rays, woven"
     },
     "B-breathing.dc.html": {
       "x": 0,
-      "y": 4468,
+      "y": 4568,
       "w": 2620,
       "h": 1004,
       "title": "B · Breathing, woven"
     },
     "C-words.dc.html": {
       "x": 0,
-      "y": 5852,
+      "y": 5952,
       "w": 2190,
       "h": 1004,
       "title": "C · Words round the sun and moon"
     },
     "D-splash.dc.html": {
       "x": 0,
-      "y": 7236,
+      "y": 7336,
       "w": 2190,
       "h": 1004,
       "title": "D · Splash intros"
     },
     "E-scenes.dc.html": {
       "x": 0,
-      "y": 8620,
+      "y": 8720,
       "w": 2620,
       "h": 1004,
       "title": "E · The Tanafas scenes"
     },
     "F-app.dc.html": {
       "x": 0,
-      "y": 10004,
+      "y": 10104,
       "w": 2620,
       "h": 1004,
       "title": "F · Around the app"
     },
     "G-night.dc.html": {
       "x": 0,
-      "y": 11388,
+      "y": 11488,
       "w": 1760,
       "h": 1004,
       "title": "G · Night"
+    },
+    "P-pixel-1.dc.html": {
+      "x": 0,
+      "y": 12872,
+      "w": 2190,
+      "h": 1004,
+      "title": "P · Pixel art (P1–P5)"
+    },
+    "P-pixel-2.dc.html": {
+      "x": 0,
+      "y": 13996,
+      "w": 2190,
+      "h": 1004,
+      "title": "P · Pixel art (P6–P10)"
     }
   },
   "order": [
@@ -83,14 +97,16 @@
     "D-splash.dc.html",
     "E-scenes.dc.html",
     "F-app.dc.html",
-    "G-night.dc.html"
+    "G-night.dc.html",
+    "P-pixel-1.dc.html",
+    "P-pixel-2.dc.html"
   ],
   "notes": {
     "row1": {
       "kind": "title1",
       "text": "H · From your inspiration",
       "x": 0,
-      "y": 1460,
+      "y": 1560,
       "maxW": 2620,
       "w": 240
     },
@@ -98,7 +114,7 @@
       "kind": "title1",
       "text": "A · The sun’s rays, woven",
       "x": 0,
-      "y": 2844,
+      "y": 2944,
       "maxW": 2620,
       "w": 240
     },
@@ -106,7 +122,7 @@
       "kind": "title1",
       "text": "B · Breathing, woven",
       "x": 0,
-      "y": 4228,
+      "y": 4328,
       "maxW": 2620,
       "w": 240
     },
@@ -114,7 +130,7 @@
       "kind": "title1",
       "text": "C · Words round the sun and moon",
       "x": 0,
-      "y": 5612,
+      "y": 5712,
       "maxW": 2190,
       "w": 240
     },
@@ -122,7 +138,7 @@
       "kind": "title1",
       "text": "D · Splash intros",
       "x": 0,
-      "y": 6996,
+      "y": 7096,
       "maxW": 2190,
       "w": 240
     },
@@ -130,7 +146,7 @@
       "kind": "title1",
       "text": "E · The Tanafas scenes",
       "x": 0,
-      "y": 8380,
+      "y": 8480,
       "maxW": 2620,
       "w": 240
     },
@@ -138,7 +154,7 @@
       "kind": "title1",
       "text": "F · Around the app",
       "x": 0,
-      "y": 9764,
+      "y": 9864,
       "maxW": 2620,
       "w": 240
     },
@@ -146,8 +162,16 @@
       "kind": "title1",
       "text": "G · Night",
       "x": 0,
-      "y": 11148,
+      "y": 11248,
       "maxW": 2000,
+      "w": 240
+    },
+    "row9": {
+      "kind": "title1",
+      "text": "P · Pixel art",
+      "x": 0,
+      "y": 12632,
+      "maxW": 2190,
       "w": 240
     }
   },

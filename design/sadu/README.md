@@ -25,6 +25,7 @@ changes the app. Picks go to `PICKS.md`, then to the Houna Redesign canvas and t
 | E | `E-scenes.dc.html` | The Tanafas scenes, a few Kuwaiti landmarks |
 | F | `F-app.dc.html` | Around the app (tab bar, headers, loading, Recap, badges, Home) |
 | G | `G-night.dc.html` | Night |
+| P | `P-pixel-1.dc.html`, `P-pixel-2.dc.html` | Pixel art: everything on a 6 px grid, sprites sampled from the real outlines (`scripts/make-sprites.js` → `sprites.json`, drawn by `scripts/study-pixel.js`), motion stepped frame by frame |
 
 Motif names follow published research on Kuwaiti Al Sadu; confirm the drawings and any Arabic names
 with the Sadu House (AlSadu Society, alsadu.org.kw) before anything ships.

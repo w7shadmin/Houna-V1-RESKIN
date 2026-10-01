@@ -105,6 +105,7 @@ const homePanel = (T, inner, label = 'On Home') => `<div style="position: absolu
     ['D · Splash intros', 'Sunrise and Dusk openings: a horizon woven row by row; the mark woven in Sadu; a strip unrolling under the wordmark; the sun setting over Kuwait Towers.'],
     ['E · The Tanafas scenes', 'Morning and evening skies over a woven horizon: the tent’s wall, Kuwait Bay and a boom, the Towers at dusk, the skyline with seed stars. Landmarks sparingly.'],
     ['F · Around the app', 'The tab bar’s edge and raised button, page headers, a woven loading strip, Recap’s “your month, woven”, badges as Sadu medallions, Home’s dividers.'],
+    ['P · Pixel art', 'All of it on a 6-pixel grid: dithered skies, the mark, wordmark, Towers and map as true-outline sprites, Sadu one cell a pixel, motion stepped frame by frame.'],
     ['G · Night', 'The starfield over a moonlit woven horizon; the moon in a seed-and-eye halo; Night Home’s moon ringed in Sadu.'],
   ];
   const body = `<div style="position: absolute; inset: 0; padding: 72px; box-sizing: border-box; display: flex; flex-direction: column; gap: 40px">
@@ -113,10 +114,10 @@ const homePanel = (T, inner, label = 'On Home') => `<div style="position: absolu
 <span style="max-width: 1180px; font-size: 17px; line-height: 1.55; color: ${M.mist}">Al Sadu is the Bedouin weaving of Kuwait and the Gulf, on UNESCO’s list of intangible heritage: warp-faced bands of small stepped cells, border motifs round a central tree, in black, brown, beige and red brightened with orange. Here it’s woven into the places Houna already has: the sun’s rays, the breathing stage, the words round the sun and moon, the splash, the Tanafas scenes and the app’s small surfaces, with Kuwait Towers, Liberation Tower, the Grand Mosque and a boom only now and then. Every board moves where the idea is motion. Pick by selecting boards or commenting on one.</span></div>
 <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px 40px">${motifRow('hubub', 'Seeds: dots scattered on the ground')}${motifRow('dealla', 'Ribs: short upright bars')}${motifRow('eein', 'Eye: a diamond round a centre')}${motifRow('dhurus', 'Horse teeth: a row of small triangles')}${motifRow('uwairjan', 'Facing triangles, point to point')}${motifRow('shajarah', 'Tree: the long central band')}</div>
 <div style="display: flex; gap: 48px">${sw('Traditional: black, beige, red, orange, brown', S.PAL.classic)}${sw('In Sunrise: teal, cream, coral, peach, rose', S.PAL.sunrise)}${sw('In Dusk: indigo, sand, ember, amber, violet', S.PAL.dusk)}${sw('In Night: midnight, moonlight, teal, amber, haze', S.PAL.night)}</div>
-<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px">${ROWS.map(([t, d]) => `<div style="padding: 20px; border-radius: 18px; background: rgba(242,236,221,0.045); border: 1px solid rgba(242,236,221,0.1); display: flex; flex-direction: column; gap: 8px"><span style="font-size: 16px; font-weight: 600; color: ${M.moonlight}">${t}</span><span style="font-size: 13.5px; line-height: 1.5; color: ${M.mist}">${d}</span></div>`).join('')}</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">${ROWS.map(([t, d]) => `<div style="padding: 20px; border-radius: 18px; background: rgba(242,236,221,0.045); border: 1px solid rgba(242,236,221,0.1); display: flex; flex-direction: column; gap: 8px"><span style="font-size: 16px; font-weight: 600; color: ${M.moonlight}">${t}</span><span style="font-size: 13.5px; line-height: 1.5; color: ${M.mist}">${d}</span></div>`).join('')}</div>
 <span style="font-size: 13px; line-height: 1.5; color: ${M.haze}">Motif names from Kuwaiti Al Sadu research (Hubub, Dealla, Eein, Dhurs al-Khail, Uwairjan, Shajarah); confirm the drawings and any Arabic names with the Sadu House before anything ships. Row H follows your inspiration images.</span>
 </div>`;
-  out.push(K.board('Main.dc.html', { title: 'Sadu in Houna', w: 1600, h: 1320, root: 'background: #0E0C14', body, dir: DIR }));
+  out.push(K.board('Main.dc.html', { title: 'Sadu in Houna', w: 1600, h: 1420, root: 'background: #0E0C14', body, dir: DIR }));
 })();
 
 /* ══════════ A · The sun's rays, woven (Sunrise) ══════════ */
@@ -523,9 +524,12 @@ ${at(195, 380, 110, sunDisc(110))}
   });
 })();
 
+/* ══════════ P · Pixel art (study-pixel.js) ══════════ */
+const PIXEL = require('./study-pixel.js')({ K, S, row });
+
 /* ── The canvas ── */
-const ROWS = [['Main.dc.html'], ['H-inspiration.dc.html'], ['A-rays.dc.html'], ['B-breathing.dc.html'], ['C-words.dc.html'], ['D-splash.dc.html'], ['E-scenes.dc.html'], ['F-app.dc.html'], ['G-night.dc.html']];
-const TITLES = { 1: 'H · From your inspiration', 2: 'A · The sun’s rays, woven', 3: 'B · Breathing, woven', 4: 'C · Words round the sun and moon', 5: 'D · Splash intros', 6: 'E · The Tanafas scenes', 7: 'F · Around the app', 8: 'G · Night' };
+const ROWS = [['Main.dc.html'], ['H-inspiration.dc.html'], ['A-rays.dc.html'], ['B-breathing.dc.html'], ['C-words.dc.html'], ['D-splash.dc.html'], ['E-scenes.dc.html'], ['F-app.dc.html'], ['G-night.dc.html'], ...PIXEL.pRows];
+const TITLES = { 1: 'H · From your inspiration', 2: 'A · The sun’s rays, woven', 3: 'B · Breathing, woven', 4: 'C · Words round the sun and moon', 5: 'D · Splash intros', 6: 'E · The Tanafas scenes', 7: 'F · Around the app', 8: 'G · Night', 9: 'P · Pixel art' };
 const byFile = Object.fromEntries(out.map((b) => [b.file, b]));
 const boards = {}, notes = {}, order = [];
 let y = 0;
@@ -545,6 +549,10 @@ ROWS.forEach((files, r) => {
   }
   y += h + 120;
 });
+for (const fl of ['P-pixel-1.dc.html', 'P-pixel-2.dc.html']) {
+  const fp = path.join(DIR, fl);
+  fs.writeFileSync(fp, fs.readFileSync(fp, 'utf8').replace('<helmet>', '<helmet>\n<link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600&amp;display=swap" rel="stylesheet">'));
+}
 const indexPath = path.join(DIR, 'canvas.json');
 const prev = fs.existsSync(indexPath) ? JSON.parse(fs.readFileSync(indexPath, 'utf8')) : null;
 fs.writeFileSync(indexPath, JSON.stringify({ v: 3, createdOnFiles: prev?.createdOnFiles ?? { v: 1, at: new Date().toISOString().replace(/\.\d+Z$/, 'Z') }, title: 'Houna — Sadu', launch: { view: 'canvas' }, pages: [], boards, order, notes, designSystems: [] }, null, 2) + '\n');
