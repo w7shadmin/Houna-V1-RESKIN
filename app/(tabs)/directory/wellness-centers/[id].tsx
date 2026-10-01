@@ -8,6 +8,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { grid, layout } from '@/constants/theme';
 import { fetchWellnessCenterDetail, type WellnessCenterDetail } from '@/lib/hounaApi';
 import { infoWebsite, ownSocials, profileFacts } from '@/lib/directoryProfile';
+import { cleanServiceTags } from '@/lib/directoryFilters';
 import { LoadingState, ErrorState } from '@/components/directory/AsyncState';
 import ScreenGlow from '@/components/ui/ScreenGlow';
 import {
@@ -73,7 +74,8 @@ export default function WellnessCenterDetailScreen() {
   const socials = ownSocials(detail.socials);
   const showWebsite = !!website && !socials.some((x) => x.url === website);
   const bio = detail.fullBio.trim() || detail.summary.trim();
-  const services = detail.services.map((x) => x.replace(/[.\s]+$/, '')).filter(Boolean);
+  // Tidied as on the list: no trailing full stops, repeats or houna.org's misspellings ("Pilate").
+  const services = cleanServiceTags(detail.services);
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>

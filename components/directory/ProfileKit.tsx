@@ -58,9 +58,11 @@ interface ProfileHeroProps {
   imageUrl: string | null;
   /** `person` — photo fills the circle; `logo` — logo sits contained on a paper disc. */
   kind: 'person' | 'logo';
+  /** Shown under the role with the list's online dot ("Offers online sessions"). */
+  online?: string;
 }
 
-export function ProfileHero({ name, role, eyebrow, imageUrl, kind }: ProfileHeroProps) {
+export function ProfileHero({ name, role, eyebrow, imageUrl, kind, online }: ProfileHeroProps) {
   const { colors } = useTheme();
   const { fonts, isRTL } = useLanguage();
   const uri = resolveImageUrl(imageUrl);
@@ -114,6 +116,12 @@ export function ProfileHero({ name, role, eyebrow, imageUrl, kind }: ProfileHero
           {decodeEntities(name)}
         </Text>
         {!!role && <Text style={[styles.role, { color: colors.primary, fontFamily: fonts.medium }]}>{decodeEntities(role)}</Text>}
+        {!!online && (
+          <View style={[styles.online, { backgroundColor: colors.tones.glow.bg, borderColor: colors.tones.glow.border }]}>
+            <View style={[styles.onlineDot, { backgroundColor: colors.tones.glow.fg }]} />
+            <Text style={[styles.onlineText, { color: colors.tones.glow.text, fontFamily: fonts.medium }]}>{online}</Text>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -356,6 +364,25 @@ export function ContactActions({ primary, secondary }: { primary: ContactAction;
 }
 
 const styles = StyleSheet.create({
+  online: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'center',
+    gap: grid(1),
+    borderWidth: 1,
+    borderRadius: radius.full,
+    paddingHorizontal: grid(1.5),
+    paddingVertical: grid(0.5),
+    marginTop: grid(1),
+  },
+  onlineDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  onlineText: {
+    fontSize: 13,
+  },
   flex: {
     flex: 1,
     minWidth: 0,

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, Image, ScrollView, Pressable, Linking, StyleSheet, Platform } from 'react-native';
+import { View, Text, Image, ScrollView, Pressable, StyleSheet, Platform } from 'react-native';
 import Animated, { Easing, interpolate, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useRouter, useLocalSearchParams, useNavigation } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -15,6 +15,7 @@ import { stripHtml } from '@/lib/html';
 import { useReduceMotion } from '@/hooks/useCalmLoop';
 import { LoadingState, ErrorState } from '@/components/directory/AsyncState';
 import { BodyText, FactGrid, GroupLabel, ProfileTopBar, SectionCard } from '@/components/directory/ProfileKit';
+import YouTubePlayer from '@/components/ui/YouTubePlayer';
 
 const GROW_MS = 650;
 const SHRINK_MS = 480;
@@ -153,6 +154,8 @@ export default function EventDetailScreen() {
       </Animated.View>
     ) : null;
 
+  // Which video is playing in place (none until one is pressed: nothing loads from YouTube before).
+  const [playing, setPlaying] = useState<string | null>(null);
   const facts = detail ? profileFacts(detail.info) : [];
   const description = detail?.description ? decodeEntities(stripHtml(detail.description)) : '';
   const date = detail?.date ? formatEventDate(detail.date, { monthsLong: t.journal.dateNames.monthsLong, am: list.am, pm: list.pm }, num) : '';
@@ -216,22 +219,29 @@ export default function EventDetailScreen() {
                 {videos.length > 0 && (
                   <View style={styles.group}>
                     <GroupLabel>{s.watch}</GroupLabel>
-                    {videos.map((id) => (
-                      <Pressable
-                        key={id}
-                        onPress={() => Linking.openURL(`https://www.youtube.com/watch?v=${id}`).catch(() => {})}
-                        accessibilityRole="link"
-                        accessibilityLabel={`${s.watch}: ${detail.title}`}
-                        style={({ pressed }) => [styles.video, { backgroundColor: colors.control, borderColor: colors.border }, pressed && styles.pressed]}
-                      >
-                        <Image source={{ uri: `https://img.youtube.com/vi/${id}/hqdefault.jpg` }} style={styles.fill} resizeMode="cover" />
-                        <View style={styles.videoShade}>
-                          <View style={[styles.play, { backgroundColor: colors.action }, shadows.glow]}>
-                            <Play size={22} color={colors.onAction} fill={colors.onAction} />
-                          </View>
+                    {videos.map((id) =>
+                      playing === id ? (
+                        // Plays here, in place of its thumbnail (components/ui/YouTubePlayer.tsx).
+                        <View key={id} style={[styles.video, { backgroundColor: '#000', borderColor: colors.border }]}>
+                          <YouTubePlayer id={id} title={detail.title} />
                         </View>
-                      </Pressable>
-                    ))}
+                      ) : (
+                        <Pressable
+                          key={id}
+                          onPress={() => setPlaying(id)}
+                          accessibilityRole="button"
+                          accessibilityLabel={`${s.watch}: ${detail.title}`}
+                          style={({ pressed }) => [styles.video, { backgroundColor: colors.control, borderColor: colors.border }, pressed && styles.pressed]}
+                        >
+                          <Image source={{ uri: `https://img.youtube.com/vi/${id}/hqdefault.jpg` }} style={styles.fill} resizeMode="cover" />
+                          <View style={styles.videoShade}>
+                            <View style={[styles.play, { backgroundColor: colors.action }, shadows.glow]}>
+                              <Play size={22} color={colors.onAction} fill={colors.onAction} />
+                            </View>
+                          </View>
+                        </Pressable>
+                      ),
+                    )}
                   </View>
                 )}
               </>

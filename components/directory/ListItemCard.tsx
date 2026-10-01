@@ -19,6 +19,8 @@ interface ListItemCardProps {
   tags?: string[];
   onPress: () => void;
   imageResizeMode?: 'cover' | 'contain';
+  /** A small mark on the photo: this professional offers online sessions (and the label read out). */
+  onlineLabel?: string;
 }
 
 /**
@@ -36,6 +38,7 @@ export default React.memo(function ListItemCard({
   tags,
   onPress,
   imageResizeMode = 'cover',
+  onlineLabel,
 }: ListItemCardProps) {
   const { t, isRTL, fonts } = useLanguage();
   const { colors } = useTheme();
@@ -45,10 +48,18 @@ export default React.memo(function ListItemCard({
   const resolvedImageUrl = resolveImageUrl(imageUrl);
 
   return (
-    <Card onPress={onPress} accessibilityLabel={title} style={styles.card}>
-      <View style={[styles.image, { backgroundColor: colors.control }]}>
-        {!!resolvedImageUrl && (
-          <Image source={{ uri: resolvedImageUrl }} style={styles.imageImg} resizeMode={imageResizeMode} />
+    <Card onPress={onPress} accessibilityLabel={onlineLabel ? `${title}, ${onlineLabel}` : title} style={styles.card}>
+      <View>
+        <View style={[styles.image, { backgroundColor: colors.control }]}>
+          {!!resolvedImageUrl && (
+            <Image source={{ uri: resolvedImageUrl }} style={styles.imageImg} resizeMode={imageResizeMode} />
+          )}
+        </View>
+        {!!onlineLabel && (
+          // A small lit dot at the photo's corner, ringed in the card's colour: online sessions.
+          <View style={[styles.online, { borderColor: colors.background }]}>
+            <View style={[styles.onlineDot, { backgroundColor: colors.tones.glow.fg }]} />
+          </View>
         )}
       </View>
       <View style={styles.text}>
@@ -107,6 +118,22 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  online: {
+    position: 'absolute',
+    bottom: -4,
+    end: -4,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  onlineDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+  },
   text: {
     flex: 1,
     minWidth: 0,
@@ -131,6 +158,8 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
   tag: {
+    // A long service ("Pediatric Dentistry for Children on the Autism Spectrum") ends in an ellipsis, inside the card.
+    maxWidth: '100%',
     borderRadius: radius.full,
     borderWidth: 1,
     paddingHorizontal: 12,

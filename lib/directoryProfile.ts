@@ -73,6 +73,15 @@ const FACT_KEYS: Record<string, FactId> = {
   'الدولة': 'countries',
 };
 
+/** One fact's value from a profile's info rows, whatever language its label is in. */
+export function factValue(info: Record<string, string> | undefined, id: FactId): string | null {
+  if (!info) return null;
+  for (const [label, value] of Object.entries(info)) {
+    if (FACT_KEYS[label.trim().toLowerCase()] === id) return decodeEntities(String(value).trim());
+  }
+  return null;
+}
+
 export interface Fact {
   /** Known fact, or null for a label the app doesn't recognise (shown as the site wrote it). */
   id: FactId | null;

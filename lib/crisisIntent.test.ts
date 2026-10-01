@@ -14,6 +14,12 @@ test('Arabic and Arabizi crisis searches', () => {
   }
 });
 
+test('violence and abuse bring the crisis card too', () => {
+  for (const q of ['violence', 'domestic violence', 'abuse', 'abusive relationship', 'عنف', 'العنف الأسري', 'إساءة', 'تعنيف']) {
+    assert.ok(isCrisisQuery(q), q);
+  }
+});
+
 test('ordinary searches are not crisis searches', () => {
   for (const q of ['anxiety', 'depression', 'sleep', 'Sarah Almarzooqi', 'قلق', 'اكتئاب', 'children', 'dietitian', 'die hard', 'self esteem', '']) {
     assert.ok(!isCrisisQuery(q), q);

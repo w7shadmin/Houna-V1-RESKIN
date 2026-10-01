@@ -88,7 +88,7 @@ interface ProfessionalsResult {
 }
 
 /** Bump when a saved list's shape changes, so old copies are ignored (and cleared: `clearOldVersions`). */
-const STORE_VERSION = 2;
+const STORE_VERSION = 3;
 /** A saved list this recent is used as is; an older one is used while a fresh one loads for next time. */
 const FRESH_MS = 24 * 60 * 60 * 1000;
 /** A saved list older than this isn't shown at all: the search waits for a fresh one. */
@@ -194,6 +194,80 @@ export const SOURCES: Record<SourceKey, (lang: Lang) => Promise<SearchItem[] | P
   speakers: async (lang) =>
     (await bundle(lang)).speakers.speakers.map((s) => item('speaker', s.slug, s.name, s.role, s.imageUrl, [s.bio])),
 };
+
+/**
+ * Every professional, from the same saved bundle as the search (the professionals list filters and
+ * searches it on the phone), and who offers online sessions.
+ */
+export async function professionalsDirectory(lang: Lang): Promise<{ therapists: Therapist[]; online: Set<string> }> {
+  const { therapists, online } = (await bundle(lang)).professionals;
+  return { therapists, online: new Set(online ?? []) };
+}
+
+/** An article or podcast as Read & listen shows it. */
+export interface MediaItem {
+  kind: 'article' | 'podcast';
+  url: string;
+  title: string;
+  text: string;
+  /** The site it's on (who.int), or a podcast's host. */
+  source: string;
+  imageUrl: string | null;
+  /** Listed only in the other language on houna.org (shown with a small language tag). */
+  otherLanguage: boolean;
+}
+
+/**
+ * Read & listen's articles and podcasts, both languages, the reader's first (as search shows them),
+ * from the same saved bundle: what only the other language has is marked so the screen can say so.
+ */
+export async function mediaLibrary(lang: Lang): Promise<{ articles: MediaItem[]; podcasts: MediaItem[] }> {
+  const mine = await bundle(lang);
+  const otherArticles = await otherLanguage(lang, (b) => b.articles.articles);
+  const otherPodcasts = await otherLanguage(lang, (b) => b.podcasts.podcasts);
+  const articles = mergeLanguages(mine.articles.articles, otherArticles);
+  const podcasts = mergeLanguages(mine.podcasts.podcasts, otherPodcasts);
+  const ownA = mine.articles.articles.length;
+  const ownP = mine.podcasts.podcasts.length;
+  return {
+    articles: articles.map((a, i) => ({
+      kind: 'article',
+      url: a.url,
+      title: a.title,
+      text: a.blurb,
+      source: a.sourceDomain,
+      imageUrl: a.imageUrl,
+      otherLanguage: i >= ownA,
+    })),
+    podcasts: podcasts.map((p, i) => ({
+      kind: 'podcast',
+      url: p.url,
+      title: p.title,
+      text: p.description,
+      source: p.host || p.sourceDomain,
+      imageUrl: p.imageUrl,
+      otherLanguage: i >= ownP,
+    })),
+  };
+}
+
+/** The professionals list's own search items (each with what their page says, when it's in). */
+export function professionalSearchItems(therapists: Therapist[], profiles: Map<string, ProfessionalProfile>): SearchItem[] {
+  // The slug is the name in Latin letters, so a name typed in English finds them on the Arabic list too.
+  return therapists.map((p) => ({
+    ...professionalItem(p),
+    aliases: [p.slug.replace(/[-_.]+/g, ' ')],
+    profile: profiles.get(p.slug),
+  }));
+}
+
+/** Any list's items for its own search box: title, a line under it, and whatever else to match. */
+export function listSearchItems<T>(list: T[], pick: (x: T) => { key: string; title: string; subtitle?: string; extra?: string[] }): SearchItem[] {
+  return list.map((x) => {
+    const p = pick(x);
+    return item('article', p.key, p.title, p.subtitle ?? '', null, p.extra ?? []);
+  });
+}
 
 /**
  * Each professional's profile by slug, from the daily server index: kept like

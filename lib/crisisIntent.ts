@@ -17,6 +17,8 @@ import { editDistance, normalizeForSearch, wordForms, words } from './searchText
 /** Single words, matched as a word's start (so "suicid" covers suicide, suicidal) or with one typo. */
 const WORDS = [
   'suicide', 'suicidal', 'suicid', 'selfharm', 'overdose', 'crisis', 'emergency',
+  // Someone searching for violence or abuse may not be safe now: the crisis screen has those lines too.
+  'violence', 'abuse', 'abused', 'abusive', 'عنف', 'إساءة', 'تعنيف', 'اعتداء',
   'انتحار', 'انتحر', 'انتحاري', 'طوارئ', 'أزمة',
   'entehar', 'ente7ar', 'intihar', 'enti7ar',
 ].map(normalizeForSearch);

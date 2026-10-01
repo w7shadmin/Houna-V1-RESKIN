@@ -8,6 +8,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { grid, layout } from '@/constants/theme';
 import { fetchTherapistDetail, type TherapistDetail } from '@/lib/hounaApi';
 import { organizationIdFromUrl, ownSocials, profileFacts } from '@/lib/directoryProfile';
+import { professionalsDirectory } from '@/lib/directorySearch';
 import { LoadingState, ErrorState } from '@/components/directory/AsyncState';
 import ScreenGlow from '@/components/ui/ScreenGlow';
 import {
@@ -34,6 +35,14 @@ export default function ProfessionalDetailScreen() {
   const [detail, setDetail] = useState<TherapistDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // From the same saved directory as the list: houna.org says who offers online sessions only there.
+  const [online, setOnline] = useState(false);
+
+  useEffect(() => {
+    professionalsDirectory(language)
+      .then((d) => setOnline(d.online.has(slug)))
+      .catch(() => {});
+  }, [slug, language]);
 
   useEffect(() => {
     let cancelled = false;
@@ -78,7 +87,7 @@ export default function ProfessionalDetailScreen() {
         <View style={styles.top}>
           <ScreenGlow color={colors.glow} rx={60} ry={55} cy={55} />
           <ProfileTopBar onBack={back} />
-          <ProfileHero name={detail.name} role={detail.role} imageUrl={detail.imageUrl} kind="person" />
+          <ProfileHero name={detail.name} role={detail.role} imageUrl={detail.imageUrl} kind="person" online={online ? s.online : undefined} />
         </View>
 
         {facts.length > 0 && <FactGrid facts={facts} />}

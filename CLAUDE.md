@@ -128,8 +128,8 @@ Keep these when changing anything nearby:
   - the public roles have no TRUNCATE, TRIGGER or REFERENCES on any table;
   - storage: images only (5 MB avatars), no public listing (public links still work),
     and `avatar_url` must point into the owner's own folder.
-- **Directory proxy**: only the filter values the app sends (`AVAILABILITY`, `SORTS`, small numeric
-  ids, pages 1–60), slugs validated on every detail route, expired cache rows purged. Add a new
+- **Directory proxy**: only the filter values it knows (`AVAILABILITY`, `SORTS`; the app now filters on the phone and sends none), small numeric
+  ids and pages 1–60; slugs validated on every detail route, expired cache rows purged. Add a new
   filter value to both `constants/directoryStrings.ts` and the proxy.
 - **Sign-in**: PKCE (`flowType: 'pkce'`, `exchangeCodeForSession`), so a redirect caught by another
   app registering `houna://` is useless. Passwords at least 8; sign-up doesn't confirm which emails
@@ -936,6 +936,41 @@ the server copy ("Save to my profile") was removed on 30 Sep 2026 (see "Store co
 
 **Articles and podcasts show every language** (`fetchAllArticles` / `fetchAllPodcasts` in `lib/hounaApi.ts`, and in search): houna.org lists each language's separately; Houna shows the reader's first, then what only the other has (matched by link), until they're translated.
 
+**Read & listen** (1 Oct 2026): the hub's one row for articles and podcasts, a media room
+(`components/directory/MediaHub.tsx`; both `/directory/articles` and `/directory/podcasts` render it,
+on the All or Podcasts tab). Search, All · Articles · Podcasts, topic chips (`lib/mediaTopics.ts`,
+tested: houna.org gives no categories, so pieces are sorted by their words; a topic shows once it
+holds two), a featured article, a rail of podcasts, then the articles; what only the other language
+has carries a small language tag. From the saved search bundle (`mediaLibrary`), no calls of its own.
+Pieces open **inside Houna** (`lib/inAppBrowser.ts`'s `openInApp`: `safeUrl` first, then
+expo-web-browser's in-app browser, Custom Tabs / SFSafariViewController; podcasts' own pages play
+there). A native player with lock-screen controls would need each show's RSS feed: later.
+
+**Event videos play in the app** (`components/ui/YouTubePlayer.tsx`): a thumbnail's play swaps in
+YouTube's privacy-enhanced embed (youtube-nocookie.com), a `react-native-webview` page posing as
+houna.org on the phone (YouTube wants an origin), an iframe on the web. Only a checked video id
+(`YOUTUBE_ID`) is loaded. The web view is required lazily (a dev client built before it has none).
+
+**The professionals list is Houna's own** (1 Oct 2026; houna.org's filters go with its rebuild):
+the whole list from the bundle (`professionalsDirectory`), searched on the phone (`ListSearch`, names,
+roles, summaries and their page's facts; the slug as an alias, so a Latin name finds them in Arabic),
+and three filters as pills that open a `GlassSheet` (`components/directory/FilterSelect.tsx`; sheets
+render at the screen's root, since a GlassSheet fills its parent): Profession (four plain groups from
+the scraped role, `professionGroup` in `lib/directoryFilters.ts`, tested; physical roles fall under
+All only), Country (from their page's location) and Works with (children, teens, adults, couples,
+families). No sorting, no A–Z, no online/offline filter. Professionals houna.org lists as online
+(the bundle's `professionals.online`, read from houna.org's `?availability=online` pages, falling
+back to the last list) carry a small dot at their photo's corner and "Offers online sessions" on
+their page and to screen readers. Wellness centers and organizations have the same search and a
+country pill; wellness services go through `cleanServiceTags` (fixes "pilate" → Pilates, trims,
+de-duplicates). Bundle `KEY_VERSION` 3, phone `STORE_VERSION` 3.
+
+**Plain words** (the hub's "In your own words"): chips in everyday language ("Lost my spark",
+"Can't sleep", "Something from childhood"…, `t.directory.search.feelings`, `Chip`'s `plain` style:
+body font, no tracked caps) that run a search; `lib/searchConcepts.ts` maps everyday words (burnout,
+numb, grieving, hormones, adjusting…) to the specialties professionals list. Violence and abuse words
+also show the crisis card (`lib/crisisIntent.ts`), whose text covers not being safe where you are.
+
 **Directory pages** are all in the canvas language now: list pages use
 `components/directory/PageHeader.tsx`; the professional / organization /
 wellness-center pages share `components/directory/ProfileKit.tsx` (from the
@@ -962,7 +997,7 @@ rebuilds it in the background; `?country=` gives one country's professionals for
 "near you"). A search used to cost ~60 proxy calls a phone a day, the free plan's
 first limit; now it's three at most (this language, the other one's names, the
 profiles). A new list for search goes in the bundle, not a call of its own.
-They're saved on the phone as one copy (AsyncStorage, `directory-search:v2:bundle:*`,
+They're saved on the phone as one copy (AsyncStorage, `directory-search:v3:bundle:*`,
 older versions' keys cleared: used as is under a day old, shown while refreshing
 up to two weeks), and each item also carries its name in the other language
 (`aliases`), loaded after.

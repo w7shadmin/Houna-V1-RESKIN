@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, FlatList, Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -10,9 +10,11 @@ import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
 import { fetchWellnessCenters, type WellnessCenter, type CountryOption } from '@/lib/hounaApi';
 import { LoadingState, ErrorState, InlineError } from '@/components/directory/AsyncState';
 import ListItemCard from '@/components/directory/ListItemCard';
-import FilterToggle from '@/components/directory/FilterToggle';
-import ChipFilter from '@/components/directory/ChipFilter';
 import PageHeader from '@/components/directory/PageHeader';
+import ListSearch from '@/components/directory/ListSearch';
+import { FilterPill, FilterSheet } from '@/components/directory/FilterSelect';
+import { buildSearchIndex, listSearchItems } from '@/lib/directorySearch';
+import { cleanServiceTags } from '@/lib/directoryFilters';
 
 export default function WellnessCentersListScreen() {
   const { colors } = useTheme();
@@ -26,7 +28,9 @@ export default function WellnessCentersListScreen() {
   const [country, setCountry] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showFilters, setShowFilters] = useState(false);
+  const [countryOpen, setCountryOpen] = useState(false);
+  // This list's own search (names, summaries, services), on the phone, as you type.
+  const [query, setQuery] = useState('');
 
   const load = useCallback(
     async (selectedCountry: string) => {
@@ -56,7 +60,19 @@ export default function WellnessCentersListScreen() {
   };
 
   const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
-  const countryOptions = [{ value: '', label: common.all }, ...countries];
+  const countryOptions = [{ value: '', label: t.directory.professionals.anyCountry }, ...countries];
+  const index = useMemo(
+    () =>
+      buildSearchIndex(
+        listSearchItems(centers, (x) => ({ key: x.id, title: x.name, subtitle: x.summary, extra: x.services })),
+      ),
+    [centers],
+  );
+  const shown = useMemo(() => {
+    if (!query.trim()) return centers;
+    const byId = new Map(centers.map((x) => [x.id, x]));
+    return index.query(query).items.map((it) => byId.get(it.key)).filter((x): x is (typeof centers)[number] => !!x);
+  }, [centers, index, query]);
   const header = <PageHeader title={s.title} intro={t.directory.hub.wellnessSubtitle} />;
 
   return (
@@ -75,35 +91,23 @@ export default function WellnessCentersListScreen() {
         </View>
       ) : (
         <FlatList
-          data={centers}
+          data={shown}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
           keyExtractor={(item, i) => `${item.id}-${i}`}
           contentContainerStyle={styles.listContent}
           ListHeaderComponent={
             <View style={styles.listHeader}>
               {header}
+              <ListSearch value={query} onChange={setQuery} placeholder={s.searchPlaceholder} />
               {/* Only offer the filter when the server sent countries to pick from. */}
               {countries.length > 0 && (
-                <FilterToggle
-                  label={common.filterByCountry}
-                  activeCount={country ? 1 : 0}
-                  expanded={showFilters}
-                  onPress={() => setShowFilters((v) => !v)}
-                />
-              )}
-              {showFilters && countries.length > 0 && (
-                <View style={[styles.filterPanel, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                  <ChipFilter label={common.country} options={countryOptions} value={country} onChange={setCountry} />
-                  {!!country && (
-                    <Pressable onPress={() => setCountry('')} accessibilityRole="button" style={({ pressed }) => pressed && styles.pressed}>
-                      <Text style={[styles.resetText, { color: colors.primary, fontFamily: fonts.semiBold }]}>
-                        {common.resetFilter}
-                      </Text>
-                    </Pressable>
-                  )}
+                <View style={styles.pills}>
+                  <FilterPill label={common.country} value={country} options={countryOptions} onPress={() => setCountryOpen(true)} />
                 </View>
               )}
               <Text style={[styles.count, { color: colors.textTertiary, fontFamily: fonts.medium }]}>
-                {arabicPlural(centers.length, s.count).replace('{n}', num(centers.length))}
+                {arabicPlural(shown.length, s.count).replace('{n}', num(shown.length))}
               </Text>
             </View>
           }
@@ -112,7 +116,7 @@ export default function WellnessCentersListScreen() {
               <ListItemCard
                 imageUrl={item.imageUrl}
                 title={item.name}
-                tags={item.services}
+                tags={cleanServiceTags(item.services)}
                 imageResizeMode="contain"
                 onPress={() => router.push({ pathname: '/directory/wellness-centers/[id]', params: { id: item.id } })}
               />
@@ -132,6 +136,14 @@ export default function WellnessCentersListScreen() {
           }
         />
       )}
+      <FilterSheet
+        visible={countryOpen}
+        title={common.country}
+        value={country}
+        options={countryOptions}
+        onChange={setCountry}
+        onClose={() => setCountryOpen(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -158,17 +170,8 @@ const styles = StyleSheet.create({
     gap: grid(2),
     marginBottom: grid(1.5),
   },
-  filterPanel: {
-    gap: grid(1),
-    borderRadius: radius.cardLg,
-    borderWidth: 1,
-    padding: grid(2),
-  },
-  pressed: {
-    opacity: 0.6,
-  },
-  resetText: {
-    fontSize: 14,
+  pills: {
+    flexDirection: 'row',
   },
   count: {
     fontSize: 13,

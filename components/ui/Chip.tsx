@@ -11,6 +11,8 @@ interface ChipProps {
   size?: 'md' | 'sm';
   onPress: () => void;
   style?: StyleProp<ViewStyle>;
+  /** A phrase in someone's own words ("Lost my spark"): the body font, as written, not tracked caps. */
+  plain?: boolean;
 }
 
 /**
@@ -18,7 +20,7 @@ interface ChipProps {
  * are tracked DM Mono caps; Arabic uses IBM Plex Sans Arabic untracked
  * (Arabic has no case and tracking breaks its joins).
  */
-export default function Chip({ label, selected = false, size = 'md', onPress, style }: ChipProps) {
+export default function Chip({ label, selected = false, size = 'md', onPress, style, plain = false }: ChipProps) {
   const { fonts } = useLanguage();
   const { colors } = useTheme();
 
@@ -43,9 +45,11 @@ export default function Chip({ label, selected = false, size = 'md', onPress, st
           styles.label,
           {
             color: selected ? colors.onAction : colors.text,
-            fontFamily: selected ? fonts.label : fonts.labelRegular,
+            fontFamily: plain ? (selected ? fonts.semiBold : fonts.medium) : selected ? fonts.label : fonts.labelRegular,
           },
-          fonts.labelTracked
+          plain
+            ? styles.labelPlain
+            : fonts.labelTracked
             ? size === 'sm'
               ? styles.labelLatinSm
               : { letterSpacing: typography.chip.letterSpacing, textTransform: 'uppercase' }
@@ -72,6 +76,9 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: typography.chip.fontSize,
+  },
+  labelPlain: {
+    fontSize: 14,
   },
   labelArabic: {
     fontSize: 14,

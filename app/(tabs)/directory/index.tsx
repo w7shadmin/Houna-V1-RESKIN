@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Linking, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type TextStyle } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View, type TextStyle } from 'react-native';
+import { openInApp } from '@/lib/inAppBrowser';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import PageMarkGlow from '@/components/ui/PageMarkGlow';
-import { BookOpen, Building2, Headphones, HeartPulse, Newspaper, Users, type LucideIcon } from 'lucide-react-native';
+import { BookOpen, Building2, HeartPulse, Newspaper, Users, type LucideIcon } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,7 +14,6 @@ import { formatEventDate } from '@/lib/eventDate';
 import { BREATHE_ORDER, BREATHE_TONE } from '@/constants/breathPatterns';
 import { MEDITATION_SCENES } from '@/components/meditation/scenes';
 import { EXERCISE_TEXT } from '@/components/tanafas/BreathePlayers';
-import { safeUrl } from '@/lib/hounaApi';
 import { buildSearchIndex, tanafasItems, type LocalExercise, type SearchItem } from '@/lib/directorySearch';
 import { whyLine } from '@/lib/searchHighlight';
 import { isCrisisQuery } from '@/lib/crisisIntent';
@@ -199,10 +199,9 @@ export default function DirectoryHubScreen() {
         router.push({ pathname: '/tanafas', params: kind === 'breathe' ? { tab: 'breathe', exercise: id } : { tab: 'meditate', scene: id } });
         break;
       }
-      default: {
-        const url = safeUrl(item.key);
-        if (url) Linking.openURL(url).catch(() => {});
-      }
+      default:
+        // Articles and podcasts open inside Houna (lib/inAppBrowser.ts).
+        openInApp(item.key, colors.background);
     }
   };
 
@@ -226,10 +225,23 @@ export default function DirectoryHubScreen() {
     { href: '/directory/professionals', title: hub.professionalsTitle, subtitle: hub.professionalsSubtitle, icon: Users, tone: 'glow' },
     { href: '/directory/organizations', title: hub.organizationsTitle, subtitle: hub.organizationsSubtitle, icon: Building2, tone: 'dawn' },
     { href: '/directory/wellness-centers', title: hub.wellnessTitle, subtitle: hub.wellnessSubtitle, icon: HeartPulse, tone: 'dusk' },
-    { href: '/directory/articles', title: hub.articlesTitle, subtitle: hub.articlesSubtitle, icon: Newspaper, tone: 'glow' },
-    { href: '/directory/podcasts', title: hub.podcastsTitle, subtitle: hub.podcastsSubtitle, icon: Headphones, tone: 'dusk' },
+    // Read & listen: articles and podcasts in one place (components/directory/MediaHub.tsx).
+    { href: '/directory/articles', title: hub.mediaTitle, subtitle: hub.mediaSubtitle, icon: Newspaper, tone: 'glow' },
     { href: '/directory/resources', title: hub.resourcesTitle, subtitle: hub.resourcesSubtitle, icon: BookOpen, tone: 'dawn' },
   ];
+
+  // In your own words: for anyone who doesn't know the clinical name for what they feel.
+  const ownWords = (
+    <View style={styles.section}>
+      <SectionHeader label={s.ownWords} />
+      <Text style={[styles.ownIntro, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{s.ownWordsIntro}</Text>
+      <View style={styles.suggestions}>
+        {s.feelings.map((f) => (
+          <Chip key={f.query} plain label={f.label} onPress={() => suggest(f.query)} />
+        ))}
+      </View>
+    </View>
+  );
 
   const browse = (
     <View style={styles.section}>
@@ -344,6 +356,7 @@ export default function DirectoryHubScreen() {
                 )}
               </>
             )}
+            {ownWords}
             {browse}
           </>
         ) : (
@@ -585,6 +598,11 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  ownIntro: {
+    fontSize: 14,
+    lineHeight: 20,
+    marginTop: -4,
   },
   suggestions: {
     flexDirection: 'row',

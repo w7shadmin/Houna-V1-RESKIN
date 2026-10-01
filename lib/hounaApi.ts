@@ -464,6 +464,8 @@ export async function fetchSearchIndex(lang: 'en' | 'ar' = 'en'): Promise<Search
 export interface AllProfessionals {
   therapists: Therapist[];
   countries: CountryOption[];
+  /** Slugs of those houna.org lists as offering online sessions (the full bundle only). */
+  online?: string[];
 }
 
 /** Directory search's lists for one language, each as its own list route returns it. */
