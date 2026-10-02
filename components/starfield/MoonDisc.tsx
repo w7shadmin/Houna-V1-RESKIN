@@ -57,6 +57,12 @@ const shade = (c: string) => flatten(alpha(nightPalette.midnight, 0.82), c);
 const EARTHSHINE: [string, number][] = PEARL_SOLID.map(([c, o]) => [shade(c), o]);
 /** The dark lune of a gibbous moon, one even shade of it. */
 const LUNE = shade('#D6DAE6');
+/**
+ * The moon's whole outline and the mark's, drawn over every phase (2 Oct 2026): the unlit part is
+ * as dark as the night, so without them a thin or new moon looked smaller and its mark vanished.
+ */
+const OUTLINE = alpha(PEARL, 0.42);
+const MARK_OUTLINE = alpha(PEARL, 0.5);
 /** The mark as pressed into the glass: the glass as it looks over the night. */
 const MARK_SURFACE = flatten(alpha('#F0F0F6', 0.42), nightPalette.midnight);
 
@@ -258,6 +264,11 @@ export default function MoonDisc({ form, date, ringOpacity: ringShown }: {
             </View>
           </>
         )}
+        {/* Over every phase: the disc's whole edge and the mark's outline, so neither shrinks with the light. */}
+        <View style={[styles.rim, { borderColor: OUTLINE }]} />
+        <View style={styles.centre}>
+          <HounaMark size={MARK} color={MARK_OUTLINE} outline={1} />
+        </View>
       </Animated.View>
     </View>
   );

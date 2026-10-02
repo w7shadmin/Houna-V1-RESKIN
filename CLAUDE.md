@@ -548,7 +548,9 @@ pearl glass moon about the mark's size with the mark pressed in
 (`MoonDisc`, Design studies "F4"), its halo joined to the disc's edge (`EdgeHalo`). The moon is
 in tonight's real phase (`lib/moonPhase.ts`, from the date alone: offline, no
 permissions), lit on the right while waxing as seen from the Gulf, the dark part
-in earthshine with the mark just visible. The lit shape is two clipping windows
+in earthshine with the mark just visible. Over every phase the disc's whole edge and the mark's outline
+are drawn in faint pearl (2 Oct 2026; `HounaMark`'s `outline`), so a thin or new moon keeps its full
+size and its mark, on Home, Profile and in the starfield alike. The lit shape is two clipping windows
 over whole faces (a half-disc slid sideways, a round window squeezed across), so
 the pressed mark never distorts and the breath animates natively: the lit part
 swells a little on the in-breath, never past the quarter line, and the halo
