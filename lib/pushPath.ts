@@ -4,7 +4,7 @@
  */
 
 /** The screens a notification may open: Houna's own paths only, never an outside address. */
-const PUSH_PATH_ROOTS = ['', 'tanafas', 'events', 'directory', 'crisis', 'recap', 'profile', 'month', 'your-sky', 'results', 'about', 'account'];
+const PUSH_PATH_ROOTS = ['', 'tanafas', 'events', 'directory', 'crisis', 'recap', 'profile', 'month', 'your-sky', 'results', 'about', 'account', 'live'];
 
 /** The in-app path a notification carries (`data.url`), if it's one the app may open. */
 export function notificationPath(data: unknown): string | null {

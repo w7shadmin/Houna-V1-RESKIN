@@ -4,7 +4,10 @@
 //     node scripts/send-push.js --to "ExponentPushToken[...]" --title "Hello" --body "A test" [--url /tanafas]
 //
 //   A broadcast to every Alias who opted in to that kind:
-//     SUPABASE_SERVICE_ROLE_KEY=... node scripts/send-push.js --kind story|stats --title "..." --body "..." [--url /events]
+//     SUPABASE_SERVICE_ROLE_KEY=... node scripts/send-push.js --kind story|stats|events --title "..." --body "..." [--url /events]
+//
+//   "We're live" (a Houna event starting to stream; set app_config.live_event first, so /live has it):
+//     SUPABASE_SERVICE_ROLE_KEY=... node scripts/send-push.js --kind events --title "We're live" --body "..." --url /live
 //
 // The service-role key is read from the environment only: never put it in a file in this repo.
 // --url must be one of Houna's own paths (lib/pushPath.ts); a tap opens it. Tokens Expo reports as no
@@ -19,7 +22,7 @@ const args = Object.fromEntries(
 );
 const fail = (m) => { console.error(m); process.exit(1); };
 if (!args.title || !args.body) fail('Needs --title and --body.');
-if (!args.to && !['story', 'stats'].includes(args.kind)) fail('Needs --to <token> or --kind story|stats.');
+if (!args.to && !['story', 'stats', 'events'].includes(args.kind)) fail('Needs --to <token> or --kind story|stats|events.');
 if (args.url && !/^\/[A-Za-z0-9\-/?=&_%.]*$/.test(args.url)) fail('--url must be an in-app path such as /tanafas.');
 
 const env = Object.fromEntries(
@@ -44,7 +47,7 @@ async function db(method, query, body) {
   if (args.to) tokens = [args.to];
   else {
     if (!SERVICE_KEY) fail('A broadcast needs SUPABASE_SERVICE_ROLE_KEY in the environment.');
-    const column = args.kind === 'story' ? 'wants_story_highlights' : 'wants_community_stats';
+    const column = { story: 'wants_story_highlights', stats: 'wants_community_stats', events: 'wants_events' }[args.kind];
     tokens = (await db('GET', `select=token&${column}=eq.true`)).map((r) => r.token);
   }
   if (!tokens.length) return console.log('Nobody to send to.');

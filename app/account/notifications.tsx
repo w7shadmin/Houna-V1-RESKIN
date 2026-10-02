@@ -21,6 +21,7 @@ export default function NotificationSettingsScreen() {
   // Off until the person chooses (broadcasts are opt-in); then whatever the Alias saved.
   const [storyHighlights, setStoryHighlights] = useState(false);
   const [communityStats, setCommunityStats] = useState(false);
+  const [liveEvents, setLiveEvents] = useState(false);
 
   useEffect(() => {
     isDailyReminderEnabled().then(setReminderOn);
@@ -32,6 +33,7 @@ export default function NotificationSettingsScreen() {
       .then((p) => {
         setStoryHighlights(p.wantsStoryHighlights);
         setCommunityStats(p.wantsCommunityStats);
+        setLiveEvents(p.wantsEvents);
       })
       .catch(() => {});
   }, [session]);
@@ -49,21 +51,24 @@ export default function NotificationSettingsScreen() {
     }
   };
 
-  const handleRemoteToggle = async (key: 'story' | 'stats', value: boolean) => {
+  const handleRemoteToggle = async (key: 'story' | 'stats' | 'events', value: boolean) => {
     if (!session) return;
     setPermissionBlocked(false);
-    const before = { wantsStoryHighlights: storyHighlights, wantsCommunityStats: communityStats };
+    const before = { wantsStoryHighlights: storyHighlights, wantsCommunityStats: communityStats, wantsEvents: liveEvents };
     const prefs = {
       wantsStoryHighlights: key === 'story' ? value : storyHighlights,
       wantsCommunityStats: key === 'stats' ? value : communityStats,
+      wantsEvents: key === 'events' ? value : liveEvents,
     };
     setStoryHighlights(prefs.wantsStoryHighlights);
     setCommunityStats(prefs.wantsCommunityStats);
+    setLiveEvents(prefs.wantsEvents);
     // Registers this phone when something is on (asking for permission), removes the tokens when all is off.
     const applied = await setRemotePushPrefs(session.user.id, prefs);
     if (!applied) {
       setStoryHighlights(before.wantsStoryHighlights);
       setCommunityStats(before.wantsCommunityStats);
+      setLiveEvents(before.wantsEvents);
       setPermissionBlocked(true);
     }
   };
@@ -97,6 +102,11 @@ export default function NotificationSettingsScreen() {
             title={s.communityStatsTitle}
             body={s.communityStatsBody}
             trailing={<ThemedSwitch label={s.communityStatsTitle} value={communityStats} onValueChange={(v) => handleRemoteToggle('stats', v)} />}
+          />
+          <SettingsRow
+            title={s.liveEventsTitle}
+            body={s.liveEventsBody}
+            trailing={<ThemedSwitch label={s.liveEventsTitle} value={liveEvents} onValueChange={(v) => handleRemoteToggle('events', v)} />}
           />
         </SettingsGroup>
       )}

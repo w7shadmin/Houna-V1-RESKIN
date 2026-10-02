@@ -16,6 +16,8 @@ import { GroupLabel } from '@/components/directory/ProfileKit';
 import { EventPills, tidyRole } from '@/components/events/EventPills';
 import Chip from '@/components/ui/Chip';
 import { DirectionalIcon } from '@/components/ui/CanvasIcon';
+import LiveBanner from '@/components/events/LiveBanner';
+import { useLiveEvent } from '@/hooks/useLiveEvent';
 
 type EventFilter = 'all' | 'upcoming' | 'virtual' | 'past';
 
@@ -28,6 +30,7 @@ export default function EventsListScreen() {
   const { colors } = useTheme();
   const router = useRouter();
   const { t, language, isRTL, fonts } = useLanguage();
+  const live = useLiveEvent();
   const s = t.events.list;
   const common = t.directory.common;
   const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
@@ -93,6 +96,7 @@ export default function EventsListScreen() {
         {s.title}
       </Text>
       <Text style={[styles.intro, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{s.intro}</Text>
+      <LiveBanner event={live.event} state={live.state} style={styles.live} />
     </View>
   );
 
@@ -305,6 +309,9 @@ const styles = StyleSheet.create({
   },
   titleArabic: {
     lineHeight: 48,
+  },
+  live: {
+    marginTop: grid(2),
   },
   intro: {
     fontSize: 15,

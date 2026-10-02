@@ -32,6 +32,17 @@ export const eventsStrings = {
       aboutEvent: 'About this event',
       watch: 'Watch',
     },
+    // A Houna event streamed live (app_config.live_event): Home's and Events' banner, and app/live.tsx.
+    live: {
+      title: 'Live',
+      now: 'Live now',
+      soon: 'Starting at {time}',
+      a11yNow: 'Live now: {title}. Opens the stream.',
+      a11ySoon: 'Starting at {time}: {title}. Opens the stream.',
+      chat: 'Open on YouTube for the chat',
+      aboutEvent: 'About this event',
+      none: 'Nothing is live right now. Upcoming events are in Events.',
+    },
     speaker: {
       loading: 'Loading speaker...',
       about: 'About',
@@ -62,6 +73,16 @@ export const eventsStrings = {
       loading: 'جاري تحميل الفعالية...',
       aboutEvent: 'عن هذه الفعالية',
       watch: 'شاهد',
+    },
+    live: {
+      title: 'بث مباشر',
+      now: 'مباشر الآن',
+      soon: 'يبدأ الساعة {time}',
+      a11yNow: 'مباشر الآن: {title}. يفتح البث.',
+      a11ySoon: 'يبدأ الساعة {time}: {title}. يفتح البث.',
+      chat: 'افتح على YouTube للمحادثة',
+      aboutEvent: 'عن هذه الفعالية',
+      none: 'لا يوجد بث مباشر الآن. الفعاليات القادمة في صفحة الفعاليات.',
     },
     speaker: {
       loading: 'جاري تحميل بيانات المتحدث...',

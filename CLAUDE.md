@@ -230,6 +230,16 @@ manage it later (its `config` schema). Change a value with an UPDATE:
   blocks every email sign-in). The widget's hostnames must include houna.org (the phone's web view
   poses as it) and localhost (the web preview). Cloudflare's test key `1x00000000000000000000AA` always
   passes. Google sign-in isn't checked.
+- `live_event` (2 Oct 2026, migration `20261002100000_live_events.sql`): `{ video_id, title_en, title_ar,
+  starts_at, ends_at, event_slug? }`, a Houna event streamed on YouTube; `{}` = nothing live. Unlike the
+  rest it's read again on focus (`hooks/useLiveEvent.ts`, at most every 2 minutes, one small read), so it
+  can be set shortly before an event. `lib/liveEvent.ts` (tested) checks it (a YouTube id, an end after the
+  start, at most 12 hours) and says where it stands: `components/events/LiveBanner.tsx` shows "Starting
+  at …" from an hour before and "Live now" (a breathing dot) until the end, on Home (above the map) and
+  Events (under the intro); it opens `app/live.tsx`, which plays the stream in `YouTubePlayer` (YouTube's
+  own waiting screen and countdown before it starts), with "Open on YouTube for the chat" (the embedded
+  player has no chat) and, with `event_slug`, the event's page. Set it, then send "We're live" with
+  `send-push.js --kind events --url /live`. Empty it after (it also hides itself at `ends_at`).
 
 ### Push notifications (set up 30 Sep 2026)
 
@@ -240,7 +250,7 @@ manage it later (its `config` schema). Change a value with an UPDATE:
   and its FCM V1 service-account key lives only in Expo's credentials, never in this repo. iOS needs
   an APNs key through EAS once the Apple organization account and bundle ID exist.
 - **Opt-in**: the daily reminder is local (Guests too). Broadcasts are for Aliases, one switch per
-  kind (`wants_story_highlights`, `wants_community_stats`), off until switched on (Apple 4.5.4; the
+  kind (`wants_story_highlights`, `wants_community_stats`, `wants_events`: "Live events"), off until switched on (Apple 4.5.4; the
   columns default to false). The choices are the Alias's, applied to every phone it registered;
   everything off deletes its tokens. `lib/notifications.ts` (`setRemotePushPrefs`).
 - **On launch** (`hooks/usePushNotifications.ts`, in the root layout): an opted-in Alias's token is
@@ -248,7 +258,7 @@ manage it later (its `config` schema). Change a value with an UPDATE:
 - **A tap** opens `data.url`, only if it's one of Houna's own paths (`lib/pushPath.ts`, tested); the
   daily reminder opens Tanafas.
 - **Sending**, until the Console: `node scripts/send-push.js`, one phone with `--to`, or a broadcast
-  by `--kind` with `SUPABASE_SERVICE_ROLE_KEY` in the environment only. It removes tokens Expo reports
+  by `--kind story|stats|events` with `SUPABASE_SERVICE_ROLE_KEY` in the environment only. It removes tokens Expo reports
   as unregistered.
 
 ### Store compliance (decided 30 Sep 2026)

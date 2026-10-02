@@ -116,6 +116,7 @@ function InnerLayout() {
         <Stack.Screen name="your-sky" />
         <Stack.Screen name="results" />
         <Stack.Screen name="crisis" />
+        <Stack.Screen name="live" />
         <Stack.Screen name="about" />
         <Stack.Screen name="get-involved" />
         <Stack.Screen name="contact" />

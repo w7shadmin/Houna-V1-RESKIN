@@ -74,12 +74,14 @@ export async function setDailyReminderEnabled(
 export interface RemotePushPrefs {
   wantsStoryHighlights: boolean;
   wantsCommunityStats: boolean;
+  /** A Houna event starting to stream (app_config.live_event; the tap opens /live). */
+  wantsEvents: boolean;
 }
 
 /** Nothing until the person switches a kind on (Apple 4.5.4: broadcasts are opt-in). */
-export const NO_REMOTE_PUSH: RemotePushPrefs = { wantsStoryHighlights: false, wantsCommunityStats: false };
+export const NO_REMOTE_PUSH: RemotePushPrefs = { wantsStoryHighlights: false, wantsCommunityStats: false, wantsEvents: false };
 
-const wantsAny = (p: RemotePushPrefs) => p.wantsStoryHighlights || p.wantsCommunityStats;
+const wantsAny = (p: RemotePushPrefs) => p.wantsStoryHighlights || p.wantsCommunityStats || p.wantsEvents;
 
 /** This phone's Expo push token, or null (web, simulator, no project, no permission). */
 async function devicePushToken(): Promise<string | null> {
@@ -97,12 +99,12 @@ async function devicePushToken(): Promise<string | null> {
 export async function getRemotePushPrefs(userId: string): Promise<RemotePushPrefs> {
   const { data } = await supabase
     .from('push_tokens')
-    .select('wants_story_highlights, wants_community_stats')
+    .select('wants_story_highlights, wants_community_stats, wants_events')
     .eq('user_id', userId)
     .limit(1)
     .maybeSingle();
   if (!data) return NO_REMOTE_PUSH;
-  return { wantsStoryHighlights: !!data.wants_story_highlights, wantsCommunityStats: !!data.wants_community_stats };
+  return { wantsStoryHighlights: !!data.wants_story_highlights, wantsCommunityStats: !!data.wants_community_stats, wantsEvents: !!data.wants_events };
 }
 
 /**
@@ -163,6 +165,7 @@ export async function registerPushToken(userId: string, prefs: RemotePushPrefs):
         platform: Platform.OS,
         wants_story_highlights: prefs.wantsStoryHighlights,
         wants_community_stats: prefs.wantsCommunityStats,
+        wants_events: prefs.wantsEvents,
         updated_at: new Date().toISOString(),
       },
       { onConflict: 'token' },
@@ -194,6 +197,7 @@ export async function updatePushPrefs(userId: string, prefs: RemotePushPrefs): P
       .update({
         wants_story_highlights: prefs.wantsStoryHighlights,
         wants_community_stats: prefs.wantsCommunityStats,
+        wants_events: prefs.wantsEvents,
         updated_at: new Date().toISOString(),
       })
       .eq('user_id', userId);

@@ -23,6 +23,8 @@ import IconButton from '@/components/ui/IconButton';
 import CanvasIcon from '@/components/ui/CanvasIcon';
 import NightStars from '@/components/home/NightStars';
 import { useBadgeCheck } from '@/hooks/useBadgeCheck';
+import { useLiveEvent } from '@/hooks/useLiveEvent';
+import LiveBanner from '@/components/events/LiveBanner';
 
 // Each rotating line stays this long: slow enough to read and settle before the next.
 const ROTATE_MS = 9000;
@@ -62,6 +64,8 @@ export default function HomeScreen() {
   const h = t.home;
   // A badge earned in a session arrives as Home comes back into view.
   useBadgeCheck();
+  // A Houna event streaming on YouTube: a banner over the map from an hour before until it ends.
+  const live = useLiveEvent();
   const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
 
   const period = SHOWN_PERIOD;
@@ -303,6 +307,7 @@ export default function HomeScreen() {
         </View>
 
         <Animated.View style={[styles.lower, chrome.style]} pointerEvents={chrome.pointerEvents}>
+        <LiveBanner event={live.event} state={live.state} />
         {/* Breathing together: the map, its periods and the count, straight on the sky (canvas "Round 2 —
             Home's map without its card"); the card's room is kept, so nothing else moves. */}
         <View style={styles.community}>
