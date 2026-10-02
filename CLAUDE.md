@@ -643,7 +643,10 @@ nights practised glow softly behind their moons, and a tap on one says its minut
 **Home's map** sits straight on the sky, with its periods and count (canvas "Round 2 — Home's map
 without its card"): the card's box went, its padding stayed, so nothing on Home moved. While testing
 (1 Oct 2026) it shows the past month only (`SHOWN_PERIOD` in `app/(tabs)/index.tsx`; the 24-hour and
-week choices come back after launch, their strings kept), so every phone shows the same figure. The
+week choices come back after launch, their strings kept), so every phone shows the same figure; there's
+no period chip at all (2 Oct), the sentence saying "this month". The count's digits are grouped (12,480 ·
+١٢٬٤٨٠) and its size steps down as it grows (`countSize`: 44 up to two digits, then 40, 34, 30, 26),
+centred on its sentence. The
 rotating line under "You're not alone" now turns on its own; tapping it shows the next and stops the
 turning. The figure counts installs (each has its own anonymous `actor`), so one person on a phone and
 two browsers counts as three; it's cached for 2 minutes.

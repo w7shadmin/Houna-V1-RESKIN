@@ -35,6 +35,21 @@ const ROTATE_MS = 9000;
 const SHOWN_PERIOD = ACTIVITY_PERIODS.indexOf('month');
 
 /**
+ * Home's count of people breathing together: the same weight whatever it reaches. Digits are grouped
+ * (12,480 · ١٢٬٤٨٠) and the size steps down as they grow, so a large number never crowds its sentence.
+ */
+const COUNT_SIZES = [44, 44, 40, 34, 30, 26];
+function countSize(n: number, isRTL: boolean) {
+  const size = COUNT_SIZES[Math.min(COUNT_SIZES.length - 1, String(Math.max(0, Math.floor(n))).length)];
+  // Amiri's numerals sit higher in their line than Figtree's: a taller line keeps them centred.
+  return { fontSize: size, lineHeight: Math.round(size * (isRTL ? 1.4 : 1.1)) };
+}
+function groupedCount(n: number, isRTL: boolean) {
+  const grouped = Math.max(0, Math.floor(n)).toLocaleString('en-US');
+  return isRTL ? arabicNumber(grouped.replace(/,/g, '٬')) : grouped;
+}
+
+/**
  * Home — one screen, no scroll on a typical phone (canvas "Home — English"
  * / "Home — Arabic", Night and Day). Top bar (mood check-in, wordmark,
  * profile), the mark with its ring, "You're not alone" and a rotating line,
@@ -308,8 +323,8 @@ export default function HomeScreen() {
 
         <Animated.View style={[styles.lower, chrome.style]} pointerEvents={chrome.pointerEvents}>
         <LiveBanner event={live.event} state={live.state} />
-        {/* Breathing together: the map, its periods and the count, straight on the sky (canvas "Round 2 —
-            Home's map without its card"); the card's room is kept, so nothing else moves. */}
+        {/* Breathing together: the map and the count, straight on the sky (canvas "Round 2 — Home's map
+            without its card"). No period chooser while testing: the sentence says "this month". */}
         <View style={styles.community}>
           <View style={styles.communityHead}>
             <Text
@@ -320,27 +335,17 @@ export default function HomeScreen() {
             >
               {h.community.label}
             </Text>
-            {/* The period chooser (24H · Week · Month) is off while testing: the month only. */}
-            <View style={[styles.periods, { backgroundColor: colors.control }]}>
-              <View style={[styles.period, { backgroundColor: colors.action }]}>
-                <Text
-                  style={[
-                    labelLatin ? styles.periodLatin : styles.periodArabic,
-                    { color: colors.onAction, fontFamily: labelLatin ? fonts.labelRegular : fonts.label },
-                  ]}
-                >
-                  {h.community.periods[period]}
-                </Text>
-              </View>
-            </View>
           </View>
 
           <CommunityDotMap lit={lit} accent={accent} dotColor={colors.mapLand} variant="solid" />
 
           {current ? (
             <View style={styles.countRow}>
-              <Text style={[styles.count, isRTL && styles.countArabic, { color: accent, fontFamily: fonts.numeral }]}>
-                {num(current.totalPeople)}
+              <Text
+                style={[styles.count, countSize(current.totalPeople, isRTL), { color: accent, fontFamily: fonts.numeral }]}
+                numberOfLines={1}
+              >
+                {groupedCount(current.totalPeople, isRTL)}
               </Text>
               <View style={styles.countText}>
                 <Text
@@ -520,43 +525,17 @@ const styles = StyleSheet.create({
   sectionLabelArabic: {
     fontSize: 13,
   },
-  periods: {
-    flexDirection: 'row',
-    gap: 4,
-    padding: 4,
-    borderRadius: 999,
-  },
-  period: {
-    height: 28,
-    paddingHorizontal: 12,
-    borderRadius: 999,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  periodLatin: {
-    fontSize: 11,
-    letterSpacing: 11 * 0.08,
-    textTransform: 'uppercase',
-  },
-  periodArabic: {
-    fontSize: 12.5,
-  },
   countRow: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     gap: 12,
   },
   count: {
-    fontSize: 36,
-    lineHeight: 36,
-  },
-  countArabic: {
-    lineHeight: 50,
+    flexShrink: 0,
   },
   countText: {
     flex: 1,
     gap: 4,
-    paddingBottom: 4,
   },
   countSentence: {
     fontSize: 14,
