@@ -111,7 +111,6 @@ export const COUNTRIES: Country[] = [
   { code: 'IR', en: 'Iran', ar: 'إيران', lat: 35.7, lon: 51.4 },
   { code: 'IQ', en: 'Iraq', ar: 'العراق', lat: 33.3, lon: 44.4 },
   { code: 'IE', en: 'Ireland', ar: 'أيرلندا', lat: 53.3, lon: -6.3 },
-  { code: 'IL', en: 'Israel', ar: 'إسرائيل', lat: 31.8, lon: 35.2 },
   { code: 'IT', en: 'Italy', ar: 'إيطاليا', lat: 41.9, lon: 12.5 },
   { code: 'JM', en: 'Jamaica', ar: 'جامايكا', lat: 18.0, lon: -76.8 },
   { code: 'JP', en: 'Japan', ar: 'اليابان', lat: 35.7, lon: 139.7 },
@@ -231,12 +230,17 @@ const GCC_SET = new Set<string>(GCC_CODES);
  * alphabetically by its name in the given language.
  */
 export function getCountryList(language: 'en' | 'ar'): Country[] {
+  const cached = listCache[language];
+  if (cached) return cached;
+  // One collator for the whole sort: `localeCompare(b, locale)` builds a new
+  // one per comparison, which made this sort take seconds on Hermes.
+  const collator = new Intl.Collator(language);
   const priority = GCC_CODES.map((code) => COUNTRIES.find((c) => c.code === code)!);
-  const rest = COUNTRIES.filter((c) => !GCC_SET.has(c.code)).sort((a, b) =>
-    a[language].localeCompare(b[language], language),
-  );
-  return [...priority, ...rest];
+  const rest = COUNTRIES.filter((c) => !GCC_SET.has(c.code)).sort((a, b) => collator.compare(a[language], b[language]));
+  return (listCache[language] = [...priority, ...rest]);
 }
+
+const listCache: Partial<Record<'en' | 'ar', Country[]>> = {};
 
 export function getCountryName(code: string, language: 'en' | 'ar'): string | null {
   const country = COUNTRIES.find((c) => c.code === code);

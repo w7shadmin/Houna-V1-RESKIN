@@ -1,0 +1,1092 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "AppIcon.dc.html": {
+      "h": 4128,
+      "title": "App icon — every option",
+      "w": 1280,
+      "x": 13022,
+      "y": 0
+    },
+    "AppIconGCC.dc.html": {
+      "h": 2633,
+      "title": "App icon — GCC editions",
+      "w": 1280,
+      "x": 14382,
+      "y": 0
+    },
+    "Badges.dc.html": {
+      "h": 1186,
+      "title": "Badges — nine skies",
+      "w": 1376,
+      "x": 6068,
+      "y": 11600
+    },
+    "BadgesP6.dc.html": {
+      "h": 984,
+      "title": "Phase 6 — Badges: skies inside gems",
+      "w": 1760,
+      "x": 2270,
+      "y": 23472
+    },
+    "BodiesDate.dc.html": {
+      "h": 984,
+      "title": "Phase 3 — Home: the Hijri date",
+      "w": 1760,
+      "x": 1410,
+      "y": 19380
+    },
+    "BodiesMonth.dc.html": {
+      "h": 984,
+      "is_interactive": true,
+      "title": "Phase 3 — the month of moons",
+      "w": 1760,
+      "x": 3250,
+      "y": 19380
+    },
+    "BodiesNight.dc.html": {
+      "h": 984,
+      "title": "Phase 3 — Night: the crescent bowl",
+      "w": 1330,
+      "x": 0,
+      "y": 19380
+    },
+    "BodiesSky.dc.html": {
+      "h": 984,
+      "title": "Phase 3 — the sky clock",
+      "w": 1330,
+      "x": 6070,
+      "y": 19380
+    },
+    "BodiesStarSun.dc.html": {
+      "h": 984,
+      "title": "Phase 3 — Sunrise: the star-lattice sun",
+      "w": 900,
+      "x": 5090,
+      "y": 19380
+    },
+    "Breathe.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Breathing session — in place (box)",
+      "w": 390,
+      "x": 3710,
+      "y": 0
+    },
+    "BreatheDay.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Breathing session (Dusk)",
+      "w": 390,
+      "x": 3710,
+      "y": 2420
+    },
+    "BreatheMorning.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Breathing session (Sunrise)",
+      "w": 390,
+      "x": 3710,
+      "y": 4840
+    },
+    "CheckIn.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "title": "Mood check-in — Houna bloom",
+      "w": 390,
+      "x": 4180,
+      "y": 0
+    },
+    "CheckInDay.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "title": "Mood check-in (Dusk)",
+      "w": 390,
+      "x": 4180,
+      "y": 2420
+    },
+    "CheckInMorning.dc.html": {
+      "h": 900,
+      "is_interactive": true,
+      "title": "Mood check-in (Sunrise)",
+      "w": 390,
+      "x": 4180,
+      "y": 4840
+    },
+    "CountdownR2.dc.html": {
+      "h": 994,
+      "title": "Round 2 — a countdown before each breathing exercise",
+      "w": 1760,
+      "x": 0,
+      "y": 25592
+    },
+    "Directory.dc.html": {
+      "h": 1120,
+      "is_interactive": true,
+      "title": "Professionals list",
+      "w": 390,
+      "x": 2300,
+      "y": 0
+    },
+    "DirectoryDay.dc.html": {
+      "h": 1120,
+      "is_interactive": true,
+      "title": "Professionals list (Dusk)",
+      "w": 390,
+      "x": 2300,
+      "y": 2420
+    },
+    "DirectoryMorning.dc.html": {
+      "h": 1120,
+      "is_interactive": true,
+      "title": "Professionals list (Sunrise)",
+      "w": 390,
+      "x": 2300,
+      "y": 4840
+    },
+    "DuskPressed.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Houna dusk — pressed logo",
+      "w": 390,
+      "x": 2914,
+      "y": 7200
+    },
+    "DuskScene.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Houna dusk — tap the mark on Home",
+      "w": 390,
+      "x": 7000,
+      "y": 2420
+    },
+    "DuskStory.dc.html": {
+      "h": 1603,
+      "title": "Houna dusk — storyboard & build plan",
+      "w": 1172,
+      "x": 7470,
+      "y": 2420
+    },
+    "Eclipses.dc.html": {
+      "h": 3340,
+      "title": "Houna eclipses — lunar, solar, annular",
+      "w": 1784,
+      "x": 6424,
+      "y": 7200
+    },
+    "FirstBreathP5.dc.html": {
+      "h": 984,
+      "title": "Phase 5 — one breath together, once",
+      "w": 1760,
+      "x": 1840,
+      "y": 22108
+    },
+    "FirstSplashP5.dc.html": {
+      "h": 984,
+      "title": "Phase 5 — the splash, each theme’s body",
+      "w": 1760,
+      "x": 0,
+      "y": 22108
+    },
+    "GemsP6.dc.html": {
+      "h": 1130,
+      "title": "Phase 6 — nine skies, set in gems",
+      "w": 1436,
+      "x": 4110,
+      "y": 23472
+    },
+    "GraphsMonthGlow.dc.html": {
+      "h": 984,
+      "title": "Phase 4 — the month of moons, nights practised",
+      "w": 1330,
+      "x": 3680,
+      "y": 20744
+    },
+    "GraphsMoonlight.dc.html": {
+      "h": 984,
+      "is_interactive": true,
+      "title": "Phase 4 — Recap: the month by moonlight",
+      "w": 1760,
+      "x": 0,
+      "y": 20744
+    },
+    "GraphsWeekArc.dc.html": {
+      "h": 984,
+      "title": "Phase 4 — Stats: the week as an arc",
+      "w": 1760,
+      "x": 1840,
+      "y": 20744
+    },
+    "HomeAppearance.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Home — appearance (tap the logo)",
+      "w": 390,
+      "x": 0,
+      "y": 11600
+    },
+    "HomeAppearanceStory.dc.html": {
+      "h": 4682,
+      "title": "Home — appearance, storyboard",
+      "w": 1354,
+      "x": 470,
+      "y": 11600
+    },
+    "HomeAr.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Home — Arabic (RTL)",
+      "w": 390,
+      "x": 1830,
+      "y": 0
+    },
+    "HomeArDay.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Home — Arabic (Dusk)",
+      "w": 390,
+      "x": 1830,
+      "y": 2420
+    },
+    "HomeArMorning.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Home — Arabic (Sunrise)",
+      "w": 390,
+      "x": 1830,
+      "y": 4840
+    },
+    "HomeDay.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Home — English (Dusk)",
+      "w": 390,
+      "x": 1360,
+      "y": 2420
+    },
+    "HomeFit.dc.html": {
+      "h": 1207,
+      "title": "Home — one screen",
+      "w": 1784,
+      "x": 7524,
+      "y": 11600
+    },
+    "HomeMapR2.dc.html": {
+      "h": 994,
+      "title": "Round 2 — Home’s map without its card",
+      "w": 2620,
+      "x": 6380,
+      "y": 25592
+    },
+    "HomeMorning.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Home — English (Sunrise)",
+      "w": 390,
+      "x": 1360,
+      "y": 4840
+    },
+    "Icons.dc.html": {
+      "h": 3944,
+      "title": "Icon library",
+      "w": 1280,
+      "x": 8942,
+      "y": 0
+    },
+    "IconsDay.dc.html": {
+      "h": 3944,
+      "title": "Icon library (Dusk)",
+      "w": 1280,
+      "x": 10302,
+      "y": 0
+    },
+    "IconsMorning.dc.html": {
+      "h": 3944,
+      "title": "Icon library (Sunrise)",
+      "w": 1280,
+      "x": 11662,
+      "y": 0
+    },
+    "Main.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Home — English",
+      "w": 390,
+      "x": 1360,
+      "y": 0
+    },
+    "MeditateFlow.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Meditate — cover flow (tap a side cover)",
+      "w": 390,
+      "x": 2100,
+      "y": 11600
+    },
+    "MeditateFlowStory.dc.html": {
+      "h": 2874,
+      "title": "Meditate — cover flow, storyboard",
+      "w": 1148,
+      "x": 2570,
+      "y": 11600
+    },
+    "MoodStates.dc.html": {
+      "h": 560,
+      "title": "Houna bloom — mood states",
+      "w": 1280,
+      "x": 0,
+      "y": 1300
+    },
+    "MoodStatesDay.dc.html": {
+      "h": 560,
+      "title": "Houna bloom — mood states (Dusk)",
+      "w": 1280,
+      "x": 0,
+      "y": 3720
+    },
+    "MoodStatesMorning.dc.html": {
+      "h": 560,
+      "title": "Houna bloom — mood states (Sunrise)",
+      "w": 1280,
+      "x": 0,
+      "y": 6240
+    },
+    "MoonConcepts.dc.html": {
+      "h": 1530,
+      "title": "Houna moon — concepts",
+      "w": 1332,
+      "x": 3464,
+      "y": 7200
+    },
+    "MoonPhases.dc.html": {
+      "h": 1380,
+      "title": "Houna moon — real phases",
+      "w": 1468,
+      "x": 4876,
+      "y": 7200
+    },
+    "MotionPhaseCard.dc.html": {
+      "h": 960,
+      "is_interactive": true,
+      "title": "Motion — an event card grows into its page",
+      "w": 1330,
+      "x": 1410,
+      "y": 16700
+    },
+    "MotionPhaseControls.dc.html": {
+      "h": 960,
+      "title": "Motion — controls step aside during practice",
+      "w": 1330,
+      "x": 2820,
+      "y": 16700
+    },
+    "MotionPhasePill.dc.html": {
+      "h": 960,
+      "title": "Motion — one glowing pill per screen",
+      "w": 1330,
+      "x": 5640,
+      "y": 16700
+    },
+    "MotionPhaseSheet.dc.html": {
+      "h": 960,
+      "is_interactive": true,
+      "title": "Motion — the check-in as a glass sheet",
+      "w": 1330,
+      "x": 0,
+      "y": 16700
+    },
+    "MotionPhaseTabs.dc.html": {
+      "h": 960,
+      "is_interactive": true,
+      "title": "Motion — the Tanafas tabs, three styles",
+      "w": 1330,
+      "x": 7050,
+      "y": 16700
+    },
+    "MotionPhaseWords.dc.html": {
+      "h": 960,
+      "is_interactive": true,
+      "title": "Motion — Home’s line arrives",
+      "w": 1330,
+      "x": 4230,
+      "y": 16700
+    },
+    "MyResults.dc.html": {
+      "h": 844,
+      "title": "My results",
+      "w": 390,
+      "x": 4370,
+      "y": 11600
+    },
+    "Numbers.dc.html": {
+      "h": 1486,
+      "title": "Numbers — four faces",
+      "w": 1724,
+      "x": 9468,
+      "y": 11600
+    },
+    "PlayersArabic.dc.html": {
+      "h": 960,
+      "title": "Players — Arabic hero and scenes (Night)",
+      "w": 900,
+      "x": 8460,
+      "y": 18040
+    },
+    "PlayersBackdrop.dc.html": {
+      "h": 960,
+      "title": "Players — the dawn backdrop for breathing sessions",
+      "w": 1330,
+      "x": 7050,
+      "y": 18040
+    },
+    "PlayersHero.dc.html": {
+      "h": 960,
+      "title": "Players — the Meditate tab as a hero",
+      "w": 1330,
+      "x": 0,
+      "y": 18040
+    },
+    "PlayersMinutes.dc.html": {
+      "h": 960,
+      "is_interactive": true,
+      "title": "Players — choosing a length (minutes wheel)",
+      "w": 1330,
+      "x": 2820,
+      "y": 18040
+    },
+    "PlayersOrb.dc.html": {
+      "h": 960,
+      "title": "Players — 4-7-8 with the glass orb",
+      "w": 1330,
+      "x": 4230,
+      "y": 18040
+    },
+    "PlayersScenes.dc.html": {
+      "h": 960,
+      "is_interactive": true,
+      "title": "Players — choosing a scene (arches, glass sheet)",
+      "w": 1330,
+      "x": 1410,
+      "y": 18040
+    },
+    "PlayersStar.dc.html": {
+      "h": 960,
+      "title": "Players — box breathing with the star",
+      "w": 1330,
+      "x": 5640,
+      "y": 18040
+    },
+    "PressedLogo.dc.html": {
+      "h": 1720,
+      "title": "Pressed logo — side by side",
+      "w": 1424,
+      "x": 0,
+      "y": 7200
+    },
+    "Professional.dc.html": {
+      "h": 1080,
+      "is_interactive": true,
+      "title": "Professional profile",
+      "w": 390,
+      "x": 2770,
+      "y": 0
+    },
+    "ProfessionalDay.dc.html": {
+      "h": 1080,
+      "is_interactive": true,
+      "title": "Professional profile (Dusk)",
+      "w": 390,
+      "x": 2770,
+      "y": 2420
+    },
+    "ProfessionalMorning.dc.html": {
+      "h": 1080,
+      "is_interactive": true,
+      "title": "Professional profile (Sunrise)",
+      "w": 390,
+      "x": 2770,
+      "y": 4840
+    },
+    "Profile.dc.html": {
+      "h": 1320,
+      "is_interactive": true,
+      "title": "Profile",
+      "w": 390,
+      "x": 6060,
+      "y": 0
+    },
+    "ProfileDay.dc.html": {
+      "h": 1320,
+      "is_interactive": true,
+      "title": "Profile (Dusk)",
+      "w": 390,
+      "x": 6060,
+      "y": 2420
+    },
+    "ProfileMorning.dc.html": {
+      "h": 1320,
+      "is_interactive": true,
+      "title": "Profile (Sunrise)",
+      "w": 390,
+      "x": 6060,
+      "y": 4840
+    },
+    "ProfileP6.dc.html": {
+      "h": 1740,
+      "title": "Phase 6 — Profile: the Kufic ring",
+      "w": 2190,
+      "x": 0,
+      "y": 23472
+    },
+    "ProfileRevamp.dc.html": {
+      "h": 1320,
+      "is_interactive": true,
+      "title": "Profile — revamp (tap a badge)",
+      "w": 390,
+      "x": 3900,
+      "y": 11600
+    },
+    "ProfileStory.dc.html": {
+      "h": 1513,
+      "title": "Profile — storyboard & notes",
+      "w": 1148,
+      "x": 4840,
+      "y": 11600
+    },
+    "Recap.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Recap (tap through)",
+      "w": 390,
+      "x": 6530,
+      "y": 0
+    },
+    "RecapDay.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Recap (Dusk)",
+      "w": 390,
+      "x": 6530,
+      "y": 2420
+    },
+    "RecapMorning.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Recap (Sunrise)",
+      "w": 390,
+      "x": 6530,
+      "y": 4840
+    },
+    "ResultsP6.dc.html": {
+      "h": 984,
+      "title": "Phase 6 — My results",
+      "w": 1760,
+      "x": 11146,
+      "y": 23472
+    },
+    "ScenesR2.dc.html": {
+      "h": 994,
+      "title": "Round 2 — the scene sheet, three ways",
+      "w": 2620,
+      "x": 3680,
+      "y": 25592
+    },
+    "Search.dc.html": {
+      "h": 1380,
+      "is_interactive": true,
+      "title": "Directory search",
+      "w": 390,
+      "x": 4650,
+      "y": 0
+    },
+    "SearchDay.dc.html": {
+      "h": 1380,
+      "is_interactive": true,
+      "title": "Directory search (Dusk)",
+      "w": 390,
+      "x": 4650,
+      "y": 2420
+    },
+    "SearchMorning.dc.html": {
+      "h": 1380,
+      "is_interactive": true,
+      "title": "Directory search (Sunrise)",
+      "w": 390,
+      "x": 4650,
+      "y": 4840
+    },
+    "SearchPhase3.dc.html": {
+      "h": 1640,
+      "title": "Directory search — phase 3",
+      "w": 1808,
+      "x": 0,
+      "y": 9500
+    },
+    "SighR2.dc.html": {
+      "h": 994,
+      "title": "Round 2 — the physiological sigh, a fifth exercise",
+      "w": 1760,
+      "x": 1840,
+      "y": 25592
+    },
+    "SkyP6.dc.html": {
+      "h": 984,
+      "title": "Phase 6 — Your sky",
+      "w": 1760,
+      "x": 9306,
+      "y": 23472
+    },
+    "Starfield.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Houna starfield — tap the mark on Home",
+      "w": 390,
+      "x": 7000,
+      "y": 0
+    },
+    "StarfieldPressedSilver.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Houna starfield — pressed logo, silver moon",
+      "w": 390,
+      "x": 1974,
+      "y": 7200
+    },
+    "StarfieldPressedTeal.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Houna starfield — pressed logo, teal moon",
+      "w": 390,
+      "x": 1504,
+      "y": 7200
+    },
+    "StreakP6.dc.html": {
+      "h": 984,
+      "title": "Phase 6 — Stats: the week in moons",
+      "w": 1760,
+      "x": 7466,
+      "y": 23472
+    },
+    "Sunrise.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Houna sunrise — tap the mark on Home",
+      "w": 390,
+      "x": 7000,
+      "y": 4840
+    },
+    "SunriseFromBelow.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Houna sunrise — from below (tap the mark)",
+      "w": 390,
+      "x": 8722,
+      "y": 4840
+    },
+    "SunriseFromBelowStory.dc.html": {
+      "h": 1300,
+      "title": "Houna sunrise — from below, storyboard",
+      "w": 1442,
+      "x": 9192,
+      "y": 4840
+    },
+    "SunrisePressed.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Houna sunrise — pressed logo",
+      "w": 390,
+      "x": 2444,
+      "y": 7200
+    },
+    "SunriseStory.dc.html": {
+      "h": 1378,
+      "title": "Houna sunrise — storyboard & build plan",
+      "w": 1172,
+      "x": 7470,
+      "y": 4840
+    },
+    "System.dc.html": {
+      "h": 1240,
+      "title": "Nightlight — direction & system",
+      "w": 1321,
+      "x": 0,
+      "y": 0
+    },
+    "SystemDay.dc.html": {
+      "h": 1213,
+      "title": "Dusk — direction & system",
+      "w": 1296,
+      "x": 0,
+      "y": 2420
+    },
+    "SystemMorning.dc.html": {
+      "h": 1360,
+      "title": "Sunrise — direction & system",
+      "w": 1360,
+      "x": 0,
+      "y": 4840
+    },
+    "Tanafas.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Tanafas — Breathe · Meditate · Discover",
+      "w": 390,
+      "x": 3240,
+      "y": 0
+    },
+    "TanafasDay.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Tanafas (Dusk)",
+      "w": 390,
+      "x": 3240,
+      "y": 2420
+    },
+    "TanafasMorning.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Tanafas (Sunrise)",
+      "w": 390,
+      "x": 3240,
+      "y": 4840
+    },
+    "TestQuestion.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Self-reflection — question",
+      "w": 390,
+      "x": 5120,
+      "y": 0
+    },
+    "TestQuestionDay.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Self-reflection — question (Dusk)",
+      "w": 390,
+      "x": 5120,
+      "y": 2420
+    },
+    "TestQuestionMorning.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "Self-reflection — question (Sunrise)",
+      "w": 390,
+      "x": 5120,
+      "y": 4840
+    },
+    "TestResult.dc.html": {
+      "h": 1240,
+      "is_interactive": true,
+      "title": "Self-reflection — results",
+      "w": 390,
+      "x": 5590,
+      "y": 0
+    },
+    "TestResultDay.dc.html": {
+      "h": 1240,
+      "is_interactive": true,
+      "title": "Self-reflection — results (Dusk)",
+      "w": 390,
+      "x": 5590,
+      "y": 2420
+    },
+    "TestResultMorning.dc.html": {
+      "h": 1240,
+      "is_interactive": true,
+      "title": "Self-reflection — results (Sunrise)",
+      "w": 390,
+      "x": 5590,
+      "y": 4840
+    },
+    "UnlockP6.dc.html": {
+      "h": 984,
+      "is_interactive": true,
+      "title": "Phase 6 — the unlock moment",
+      "w": 1760,
+      "x": 5626,
+      "y": 23472
+    },
+    "MarkAnchorR3.dc.html": {
+      "h": 1324,
+      "title": "Round 3 — the mark in one spot",
+      "w": 3480,
+      "x": 0,
+      "y": 26966
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-09-24T22:50:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "title": {
+      "kind": "title1",
+      "maxW": 7390,
+      "text": "Houna — Nightlight",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    },
+    "titleAccountPhase": {
+      "kind": "title1",
+      "maxW": 8000,
+      "text": "Houna — Account & badges (phase 6)",
+      "w": 240,
+      "x": 0,
+      "y": 23212
+    },
+    "titleBodiesPhase": {
+      "kind": "title1",
+      "maxW": 7400,
+      "text": "Houna — Home: suns and moons (phase 3)",
+      "w": 240,
+      "x": 0,
+      "y": 19120
+    },
+    "titleDay": {
+      "kind": "title1",
+      "maxW": 8000,
+      "text": "Houna — Dusk",
+      "w": 240,
+      "x": 0,
+      "y": 2120
+    },
+    "titleEclipses": {
+      "kind": "title1",
+      "maxW": 1784,
+      "text": "Houna — Eclipses",
+      "w": 240,
+      "x": 6424,
+      "y": 6900
+    },
+    "titleFirstRunPhase": {
+      "kind": "title1",
+      "maxW": 3600,
+      "text": "Houna — First run (phase 5)",
+      "w": 240,
+      "x": 0,
+      "y": 21848
+    },
+    "titleGraphsPhase": {
+      "kind": "title1",
+      "maxW": 5010,
+      "text": "Houna — Graphs (phase 4)",
+      "w": 240,
+      "x": 0,
+      "y": 20484
+    },
+    "titleHomeAppearance": {
+      "kind": "title1",
+      "maxW": 1824,
+      "text": "Houna — Home appearance",
+      "w": 240,
+      "x": 0,
+      "y": 11300
+    },
+    "titleIcons": {
+      "kind": "title1",
+      "maxW": 6760,
+      "text": "Houna — Icons & app icon",
+      "w": 240,
+      "x": 8942,
+      "y": -300
+    },
+    "titleMeditate": {
+      "kind": "title1",
+      "maxW": 1618,
+      "text": "Houna — Meditate",
+      "w": 240,
+      "x": 2100,
+      "y": 11300
+    },
+    "titleMorning": {
+      "kind": "title1",
+      "maxW": 8000,
+      "text": "Houna — Sunrise",
+      "w": 240,
+      "x": 0,
+      "y": 4540
+    },
+    "titleMotionPhase": {
+      "kind": "title1",
+      "maxW": 8000,
+      "text": "Houna — Motion (phase 1)",
+      "w": 240,
+      "x": 0,
+      "y": 16440
+    },
+    "titleNumbers": {
+      "kind": "title1",
+      "maxW": 1724,
+      "text": "Houna — Numbers",
+      "w": 240,
+      "x": 9468,
+      "y": 11300
+    },
+    "titlePlayersPhase": {
+      "kind": "title1",
+      "maxW": 8000,
+      "text": "Houna — Players (phase 2)",
+      "w": 240,
+      "x": 0,
+      "y": 17780
+    },
+    "titlePressed": {
+      "kind": "title1",
+      "maxW": 6344,
+      "text": "Houna — Pressed logo (alternative)",
+      "w": 240,
+      "x": 0,
+      "y": 6900
+    },
+    "titleProfile": {
+      "kind": "title1",
+      "maxW": 5408,
+      "text": "Houna — Profile & badges",
+      "w": 240,
+      "x": 3900,
+      "y": 11300
+    },
+    "titleRound2": {
+      "kind": "title1",
+      "maxW": 8000,
+      "text": "Houna — Round 2 (countdown, the sigh, scenes, Home’s map)",
+      "w": 240,
+      "x": 0,
+      "y": 25332
+    },
+    "titleSearch": {
+      "kind": "title1",
+      "maxW": 1808,
+      "text": "Houna — Directory search",
+      "w": 240,
+      "x": 0,
+      "y": 9200
+    },
+    "titleRound3": {
+      "kind": "title1",
+      "maxW": 3480,
+      "text": "Houna — Round 3 (the mark in one spot)",
+      "w": 240,
+      "x": 0,
+      "y": 26706
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "System.dc.html",
+    "MoodStates.dc.html",
+    "HomeAr.dc.html",
+    "Directory.dc.html",
+    "Professional.dc.html",
+    "Tanafas.dc.html",
+    "Breathe.dc.html",
+    "CheckIn.dc.html",
+    "Search.dc.html",
+    "TestQuestion.dc.html",
+    "TestResult.dc.html",
+    "Profile.dc.html",
+    "Recap.dc.html",
+    "Starfield.dc.html",
+    "SystemDay.dc.html",
+    "MoodStatesDay.dc.html",
+    "HomeDay.dc.html",
+    "HomeArDay.dc.html",
+    "DirectoryDay.dc.html",
+    "ProfessionalDay.dc.html",
+    "TanafasDay.dc.html",
+    "BreatheDay.dc.html",
+    "CheckInDay.dc.html",
+    "SearchDay.dc.html",
+    "TestQuestionDay.dc.html",
+    "TestResultDay.dc.html",
+    "ProfileDay.dc.html",
+    "RecapDay.dc.html",
+    "DuskScene.dc.html",
+    "DuskStory.dc.html",
+    "SystemMorning.dc.html",
+    "MoodStatesMorning.dc.html",
+    "HomeMorning.dc.html",
+    "HomeArMorning.dc.html",
+    "DirectoryMorning.dc.html",
+    "ProfessionalMorning.dc.html",
+    "TanafasMorning.dc.html",
+    "BreatheMorning.dc.html",
+    "CheckInMorning.dc.html",
+    "SearchMorning.dc.html",
+    "TestQuestionMorning.dc.html",
+    "TestResultMorning.dc.html",
+    "ProfileMorning.dc.html",
+    "RecapMorning.dc.html",
+    "Sunrise.dc.html",
+    "SunriseStory.dc.html",
+    "Icons.dc.html",
+    "IconsDay.dc.html",
+    "IconsMorning.dc.html",
+    "AppIcon.dc.html",
+    "AppIconGCC.dc.html",
+    "PressedLogo.dc.html",
+    "StarfieldPressedTeal.dc.html",
+    "StarfieldPressedSilver.dc.html",
+    "SunrisePressed.dc.html",
+    "DuskPressed.dc.html",
+    "MoonConcepts.dc.html",
+    "MoonPhases.dc.html",
+    "SunriseFromBelow.dc.html",
+    "SunriseFromBelowStory.dc.html",
+    "SearchPhase3.dc.html",
+    "Eclipses.dc.html",
+    "HomeAppearance.dc.html",
+    "HomeAppearanceStory.dc.html",
+    "MeditateFlow.dc.html",
+    "MeditateFlowStory.dc.html",
+    "ProfileRevamp.dc.html",
+    "MyResults.dc.html",
+    "ProfileStory.dc.html",
+    "Badges.dc.html",
+    "HomeFit.dc.html",
+    "Numbers.dc.html",
+    "MotionPhaseSheet.dc.html",
+    "MotionPhaseCard.dc.html",
+    "MotionPhaseControls.dc.html",
+    "MotionPhaseWords.dc.html",
+    "MotionPhasePill.dc.html",
+    "MotionPhaseTabs.dc.html",
+    "PlayersHero.dc.html",
+    "PlayersScenes.dc.html",
+    "PlayersMinutes.dc.html",
+    "PlayersOrb.dc.html",
+    "PlayersStar.dc.html",
+    "PlayersBackdrop.dc.html",
+    "PlayersArabic.dc.html",
+    "BodiesNight.dc.html",
+    "BodiesDate.dc.html",
+    "BodiesMonth.dc.html",
+    "BodiesStarSun.dc.html",
+    "BodiesSky.dc.html",
+    "GraphsMoonlight.dc.html",
+    "GraphsWeekArc.dc.html",
+    "GraphsMonthGlow.dc.html",
+    "FirstSplashP5.dc.html",
+    "FirstBreathP5.dc.html",
+    "ProfileP6.dc.html",
+    "BadgesP6.dc.html",
+    "GemsP6.dc.html",
+    "UnlockP6.dc.html",
+    "StreakP6.dc.html",
+    "SkyP6.dc.html",
+    "ResultsP6.dc.html",
+    "CountdownR2.dc.html",
+    "SighR2.dc.html",
+    "ScenesR2.dc.html",
+    "HomeMapR2.dc.html",
+    "MarkAnchorR3.dc.html"
+  ],
+  "pages": [],
+  "title": "Houna Redesign"
+}

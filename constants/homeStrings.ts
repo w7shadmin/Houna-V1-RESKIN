@@ -9,12 +9,92 @@
 
 export const homeStrings = {
   en: {
+    // The Hijri date under the logo (tonight's moon beside it), which opens the month of moons.
+    hijri: {
+      months: ['Muharram', 'Safar', 'Rabiʻ I', 'Rabiʻ II', 'Jumada I', 'Jumada II', 'Rajab', 'Shaʻban', 'Ramadan', 'Shawwal', 'Dhuʻl-Qiʻdah', 'Dhuʻl-Hijjah'],
+      phases: {
+        new: 'New moon',
+        waxingCrescent: 'Waxing crescent',
+        firstQuarter: 'First quarter',
+        waxingGibbous: 'Waxing gibbous',
+        full: 'Full moon',
+        waningGibbous: 'Waning gibbous',
+        lastQuarter: 'Last quarter',
+        waningCrescent: 'Waning crescent',
+      },
+      // The evening a month begins: the first thin crescent, seen at sunset.
+      hilal: 'The new crescent',
+      open: '{date}, {phase}. Shows the month.',
+    },
+    month: {
+      eyebrow: 'The month',
+      tonight: 'Tonight',
+      newMoonIn: {
+        zero: 'New moon tonight',
+        one: 'New moon in {n} day',
+        few: 'New moon in {n} days',
+      },
+      note: 'Every night of the Hijri month in its phase. Tap one to see it; tonight has the ring.',
+      close: 'Close the month',
+      practised: { one: '{n} minute practised', few: '{n} minutes practised' },
+    },
+    // The sky clock (long-press Home's sun or moon): the day from first light to now, then the hour.
+    // The Houna starfield: only its accessibility labels; the scene's one visible word is "Tanafas".
+    starfield: {
+      open: 'Breathe under the stars',
+      close: 'Back to Home',
+    },
+    // The Houna sunrise (Sunrise theme's counterpart): the same, with the mark becoming the sun.
+    sunrise: {
+      open: 'Breathe with the sunrise',
+      close: 'Back to Home',
+    },
+    // The Houna dusk (Dusk theme's counterpart): the mark becoming the evening sun.
+    dusk: {
+      open: 'Breathe with the dusk',
+      close: 'Back to Home',
+    },
     hero: {
       badge: "You're not alone",
       headline: 'SELF-CARE IS HOW YOU GAIN CONTROL OF YOUR LIFE',
       body: 'A non-profit haven for mental health support, knowledge, and resources in the Arab world.',
       cta: 'Explore Resources',
     },
+    /** Nightlight one-screen Home (canvas "Home — English"). */
+    topBar: {
+      moodCheckIn: 'Mood check-in',
+      moodCheckInPending: 'Mood check-in — not done today',
+      profile: 'Your profile',
+      logo: 'Houna',
+      // The logo as the appearance toggle (Home style "Sun & moon").
+      appearanceToggle: 'Appearance: {current}. Double-tap for {next}.',
+    },
+    /** Rotating line under "You're not alone". DRAFT copy from the canvas; awaiting final lines. */
+    lines: [
+      'Someone, somewhere, is breathing with you.',
+      'Small pauses, taken together, change a day.',
+      'You are one light among many.',
+    ],
+    community: {
+      a11yLabel: 'Houna community',
+      label: 'Breathing together',
+      periodsLabel: 'Time period',
+      /** Screen readers: tapping the rotating line shows the next one and stops the rotation. */
+      nextLine: 'Shows the next line',
+      periods: ['24H', 'Week', 'Month'],
+      periodText: ['in the last 24 hours', 'this week', 'this month'],
+      /** Follows the large count. `{period}` is one of `periodText`. */
+      people: {
+        one: 'person breathed and meditated with Houna {period}',
+        few: 'people breathed and meditated with Houna {period}',
+      },
+      countries: {
+        one: 'In {n} country',
+        few: 'Across {n} countries',
+      },
+      unavailable: 'Community activity will appear here soon.',
+    },
+    crisisButton: 'Need to talk now?',
     tanafasCard: {
       eyebrow: 'BREATHE',
       title: 'Tanafas',
@@ -24,20 +104,6 @@ export const homeStrings = {
       heading: 'How are you feeling today?',
       logged: 'Logged',
       viewHistory: 'View mood history',
-      /**
-       * Shown instead of `logged` when the day's mood-ping count (see
-       * lib/moodPings.ts) is 2 or more — i.e. never just the person who
-       * logged it. Plural-forms shaped like arabicPlural() expects even in
-       * English (which has no dual/few distinction) so both languages carry
-       * the same structure; `{n}` is replaced with the arabicNumber()'d or
-       * plain count by the caller.
-       */
-      notAlone: {
-        one: "You're not alone — {n} person felt this way today",
-        two: "You're not alone — {n} people felt this way today",
-        few: "You're not alone — {n} people felt this way today",
-        many: "You're not alone — {n} people felt this way today",
-      },
     },
     proResources: {
       heading: 'Professional Resources',
@@ -92,12 +158,89 @@ export const homeStrings = {
     },
   },
   ar: {
+    hijri: {
+      months: ['محرم', 'صفر', 'ربيع الأول', 'ربيع الآخر', 'جمادى الأولى', 'جمادى الآخرة', 'رجب', 'شعبان', 'رمضان', 'شوال', 'ذو القعدة', 'ذو الحجة'],
+      phases: {
+        new: 'محاق',
+        waxingCrescent: 'هلال متزايد',
+        firstQuarter: 'تربيع أول',
+        waxingGibbous: 'أحدب متزايد',
+        full: 'بدر',
+        waningGibbous: 'أحدب متناقص',
+        lastQuarter: 'تربيع أخير',
+        waningCrescent: 'هلال متناقص',
+      },
+      hilal: 'الهلال',
+      open: '{date}، {phase}. يعرض الشهر.',
+    },
+    month: {
+      eyebrow: 'الشهر',
+      tonight: 'الليلة',
+      newMoonIn: {
+        zero: 'المحاق الليلة',
+        one: 'المحاق بعد يوم واحد',
+        two: 'المحاق بعد يومين',
+        few: 'المحاق بعد {n} أيام',
+        many: 'المحاق بعد {n} يوماً',
+      },
+      note: 'كل ليالي الشهر الهجري بأطوارها. المس ليلة لتراها؛ الليلة محاطة بحلقة.',
+      close: 'إغلاق الشهر',
+      practised: { one: 'دقيقة واحدة من التمرّن', two: 'دقيقتان من التمرّن', few: '{n} دقائق من التمرّن', many: '{n} دقيقة من التمرّن' },
+    },
+    starfield: {
+      open: 'تنفّس تحت النجوم',
+      close: 'العودة إلى الرئيسية',
+    },
+    sunrise: {
+      open: 'تنفّس مع الشروق',
+      close: 'العودة إلى الرئيسية',
+    },
+    dusk: {
+      open: 'تنفّس مع الغسق',
+      close: 'العودة إلى الرئيسية',
+    },
     hero: {
       badge: 'لست وحدك',
       headline: 'العناية بالنفس هي كيف تسيطر على حياتك',
       body: 'ملاذ غير ربحي لدعم الصحة النفسية والموارد في العالم العربي.',
       cta: 'استكشف الموارد',
     },
+    /** Nightlight one-screen Home (canvas "Home — Arabic"). */
+    topBar: {
+      moodCheckIn: 'تسجيل المزاج',
+      moodCheckInPending: 'تسجيل المزاج — لم يتم اليوم',
+      profile: 'ملفك الشخصي',
+      logo: 'هُنا',
+      appearanceToggle: 'المظهر: {current}. انقر مرتين للتبديل إلى {next}.',
+    },
+    /** DRAFT copy from the canvas; awaiting final lines. */
+    lines: [
+      'في مكانٍ ما، أحدٌ يتنفّس معك.',
+      'لحظات هدوء صغيرة، معاً، تغيّر يوماً كاملاً.',
+      'أنت نورٌ بين أنوارٍ كثيرة.',
+    ],
+    community: {
+      a11yLabel: 'مجتمع هُنا',
+      label: 'نتنفّس معاً',
+      periodsLabel: 'الفترة',
+      nextLine: 'يعرض السطر التالي',
+      periods: ['٢٤ ساعة', 'أسبوع', 'شهر'],
+      periodText: ['خلال آخر ٢٤ ساعة', 'هذا الأسبوع', 'هذا الشهر'],
+      people: {
+        one: 'شخص تنفّس وتأمّل مع هُنا {period}',
+        two: 'شخصان تنفّسا وتأمّلا مع هُنا {period}',
+        few: 'أشخاص تنفّسوا وتأمّلوا مع هُنا {period}',
+        many: 'شخصاً تنفّسوا وتأمّلوا مع هُنا {period}',
+      },
+      countries: {
+        one: 'في دولة واحدة',
+        two: 'في دولتين',
+        few: 'في {n} دول',
+        many: 'في {n} دولة',
+      },
+      unavailable: 'سيظهر نشاط المجتمع هنا قريباً.',
+    },
+    crisisButton: 'تحتاج إلى التحدث الآن؟',
     tanafasCard: {
       eyebrow: 'تنفس',
       title: 'تنفّس',
@@ -107,12 +250,6 @@ export const homeStrings = {
       heading: 'كيف تشعر اليوم؟',
       logged: 'تم التسجيل',
       viewHistory: 'عرض سجل المزاج',
-      notAlone: {
-        one: 'لست وحدك — شعر شخص واحد بهذا الشعور اليوم',
-        two: 'لست وحدك — شعر شخصان بهذا الشعور اليوم',
-        few: 'لست وحدك — شعر {n} أشخاص بهذا الشعور اليوم',
-        many: 'لست وحدك — شعر {n} شخصًا بهذا الشعور اليوم',
-      },
     },
     proResources: {
       heading: 'الموارد المهنية',

@@ -2,14 +2,54 @@
   "expo": {
     "name": "Houna",
     "slug": "houna",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "houna",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "requireFullScreen": true,
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "audio"
+        ],
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "privacyManifests": {
+        "NSPrivacyTracking": false,
+        "NSPrivacyAccessedAPITypes": [
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryUserDefaults",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "CA92.1"
+            ]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "C617.1"
+            ]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategorySystemBootTime",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "35F9.1"
+            ]
+          },
+          {
+            "NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryDiskSpace",
+            "NSPrivacyAccessedAPITypeReasons": [
+              "E174.1"
+            ]
+          }
+        ]
+      }
+    },
+    "locales": {
+      "en": "./locales/en.json",
+      "ar": "./locales/ar.json"
     },
     "web": {
       "bundler": "metro",
@@ -24,35 +64,72 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/icon.png",
+          "image": "./assets/images/splash-mark.png",
           "resizeMode": "contain",
-          "backgroundColor": "#EFF0EE"
+          "backgroundColor": "#F5F1E8",
+          "dark": {
+            "image": "./assets/images/splash-mark-dark.png",
+            "backgroundColor": "#0B1026"
+          },
+          "ios": {
+            "imageWidth": 107
+          }
         }
       ],
       "expo-sqlite",
       "expo-video",
-      "expo-audio",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
       "expo-navigation-bar",
+      "./plugins/withNavigationBarContrastOff",
+      "./plugins/withReleaseSigning",
+      "./plugins/withoutRecordingService",
       [
         "expo-image-picker",
         {
-          "photosPermission": "Houna needs access to your photos so you can choose an avatar for your Alias."
+          "photosPermission": "Houna opens your photos only when you choose one as the picture for your Alias.",
+          "cameraPermission": false,
+          "microphonePermission": false
         }
       ],
-      "expo-notifications"
+      "expo-notifications",
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true
     },
     "android": {
       "permissions": [
-        "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS"
       ],
       "package": "com.anonymous.houna",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon.png",
+        "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#3BAAA7"
+      },
+      "blockedPermissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.CAMERA",
+        "com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE"
+      ],
+      "googleServicesFile": "./google-services.json",
+      "versionCode": 2
+    },
+    "androidNavigationBar": {
+      "enforceContrast": false
+    },
+    "owner": "w7sh",
+    "extra": {
+      "eas": {
+        "projectId": "6f3a96a6-db94-4bed-bce9-34f0e084cafa"
       }
     }
   }

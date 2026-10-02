@@ -15,6 +15,13 @@ import { eventsStrings } from './eventsStrings';
 import { journalStrings } from './journalStrings';
 import { homeStrings } from './homeStrings';
 import { accountStrings } from './accountStrings';
+import { crisisStrings } from './crisisStrings';
+import { checkInStrings } from './checkInStrings';
+import { discoverStrings } from './discoverStrings';
+import { recapStrings } from './recapStrings';
+import { profileStrings } from './profileStrings';
+import { firstRunStrings } from './firstRunStrings';
+import { badgeStrings, resultsStrings } from './badgeStrings';
 
 export type Language = 'en' | 'ar';
 
@@ -47,7 +54,22 @@ export const strings = {
       subheading: 'You are Houna',
       explore: 'Explore Houna',
     },
+    // Shown over the whole app when this version is too old (components/UpdateRequired.tsx).
+    update: {
+      title: 'Time to update Houna',
+      body: 'This version of Houna is no longer supported. Update to keep breathing with us.',
+      bodyNoStore: 'This version of Houna is no longer supported. Please install the new version you were sent.',
+      update: 'Update Houna',
+    },
     home: homeStrings.en,
+    crisis: crisisStrings.en,
+    checkIn: checkInStrings.en,
+    discover: discoverStrings.en,
+    recap: recapStrings.en,
+    firstRun: firstRunStrings.en,
+    badges: badgeStrings.en,
+    results: resultsStrings.en,
+    profile: profileStrings.en,
     directory: directoryStrings.en,
     events: eventsStrings.en,
     about: {
@@ -72,6 +94,8 @@ export const strings = {
       about: 'About / Who We Are',
       getInvolved: 'Get Involved',
       contact: 'Contact Us',
+      privacy: 'Privacy policy',
+      terms: 'Terms of use',
     },
     account: accountStrings.en,
     tanafas: tanafasStrings.en,
@@ -106,7 +130,21 @@ export const strings = {
       subheading: 'أنت هُنا',
       explore: 'استكشف هُنا',
     },
+    update: {
+      title: 'حان وقت تحديث هُنا',
+      body: 'لم يعد هذا الإصدار من هُنا مدعومًا. حدّثه لتواصل التنفّس معنا.',
+      bodyNoStore: 'لم يعد هذا الإصدار من هُنا مدعومًا. يُرجى تثبيت الإصدار الجديد الذي أُرسل إليك.',
+      update: 'تحديث هُنا',
+    },
     home: homeStrings.ar,
+    crisis: crisisStrings.ar,
+    checkIn: checkInStrings.ar,
+    discover: discoverStrings.ar,
+    recap: recapStrings.ar,
+    firstRun: firstRunStrings.ar,
+    badges: badgeStrings.ar,
+    results: resultsStrings.ar,
+    profile: profileStrings.ar,
     directory: directoryStrings.ar,
     events: eventsStrings.ar,
     about: {
@@ -129,6 +167,8 @@ export const strings = {
       about: 'عن هُنا / من نحن',
       getInvolved: 'شارك معنا',
       contact: 'تواصل معنا',
+      privacy: 'سياسة الخصوصية',
+      terms: 'شروط الاستخدام',
     },
     account: accountStrings.ar,
     tanafas: tanafasStrings.ar,

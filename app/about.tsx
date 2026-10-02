@@ -3,7 +3,8 @@ import { View, Text, Image, Pressable, ScrollView, ActivityIndicator, StyleSheet
 import { Award, HeartHandshake, Users, RotateCw, ChevronRight } from 'lucide-react-native';
 import DetailScreen from '@/components/DetailScreen';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, typography, shadows } from '@/constants/theme';
+import { spacing, radius, typography, shadows } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { fetchAbout, resolveImageUrl, type AboutData, type TeamMember } from '@/lib/hounaApi';
 
 // Members who've left since this content was scraped — filtered client-side
@@ -14,6 +15,7 @@ const REMOVED = new Set([
 ]);
 
 export default function AboutScreen() {
+  const { colors } = useTheme();
   const { t, language, fonts } = useLanguage();
   const s = t.about;
 
@@ -105,6 +107,8 @@ export default function AboutScreen() {
         <Text style={[styles.stateText, { color: colors.text, fontFamily: fonts.semiBold }]}>{error}</Text>
         <Pressable
           onPress={handleRetry}
+          accessibilityRole="button"
+          hitSlop={{ top: 5, bottom: 5 }}
           style={({ pressed }) => [
             styles.retryBtn,
             { backgroundColor: colors.primary },
@@ -158,7 +162,7 @@ export default function AboutScreen() {
         {!!(error && data) && (
           <View style={[styles.inlineError, { backgroundColor: colors.accent + '14', borderColor: colors.accent + '30' }]}>
             <Text style={[styles.inlineErrorText, { color: colors.accent, fontFamily: fonts.regular }]}>{error}</Text>
-            <Pressable onPress={handleRetry} style={({ pressed }) => pressed && { opacity: 0.6 }}>
+            <Pressable onPress={handleRetry} accessibilityRole="button" hitSlop={12} style={({ pressed }) => pressed && { opacity: 0.6 }}>
               <Text style={[styles.inlineRetryText, { color: colors.primary, fontFamily: fonts.semiBold }]}>
                 {s.retry}
               </Text>
@@ -170,7 +174,7 @@ export default function AboutScreen() {
   }
 
   return (
-    <DetailScreen title={t.more.about}>
+    <DetailScreen title={t.more.about} markGlow>
       {content}
     </DetailScreen>
   );
@@ -285,12 +289,12 @@ const styles = StyleSheet.create({
   },
   memberRole: {
     fontSize: typography.fontSize.xs,
-    marginTop: 1,
+    marginTop: 0,
   },
   memberBio: {
     fontSize: typography.fontSize.xs,
     lineHeight: typography.lineHeight.xs,
-    marginTop: 2,
+    marginTop: 4,
   },
   inlineError: {
     marginTop: spacing.md,

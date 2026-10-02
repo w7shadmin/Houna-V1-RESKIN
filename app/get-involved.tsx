@@ -6,7 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 export default function GetInvolvedScreen() {
   const { t } = useLanguage();
   return (
-    <DetailScreen title={t.more.getInvolved}>
+    <DetailScreen title={t.more.getInvolved} markGlow>
       <ComingSoon />
     </DetailScreen>
   );

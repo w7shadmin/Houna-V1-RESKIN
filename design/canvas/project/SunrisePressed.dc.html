@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Houna sunrise — pressed logo</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;family=Figtree:wght@400;500;600&amp;family=Marcellus&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F2F6F4;font-family:'Figtree',system-ui,sans-serif;color:#1D2B2A}
+@keyframes rise-chrome{0.0%{opacity:1}12.0%{opacity:0}100.0%{opacity:0}}
+@keyframes rise-markHome{0.0%{opacity:1}30.0%{opacity:1}60.0%{opacity:0}100.0%{opacity:0}}
+@keyframes rise-markSun{0.0%{opacity:0}30.0%{opacity:0}60.0%{opacity:1}100.0%{opacity:1}}
+@keyframes rise-disc{0.0%{opacity:0}30.0%{opacity:0}85.0%{opacity:1}100.0%{opacity:1}}
+@keyframes rise-skyA{0.0%{opacity:0}15.0%{opacity:1}35.0%{opacity:1}80.0%{opacity:0}100.0%{opacity:0}}
+@keyframes rise-skyB{0.0%{opacity:0}30.0%{opacity:0}100.0%{opacity:1}}
+@keyframes rise-sun{0.0%{transform:translateY(85.0px) scale(1.000)}10.0%{transform:translateY(85.0px) scale(1.000)}30.0%{transform:translateY(130.1px) scale(1.000)}70.0%{transform:translateY(259.0px) scale(0.918)}85.0%{transform:translateY(259.0px) scale(0.900)}100.0%{transform:translateY(259.0px) scale(0.900)}}
+@keyframes set-chrome{0.0%{opacity:0}65.0%{opacity:0}100.0%{opacity:1}}
+@keyframes set-markHome{0.0%{opacity:0}30.0%{opacity:0}60.0%{opacity:1}100.0%{opacity:1}}
+@keyframes set-markSun{0.0%{opacity:1}30.0%{opacity:1}60.0%{opacity:0}100.0%{opacity:0}}
+@keyframes set-disc{0.0%{opacity:1}45.0%{opacity:0}100.0%{opacity:0}}
+@keyframes set-skyA{0.0%{opacity:0}25.0%{opacity:0.7}50.0%{opacity:0.7}80.0%{opacity:0}100.0%{opacity:0}}
+@keyframes set-skyB{0.0%{opacity:1}30.0%{opacity:0}100.0%{opacity:0}}
+@keyframes set-sun{0.0%{transform:translateY(259.0px) scale(0.900)}15.0%{transform:translateY(259.0px) scale(0.916)}60.0%{transform:translateY(112.2px) scale(1.000)}75.0%{transform:translateY(85.0px) scale(1.000)}100.0%{transform:translateY(85.0px) scale(1.000)}}
+@keyframes breath{0%{transform:scale(0.95);opacity:0.2}50%{transform:scale(1.1);opacity:1}100%{transform:scale(0.95);opacity:0.2}}
+@keyframes sunglow{0%{transform:scale(0.92);opacity:0.3}50%{transform:scale(1.08);opacity:1}100%{transform:scale(0.92);opacity:0.3}}
+@keyframes rays{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes halo-l0{from{transform:rotate(0deg) scale(1.04,0.96)}to{transform:rotate(360deg) scale(1.04,0.96)}}
+@keyframes halo-l1{from{transform:rotate(45deg) scale(0.96,1.04)}to{transform:rotate(-315deg) scale(0.96,1.04)}}
+@keyframes halo-l2{from{transform:rotate(100deg) scale(1.03,0.97)}to{transform:rotate(820deg) scale(1.03,0.97)}}
+@keyframes shoot{0%{opacity:0;transform:translate(0,0) rotate(-24deg)}2%{opacity:1}14%{opacity:0.9}18%{opacity:0;transform:translate(-560px,250px) rotate(-24deg)}100%{opacity:0;transform:translate(-560px,250px) rotate(-24deg)}}
+@keyframes shoot-b{0%{opacity:0;transform:translate(0,0) rotate(20deg)}2%{opacity:1}14%{opacity:0.9}18%{opacity:0;transform:translate(540px,196px) rotate(20deg)}100%{opacity:0;transform:translate(540px,196px) rotate(20deg)}}
+@keyframes twinkle{0%{opacity:0.35}50%{opacity:1}100%{opacity:0.35}}
+@keyframes word{0%{opacity:0;transform:translateY(4px)}15%{opacity:1;transform:translateY(0)}80%{opacity:1}100%{opacity:0}}
+@media (prefers-reduced-motion: reduce){*{animation-duration:0.01s!important;animation-delay:0s!important;animation-iteration-count:1!important}}
+
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; background: #F2F6F4; font-family: 'Figtree', system-ui, sans-serif">
+<span aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 390px; height: 844px; background: linear-gradient(180deg, #274A5E 0%, #4F7A86 42%, #C99A8A 80%, #F2B38F 100%); opacity: 0.000; animation: {{a_skyA}}"></span>
+<span aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 390px; height: 844px; background: linear-gradient(180deg, #A9DDE0 0%, #DDF1EF 38%, #FCE7D8 74%, #FBC9A6 100%); opacity: 0.000; animation: {{a_skyB}}"></span>
+
+
+<div role="button" aria-label="{{sunLabel}}" onClick="{{toggle}}" style="position: absolute; left: 100px; top: 0; width: 190px; height: 190px; cursor: pointer; transform: translateY(85.0px) scale(1.000); animation: {{a_sun}}">
+<div style="position: absolute; left: 0; top: 0; width: 190px; height: 190px; opacity: 0.000; animation: {{a_disc}}">
+<span style="position: absolute; left: -115px; top: -115px; width: 420px; height: 420px; border-radius: 999px; background: radial-gradient(circle closest-side, rgba(249,169,128,0.28) 20%, rgba(249,169,128,0) 100%); animation: {{a_glow}}"></span>
+<div style="position: absolute; left: 0; top: 0; width: 190px; height: 190px; animation: {{a_breath}}">
+<span style="position: absolute; left: -95px; top: -95px; width: 380px; height: 380px; border-radius: 999px; background: repeating-conic-gradient(from 0deg, rgba(255,222,190,0.45) 0deg 3deg, rgba(255,222,190,0) 3deg 15deg); -webkit-mask-image: radial-gradient(circle, #000 26%, transparent 64%); mask-image: radial-gradient(circle, #000 26%, transparent 64%); animation: rays 120s linear infinite"></span>
+<div style="position: absolute; left: -25px; top: -25px; width: 240px; height: 240px"><span style="position: absolute; left: 0; top: 0; width: 240px; height: 240px; border-radius: 999px; background: radial-gradient(circle closest-side, rgba(249,169,128,0) 51.5%, rgba(249,169,128,0.263) 58%, rgba(249,169,128,0) 100%); animation: halo-l0 120s linear infinite"></span><span style="position: absolute; left: 0; top: 0; width: 240px; height: 240px; border-radius: 999px; background: radial-gradient(circle closest-side, rgba(249,169,128,0) 51.5%, rgba(249,169,128,0.263) 58%, rgba(249,169,128,0) 100%); animation: halo-l1 120s linear infinite"></span><span style="position: absolute; left: 0; top: 0; width: 240px; height: 240px; border-radius: 999px; background: radial-gradient(circle closest-side, rgba(249,169,128,0) 51.5%, rgba(249,169,128,0.263) 58%, rgba(249,169,128,0) 100%); animation: halo-l2 120s linear infinite"></span></div>
+</div>
+<span style="position: absolute; left: 29px; top: 29px; width: 132px; height: 132px; border-radius: 999px; background: radial-gradient(circle at 50% 45%, #FFF9F1 0%, #FFE9D3 52%, #FBC8A3 82%, #F9A980 100%); box-shadow: 0 0 14px rgba(249,169,128,0.45)"></span>
+</div>
+<div style="position: absolute; left: 0; top: 0; width: 190px; height: 190px; opacity: 1.000; animation: {{a_markHome}}"><span style="position: absolute; left: 35.5px; top: 35.5px; width: 119px; height: 119px; border-radius: 999px; background: radial-gradient(circle closest-side, rgba(59,170,167,0) 52%, rgba(59,170,167,0.5) 61%, rgba(59,170,167,0) 100%)"></span><svg aria-hidden="true" width="70" height="70" viewBox="17 5.4 20.6 20.6" style="position: absolute; left: 50%; top: 50%; margin-left: -35px; margin-top: -35px; overflow: visible; "><g transform="translate(-10.7 -6.6)"><g transform="translate(29.24 13.384)"><path d="M50.18,33.714a6.82,6.82,0,0,1-2.116-1.448,7.132,7.132,0,0,1-1.448-2.116,6.565,6.565,0,0,1-.5-2.561,7.052,7.052,0,0,1,.5-2.617,6.228,6.228,0,0,1,1.448-2.116A7.132,7.132,0,0,1,50.18,21.41a6.565,6.565,0,0,1,2.561-.5,7.052,7.052,0,0,1,2.617.5,6.228,6.228,0,0,1,2.116,1.448,7.132,7.132,0,0,1,1.448,2.116,6.843,6.843,0,0,1,.5,2.617,6.565,6.565,0,0,1-.5,2.561,6.82,6.82,0,0,1-1.448,2.116,7.132,7.132,0,0,1-2.116,1.448,6.843,6.843,0,0,1-2.617.5,6.769,6.769,0,0,1-2.561-.5m-.835-14.253a8.809,8.809,0,0,0-2.784,1.893,8.2,8.2,0,0,0-1.893,2.839A8.871,8.871,0,0,0,44,27.646a9.074,9.074,0,0,0,.668,3.452,8.224,8.224,0,0,0,1.893,2.784,8.525,8.525,0,0,0,2.784,1.893,9.251,9.251,0,0,0,6.9,0,9.744,9.744,0,0,0,2.839-1.893A8.525,8.525,0,0,0,60.981,31.1a9.251,9.251,0,0,0,0-6.9,9.744,9.744,0,0,0-1.893-2.839,8.2,8.2,0,0,0-2.839-1.893,8.871,8.871,0,0,0-3.452-.668,7.232,7.232,0,0,0-3.452.668" transform="translate(-44 -18.785)" fill="#3BAAA7"></path></g><g transform="translate(31.801 13.392)"><path d="M48.6,24.924c0,3.4,6.124,5.679,6.124,8.685,0-3.006,6.124-5.289,6.124-8.685a6.124,6.124,0,0,0-12.248,0M57.452,24.367A2.672,2.672,0,1,1,54.779,21.695a2.71,2.71,0,0,1,2.672,2.672Z" transform="translate(-48.6 -18.8)" fill="#3BAAA7" fill-rule="evenodd"></path></g></g></svg></div>
+<div style="position: absolute; left: 0; top: 0; width: 190px; height: 190px; opacity: 0.000; animation: {{a_markSun}}"><svg aria-hidden="true" width="70" height="70" viewBox="17 5.4 20.6 20.6" style="position: absolute; left: 50%; top: 50%; margin-left: -35px; margin-top: -35px; overflow: visible; opacity: 0.7"><g transform="translate(-10.7 -6.6)"><g transform="translate(29.24 13.384)"><path d="M50.18,33.714a6.82,6.82,0,0,1-2.116-1.448,7.132,7.132,0,0,1-1.448-2.116,6.565,6.565,0,0,1-.5-2.561,7.052,7.052,0,0,1,.5-2.617,6.228,6.228,0,0,1,1.448-2.116A7.132,7.132,0,0,1,50.18,21.41a6.565,6.565,0,0,1,2.561-.5,7.052,7.052,0,0,1,2.617.5,6.228,6.228,0,0,1,2.116,1.448,7.132,7.132,0,0,1,1.448,2.116,6.843,6.843,0,0,1,.5,2.617,6.565,6.565,0,0,1-.5,2.561,6.82,6.82,0,0,1-1.448,2.116,7.132,7.132,0,0,1-2.116,1.448,6.843,6.843,0,0,1-2.617.5,6.769,6.769,0,0,1-2.561-.5m-.835-14.253a8.809,8.809,0,0,0-2.784,1.893,8.2,8.2,0,0,0-1.893,2.839A8.871,8.871,0,0,0,44,27.646a9.074,9.074,0,0,0,.668,3.452,8.224,8.224,0,0,0,1.893,2.784,8.525,8.525,0,0,0,2.784,1.893,9.251,9.251,0,0,0,6.9,0,9.744,9.744,0,0,0,2.839-1.893A8.525,8.525,0,0,0,60.981,31.1a9.251,9.251,0,0,0,0-6.9,9.744,9.744,0,0,0-1.893-2.839,8.2,8.2,0,0,0-2.839-1.893,8.871,8.871,0,0,0-3.452-.668,7.232,7.232,0,0,0-3.452.668" transform="translate(-44 -18.785)" fill="rgb(191,154,132)"></path></g><g transform="translate(31.801 13.392)"><path d="M48.6,24.924c0,3.4,6.124,5.679,6.124,8.685,0-3.006,6.124-5.289,6.124-8.685a6.124,6.124,0,0,0-12.248,0M57.452,24.367A2.672,2.672,0,1,1,54.779,21.695a2.71,2.71,0,0,1,2.672,2.672Z" transform="translate(-48.6 -18.8)" fill="rgb(191,154,132)" fill-rule="evenodd"></path></g></g></svg></div>
+</div>
+<div aria-hidden="true" style="position: absolute; left: 0; top: 0; width: 390px; height: 844px; pointer-events: none; opacity: 1.000; animation: {{a_chrome}}">
+<span style="position: absolute; left: 16px; top: 16px; width: 44px; height: 44px; border-radius: 999px; background: #FFFFFF; border: 1px solid rgba(29,43,42,0.12); box-sizing: border-box"></span>
+<span style="position: absolute; left: 0; right: 0; top: 26px; text-align: center; font-family: 'Marcellus', serif; font-size: 22px; color: #3BAAA7">houna</span>
+<span style="position: absolute; right: 16px; top: 16px; width: 44px; height: 44px; border-radius: 999px; background: #FFFFFF; border: 1px solid rgba(29,43,42,0.12); box-sizing: border-box"></span>
+<span style="position: absolute; left: 193.8px; top: 92.8px; width: 2.5px; height: 2.5px; border-radius: 999px; background: #196662; opacity: 0.22"></span><span style="position: absolute; left: 212.7px; top: 94.7px; width: 2.9px; height: 2.9px; border-radius: 999px; background: #196662; opacity: 0.31"></span><span style="position: absolute; left: 230.6px; top: 100.8px; width: 3.4px; height: 3.4px; border-radius: 999px; background: #196662; opacity: 0.39"></span><span style="position: absolute; left: 246.7px; top: 110.9px; width: 3.8px; height: 3.8px; border-radius: 999px; background: #196662; opacity: 0.48"></span><span style="position: absolute; left: 260.1px; top: 124.3px; width: 4.2px; height: 4.2px; border-radius: 999px; background: #196662; opacity: 0.56"></span><span style="position: absolute; left: 270.2px; top: 140.4px; width: 4.6px; height: 4.6px; border-radius: 999px; background: #196662; opacity: 0.63"></span><span style="position: absolute; left: 276.3px; top: 158.4px; width: 5.0px; height: 5.0px; border-radius: 999px; background: #196662; opacity: 0.71"></span><span style="position: absolute; left: 278.3px; top: 177.3px; width: 5.3px; height: 5.3px; border-radius: 999px; background: #196662; opacity: 0.77"></span><span style="position: absolute; left: 276.0px; top: 196.3px; width: 5.6px; height: 5.6px; border-radius: 999px; background: #196662; opacity: 0.83"></span><span style="position: absolute; left: 269.5px; top: 214.4px; width: 5.9px; height: 5.9px; border-radius: 999px; background: #196662; opacity: 0.88"></span><span style="position: absolute; left: 259.2px; top: 230.6px; width: 6.1px; height: 6.1px; border-radius: 999px; background: #196662; opacity: 0.92"></span><span style="position: absolute; left: 245.5px; top: 244.1px; width: 6.3px; height: 6.3px; border-radius: 999px; background: #196662; opacity: 0.96"></span><span style="position: absolute; left: 229.1px; top: 254.3px; width: 6.4px; height: 6.4px; border-radius: 999px; background: #196662; opacity: 0.98"></span><span style="position: absolute; left: 210.9px; top: 260.6px; width: 6.5px; height: 6.5px; border-radius: 999px; background: #196662; opacity: 1.00"></span><span style="position: absolute; left: 191.8px; top: 262.8px; width: 6.5px; height: 6.5px; border-radius: 999px; background: #0A91BB; opacity: 1.00"></span><span style="position: absolute; left: 172.6px; top: 260.6px; width: 6.5px; height: 6.5px; border-radius: 999px; background: #0A91BB; opacity: 1.00"></span><span style="position: absolute; left: 154.5px; top: 254.3px; width: 6.4px; height: 6.4px; border-radius: 999px; background: #0A91BB; opacity: 0.98"></span><span style="position: absolute; left: 138.2px; top: 244.1px; width: 6.3px; height: 6.3px; border-radius: 999px; background: #0A91BB; opacity: 0.96"></span><span style="position: absolute; left: 124.7px; top: 230.6px; width: 6.1px; height: 6.1px; border-radius: 999px; background: #0A91BB; opacity: 0.92"></span><span style="position: absolute; left: 114.6px; top: 214.4px; width: 5.9px; height: 5.9px; border-radius: 999px; background: #0A91BB; opacity: 0.88"></span><span style="position: absolute; left: 108.3px; top: 196.3px; width: 5.6px; height: 5.6px; border-radius: 999px; background: #0A91BB; opacity: 0.83"></span><span style="position: absolute; left: 106.3px; top: 177.3px; width: 5.3px; height: 5.3px; border-radius: 999px; background: #0A91BB; opacity: 0.77"></span><span style="position: absolute; left: 108.7px; top: 158.4px; width: 5.0px; height: 5.0px; border-radius: 999px; background: #0A91BB; opacity: 0.71"></span><span style="position: absolute; left: 115.2px; top: 140.4px; width: 4.6px; height: 4.6px; border-radius: 999px; background: #0A91BB; opacity: 0.63"></span><span style="position: absolute; left: 125.6px; top: 124.3px; width: 4.2px; height: 4.2px; border-radius: 999px; background: #0A91BB; opacity: 0.56"></span><span style="position: absolute; left: 139.5px; top: 110.9px; width: 3.8px; height: 3.8px; border-radius: 999px; background: #0A91BB; opacity: 0.48"></span><span style="position: absolute; left: 156.0px; top: 100.8px; width: 3.4px; height: 3.4px; border-radius: 999px; background: #0A91BB; opacity: 0.39"></span><span style="position: absolute; left: 174.4px; top: 94.7px; width: 2.9px; height: 2.9px; border-radius: 999px; background: #0A91BB; opacity: 0.31"></span>
+<div style="position: absolute; left: 0; right: 0; top: 292px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center">
+<span style="font-family: 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; color: #196662">● YOU'RE NOT ALONE</span>
+<span style="font-family: 'Marcellus', serif; font-size: 20px; color: #1D2B2A">You are one light among many.</span>
+</div>
+<div style="position: absolute; left: 16px; right: 16px; top: 372px; height: 226px; border-radius: 24px; background: #FFFFFF; border: 1px solid rgba(29,43,42,0.10); box-sizing: border-box; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.14em; color: #6D6F72">BREATHING TOGETHER</span>
+<span style="flex: 1; border-radius: 14px; background: radial-gradient(circle at 30% 40%, rgba(29,43,42,0.10) 1.2px, transparent 1.6px) 0 0 / 9px 9px"></span>
+<span style="font-size: 13px; color: #58595B">people breathed with Houna this month</span>
+</div>
+<span style="position: absolute; left: 50%; top: 620px; transform: translateX(-50%); padding: 10px 18px; border-radius: 999px; background: rgba(249,169,128,0.08); border: 1px solid rgba(249,169,128,0.4); font-size: 13px; color: #1D2B2A; white-space: nowrap">Need to talk now?</span>
+<div style="position: absolute; left: 0; right: 0; bottom: 0; height: 84px; background: #FFFFFF; border-top: 1px solid rgba(29,43,42,0.08); display: flex; align-items: flex-start; padding-top: 12px">
+<span style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; color: #196662"><span style="width: 22px; height: 22px; border-radius: 6px; border: 1.6px solid currentColor; box-sizing: border-box"></span>Home</span><span style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; font-weight: 400; color: #6D6F72"><span style="width: 22px; height: 22px; border-radius: 6px; border: 1.6px solid currentColor; box-sizing: border-box"></span>Directory</span><span style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; color: #6D6F72"><span style="margin-top: -30px; width: 56px; height: 56px; border-radius: 999px; background: #196662; box-shadow: 0 0 0 6px #F2F6F4, 0 0 32px rgba(59,170,167,0.45)"></span>Tanafas</span><span style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; font-weight: 400; color: #6D6F72"><span style="width: 22px; height: 22px; border-radius: 6px; border: 1.6px solid currentColor; box-sizing: border-box"></span>Events</span><span style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; font-weight: 400; color: #6D6F72"><span style="width: 22px; height: 22px; border-radius: 6px; border: 1.6px solid currentColor; box-sizing: border-box"></span>More</span>
+</div>
+</div>
+<span aria-hidden="true" style="position: absolute; left: 0; right: 0; bottom: 56px; text-align: center; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.3em; color: #58595B; opacity: 0; animation: {{a_word}}">TANAFAS</span>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { phase: 'home' };
+  }
+  renderVals() {
+    const phase = this.state.phase;
+    const dur = { rise: 3.6, set: 2.6 }[phase];
+    const vals = {};
+    for (const k of ["chrome","markHome","markSun","disc","skyA","skyB","sun"]) vals['a_' + k] = phase === 'home' ? 'none' : phase + '-' + k + ' ' + dur + 's ease-in-out forwards';
+    return Object.assign(vals, {
+      a_breath: phase === 'rise' ? 'breath 5s ease-in-out 3.6s infinite' : 'none',
+      a_glow: phase === 'rise' ? 'sunglow 5s ease-in-out 3.6s infinite' : 'none',
+      a_word: phase === 'rise' ? 'word 4.5s ease-in-out 3.8000000000000003s forwards' : 'none',
+      sunLabel: phase === 'rise' ? 'Back to Home' : 'Breathe with the sunrise',
+      toggle: () => this.setState({ phase: phase === 'rise' ? 'set' : 'rise' })
+    });
+  }
+}
+</script>
+</body>
+</html>

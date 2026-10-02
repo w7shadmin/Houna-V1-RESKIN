@@ -1,0 +1,54 @@
+{
+  "id": "asrs5",
+  "version": 1,
+  "title": { "en": "Attention & focus (ASRS-5)", "ar": "الانتباه والتركيز (ASRS-5)" },
+  "description": {
+    "en": "Six questions from the World Health Organization's adult ADHD screener for DSM-5, about the past six months. The Arabic is the Saudi ADHD Society's standardised version.",
+    "ar": "ستة أسئلة من أداة منظمة الصحة العالمية لفحص اضطراب فرط الحركة وتشتت الانتباه لدى البالغين (الإصدار الخامس)، عن الأشهر الستة الماضية. النسخة العربية هي نسخة جمعية إشراق المقننة."
+  },
+  "source": {
+    "citation": "Ustun B, Adler LA, Rudin C, et al. The World Health Organization Adult Attention-Deficit/Hyperactivity Disorder Self-Report Screening Scale for DSM-5. JAMA Psychiatry. 2017;74(5):520–526. ASRS-5 © New York University and President and Fellows of Harvard College, from the Composite International Diagnostic Interview for DSM-5 (CIDI-5.0) © President and Fellows of Harvard College. Arabic: Saudi ADHD Society (Eshraq), ASRS-5-AR; Alqahtani MMJ, et al. Standardization of the Arabic Version of the Adult ADHD Self-Report Screening Scale for DSM-5 (ASRS-5) Among Adults in Saudi Arabia. J Atten Disord. 2025.",
+    "licence": "The simple 0–24 total may be used without permission (no diagnostic cut-off). The weighted scoring and cut-offs, and commercial use, need a licence from NYU (Dr Lenard Adler). Arabic version: Saudi ADHD Society, Creative Commons.",
+    "url": "https://cpg.adhd.org.sa"
+  },
+  "instructions": {
+    "en": "Choose the answer that best describes how often each of these has applied to how you've felt and lived over the past 6 months.",
+    "ar": "اختر ما يعبر عن معدل تكرار الأمور التالية المتعلقة بشعورك وأسلوب حياتك خلال الشهور الستة الماضية."
+  },
+  "scale": {
+    "min": 0,
+    "max": 4,
+    "labels": {
+      "en": ["Never", "Rarely", "Sometimes", "Often", "Very often"],
+      "ar": ["إطلاقاً", "نادراً", "أحياناً", "كثيراً", "كثيراً جداً"]
+    }
+  },
+  "traits": [
+    {
+      "key": "total",
+      "label": { "en": "Signs of adult ADHD", "ar": "علامات فرط الحركة وتشتت الانتباه لدى البالغين" },
+      "description": { "en": "How often these six signs have shown up for you, from 0 to 24.", "ar": "مدى تكرار هذه العلامات الست لديك، من ٠ إلى ٢٤." }
+    }
+  ],
+  "items": [
+    { "id": "q1", "trait": "total", "reverse": false, "text": { "en": "How often do you have difficulty concentrating on what people say to you, even when they are speaking to you directly?", "ar": "إلى أي مدى تجد صعوبة في التركيز على ما يقوله لك الآخرون، حتى عندما يوجهون لك الحديث مباشرة؟" } },
+    { "id": "q2", "trait": "total", "reverse": false, "text": { "en": "How often do you leave your seat in meetings or other situations in which you are expected to remain seated?", "ar": "ما مدى تكرار مغادرة مقعدك أثناء الاجتماعات أو في المواقف الأخرى التي يتوقع فيها منك أن تبقى جالساً؟" } },
+    { "id": "q3", "trait": "total", "reverse": false, "text": { "en": "How often do you have difficulty unwinding and relaxing when you have time to yourself?", "ar": "إلى أي مدى تواجه صعوبة في الاسترخاء والراحة عندما يكون لديك متسع من الوقت لنفسك؟" } },
+    { "id": "q4", "trait": "total", "reverse": false, "text": { "en": "When you're in a conversation, how often do you find yourself finishing the sentences of the people you are talking to before they can finish them themselves?", "ar": "أثناء الحوار مع الآخرين، إلى أي مدى تجد نفسك تُكمل جمل الأشخاص الذين تتكلم معهم قبل أن يتمكنوا هم من إكمالها؟" } },
+    { "id": "q5", "trait": "total", "reverse": false, "text": { "en": "How often do you put things off until the last minute?", "ar": "إلى أي مدى تؤجل الأمور حتى آخر لحظة؟" } },
+    { "id": "q6", "trait": "total", "reverse": false, "text": { "en": "How often do you depend on others to keep your life in order and attend to details?", "ar": "إلى أي مدى تعتمد على الآخرين في ترتيب أمورك الحياتية والاهتمام بالتفاصيل؟" } }
+  ],
+  "scoring": {
+    "method": "sum",
+    "bands": [
+      {
+        "max": 24,
+        "label": { "en": "Your total", "ar": "مجموعك" },
+        "description": {
+          "en": "Higher totals mean these signs show up more often. This screener has no pass or fail line: only a professional assessment can say whether it's ADHD. If focus troubles you, it's worth asking for one.",
+          "ar": "المجموع الأعلى يعني أن هذه العلامات تظهر لديك أكثر. لا يوجد في هذه الأداة حد فاصل للنجاح أو الرسوب: التقييم المهني وحده يستطيع أن يحدد إن كان هذا اضطراب فرط الحركة وتشتت الانتباه. إن كان التركيز يزعجك، فمن المفيد أن تطلب تقييماً."
+        }
+      }
+    ]
+  }
+}

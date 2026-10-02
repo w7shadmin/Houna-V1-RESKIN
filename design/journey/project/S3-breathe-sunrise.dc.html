@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>3 · Breathe · Sunrise</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=DM+Mono:wght@400;500&amp;family=Figtree:wght@300;400;500;600&amp;family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&amp;family=Marcellus&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font:inherit;color:inherit}
+@keyframes twinkle { 0%,100% { opacity: 0.25 } 50% { opacity: 1 } }
+@keyframes drift { 0% { transform: translate(0,0) scale(1) } 50% { transform: translate(24px,-18px) scale(1.08) } 100% { transform: translate(0,0) scale(1) } }
+@keyframes drift2 { 0% { transform: translate(0,0) scale(1.05) } 50% { transform: translate(-30px,22px) scale(0.95) } 100% { transform: translate(0,0) scale(1.05) } }
+@keyframes spin { to { transform: rotate(360deg) } }
+@keyframes spinBack { to { transform: rotate(-360deg) } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: none } }
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes glowPulse { 0%,100% { opacity: 0.55 } 50% { opacity: 1 } }
+@keyframes bars { 0%,100% { transform: scaleY(0.35) } 50% { transform: scaleY(1) } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important } }
+
+</style>
+</helmet>
+<div style="position: relative; width: 2366px; height: 1276px; overflow: hidden; box-sizing: border-box; font-family: 'Figtree', system-ui, sans-serif; background: #F2F6F4">
+
+<span aria-hidden="true" style="position: absolute; left: 0; right: 0; top: 0; height: 600px; background: radial-gradient(60% 100% at 20% 0%, rgba(249,169,128,0.22), rgba(0,0,0,0) 70%)"></span>
+<div style="position: absolute; left: 72px; top: 72px; right: 72px; display: flex; gap: 64px; align-items: flex-start">
+  <div style="display: flex; flex-direction: column; gap: 12px; min-width: 360px">
+    <span style="font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #196662; white-space: nowrap">Stage 3 · Sunrise</span>
+    <h1 style="margin: 0; font-family: 'Marcellus', serif; font-weight: 400; font-size: 52px; line-height: 1.05; color: #1D2B2A">Breathe</h1>
+  </div>
+  <div style="display: flex; gap: 48px; padding-top: 6px"><div style="display: flex; flex-direction: column; gap: 8px; max-width: 420px"><span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #196662; white-space: nowrap">The person wants</span><span style="font-size: 16px; line-height: 1.55; color: #1D2B2A">To calm down, now.</span></div><div style="display: flex; flex-direction: column; gap: 8px; max-width: 420px"><span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #196662; white-space: nowrap">Houna</span><span style="font-size: 16px; line-height: 1.55; color: #1D2B2A">Five exercises in Tanafas, each with its own stage. A gentle countdown, then the screen goes quiet: the bars hide and the controls step aside.</span></div><div style="display: flex; flex-direction: column; gap: 8px; max-width: 420px"><span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #196662; white-space: nowrap">How it should feel</span><span style="font-size: 16px; line-height: 1.55; color: #1D2B2A">Held, never rushed.</span></div></div>
+</div>
+
+<div style="position: absolute; left: 72px; top: 322px; width: 342px; height: 732px; transform-origin: 0 0; transform: scale(1) rotate(0deg)">
+  <div style="position: absolute; inset: 0; border-radius: 50px; background: linear-gradient(145deg, #3A3F4E 0%, #1B1E28 45%, #2A2E3B 100%); box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 30px 60px rgba(29,43,42,0.22), inset 0 0 0 2px rgba(255,255,255,0.05)"></div>
+  <span style="position: absolute; left: -3px; top: 150px; width: 3px; height: 56px; border-radius: 2px; background: #2A2E3B"></span>
+  <span style="position: absolute; left: -3px; top: 220px; width: 3px; height: 56px; border-radius: 2px; background: #2A2E3B"></span>
+  <span style="position: absolute; right: -3px; top: 190px; width: 3px; height: 84px; border-radius: 2px; background: #2A2E3B"></span>
+  <span style="position: absolute; left: 50%; top: 11px; width: 52px; height: 5px; margin-left: -26px; border-radius: 3px; background: #0A0C12"></span>
+  <span style="position: absolute; left: 50%; top: 9px; width: 9px; height: 9px; margin-left: 36px; border-radius: 999px; background: radial-gradient(circle at 35% 35%, #2B3550, #07080C)"></span>
+  <div style="position: absolute; left: 11px; top: 26px; width: 320px; height: 692px; border-radius: 34px; overflow: hidden; background: #0B1026">
+    <img src="/_blob/b1a891fcdd2051b855381a1a31e1daca" alt="4-7-8" style="display: block; width: 320px; height: 692px; object-fit: cover">
+  </div>
+</div><div style="position: absolute; left: 72px; top: 1078px; width: 342px; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 16px; font-weight: 600; color: #1D2B2A">4-7-8</span><span style="font-size: 13.5px; line-height: 1.5; color: #58595B">A glass orb with the mark pressed in. Pattern and length on tiles; one round button.</span></div>
+<div style="position: absolute; left: 414px; top: 658px; width: 128px; display: flex; flex-direction: column; align-items: center; gap: 10px">
+  <svg width="96" height="18" viewBox="0 0 96 18" aria-hidden="true"><path d="M2 9 H88" stroke="#196662" stroke-width="1.6" stroke-dasharray="4 5" fill="none"></path><path d="M82 3 L90 9 L82 15" stroke="#196662" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+  <span style="font-size: 13px; line-height: 1.4; color: #58595B; text-align: center">Swipe</span>
+</div>
+<div style="position: absolute; left: 542px; top: 322px; width: 342px; height: 732px; transform-origin: 0 0; transform: scale(1) rotate(0deg)">
+  <div style="position: absolute; inset: 0; border-radius: 50px; background: linear-gradient(145deg, #3A3F4E 0%, #1B1E28 45%, #2A2E3B 100%); box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 30px 60px rgba(29,43,42,0.22), inset 0 0 0 2px rgba(255,255,255,0.05)"></div>
+  <span style="position: absolute; left: -3px; top: 150px; width: 3px; height: 56px; border-radius: 2px; background: #2A2E3B"></span>
+  <span style="position: absolute; left: -3px; top: 220px; width: 3px; height: 56px; border-radius: 2px; background: #2A2E3B"></span>
+  <span style="position: absolute; right: -3px; top: 190px; width: 3px; height: 84px; border-radius: 2px; background: #2A2E3B"></span>
+  <span style="position: absolute; left: 50%; top: 11px; width: 52px; height: 5px; margin-left: -26px; border-radius: 3px; background: #0A0C12"></span>
+  <span style="position: absolute; left: 50%; top: 9px; width: 9px; height: 9px; margin-left: 36px; border-radius: 999px; background: radial-gradient(circle at 35% 35%, #2B3550, #07080C)"></span>
+  <div style="position: absolute; left: 11px; top: 26px; width: 320px; height: 692px; border-radius: 34px; overflow: hidden; background: #0B1026">
+    <img src="/_blob/52b2e34a3217e5f96b4131ad1fdc467b" alt="The physiological sigh" style="display: block; width: 320px; height: 692px; object-fit: cover">
+  </div>
+</div><div style="position: absolute; left: 542px; top: 1078px; width: 342px; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 16px; font-weight: 600; color: #1D2B2A">The physiological sigh</span><span style="font-size: 13.5px; line-height: 1.5; color: #58595B">Two breaths in, one long breath out. Two lines to rise to.</span></div>
+<div style="position: absolute; left: 884px; top: 658px; width: 128px; display: flex; flex-direction: column; align-items: center; gap: 10px">
+  <svg width="96" height="18" viewBox="0 0 96 18" aria-hidden="true"><path d="M2 9 H88" stroke="#196662" stroke-width="1.6" stroke-dasharray="4 5" fill="none"></path><path d="M82 3 L90 9 L82 15" stroke="#196662" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+  <span style="font-size: 13px; line-height: 1.4; color: #58595B; text-align: center">Play</span>
+</div>
+<div style="position: absolute; left: 1012px; top: 322px; width: 342px; height: 732px; transform-origin: 0 0; transform: scale(1) rotate(0deg)">
+  <div style="position: absolute; inset: 0; border-radius: 50px; background: linear-gradient(145deg, #3A3F4E 0%, #1B1E28 45%, #2A2E3B 100%); box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 30px 60px rgba(29,43,42,0.22), inset 0 0 0 2px rgba(255,255,255,0.05)"></div>
+  <span style="position: absolute; left: -3px; top: 150px; width: 3px; height: 56px; border-radius: 2px; background: #2A2E3B"></span>
+  <span style="position: absolute; left: -3px; top: 220px; width: 3px; height: 56px; border-radius: 2px; background: #2A2E3B"></span>
+  <span style="position: absolute; right: -3px; top: 190px; width: 3px; height: 84px; border-radius: 2px; background: #2A2E3B"></span>
+  <span style="position: absolute; left: 50%; top: 11px; width: 52px; height: 5px; margin-left: -26px; border-radius: 3px; background: #0A0C12"></span>
+  <span style="position: absolute; left: 50%; top: 9px; width: 9px; height: 9px; margin-left: 36px; border-radius: 999px; background: radial-gradient(circle at 35% 35%, #2B3550, #07080C)"></span>
+  <div style="position: absolute; left: 11px; top: 26px; width: 320px; height: 692px; border-radius: 34px; overflow: hidden; background: #0B1026">
+    <img src="/_blob/bd5b2ae04396be61b79afebc84d030f8" alt="A countdown" style="display: block; width: 320px; height: 692px; object-fit: cover">
+  </div>
+</div><div style="position: absolute; left: 1012px; top: 1078px; width: 342px; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 16px; font-weight: 600; color: #1D2B2A">A countdown</span><span style="font-size: 13.5px; line-height: 1.5; color: #58595B">3, 2, 1, and “Settle in. Breathe as you are.” Stopping here counts nothing.</span></div>
+<div style="position: absolute; left: 1354px; top: 658px; width: 128px; display: flex; flex-direction: column; align-items: center; gap: 10px">
+  <svg width="96" height="18" viewBox="0 0 96 18" aria-hidden="true"><path d="M2 9 H88" stroke="#196662" stroke-width="1.6" stroke-dasharray="4 5" fill="none"></path><path d="M82 3 L90 9 L82 15" stroke="#196662" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+  <span style="font-size: 13px; line-height: 1.4; color: #58595B; text-align: center">It begins</span>
+</div>
+<div style="position: absolute; left: 1482px; top: 322px; width: 342px; height: 732px; transform-origin: 0 0; transform: scale(1) rotate(0deg)">
+  <div style="position: absolute; inset: 0; border-radius: 50px; background: linear-gradient(145deg, #3A3F4E 0%, #1B1E28 45%, #2A2E3B 100%); box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 30px 60px rgba(29,43,42,0.22), inset 0 0 0 2px rgba(255,255,255,0.05)"></div>
+  <span style="position: absolute; left: -3px; top: 150px; width: 3px; height: 56px; border-radius: 2px; background: #2A2E3B"></span>
+  <span style="position: absolute; left: -3px; top: 220px; width: 3px; height: 56px; border-radius: 2px; background: #2A2E3B"></span>
+  <span style="position: absolute; right: -3px; top: 190px; width: 3px; height: 84px; border-radius: 2px; background: #2A2E3B"></span>
+  <span style="position: absolute; left: 50%; top: 11px; width: 52px; height: 5px; margin-left: -26px; border-radius: 3px; background: #0A0C12"></span>
+  <span style="position: absolute; left: 50%; top: 9px; width: 9px; height: 9px; margin-left: 36px; border-radius: 999px; background: radial-gradient(circle at 35% 35%, #2B3550, #07080C)"></span>
+  <div style="position: absolute; left: 11px; top: 26px; width: 320px; height: 692px; border-radius: 34px; overflow: hidden; background: #0B1026">
+    <img src="/_blob/48d81686bf7fd022e249c100806d078e" alt="In session" style="display: block; width: 320px; height: 692px; object-fit: cover">
+  </div>
+</div><div style="position: absolute; left: 1482px; top: 1078px; width: 342px; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 16px; font-weight: 600; color: #1D2B2A">In session</span><span style="font-size: 13.5px; line-height: 1.5; color: #58595B">The orb fills and its rim lights through the hold. Each phase is spoken to screen readers.</span></div>
+<div style="position: absolute; left: 1824px; top: 658px; width: 128px; display: flex; flex-direction: column; align-items: center; gap: 10px">
+  <svg width="96" height="18" viewBox="0 0 96 18" aria-hidden="true"><path d="M2 9 H88" stroke="#196662" stroke-width="1.6" stroke-dasharray="4 5" fill="none"></path><path d="M82 3 L90 9 L82 15" stroke="#196662" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+  <span style="font-size: 13px; line-height: 1.4; color: #58595B; text-align: center">Another day</span>
+</div>
+<div style="position: absolute; left: 1952px; top: 322px; width: 342px; height: 732px; transform-origin: 0 0; transform: scale(1) rotate(0deg)">
+  <div style="position: absolute; inset: 0; border-radius: 50px; background: linear-gradient(145deg, #3A3F4E 0%, #1B1E28 45%, #2A2E3B 100%); box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 30px 60px rgba(29,43,42,0.22), inset 0 0 0 2px rgba(255,255,255,0.05)"></div>
+  <span style="position: absolute; left: -3px; top: 150px; width: 3px; height: 56px; border-radius: 2px; background: #2A2E3B"></span>
+  <span style="position: absolute; left: -3px; top: 220px; width: 3px; height: 56px; border-radius: 2px; background: #2A2E3B"></span>
+  <span style="position: absolute; right: -3px; top: 190px; width: 3px; height: 84px; border-radius: 2px; background: #2A2E3B"></span>
+  <span style="position: absolute; left: 50%; top: 11px; width: 52px; height: 5px; margin-left: -26px; border-radius: 3px; background: #0A0C12"></span>
+  <span style="position: absolute; left: 50%; top: 9px; width: 9px; height: 9px; margin-left: 36px; border-radius: 999px; background: radial-gradient(circle at 35% 35%, #2B3550, #07080C)"></span>
+  <div style="position: absolute; left: 11px; top: 26px; width: 320px; height: 692px; border-radius: 34px; overflow: hidden; background: #0B1026">
+    <img src="/_blob/e32d3f654a6e2c7dda44c3b098addf10" alt="Box breathing" style="display: block; width: 320px; height: 692px; object-fit: cover">
+  </div>
+</div><div style="position: absolute; left: 1952px; top: 1078px; width: 342px; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 16px; font-weight: 600; color: #1D2B2A">Box breathing</span><span style="font-size: 13.5px; line-height: 1.5; color: #58595B">A bead traces a square; through each hold a second square turns until they make the eight-point star.</span></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":2366,"height":1276}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

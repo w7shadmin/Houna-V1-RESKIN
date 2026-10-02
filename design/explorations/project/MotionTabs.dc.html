@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Motion — the tab glow slides</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=DM+Mono:wght@400;500&amp;family=Figtree:wght@300;400;500;600&amp;family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&amp;family=Marcellus&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font:inherit;color:inherit}
+@keyframes twinkle { 0%,100% { opacity: 0.25 } 50% { opacity: 1 } }
+@keyframes drift { 0% { transform: translate(0,0) scale(1) } 50% { transform: translate(24px,-18px) scale(1.08) } 100% { transform: translate(0,0) scale(1) } }
+@keyframes drift2 { 0% { transform: translate(0,0) scale(1.05) } 50% { transform: translate(-30px,22px) scale(0.95) } 100% { transform: translate(0,0) scale(1.05) } }
+@keyframes spin { to { transform: rotate(360deg) } }
+@keyframes spinBack { to { transform: rotate(-360deg) } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: none } }
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes glowPulse { 0%,100% { opacity: 0.55 } 50% { opacity: 1 } }
+@keyframes bars { 0%,100% { transform: scaleY(0.35) } 50% { transform: scaleY(1) } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important } }
+
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; box-sizing: border-box; font-family: 'Figtree', system-ui, sans-serif; background: #0B1026">
+
+<div style="position: absolute; left: 24px; top: 60px; display: flex; flex-direction: column; gap: 6px"><span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #6FD6CF; white-space: nowrap">Motion</span><span style="font-family: 'Marcellus', serif; font-size: 30px; color: #F2ECDD">Where you are</span></div>
+<div style="position: absolute; left: 0; right: 0; top: 170px; height: 140px">
+<span style="position: absolute; left: 24px; top: 0"><span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #8990B5; white-space: nowrap">Glow (Open)</span></span>
+<span aria-hidden="true" style="position: absolute; left: {{gx}}px; top: 40px; width: 120px; height: 68px; border-radius: 999px; background: radial-gradient(closest-side, rgba(242,236,221,0.3), rgba(242,236,221,0)); transition: left 520ms cubic-bezier(.3,1.3,.5,1)"></span>
+<div style="position: absolute; left: 23px; top: 50px; display: flex"><button type="button" onClick="{{pick0}}" style="position: relative; width: 86px; height: 48px; border: 0; background: none; font-size: 15.5px; font-weight: 500; color: {{c0}}; transition: color 400ms ease; cursor: pointer">Meditate</button><button type="button" onClick="{{pick1}}" style="position: relative; width: 86px; height: 48px; border: 0; background: none; font-size: 15.5px; font-weight: 500; color: {{c1}}; transition: color 400ms ease; cursor: pointer">Breathe</button><button type="button" onClick="{{pick2}}" style="position: relative; width: 86px; height: 48px; border: 0; background: none; font-size: 15.5px; font-weight: 500; color: {{c2}}; transition: color 400ms ease; cursor: pointer">Journal</button><button type="button" onClick="{{pick3}}" style="position: relative; width: 86px; height: 48px; border: 0; background: none; font-size: 15.5px; font-weight: 500; color: {{c3}}; transition: color 400ms ease; cursor: pointer">Discover</button></div>
+</div><div style="position: absolute; left: 0; right: 0; top: 340px; height: 140px">
+<span style="position: absolute; left: 24px; top: 0"><span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #8990B5; white-space: nowrap">Line</span></span>
+<span aria-hidden="true" style="position: absolute; left: {{lx}}px; top: 96px; width: {{lw}}px; height: 2px; border-radius: 2px; background: #F2ECDD; transition: left 420ms cubic-bezier(.2,.9,.25,1), width 420ms cubic-bezier(.2,.9,.25,1)"></span>
+<div style="position: absolute; left: 23px; top: 50px; display: flex"><button type="button" onClick="{{pick0}}" style="position: relative; width: 86px; height: 48px; border: 0; background: none; font-size: 15.5px; font-weight: 500; color: {{c0}}; transition: color 400ms ease; cursor: pointer">Meditate</button><button type="button" onClick="{{pick1}}" style="position: relative; width: 86px; height: 48px; border: 0; background: none; font-size: 15.5px; font-weight: 500; color: {{c1}}; transition: color 400ms ease; cursor: pointer">Breathe</button><button type="button" onClick="{{pick2}}" style="position: relative; width: 86px; height: 48px; border: 0; background: none; font-size: 15.5px; font-weight: 500; color: {{c2}}; transition: color 400ms ease; cursor: pointer">Journal</button><button type="button" onClick="{{pick3}}" style="position: relative; width: 86px; height: 48px; border: 0; background: none; font-size: 15.5px; font-weight: 500; color: {{c3}}; transition: color 400ms ease; cursor: pointer">Discover</button></div>
+</div><div style="position: absolute; left: 0; right: 0; top: 510px; height: 140px">
+<span style="position: absolute; left: 24px; top: 0"><span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #8990B5; white-space: nowrap">Pill</span></span>
+<span aria-hidden="true" style="position: absolute; left: 19px; top: 46px; width: 352px; height: 56px; border-radius: 999px; background: rgba(242,236,221,0.06)"></span><span aria-hidden="true" style="position: absolute; left: {{px}}px; top: 50px; width: 86px; height: 48px; border-radius: 999px; background: rgba(242,236,221,0.14); box-shadow: 0 0 18px rgba(111,214,207,0.25); transition: left 480ms cubic-bezier(.3,1.2,.5,1)"></span>
+<div style="position: absolute; left: 23px; top: 50px; display: flex"><button type="button" onClick="{{pick0}}" style="position: relative; width: 86px; height: 48px; border: 0; background: none; font-size: 15.5px; font-weight: 500; color: {{c0}}; transition: color 400ms ease; cursor: pointer">Meditate</button><button type="button" onClick="{{pick1}}" style="position: relative; width: 86px; height: 48px; border: 0; background: none; font-size: 15.5px; font-weight: 500; color: {{c1}}; transition: color 400ms ease; cursor: pointer">Breathe</button><button type="button" onClick="{{pick2}}" style="position: relative; width: 86px; height: 48px; border: 0; background: none; font-size: 15.5px; font-weight: 500; color: {{c2}}; transition: color 400ms ease; cursor: pointer">Journal</button><button type="button" onClick="{{pick3}}" style="position: relative; width: 86px; height: 48px; border: 0; background: none; font-size: 15.5px; font-weight: 500; color: {{c3}}; transition: color 400ms ease; cursor: pointer">Discover</button></div>
+</div>
+<span style="position: absolute; left: 24px; right: 24px; top: 690px; font-size: 14.5px; line-height: 1.5; color: #B6BAD6">Tap any row: all three follow. The glow overshoots a touch and settles, like a breath out.</span>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { t: 0 };
+  }
+  renderVals() {
+    const t = this.state.t, lw = [60,56,52,64];
+    const v = { gx: 23 + 86 * t + 43 - 60, px: 23 + 86 * t, lw: lw[t], lx: 23 + 86 * t + (86 - lw[t]) / 2 };
+    for (let k = 0; k < 4; k++) {
+      v['c' + k] = t === k ? '#F2ECDD' : '#8990B5';
+      v['pick' + k] = () => this.setState({ t: k });
+    }
+    return v;
+  }
+}
+</script>
+</body>
+</html>

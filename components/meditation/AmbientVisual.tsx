@@ -3,6 +3,7 @@ import { View, Animated, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import type { MeditationScene } from './scenes';
+import { useReduceMotion } from '@/hooks/useCalmLoop';
 
 interface AmbientVisualProps {
   scene: MeditationScene;
@@ -29,6 +30,27 @@ function VideoAmbient({ scene, animate }: AmbientVisualProps) {
     else player.pause();
   }, [animate, player]);
 
+  const frame = scene.videoFrame;
+  if (frame?.kind === 'base') {
+    // The whole width (or `scale` of it, centred), on the bottom edge; the dark top of the footage
+    // fades into the ground above, and when it's drawn narrower, its sides do too.
+    const scale = frame.scale ?? 1;
+    const clear = `${frame.ground}00`;
+    return (
+      <View style={[StyleSheet.absoluteFillObject, { backgroundColor: frame.ground }]}>
+        <View style={[styles.base, { width: `${scale * 100}%`, left: `${((1 - scale) / 2) * 100}%` }]}>
+          <VideoView player={player} style={styles.video} contentFit="cover" nativeControls={false} />
+          <LinearGradient colors={[frame.ground, clear]} style={styles.baseFade} pointerEvents="none" />
+          {scale < 1 && (
+            <>
+              <LinearGradient colors={[frame.ground, `${frame.ground}AA`, clear]} locations={[0, 0.4, 1]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={[styles.sideFade, styles.sideStart]} pointerEvents="none" />
+              <LinearGradient colors={[clear, `${frame.ground}AA`, frame.ground]} locations={[0, 0.6, 1]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={[styles.sideFade, styles.sideEnd]} pointerEvents="none" />
+            </>
+          )}
+        </View>
+      </View>
+    );
+  }
   return (
     <View style={StyleSheet.absoluteFillObject}>
       <VideoView
@@ -44,8 +66,15 @@ function VideoAmbient({ scene, animate }: AmbientVisualProps) {
 /** Placeholder ambient background for scenes without real video yet — a soft, slowly-breathing gradient tinted per scene. */
 function GradientAmbient({ scene, animate }: AmbientVisualProps) {
   const pulse = useRef(new Animated.Value(0)).current;
+  // Under Reduce Motion the glow rests at its middle instead of breathing.
+  const reduceMotion = useReduceMotion();
 
   useEffect(() => {
+    if (reduceMotion) {
+      pulse.stopAnimation();
+      pulse.setValue(0.5);
+      return;
+    }
     if (!animate) {
       pulse.stopAnimation();
       return;
@@ -58,7 +87,7 @@ function GradientAmbient({ scene, animate }: AmbientVisualProps) {
     );
     loop.start();
     return () => loop.stop();
-  }, [animate, pulse]);
+  }, [animate, pulse, reduceMotion]);
 
   const scale = pulse.interpolate({ inputRange: [0, 1], outputRange: [1, 1.15] });
   const opacity = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.5, 0.85] });
@@ -88,6 +117,35 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     width: '100%',
     height: '100%',
+  },
+  base: {
+    position: 'absolute',
+    left: 0,
+    width: '100%',
+    bottom: 0,
+    // The footage's own shape (9:16).
+    aspectRatio: 9 / 16,
+  },
+  // Physical sides (the footage doesn't mirror in Arabic; the fades are symmetrical anyway).
+  sideFade: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    // Wide and eased (dark for the first stretch), or the flames at the footage's edge show a seam.
+    width: '30%',
+  },
+  sideStart: {
+    left: 0,
+  },
+  sideEnd: {
+    right: 0,
+  },
+  baseFade: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    height: '24%',
   },
   glow: {
     position: 'absolute',

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Breathe — arch light (Sunrise)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=DM+Mono:wght@400;500&amp;family=Figtree:wght@300;400;500;600&amp;family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&amp;family=Marcellus&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font:inherit;color:inherit}
+@keyframes twinkle { 0%,100% { opacity: 0.25 } 50% { opacity: 1 } }
+@keyframes drift { 0% { transform: translate(0,0) scale(1) } 50% { transform: translate(24px,-18px) scale(1.08) } 100% { transform: translate(0,0) scale(1) } }
+@keyframes drift2 { 0% { transform: translate(0,0) scale(1.05) } 50% { transform: translate(-30px,22px) scale(0.95) } 100% { transform: translate(0,0) scale(1.05) } }
+@keyframes spin { to { transform: rotate(360deg) } }
+@keyframes spinBack { to { transform: rotate(-360deg) } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: none } }
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes glowPulse { 0%,100% { opacity: 0.55 } 50% { opacity: 1 } }
+@keyframes bars { 0%,100% { transform: scaleY(0.35) } 50% { transform: scaleY(1) } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important } }
+@keyframes fill { 0% { transform: translateY(100%); animation-timing-function: ease-in-out } 21.053% { transform: translateY(0%); animation-timing-function: ease-in-out } 57.895% { transform: translateY(0%); animation-timing-function: ease-in-out } 100.000% { transform: translateY(100%); animation-timing-function: ease-in-out } }
+@keyframes shine { 0% { opacity: 0; animation-timing-function: ease-in-out } 21.053% { opacity: 0.9; animation-timing-function: ease-in-out } 57.895% { opacity: 0.9; animation-timing-function: ease-in-out } 100.000% { opacity: 0; animation-timing-function: ease-in-out } }
+@keyframes a0 { 0% { opacity: 0 } 1.2% { opacity: 1 } 19.85% { opacity: 1 } 21.05% { opacity: 0 } 100% { opacity: 0 } }
+@keyframes a1 { 0% { opacity: 0 } 21.05% { opacity: 0 } 22.25% { opacity: 1 } 56.69% { opacity: 1 } 57.89% { opacity: 0 } 100% { opacity: 0 } }
+@keyframes a2 { 0% { opacity: 0 } 57.89% { opacity: 0 } 59.09% { opacity: 1 } 98.80% { opacity: 1 } 100% { opacity: 0 } }
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; box-sizing: border-box; font-family: 'Figtree', system-ui, sans-serif; background: #F2F6F4">
+
+<button type="button" aria-label="End" style="position: absolute; left: 20px; top: 56px; width: 48px; height: 48px; border-radius: 999px; background: rgba(29,43,42,0.1); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(29,43,42,0.18); display: flex; align-items: center; justify-content: center; color: #1D2B2A; cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: block; flex-shrink: 0"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+<span style="position: absolute; left: 0; right: 0; top: 70px; text-align: center"><span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #58595B; white-space: nowrap">Anxiety relief · 4-7-8</span></span>
+<span aria-hidden="true" style="position: absolute; left: 20px; top: 130px; width: 350px; height: 420px; background: radial-gradient(closest-side, rgba(59,170,167,0.3), rgba(59,170,167,0)); animation: shine 19s linear infinite"></span>
+<div aria-hidden="true" style="position: absolute; left: 80px; top: 170px; width: 230px; height: 340px; clip-path: path('M0 340 L0 154.2886904474855 A161 161 0 0 1 115 0 A161 161 0 0 1 230 154.2886904474855 L230 340 Z'); background: #E6F2EF">
+<span style="position: absolute; inset: 0; background: linear-gradient(180deg, #CFF1EE 0%, #3BAAA7 70%, #196662 100%); animation: fill 19s linear infinite"></span>
+<svg aria-hidden="true" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; mix-blend-mode: overlay; opacity: 0.12"><filter id="ag"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"></feTurbulence><feColorMatrix type="saturate" values="0"></feColorMatrix></filter><rect width="100%" height="100%" filter="url(#ag)"></rect></svg>
+</div>
+<svg width="240" height="350" viewBox="-5 -5 240 350" aria-hidden="true" style="position: absolute; left: 75px; top: 165px; overflow: visible"><path d="M0 340 L0 154.2886904474855 A161 161 0 0 1 115 0 A161 161 0 0 1 230 154.2886904474855 L230 340 Z" fill="none" stroke="#196662" stroke-width="1.5"></path><path d="M12 340 L12 150.189001009487 A144.2 144.2 0 0 1 115 12 A144.2 144.2 0 0 1 218 150.189001009487 L218 340 Z" fill="none" stroke="#196662" stroke-width="0.8" opacity="0.5"></path></svg>
+<svg aria-hidden="true" width="44" height="44" viewBox="17 5.4 20.6 20.6" style="position: absolute; left: 195px; top: 280px; opacity: 0.85; margin-left: -22px; margin-top: -22px; overflow: visible; "><g transform="translate(-10.7 -6.6)"><g transform="translate(29.24 13.384)"><path d="M50.18,33.714a6.82,6.82,0,0,1-2.116-1.448,7.132,7.132,0,0,1-1.448-2.116,6.565,6.565,0,0,1-.5-2.561,7.052,7.052,0,0,1,.5-2.617,6.228,6.228,0,0,1,1.448-2.116A7.132,7.132,0,0,1,50.18,21.41a6.565,6.565,0,0,1,2.561-.5,7.052,7.052,0,0,1,2.617.5,6.228,6.228,0,0,1,2.116,1.448,7.132,7.132,0,0,1,1.448,2.116,6.843,6.843,0,0,1,.5,2.617,6.565,6.565,0,0,1-.5,2.561,6.82,6.82,0,0,1-1.448,2.116,7.132,7.132,0,0,1-2.116,1.448,6.843,6.843,0,0,1-2.617.5,6.769,6.769,0,0,1-2.561-.5m-.835-14.253a8.809,8.809,0,0,0-2.784,1.893,8.2,8.2,0,0,0-1.893,2.839A8.871,8.871,0,0,0,44,27.646a9.074,9.074,0,0,0,.668,3.452,8.224,8.224,0,0,0,1.893,2.784,8.525,8.525,0,0,0,2.784,1.893,9.251,9.251,0,0,0,6.9,0,9.744,9.744,0,0,0,2.839-1.893A8.525,8.525,0,0,0,60.981,31.1a9.251,9.251,0,0,0,0-6.9,9.744,9.744,0,0,0-1.893-2.839,8.2,8.2,0,0,0-2.839-1.893,8.871,8.871,0,0,0-3.452-.668,7.232,7.232,0,0,0-3.452.668" transform="translate(-44 -18.785)" fill="#FFFFFF"></path></g><g transform="translate(31.801 13.392)"><path d="M48.6,24.924c0,3.4,6.124,5.679,6.124,8.685,0-3.006,6.124-5.289,6.124-8.685a6.124,6.124,0,0,0-12.248,0M57.452,24.367A2.672,2.672,0,1,1,54.779,21.695a2.71,2.71,0,0,1,2.672,2.672Z" transform="translate(-48.6 -18.8)" fill="#FFFFFF" fill-rule="evenodd"></path></g></g></svg>
+<span style="position: absolute; left: 60px; right: 60px; top: 510px; height: 1px; background: rgba(29,43,42,0.18)"></span>
+<div style="position: absolute; left: 75px; top: 560px"><span style="position: relative; display: block; width: 240px; height: 32px; font-family: 'Marcellus', serif; font-size: 26px; color: #1D2B2A"><span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; animation: a0 19s linear infinite">Breathe in</span><span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; animation: a1 19s linear infinite">Hold</span><span style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; opacity: 0; animation: a2 19s linear infinite">Breathe out</span></span></div>
+<span style="position: absolute; left: 0; right: 0; top: 610px; text-align: center; font-size: 15px; color: #58595B">In for 4, hold for 7, out for 8</span>
+<button type="button" style="position: absolute; left: 24px; right: 24px; top: 756px; height: 56px; border-radius: 999px; border: 1.5px solid #196662; background: none; color: #196662; font-size: 17px; font-weight: 600; cursor: pointer">Pause</button>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

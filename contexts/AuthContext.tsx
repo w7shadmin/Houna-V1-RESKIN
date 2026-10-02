@@ -4,6 +4,8 @@ import * as WebBrowser from 'expo-web-browser';
 import * as AuthSession from 'expo-auth-session';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
+import { unregisterPushToken } from '@/lib/notifications';
+import { activityActor } from '@/lib/activityActor';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -14,6 +16,8 @@ export interface Profile {
   username: string;
   avatar_url: string | null;
   country: string | null;
+  /** On the leaderboard only when they choose to be (off until then). */
+  show_on_leaderboard: boolean;
   created_at: string;
 }
 
@@ -25,6 +29,10 @@ export type AuthErrorCode =
   | 'invalid_credentials'
   | 'username_taken'
   | 'invalid_username'
+  /** Renamed twice in the last 30 days already (enforced by a trigger on `profiles`). */
+  | 'username_change_limit'
+  /** The bot check (Turnstile) failed or expired: get a fresh one and try again. */
+  | 'captcha_failed'
   | 'cancelled'
   | 'unknown';
 
@@ -42,12 +50,17 @@ interface AuthContextValue {
   isGuest: boolean;
   /** Signed in but hasn't claimed a username yet — the one moment sign-up is incomplete. */
   needsUsername: boolean;
-  signUpWithEmail: (email: string, password: string) => Promise<AuthResult>;
-  signInWithEmail: (email: string, password: string) => Promise<AuthResult>;
+  /** `captchaToken`: the bot check's token (components/account/Captcha.tsx), when it's on. */
+  signUpWithEmail: (email: string, password: string, captchaToken?: string) => Promise<AuthResult>;
+  signInWithEmail: (email: string, password: string, captchaToken?: string) => Promise<AuthResult>;
   signInWithGoogle: () => Promise<AuthResult>;
   signOut: () => Promise<void>;
+  /** Deletes the signed-in Alias and everything Houna keeps for it (the `delete-account` Edge Function), then signs out here. */
+  deleteAlias: () => Promise<AuthResult>;
   claimUsername: (username: string) => Promise<AuthResult>;
-  updateProfile: (fields: Partial<Pick<Profile, 'avatar_url' | 'country'>>) => Promise<AuthResult>;
+  /** Renames the signed-in Alias. The leaderboard reads names from `profiles`, so it follows. */
+  changeUsername: (username: string) => Promise<AuthResult>;
+  updateProfile: (fields: Partial<Pick<Profile, 'avatar_url' | 'country' | 'show_on_leaderboard'>>) => Promise<AuthResult>;
   refreshProfile: () => Promise<void>;
 }
 
@@ -57,6 +70,7 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 function mapAuthError(message: string | undefined): AuthErrorCode {
   const m = (message ?? '').toLowerCase();
+  if (m.includes('captcha')) return 'captcha_failed';
   if (m.includes('already registered') || m.includes('already exists')) return 'email_in_use';
   if (m.includes('password')) return 'weak_password';
   if (m.includes('invalid') && m.includes('email')) return 'invalid_email';
@@ -102,14 +116,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     refreshProfile();
   }, [refreshProfile]);
 
-  const signUpWithEmail = useCallback(async (email: string, password: string): Promise<AuthResult> => {
-    const { data, error } = await supabase.auth.signUp({ email, password });
+  const signUpWithEmail = useCallback(async (email: string, password: string, captchaToken?: string): Promise<AuthResult> => {
+    const { data, error } = await supabase.auth.signUp({ email, password, options: captchaToken ? { captchaToken } : undefined });
     if (error) return { error: mapAuthError(error.message) };
     return { error: null, needsEmailConfirmation: !data.session };
   }, []);
 
-  const signInWithEmail = useCallback(async (email: string, password: string): Promise<AuthResult> => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const signInWithEmail = useCallback(async (email: string, password: string, captchaToken?: string): Promise<AuthResult> => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password, options: captchaToken ? { captchaToken } : undefined });
     if (error) return { error: mapAuthError(error.message) };
     return { error: null };
   }, []);
@@ -130,19 +144,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
     if (result.type !== 'success' || !result.url) return { error: 'cancelled' };
 
-    const hashIndex = result.url.indexOf('#');
-    const params = new URLSearchParams(hashIndex >= 0 ? result.url.slice(hashIndex + 1) : '');
-    const access_token = params.get('access_token');
-    const refresh_token = params.get('refresh_token');
-    if (!access_token || !refresh_token) return { error: 'unknown' };
-
-    const { error: sessionError } = await supabase.auth.setSession({ access_token, refresh_token });
+    // PKCE: the redirect carries a one-time code, exchanged here with the verifier this app holds.
+    const code = new URL(result.url).searchParams.get('code');
+    if (!code) return { error: 'unknown' };
+    const { error: sessionError } = await supabase.auth.exchangeCodeForSession(code);
     return { error: sessionError ? 'unknown' : null };
   }, []);
 
   const signOut = useCallback(async () => {
+    await unregisterPushToken();
     await supabase.auth.signOut();
     setProfile(null);
+  }, []);
+
+  const deleteAlias = useCallback(async (): Promise<AuthResult> => {
+    // The function deletes whoever the session belongs to: it takes no id.
+    const { error } = await supabase.functions.invoke('delete-account', { method: 'POST' });
+    if (error) return { error: 'unknown' };
+    // The account is gone on the server, so only this phone's copy of the session is left to drop.
+    await supabase.auth.signOut({ scope: 'local' }).catch(() => {});
+    setProfile(null);
+    return { error: null };
   }, []);
 
   const claimUsername = useCallback(
@@ -162,11 +184,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [session, refreshProfile],
   );
 
+  const changeUsername = useCallback(
+    async (username: string): Promise<AuthResult> => {
+      if (!session || !profile) return { error: 'unknown' };
+      if (!USERNAME_PATTERN.test(username)) return { error: 'invalid_username' };
+      if (username === profile.username) return { error: null };
+
+      // A change of case only (noor → Noor) is still this person's own name, which the check would call taken.
+      if (username.toLowerCase() !== profile.username.toLowerCase()) {
+        const { data: available } = await supabase.rpc('is_username_available', { candidate: username });
+        if (!available) return { error: 'username_taken' };
+      }
+
+      const { error } = await supabase.from('profiles').update({ username }).eq('id', session.user.id);
+      if (error) {
+        if (error.message?.includes('username_change_limit')) return { error: 'username_change_limit' };
+        return { error: error.code === '23505' ? 'username_taken' : error.code === '23514' ? 'invalid_username' : 'unknown' };
+      }
+
+      await refreshProfile();
+      return { error: null };
+    },
+    [session, profile, refreshProfile],
+  );
+
   const updateProfile = useCallback(
-    async (fields: Partial<Pick<Profile, 'avatar_url' | 'country'>>): Promise<AuthResult> => {
+    async (fields: Partial<Pick<Profile, 'avatar_url' | 'country' | 'show_on_leaderboard'>>): Promise<AuthResult> => {
       if (!session) return { error: 'unknown' };
       const { error } = await supabase.from('profiles').update(fields).eq('id', session.user.id);
       if (error) return { error: 'unknown' };
+      // A new country moves this phone's recent pings with it, so the community map shows the
+      // person once, where they are now (not also where they were). Best effort.
+      if ('country' in fields) {
+        const actor = await activityActor();
+        if (actor) await supabase.rpc('move_my_activity', { p_actor: actor, p_country: fields.country ?? null }).then(undefined, () => {});
+      }
       await refreshProfile();
       return { error: null };
     },
@@ -184,11 +236,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signInWithEmail,
       signInWithGoogle,
       signOut,
+      deleteAlias,
       claimUsername,
+      changeUsername,
       updateProfile,
       refreshProfile,
     }),
-    [loading, session, profile, signUpWithEmail, signInWithEmail, signInWithGoogle, signOut, claimUsername, updateProfile, refreshProfile],
+    [loading, session, profile, signUpWithEmail, signInWithEmail, signInWithGoogle, signOut, deleteAlias, claimUsername, changeUsername, updateProfile, refreshProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

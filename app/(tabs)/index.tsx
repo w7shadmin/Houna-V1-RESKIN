@@ -1,227 +1,424 @@
-import React from 'react';
-import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { AccessibilityInfo, Animated, Easing, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import * as Haptics from 'expo-haptics';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Wind, Sparkles, ArrowRight, ArrowLeft, Stethoscope, Building2, HeartPulse, ChevronRight } from 'lucide-react-native';
+import Svg, { Defs, Ellipse, RadialGradient, Stop } from 'react-native-svg';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, palette, layout, spacing, radius, typography, shadows } from '@/constants/theme';
-import { hexToRgba, OLD_MVP_ICON_HEX, OLD_MVP_ICON_HEX_PALE } from '@/lib/color';
-import Logo from '@/components/Logo';
-import FlatIconTile from '@/components/ui/FlatIconTile';
-import LanguageSwitcherButton from '@/components/LanguageSwitcherButton';
-import HomeMoodCard from '@/components/home/HomeMoodCard';
-import ResourcesRail from '@/components/home/ResourcesRail';
-import ArticlesRail from '@/components/home/ArticlesRail';
-import PodcastsRail from '@/components/home/PodcastsRail';
-import ImpactStats from '@/components/home/ImpactStats';
+import { APPEARANCE_OPTIONS, THEME_FADE_MS, useTheme } from '@/contexts/ThemeContext';
+import { alpha, dayPalette, flatten, layout, typography, type ColorScheme } from '@/constants/theme';
+import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
+import { getTodayEntry } from '@/lib/journal';
+import { ACTIVITY_PERIODS, fetchCommunityActivity, type CommunityActivity } from '@/lib/communityActivity';
+import { CommunityDotMap } from '@/components/community/WorldMap';
+import ArrivingText from '@/components/ui/ArrivingText';
+import MarkHalo from '@/components/starfield/MarkHalo';
+import { useStarfield } from '@/contexts/StarfieldContext';
+import { NATIVE, useReduceMotion } from '@/hooks/useCalmLoop';
+import AppearanceToggle, { STRIP_TURN_MS } from '@/components/home/AppearanceToggle';
+import HomeBody, { startSkyChange, type SkyChange } from '@/components/home/HomeBody';
+import HijriDate from '@/components/home/HijriDate';
+import MoodBloom, { HOME_BLOOM } from '@/components/mood/MoodBloom';
+import IconButton from '@/components/ui/IconButton';
+import CanvasIcon from '@/components/ui/CanvasIcon';
+import NightStars from '@/components/home/NightStars';
+import { useBadgeCheck } from '@/hooks/useBadgeCheck';
+import { useLiveEvent } from '@/hooks/useLiveEvent';
+import LiveBanner from '@/components/events/LiveBanner';
+
+// Each rotating line stays this long: slow enough to read and settle before the next.
+const ROTATE_MS = 9000;
+/**
+ * The map shows the past month only while testing (1 Oct 2026; 24 hours and the week come back
+ * after launch: their strings and `ACTIVITY_PERIODS` stay). One figure, so every phone shows the same.
+ */
+const SHOWN_PERIOD = ACTIVITY_PERIODS.indexOf('month');
 
 /**
- * Exact gradient from the old MVP's `.calm-card-gradient` (index.css) — not
- * brand-palette colors, ported as literal hex values per explicit request.
+ * Home's count of people breathing together: the same weight whatever it reaches. Digits are grouped
+ * (12,480 · ١٢٬٤٨٠) and the size steps down as they grow, so a large number never crowds its sentence.
  */
-const TANAFAS_GRADIENT: readonly [string, string, ...string[]] = [
-  '#ffc6b2',
-  '#ffd2c6',
-  '#ffded8',
-  '#ffe9e2',
-  '#fff0e2',
-  '#f5deb0',
-  '#eedc90',
-  '#e2cc78',
-];
-const TANAFAS_GRADIENT_LOCATIONS: readonly [number, number, ...number[]] = [0, 0.18, 0.35, 0.5, 0.6, 0.72, 0.86, 1];
-
-/** Exact text/icon color from the old MVP's calm card. */
-const TANAFAS_TEXT_COLOR = '#7a3340';
-/** The old MVP used a slightly different shade for the body copy specifically. */
-const TANAFAS_BODY_COLOR = '#8a4050';
-
-interface ResourceRow {
-  id: 'professionals' | 'organizations' | 'wellness';
-  icon: typeof Stethoscope;
-  title: string;
-  desc: string;
-  color: string;
-  bg: string;
-  href: '/directory/professionals' | '/directory/organizations' | '/directory/wellness-centers';
+const COUNT_SIZES = [44, 44, 40, 34, 30, 26];
+function countSize(n: number, isRTL: boolean) {
+  const size = COUNT_SIZES[Math.min(COUNT_SIZES.length - 1, String(Math.max(0, Math.floor(n))).length)];
+  // Amiri's numerals sit higher in their line than Figtree's: a taller line keeps them centred.
+  return { fontSize: size, lineHeight: Math.round(size * (isRTL ? 1.4 : 1.1)) };
+}
+function groupedCount(n: number, isRTL: boolean) {
+  const grouped = Math.max(0, Math.floor(n)).toLocaleString('en-US');
+  return isRTL ? arabicNumber(grouped.replace(/,/g, '٬')) : grouped;
 }
 
+/**
+ * Home — one screen, no scroll on a typical phone (canvas "Home — English"
+ * / "Home — Arabic", Night and Day). Top bar (mood check-in, wordmark,
+ * profile), the mark with its ring, "You're not alone" and a rotating line,
+ * the community card, and the crisis button, which stays on Home by design
+ * (CLAUDE.md: crisis resources are never buried).
+ *
+ * In both, the wordmark is the appearance toggle (a strip of sun · setting
+ * sun · moon above it), the colours fading across on a change. Two Home
+ * styles, both kept while the client decides (More → Appearance → Home):
+ * "Classic", as above; and "Sun & moon" (canvas "Home — appearance"), where
+ * the theme's own sun or moon stands alone in place of the mark and its ring:
+ * a change sets it off the right edge, then the next rises in from the left
+ * as the new colours arrive. Night's body there is the crescent bowl, the mark resting in it.
+ *
+ * Under the logo, the Hijri date (tonight's moon beside it) opens the month of moons; a long
+ * press on the mark or body opens the sky clock (canvas "Phase 3").
+ */
 export default function HomeScreen() {
-  const router = useRouter();
+  const { colors, isNight, scheme, preference, setPreference, homeStyle } = useTheme();
+  const sky = homeStyle === 'sky';
+  const reduceMotion = useReduceMotion();
+  /** A change of theme under way from the logo: where to, and in "Sun & moon" the bodies moving. */
+  const [turningTo, setTurningTo] = useState<ColorScheme | null>(null);
+  const [change, setChange] = useState<SkyChange | null>(null);
   const { t, isRTL, fonts } = useLanguage();
-  const hero = t.home.hero;
-  const tanafasCard = t.home.tanafasCard;
-  const pro = t.home.proResources;
-  const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
+  const router = useRouter();
+  const h = t.home;
+  // A badge earned in a session arrives as Home comes back into view.
+  useBadgeCheck();
+  // A Houna event streaming on YouTube: a banner over the map from an hour before until it ends.
+  const live = useLiveEvent();
+  const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
 
-  const RESOURCE_ROWS: ResourceRow[] = [
-    {
-      id: 'professionals',
-      icon: Stethoscope,
-      title: pro.professionals,
-      desc: pro.professionalsDesc,
-      color: palette.turquoise,
-      bg: OLD_MVP_ICON_HEX_PALE.primary,
-      href: '/directory/professionals',
-    },
-    {
-      id: 'organizations',
-      icon: Building2,
-      title: pro.organizations,
-      desc: pro.organizationsDesc,
-      color: OLD_MVP_ICON_HEX.gold,
-      bg: OLD_MVP_ICON_HEX_PALE.gold,
-      href: '/directory/organizations',
-    },
-    {
-      id: 'wellness',
-      icon: HeartPulse,
-      title: pro.wellness,
-      desc: pro.wellnessDesc,
-      color: OLD_MVP_ICON_HEX.peach,
-      bg: OLD_MVP_ICON_HEX_PALE.peach,
-      href: '/directory/wellness-centers',
-    },
-  ];
+  const period = SHOWN_PERIOD;
+  const [line, setLine] = useState(0);
+  const [autoRotate, setAutoRotate] = useState(true);
+  const [current, setCurrent] = useState<CommunityActivity | null | undefined>(undefined);
+  const [moodPending, setMoodPending] = useState(false);
+
+  // Soft amber dot on the mood button only when today has no entry — never
+  // a count or streak (CLAUDE.md: no guilt mechanics on mood).
+  useFocusEffect(
+    useCallback(() => {
+      let alive = true;
+      getTodayEntry()
+        .then((entry) => alive && setMoodPending(!entry))
+        .catch(() => alive && setMoodPending(false));
+      return () => {
+        alive = false;
+      };
+    }, []),
+  );
+
+  // Auto-advancing content must be stoppable (WCAG 2.2.2): it stops once the
+  // person taps the line, and never starts with Reduce Motion on.
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled()
+      .then((reduce) => reduce && setAutoRotate(false))
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!autoRotate) return;
+    const id = setInterval(() => setLine((l) => (l + 1) % h.lines.length), ROTATE_MS);
+    return () => clearInterval(id);
+  }, [autoRotate, h.lines.length]);
+
+  useEffect(() => {
+    let alive = true;
+    fetchCommunityActivity(ACTIVITY_PERIODS[SHOWN_PERIOD]).then((a) => alive && setCurrent(a));
+    return () => {
+      alive = false;
+    };
+  }, []);
+  const lit = useMemo(() => current?.countries.map((c) => c.country) ?? [], [current]);
+
+  // The Houna starfield (Night), sunrise (Sunrise) and dusk (Dusk): tapping the mark fades
+  // everything else away, then hands the mark over to the scene, drawn at exactly this spot.
+  const scene = isNight ? ('/starfield' as const) : scheme === 'sunrise' ? ('/sunrise' as const) : ('/dusk' as const);
+  const sceneLabel = scene === '/starfield' ? h.starfield.open : scene === '/sunrise' ? h.sunrise.open : h.dusk.open;
+  const starfield = useStarfield();
+  const starfieldRef = useRef(starfield);
+  starfieldRef.current = starfield;
+  const localHalo = useRef<View>(null);
+  // Shared, so the splash can find the body it hands over to.
+  const haloRef = starfield?.homeBody ?? localHalo;
+  const away = useRef(false);
+
+  const openScene = () => {
+    const sf = starfieldRef.current;
+    if (!sf || away.current) return;
+    away.current = true;
+    sf.setChromeHidden(true);
+    Animated.timing(sf.chrome, { toValue: 0, duration: 450, easing: Easing.out(Easing.quad), useNativeDriver: NATIVE }).start(() => {
+      haloRef.current?.measureInWindow((x, y, w, hgt) => {
+        // The scene draws its moon or sun over this exact spot, then hides this mark (haloHidden).
+        // "Sun & moon": Home already shows the scene's body (Night's moon too), so the scene
+        // starts with it whole, at this spot and size.
+        router.push({
+          pathname: scene,
+          params: {
+            x: String(x + w / 2),
+            y: String(y + hgt / 2),
+            // The anchor: where the scene's moon or sun settles, the centre of the mark's box.
+            ay: String(y + hgt / 2),
+            ...(sky ? { body: '1' } : {}),
+          },
+        });
+      });
+    });
+  };
+
+  // Back from the scene: its moon or sun has returned to this spot and shown our mark again
+  // just before leaving, so bring the rest of Home (the ring and the tab bar too) back.
+  useFocusEffect(
+    useCallback(() => {
+      const sf = starfieldRef.current;
+      if (!sf || !away.current) return;
+      away.current = false;
+      Animated.timing(sf.chrome, { toValue: 1, duration: 500, easing: Easing.inOut(Easing.quad), useNativeDriver: NATIVE }).start(() =>
+        sf.setChromeHidden(false),
+      );
+    }, []),
+  );
+  const chrome = starfield
+    ? { style: { opacity: starfield.chrome }, pointerEvents: (starfield.chromeHidden ? 'none' : 'auto') as 'none' | 'auto' }
+    : { style: null, pointerEvents: 'auto' as const };
+
+  // The logo (both styles): the next theme, through the day, the colours fading across. In
+  // "Sun & moon" the body sets first, and the next rises as the new colours arrive.
+  const nextTheme = APPEARANCE_OPTIONS[(APPEARANCE_OPTIONS.indexOf(preference) + 1) % APPEARANCE_OPTIONS.length];
+  const themeNames = t.profile.settings.appearanceOptions;
+  const cycleTheme = () => {
+    if (turningTo) return;
+    if (Platform.OS !== 'web') Haptics.selectionAsync().catch(() => {});
+    const to = nextTheme;
+    setTurningTo(to);
+    // The crossfade starts from a picture of the screen, so let the strip finish its turn (and
+    // that frame be drawn) first; a picture taken mid-turn would show it jumping back.
+    const turned = Date.now() + STRIP_TURN_MS + 50;
+    const switchColours = () =>
+      new Promise((ready) => setTimeout(ready, Math.max(0, turned - Date.now()))).then(() => setPreference(to));
+    let done: Promise<unknown>;
+    if (sky) {
+      const run = startSkyChange(preference, to, reduceMotion, switchColours);
+      setChange(run.change);
+      done = run.done;
+    } else {
+      done = switchColours().then(() => new Promise((settled) => setTimeout(settled, THEME_FADE_MS)));
+    }
+    done.finally(() => {
+      setChange(null);
+      setTurningTo(null);
+    });
+  };
+
+  const nextLine = () => {
+    setAutoRotate(false);
+    setLine((l) => (l + 1) % h.lines.length);
+  };
+
+  const accent = colors.primary;
+  // Night surfaces are glassy (translucent); over the stars they'd let stars
+  // show through. Pre-blend them onto the background so the sky stays behind.
+  const solid = (c: string) => (isNight ? flatten(c, colors.background) : c);
+  const topButton = { backgroundColor: solid(colors.control) };
+  const labelLatin = fonts.labelTracked;
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
-      <LanguageSwitcherButton />
+      {isNight && <NightStars />}
 
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-        {/* Hero */}
-        <View style={styles.heroOuter}>
-          <View style={styles.heroClip}>
-            <View style={[styles.heroCircle, styles.heroCircleTop]} />
-            <View style={[styles.heroCircle, styles.heroCircleBottom]} />
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <Animated.View style={[styles.topGlowWrap, chrome.style]} pointerEvents="none">
+          <TopGlow color={colors.glow} />
+        </Animated.View>
 
-            <View style={styles.heroContent}>
-              <Logo variant="white" size="small" />
-
-              <View style={styles.heroBadge}>
-                <Sparkles size={13} color="#ffffff" strokeWidth={2} />
-                <Text style={[styles.heroBadgeText, { fontFamily: fonts.semiBold, lineHeight: typography.lineHeight.xs }]}>{hero.badge}</Text>
-              </View>
-
-              <Text style={[styles.heroHeadline, { fontFamily: fonts.bold }]}>{hero.headline}</Text>
-              <Text style={[styles.heroBody, { fontFamily: fonts.regular }]}>{hero.body}</Text>
-
-              <Pressable
-                onPress={() => router.push('/directory')}
-                style={({ pressed }) => [styles.heroCta, pressed && { opacity: 0.85 }]}
-              >
-                <Text style={[styles.heroCtaText, { fontFamily: fonts.semiBold, lineHeight: typography.lineHeight.sm }]}>{hero.cta}</Text>
-                <ArrowIcon size={18} color={palette.turquoiseDark} strokeWidth={2.4} />
-              </Pressable>
-            </View>
+        {/* Top bar */}
+        <Animated.View style={[styles.topBar, chrome.style]} pointerEvents={chrome.pointerEvents}>
+          <View>
+            <IconButton
+              variant="subtle"
+              style={topButton}
+              accessibilityLabel={moodPending ? h.topBar.moodCheckInPending : h.topBar.moodCheckIn}
+              onPress={() => router.push('/check-in')}
+              renderIcon={() => <MoodBloom size={26} color={accent} shape={HOME_BLOOM} />}
+            />
+            {moodPending && (
+              <View
+                pointerEvents="none"
+                style={[
+                  styles.moodDot,
+                  { backgroundColor: colors.accent, boxShadow: `0 0 0 2px ${colors.background}` },
+                ]}
+              />
+            )}
           </View>
-        </View>
+          <AppearanceToggle
+            current={turningTo ?? preference}
+            onPress={cycleTheme}
+            disabled={!!turningTo}
+            accessibilityLabel={h.topBar.appearanceToggle.replace('{current}', themeNames[preference]).replace('{next}', themeNames[nextTheme])}
+          />
+          <IconButton
+            variant="subtle"
+            style={topButton}
+            accessibilityLabel={h.topBar.profile}
+            onPress={() => router.push('/profile')}
+            renderIcon={(c) => <CanvasIcon name="profile" size={20} strokeWidth={1.7} color={c} />}
+          />
+        </Animated.View>
 
-        <View style={styles.body}>
-          {/* Tanafas card */}
+        {/* The Hijri date, tonight's moon beside it: opens the month of moons. */}
+        <Animated.View style={[styles.hijri, chrome.style]} pointerEvents={chrome.pointerEvents}>
+          <HijriDate />
+        </Animated.View>
+
+        {/* Mark, "You're not alone", rotating line */}
+        <View style={styles.hero}>
+          {/* The mark opens this theme's scene: the starfield, the sunrise or the dusk. */}
           <Pressable
-            onPress={() => router.push('/tanafas')}
-            style={({ pressed }) => [styles.tanafasOuter, pressed && { opacity: 0.92 }]}
+            onPress={openScene}
+            accessibilityRole="button"
+            accessibilityLabel={sceneLabel}
           >
-            <LinearGradient
-              colors={TANAFAS_GRADIENT}
-              locations={TANAFAS_GRADIENT_LOCATIONS}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.tanafasGradient}
-            >
-              <View style={[styles.tanafasCircle, styles.tanafasCircleTop]} />
-              <View style={[styles.tanafasCircle, styles.tanafasCircleBottom]} />
-
-              <View style={styles.tanafasRow}>
-                <View style={styles.tanafasIconTile}>
-                  <Wind size={26} color={TANAFAS_TEXT_COLOR} strokeWidth={1.8} />
-                </View>
-                <View style={styles.tanafasText}>
-                  <Text style={[styles.tanafasEyebrow, { fontFamily: fonts.semiBold }]}>{tanafasCard.eyebrow}</Text>
-                  <Text style={[styles.tanafasTitle, { fontFamily: fonts.bold }]}>{tanafasCard.title}</Text>
-                  <Text style={[styles.tanafasBody, { color: TANAFAS_BODY_COLOR, fontFamily: fonts.regular }]}>{tanafasCard.body}</Text>
-                </View>
-                <View style={styles.tanafasArrowBtn}>
-                  <ArrowIcon size={18} color={TANAFAS_TEXT_COLOR} strokeWidth={2.2} />
-                </View>
-              </View>
-            </LinearGradient>
+            <View ref={haloRef} collapsable={false} style={starfield?.haloHidden && styles.hidden}>
+              {/* Day: the logo's deeper teal, a little stronger — the pale Night glow vanishes on Daybreak. */}
+              {sky ? (
+                <HomeBody scheme={scheme} change={change} reduceMotion={reduceMotion} />
+              ) : (
+                <MarkHalo
+                  accent={accent}
+                  dusk={colors.tones.dusk.fg}
+                  glow={isNight ? colors.glow : dayPalette.hounaTeal}
+                  glowStrength={isNight ? 0.4 : 0.5}
+                  ringOpacity={starfield?.chrome}
+                  kufic={isNight ? alpha(colors.text, 0.72) : alpha(colors.primary, 0.78)}
+                />
+              )}
+            </View>
           </Pressable>
+          <Animated.View style={[styles.heroText, chrome.style]} pointerEvents={chrome.pointerEvents}>
+          <View style={styles.notAloneRow}>
+            <View style={[styles.notAloneDot, { backgroundColor: accent }]} />
+            <Text
+              style={[
+                labelLatin ? styles.notAloneLatin : styles.notAloneArabic,
+                { color: accent, fontFamily: labelLatin ? fonts.labelRegular : fonts.label },
+              ]}
+            >
+              {h.hero.badge}
+            </Text>
+          </View>
+          {/* Each line arrives: letter by letter in English, word by word in Arabic. */}
+          <Pressable
+            onPress={nextLine}
+            accessibilityRole="button"
+            accessibilityHint={h.community.nextLine}
+            accessibilityLiveRegion={autoRotate ? 'none' : 'polite'}
+            style={styles.lineBox}
+          >
+            <ArrivingText
+              isRTL={isRTL}
+              style={[isRTL ? styles.lineArabic : styles.lineLatin, { color: colors.text, fontFamily: fonts.display }]}
+            >
+              {h.lines[line]}
+            </ArrivingText>
+          </Pressable>
+          </Animated.View>
+        </View>
 
-          {/* Mental Health Directory topics */}
-          <ResourcesRail />
-
-          {/* Quick mood check-in */}
-          <HomeMoodCard />
-
-          {/* Professional resources */}
-          <View style={styles.proSection}>
-            <View style={styles.proHeaderRow}>
-              <Text style={[styles.sectionHeading, { color: colors.text, fontFamily: fonts.bold }]}>
-                {pro.heading}
-              </Text>
-              <Pressable
-                onPress={() => router.push('/directory')}
-                style={({ pressed }) => [styles.seeAllBtn, pressed && { opacity: 0.6 }]}
-              >
-                <Text style={[styles.seeAllText, { color: colors.primary, fontFamily: fonts.semiBold }]}>
-                  {pro.seeAll}
-                </Text>
-                <ArrowIcon size={14} color={colors.primary} strokeWidth={2.2} />
-              </Pressable>
-            </View>
-
-            <View style={styles.proList}>
-              {RESOURCE_ROWS.map((row) => {
-                const Icon = row.icon;
-                return (
-                  <Pressable
-                    key={row.id}
-                    onPress={() => router.push(row.href)}
-                    style={({ pressed }) => [
-                      styles.proRow,
-                      { backgroundColor: colors.card, borderColor: colors.border, ...shadows.card },
-                      pressed && { opacity: 0.85 },
-                    ]}
-                  >
-                    <FlatIconTile icon={Icon} color={row.color} bg={row.bg} size={44} borderRadius={radius.md} />
-                    <View style={styles.proTextWrap}>
-                      <Text
-                        numberOfLines={1}
-                        style={[styles.proTitle, { color: colors.text, fontFamily: fonts.bold }]}
-                      >
-                        {row.title}
-                      </Text>
-                      <Text
-                        numberOfLines={2}
-                        style={[styles.proDesc, { color: colors.textSecondary, fontFamily: fonts.regular }]}
-                      >
-                        {row.desc}
-                      </Text>
-                    </View>
-                    <ChevronRight
-                      size={20}
-                      color={colors.textTertiary}
-                      strokeWidth={1.8}
-                      style={isRTL ? styles.flip : undefined}
-                    />
-                  </Pressable>
-                );
-              })}
-            </View>
+        <Animated.View style={[styles.lower, chrome.style]} pointerEvents={chrome.pointerEvents}>
+        <LiveBanner event={live.event} state={live.state} />
+        {/* Breathing together: the map and the count, straight on the sky (canvas "Round 2 — Home's map
+            without its card"). No period chooser while testing: the sentence says "this month". */}
+        <View style={styles.community}>
+          <View style={styles.communityHead}>
+            <Text
+              style={[
+                labelLatin ? styles.sectionLabelLatin : styles.sectionLabelArabic,
+                { color: colors.textTertiary, fontFamily: labelLatin ? fonts.labelRegular : fonts.label },
+              ]}
+            >
+              {h.community.label}
+            </Text>
           </View>
 
-          {/* Our Impact in Numbers */}
-          <ImpactStats />
+          <CommunityDotMap lit={lit} accent={accent} dotColor={colors.mapLand} variant="solid" />
 
-          {/* Latest articles / podcasts */}
-          <ArticlesRail />
-          <PodcastsRail />
+          {current ? (
+            <View style={styles.countRow}>
+              <Text
+                style={[styles.count, countSize(current.totalPeople, isRTL), { color: accent, fontFamily: fonts.numeral }]}
+                numberOfLines={1}
+              >
+                {groupedCount(current.totalPeople, isRTL)}
+              </Text>
+              <View style={styles.countText}>
+                <Text
+                  style={[
+                    styles.countSentence,
+                    isRTL && styles.countSentenceArabic,
+                    { color: colors.text, fontFamily: fonts.regular },
+                  ]}
+                >
+                  {arabicPlural(current.totalPeople, h.community.people).replace(
+                    '{period}',
+                    h.community.periodText[period],
+                  )}
+                </Text>
+                <Text
+                  style={[
+                    labelLatin ? styles.countriesLatin : styles.countriesArabic,
+                    { color: colors.textTertiary, fontFamily: labelLatin ? fonts.labelRegular : fonts.regular },
+                  ]}
+                >
+                  {arabicPlural(current.countries.length, h.community.countries).replace(
+                    '{n}',
+                    num(current.countries.length),
+                  )}
+                </Text>
+              </View>
+            </View>
+          ) : (
+            current === null && (
+              <Text style={[styles.unavailable, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
+                {h.community.unavailable}
+              </Text>
+            )
+          )}
         </View>
+
+        {/* Crisis — always here, never behind navigation. */}
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.push('/crisis')}
+          style={({ pressed }) => [
+            styles.crisis,
+            { backgroundColor: solid(colors.crisis.bg), borderColor: colors.crisis.border },
+            pressed && styles.pressed,
+          ]}
+        >
+          <CanvasIcon name="phone" size={16} strokeWidth={1.8} color={colors.crisis.icon} />
+          <Text style={[styles.crisisText, isRTL && styles.crisisTextArabic, { color: colors.text, fontFamily: fonts.medium }]}>
+            {h.crisisButton}
+          </Text>
+        </Pressable>
+        </Animated.View>
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+/* ──────────────── Decorative layers (canvas values) ──────────────── */
+
+/** Soft brand glow behind the top of the screen (380×330 ellipse, 18% → 0). */
+function TopGlow({ color }: { color: string }) {
+  return (
+    <View pointerEvents="none" style={styles.topGlow} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+      <Svg width={380} height={330}>
+        <Defs>
+          <RadialGradient id="topGlow" cx="50%" cy="50%" rx="50%" ry="50%">
+            <Stop offset="0" stopColor={color} stopOpacity={0.18} />
+            <Stop offset="1" stopColor={color} stopOpacity={0} />
+          </RadialGradient>
+        </Defs>
+        <Ellipse cx={190} cy={165} rx={190} ry={165} fill="url(#topGlow)" />
+      </Svg>
+    </View>
   );
 }
 
@@ -230,211 +427,152 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scroll: {
-    paddingBottom: spacing.xxl,
-  },
-  flip: {
-    transform: [{ scaleX: -1 }],
-  },
-
-  /* Hero */
-  heroOuter: {
+    flexGrow: 1,
     width: '100%',
     maxWidth: layout.maxContentWidth,
     alignSelf: 'center',
+    paddingTop: 16,
+    paddingHorizontal: layout.screenPadding,
+    paddingBottom: 24,
+    gap: 12,
   },
-  heroClip: {
-    backgroundColor: palette.turquoise,
-    borderBottomLeftRadius: radius.xl + 8,
-    borderBottomRightRadius: radius.xl + 8,
-    overflow: 'hidden',
-    paddingTop: spacing.xl,
-    paddingBottom: spacing.lg,
-    paddingHorizontal: spacing.lg,
+  topGlowWrap: {
+    ...StyleSheet.absoluteFillObject,
   },
-  heroCircle: {
+  topGlow: {
     position: 'absolute',
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderRadius: radius.full,
-  },
-  heroCircleTop: {
-    width: 208,
-    height: 208,
-    top: -60,
-    end: -50,
-  },
-  heroCircleBottom: {
-    width: 224,
-    height: 224,
-    bottom: -90,
-    end: -60,
-  },
-  heroContent: {
-    gap: spacing.sm + 6,
-  },
-  heroBadge: {
-    height: 28,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs + 2,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    paddingHorizontal: spacing.sm + 4,
-    borderRadius: radius.full,
-    alignSelf: 'flex-start',
-  },
-  heroBadgeText: {
-    color: '#ffffff',
-    fontSize: typography.fontSize.xs,
-  },
-  heroHeadline: {
-    color: '#ffffff',
-    fontSize: typography.fontSize.xl,
-    lineHeight: typography.lineHeight.xl,
-    letterSpacing: 0.3,
-  },
-  heroBody: {
-    color: 'rgba(255,255,255,0.85)',
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.body,
-  },
-  heroCta: {
-    height: 42,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.sm,
-    backgroundColor: '#ffffff',
-    paddingHorizontal: spacing.md + 2,
-    borderRadius: radius.full,
-    alignSelf: 'flex-start',
-  },
-  heroCtaText: {
-    color: palette.turquoiseDark,
-    fontSize: typography.fontSize.sm,
-  },
-
-  /* Body */
-  body: {
-    paddingHorizontal: spacing.lg,
-    maxWidth: layout.maxContentWidth,
+    top: 30,
     alignSelf: 'center',
-    width: '100%',
   },
-
-  /* Tanafas card — peach-to-yellow gradient (the old MVP's version used an
-     8-stop off-brand gradient and a custom maroon text color; restructured
-     here with real brand colors: palette.peach/yellow and turquoiseDark). */
-  tanafasOuter: {
-    marginTop: spacing.lg,
-    borderRadius: radius.xl,
-    overflow: 'hidden',
-  },
-  tanafasGradient: {
-    padding: spacing.md + 4,
-    overflow: 'hidden',
-  },
-  tanafasCircle: {
-    position: 'absolute',
-    borderRadius: radius.full,
-  },
-  tanafasCircleTop: {
-    width: 128,
-    height: 128,
-    top: -40,
-    end: -30,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-  },
-  tanafasCircleBottom: {
-    width: 160,
-    height: 160,
-    bottom: -60,
-    end: -50,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-  },
-  tanafasRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm + 6,
-  },
-  tanafasIconTile: {
-    width: 56,
-    height: 56,
-    borderRadius: radius.lg,
-    backgroundColor: 'rgba(255,255,255,0.45)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  tanafasText: {
-    flex: 1,
-    gap: 2,
-  },
-  tanafasEyebrow: {
-    color: TANAFAS_TEXT_COLOR,
-    fontSize: 10,
-    letterSpacing: 1.2,
-    textTransform: 'uppercase',
-    opacity: 0.8,
-  },
-  tanafasTitle: {
-    color: TANAFAS_TEXT_COLOR,
-    fontSize: typography.fontSize.lg,
-    lineHeight: typography.lineHeight.lg,
-  },
-  tanafasBody: {
-    fontSize: typography.fontSize.xs,
-    lineHeight: typography.lineHeight.sm,
-  },
-  tanafasArrowBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: radius.full,
-    backgroundColor: hexToRgba(TANAFAS_TEXT_COLOR, 0.15),
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  /* Shared section heading */
-  sectionHeading: {
-    fontSize: typography.fontSize.md,
-  },
-
-  /* Professional resources */
-  proSection: {
-    marginTop: spacing.xl,
-  },
-  proHeaderRow: {
+  topBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: spacing.md,
   },
-  seeAllBtn: {
+  moodDot: {
+    position: 'absolute',
+    top: 2,
+    end: 2,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  hijri: {
+    alignItems: 'center',
+    // The body's box is mostly sky at the top: let the date sit into it a little.
+    marginBottom: -8,
+  },
+  hero: {
+    alignItems: 'center',
+    gap: 12,
+  },
+  hidden: {
+    opacity: 0,
+  },
+  heroText: {
+    alignItems: 'center',
+    gap: 12,
+  },
+  lower: {
+    gap: 12,
+  },
+  notAloneRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.xxs + 2,
+    gap: 8,
   },
-  seeAllText: {
-    fontSize: typography.fontSize.sm,
+  notAloneDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
-  proList: {
-    gap: spacing.sm + 4,
+  notAloneLatin: {
+    fontSize: typography.label.fontSize,
+    letterSpacing: typography.label.letterSpacing,
+    textTransform: 'uppercase',
   },
-  proRow: {
+  notAloneArabic: {
+    fontSize: 14,
+  },
+  lineBox: {
+    minHeight: 50,
+    maxWidth: 320,
+    justifyContent: 'center',
+  },
+  lineLatin: {
+    fontSize: 20,
+    lineHeight: 25,
+  },
+  lineArabic: {
+    fontSize: 22,
+    lineHeight: 32,
+  },
+  community: {
+    gap: 12,
+    // The card's own padding, kept: the map, chips and count stay where they were.
+    padding: 16,
+  },
+  communityHead: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    padding: spacing.md,
-    gap: spacing.sm + 6,
+    justifyContent: 'space-between',
   },
-  proTextWrap: {
+  sectionLabelLatin: {
+    fontSize: 11,
+    letterSpacing: 11 * 0.14,
+    textTransform: 'uppercase',
+  },
+  sectionLabelArabic: {
+    fontSize: 13,
+  },
+  countRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  count: {
+    flexShrink: 0,
+  },
+  countText: {
     flex: 1,
-    gap: 2,
+    gap: 4,
   },
-  proTitle: {
-    fontSize: typography.fontSize.body,
+  countSentence: {
+    fontSize: 14,
+    lineHeight: 14 * 1.3,
   },
-  proDesc: {
-    fontSize: typography.fontSize.sm,
-    lineHeight: typography.lineHeight.sm,
+  countSentenceArabic: {
+    lineHeight: 21,
+  },
+  countriesLatin: {
+    fontSize: 11,
+    letterSpacing: 11 * 0.1,
+    textTransform: 'uppercase',
+  },
+  countriesArabic: {
+    fontSize: 12.5,
+  },
+  unavailable: {
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  crisis: {
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    height: 44,
+    paddingHorizontal: 16,
+    borderRadius: 999,
+    borderWidth: 1,
+  },
+  crisisText: {
+    fontSize: 14,
+  },
+  crisisTextArabic: {
+    fontSize: 14.5,
+  },
+  pressed: {
+    opacity: 0.85,
   },
 });

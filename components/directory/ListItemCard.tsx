@@ -1,7 +1,9 @@
 import React from 'react';
-import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet } from 'react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, typography, shadows } from '@/constants/theme';
+import { spacing, radius } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
+import Card from '@/components/ui/Card';
 import { arabicNumber } from '@/lib/arabicNumerals';
 import { resolveImageUrl } from '@/lib/hounaApi';
 
@@ -17,6 +19,8 @@ interface ListItemCardProps {
   tags?: string[];
   onPress: () => void;
   imageResizeMode?: 'cover' | 'contain';
+  /** A small mark on the photo: this professional offers online sessions (and the label read out). */
+  onlineLabel?: string;
 }
 
 /**
@@ -34,41 +38,44 @@ export default React.memo(function ListItemCard({
   tags,
   onPress,
   imageResizeMode = 'cover',
+  onlineLabel,
 }: ListItemCardProps) {
   const { t, isRTL, fonts } = useLanguage();
+  const { colors } = useTheme();
   const common = t.directory.common;
   const visibleTags = tags?.slice(0, MAX_VISIBLE_TAGS) ?? [];
   const hiddenTagCount = (tags?.length ?? 0) - visibleTags.length;
   const resolvedImageUrl = resolveImageUrl(imageUrl);
 
   return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.card,
-        { backgroundColor: colors.card, borderColor: colors.border, ...shadows.card },
-        pressed && styles.pressed,
-      ]}
-    >
-      <View style={[styles.image, { backgroundColor: colors.surface }]}>
-        {!!resolvedImageUrl && (
-          <Image source={{ uri: resolvedImageUrl }} style={styles.imageImg} resizeMode={imageResizeMode} />
+    <Card onPress={onPress} accessibilityLabel={onlineLabel ? `${title}, ${onlineLabel}` : title} style={styles.card}>
+      <View>
+        <View style={[styles.image, { backgroundColor: colors.control }]}>
+          {!!resolvedImageUrl && (
+            <Image source={{ uri: resolvedImageUrl }} style={styles.imageImg} resizeMode={imageResizeMode} />
+          )}
+        </View>
+        {!!onlineLabel && (
+          // A small lit dot at the photo's corner, ringed in the card's colour: online sessions.
+          <View style={[styles.online, { borderColor: colors.background }]}>
+            <View style={[styles.onlineDot, { backgroundColor: colors.tones.glow.fg }]} />
+          </View>
         )}
       </View>
       <View style={styles.text}>
-        <Text numberOfLines={1} style={[styles.title, { color: colors.text, fontFamily: fonts.bold }]}>
+        <Text numberOfLines={1} style={[styles.title, { color: colors.text, fontFamily: fonts.semiBold }]}>
           {title}
         </Text>
         {!!subtitle && (
-          <Text numberOfLines={1} style={[styles.subtitle, { color: colors.primary, fontFamily: fonts.semiBold }]}>
+          <Text numberOfLines={1} style={[styles.subtitle, { color: colors.primary, fontFamily: fonts.medium }]}>
             {subtitle}
           </Text>
         )}
         {visibleTags.length > 0 && (
           <View style={styles.tagRow}>
             {visibleTags.map((tag, i) => (
-              <View key={i} style={[styles.tag, { backgroundColor: colors.primaryLightest }]}>
-                <Text numberOfLines={1} style={[styles.tagText, { color: colors.primary, fontFamily: fonts.medium }]}>
+              <View key={i} style={[styles.tag, { backgroundColor: colors.tones.glow.bg, borderColor: colors.tones.glow.border }]}>
+                <Text numberOfLines={1} style={[styles.tagText, { color: colors.tones.glow.text, fontFamily: fonts.medium }]}>
                   {tag}
                 </Text>
               </View>
@@ -89,63 +96,79 @@ export default React.memo(function ListItemCard({
           </Text>
         )}
       </View>
-    </Pressable>
+    </Card>
   );
 });
 
+// Values from the canvas's "Professionals list" artboard.
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: spacing.sm + 4,
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    padding: spacing.sm + 4,
-  },
-  pressed: {
-    opacity: 0.85,
+    gap: 16,
+    borderRadius: 22,
   },
   image: {
     width: 64,
     height: 64,
-    borderRadius: radius.md,
+    borderRadius: radius.card,
     overflow: 'hidden',
   },
   imageImg: {
     width: '100%',
     height: '100%',
   },
+  online: {
+    position: 'absolute',
+    bottom: -4,
+    end: -4,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  onlineDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+  },
   text: {
     flex: 1,
+    minWidth: 0,
+    gap: 4,
   },
   title: {
-    fontSize: typography.fontSize.sm,
+    fontSize: 16,
   },
   subtitle: {
-    fontSize: typography.fontSize.xs,
-    marginTop: 1,
+    fontSize: 13.5,
   },
   description: {
-    fontSize: typography.fontSize.xs,
-    lineHeight: typography.lineHeight.xs,
-    marginTop: 2,
+    fontSize: 13,
+    lineHeight: 13 * 1.45,
+    marginTop: 4,
   },
   tagRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
-    gap: spacing.xxs + 2,
-    marginTop: spacing.xxs + 2,
+    gap: spacing.sm,
+    marginTop: spacing.xs,
   },
   tag: {
+    // A long service ("Pediatric Dentistry for Children on the Autism Spectrum") ends in an ellipsis, inside the card.
+    maxWidth: '100%',
     borderRadius: radius.full,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 3,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
   },
   tagText: {
-    fontSize: typography.fontSize.xs,
+    fontSize: 12,
   },
   moreTagsText: {
-    fontSize: typography.fontSize.xs,
+    fontSize: 12,
   },
 });

@@ -1,192 +1,146 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { View, Text, FlatList, Pressable, ActivityIndicator, StyleSheet } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { View, Text, FlatList, Pressable, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft } from 'lucide-react-native';
+import PageMarkGlow from '@/components/ui/PageMarkGlow';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, typography } from '@/constants/theme';
-import { arabicNumber } from '@/lib/arabicNumerals';
-import { fetchTherapists, type Therapist, type CountryOption } from '@/lib/hounaApi';
-import { LoadingState, ErrorState, InlineError } from '@/components/directory/AsyncState';
+import { grid, layout } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
+import { arabicNumber, arabicPlural } from '@/lib/arabicNumerals';
+import type { Therapist } from '@/lib/hounaApi';
+import { LoadingState, ErrorState } from '@/components/directory/AsyncState';
 import ListItemCard from '@/components/directory/ListItemCard';
-import FilterToggle from '@/components/directory/FilterToggle';
-import ChipFilter from '@/components/directory/ChipFilter';
+import PageHeader from '@/components/directory/PageHeader';
+import ListSearch from '@/components/directory/ListSearch';
+import { FilterPill, FilterSheet, type FilterOption } from '@/components/directory/FilterSelect';
+import { buildSearchIndex, professionalProfiles, professionalSearchItems, professionalsDirectory } from '@/lib/directorySearch';
+import { AGE_GROUPS, PROFESSION_GROUPS, ageGroupsIn, countriesIn, countryOptions, professionGroup } from '@/lib/directoryFilters';
+import { factValue } from '@/lib/directoryProfile';
+import type { ProfessionalProfile } from '@/lib/searchHighlight';
 
-interface Filters {
-  availability: string;
-  profession: string;
-  country: string;
-  sort: string;
-}
+type FilterKey = 'profession' | 'country' | 'age';
+type Filters = Record<FilterKey, string>;
+const NO_FILTERS: Filters = { profession: '', country: '', age: '' };
 
-const initialFilters: Filters = { availability: '', profession: '', country: '', sort: 'name-ASC' };
-
+/**
+ * Every professional on houna.org, filtered and searched on the phone (Houna's own filters since 1 Oct
+ * 2026; the site's were noisy and won't survive its rebuild). One search box and one row of three
+ * pills: profession (roles grouped by their words, lib/directoryFilters.ts), country and who they
+ * work with, both from each person's own page. Anyone houna.org lists as offering online sessions
+ * carries a small mark on their photo. Sorting and an online/offline filter were dropped on purpose.
+ */
 export default function ProfessionalsListScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
   const { t, language, isRTL, fonts } = useLanguage();
   const s = t.directory.professionals;
   const common = t.directory.common;
 
-  const [therapists, setTherapists] = useState<Therapist[]>([]);
-  const [filters, setFilters] = useState<Filters>(initialFilters);
-  const [countries, setCountries] = useState<CountryOption[]>([]);
-  const [page, setPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
+  const [therapists, setTherapists] = useState<Therapist[] | null>(null);
+  const [online, setOnline] = useState<Set<string>>(new Set());
+  const [profiles, setProfiles] = useState<Map<string, ProfessionalProfile>>(new Map());
   const [error, setError] = useState<string | null>(null);
-  const [showFilters, setShowFilters] = useState(false);
+  const [query, setQuery] = useState('');
+  const [filters, setFilters] = useState<Filters>(NO_FILTERS);
+  const [sheet, setSheet] = useState<FilterKey | null>(null);
 
-  const loadingRef = useRef(false);
-  const pageRef = useRef(1);
-  const lastPageRef = useRef(1);
+  const load = useCallback(() => {
+    setError(null);
+    professionalsDirectory(language)
+      .then((d) => {
+        setTherapists(d.therapists);
+        setOnline(d.online);
+      })
+      .catch((err) => setError(err instanceof Error ? err.message : s.error));
+    // Each person's own page (location, who they work with): the filters wait for it, the list doesn't.
+    professionalProfiles(language).then(setProfiles).catch(() => {});
+  }, [language, s.error]);
 
-  const loadPage = useCallback(
-    async (pageNum: number, currentFilters: Filters, append: boolean) => {
-      if (loadingRef.current) return;
-      loadingRef.current = true;
-      if (append) setLoadingMore(true);
-      else setLoading(true);
-      setError(null);
-      try {
-        const data = await fetchTherapists(pageNum, currentFilters, language);
-        if (data.therapists.length === 0 && append) {
-          lastPageRef.current = pageNum;
-          setLastPage(pageNum);
-        } else {
-          setTherapists((prev) => (append ? [...prev, ...data.therapists] : data.therapists));
-          pageRef.current = data.currentPage;
-          lastPageRef.current = data.lastPage;
-          setPage(data.currentPage);
-          setLastPage(data.lastPage);
-        }
-        if (data.countries.length > 0) setCountries(data.countries);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : s.error);
-      } finally {
-        loadingRef.current = false;
-        setLoading(false);
-        setLoadingMore(false);
-      }
-    },
-    [language, s.error],
-  );
+  useEffect(load, [load]);
 
-  useEffect(() => {
-    pageRef.current = 1;
-    lastPageRef.current = 1;
-    setPage(1);
-    setLastPage(1);
-    setTherapists([]);
-    loadingRef.current = false;
-    loadPage(1, filters, false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters, language]);
-
-  const handleRetry = () => {
-    setTherapists([]);
-    pageRef.current = 1;
-    lastPageRef.current = 1;
-    loadingRef.current = false;
-    loadPage(1, filters, false);
-  };
-
-  const handleEndReached = () => {
-    if (pageRef.current < lastPageRef.current && !loadingRef.current) {
-      loadPage(pageRef.current + 1, filters, true);
-    }
-  };
-
-  const activeFilterCount = [filters.availability, filters.profession, filters.country, filters.sort !== 'name-ASC' ? filters.sort : ''].filter(Boolean).length;
-  const hasMore = page < lastPage;
   const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
+  const location = (p: Therapist) => factValue(profiles.get(p.slug)?.info, 'location');
+  const workWith = (p: Therapist) => factValue(profiles.get(p.slug)?.info, 'workWith');
 
-  const countryOptions = [{ value: '', label: common.all }, ...countries];
+  const index = useMemo(() => buildSearchIndex(professionalSearchItems(therapists ?? [], profiles)), [therapists, profiles]);
+
+  const shown = useMemo(() => {
+    if (!therapists) return [];
+    const bySlug = new Map(therapists.map((p) => [p.slug, p]));
+    const base = query.trim() ? index.query(query).items.map((it) => bySlug.get(it.key)).filter((p): p is Therapist => !!p) : therapists;
+    return base.filter(
+      (p) =>
+        (!filters.profession || professionGroup(p.role) === filters.profession) &&
+        (!filters.country || countriesIn(location(p)).includes(filters.country)) &&
+        (!filters.age || ageGroupsIn(workWith(p)).includes(filters.age as never)),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [therapists, profiles, index, query, filters]);
+
+  const options: Record<FilterKey, FilterOption[]> = useMemo(
+    () => ({
+      profession: [
+        { value: '', label: s.anyProfession },
+        ...PROFESSION_GROUPS.map((g) => ({ value: g, label: s.groups[g], hint: s.groupHints[g] })),
+      ],
+      country: [
+        { value: '', label: s.anyCountry },
+        ...countryOptions((therapists ?? []).map(location)).map((c) => ({ value: c.name, label: c.name, count: c.count })),
+      ],
+      age: [{ value: '', label: s.anyone }, ...AGE_GROUPS.map((a) => ({ value: a, label: s.ages[a] }))],
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [s, therapists, profiles],
+  );
+  const titles: Record<FilterKey, string> = { profession: s.profession, country: common.country, age: s.worksWith };
+  const anySet = !!(filters.profession || filters.country || filters.age);
+
+  const header = <PageHeader title={s.title} intro={t.directory.hub.professionalsSubtitle} />;
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
-      <View style={styles.headerRow}>
-        <Pressable
-          onPress={() => router.replace('/directory')}
-          hitSlop={12}
-          style={({ pressed }) => [
-            styles.backBtn,
-            { backgroundColor: colors.card, borderColor: colors.border },
-            pressed && { backgroundColor: colors.cardPressed },
-          ]}
-        >
-          <ArrowLeft size={18} color={colors.text} style={isRTL ? styles.flip : undefined} />
-        </Pressable>
-        <Text style={[styles.title, { color: colors.text, fontFamily: fonts.bold }]}>{s.title}</Text>
-      </View>
-
-      {loading && therapists.length === 0 ? (
-        <LoadingState label={s.loading} />
-      ) : error && therapists.length === 0 ? (
-        <ErrorState message={error} retryLabel={common.tryAgain} onRetry={handleRetry} />
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
+      {/* The mark as a soft glow behind the header (Design studies "E4"). */}
+      <PageMarkGlow />
+      {!therapists && !error ? (
+        <View style={styles.stateWrap}>
+          {header}
+          <LoadingState label={s.loading} />
+        </View>
+      ) : !therapists ? (
+        <View style={styles.stateWrap}>
+          {header}
+          <ErrorState message={error ?? s.error} retryLabel={common.tryAgain} onRetry={load} />
+        </View>
       ) : (
         <FlatList
-          data={therapists}
-          keyExtractor={(item, i) => `${item.slug}-${i}`}
+          data={shown}
+          keyExtractor={(item) => item.slug}
           contentContainerStyle={styles.listContent}
-          onEndReachedThreshold={0.4}
-          onEndReached={handleEndReached}
-          // This list grows via infinite scroll to ~300 rows (the real
-          // professional count) — tuned batching keeps that from
-          // triggering RN's "large list slow to update" warning.
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
           initialNumToRender={8}
           maxToRenderPerBatch={8}
           windowSize={7}
           removeClippedSubviews
           ListHeaderComponent={
-            <View>
-              <FilterToggle
-                label={common.filters}
-                activeCount={activeFilterCount}
-                expanded={showFilters}
-                onPress={() => setShowFilters((v) => !v)}
-              />
-              {showFilters && (
-                <View style={[styles.filterPanel, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                  <ChipFilter
-                    label={s.lookingFor}
-                    options={s.availability}
-                    value={filters.availability}
-                    onChange={(v) => setFilters((f) => ({ ...f, availability: v }))}
-                  />
-                  <ChipFilter
-                    label={s.profession}
-                    options={s.professionOptions}
-                    value={filters.profession}
-                    onChange={(v) => setFilters((f) => ({ ...f, profession: v }))}
-                  />
-                  <ChipFilter
-                    label={common.country}
-                    options={countryOptions}
-                    value={filters.country}
-                    onChange={(v) => setFilters((f) => ({ ...f, country: v }))}
-                  />
-                  <ChipFilter
-                    label={s.sortBy}
-                    options={s.sortOptions}
-                    value={filters.sort}
-                    onChange={(v) => setFilters((f) => ({ ...f, sort: v }))}
-                  />
-                  {activeFilterCount > 0 && (
-                    <Pressable
-                      onPress={() => setFilters(initialFilters)}
-                      style={({ pressed }) => pressed && { opacity: 0.6 }}
-                    >
-                      <Text style={[styles.resetText, { color: colors.primary, fontFamily: fonts.semiBold }]}>
-                        {common.resetFilters}
-                      </Text>
-                    </Pressable>
-                  )}
-                </View>
-              )}
-              <Text style={[styles.count, { color: colors.textTertiary, fontFamily: fonts.regular }]}>
-                {num(therapists.length)} {therapists.length === 1 ? s.countOne : s.countOther}
-              </Text>
+            <View style={styles.listHeader}>
+              {header}
+              <ListSearch value={query} onChange={setQuery} placeholder={s.searchPlaceholder} />
+              <View style={styles.pills}>
+                {(['profession', 'country', 'age'] as const).map((k) => (
+                  <FilterPill key={k} label={titles[k]} value={filters[k]} options={options[k]} onPress={() => setSheet(k)} />
+                ))}
+              </View>
+              <View style={styles.countRow}>
+                <Text style={[styles.count, { color: colors.textTertiary, fontFamily: fonts.medium }]} accessibilityLiveRegion="polite">
+                  {arabicPlural(shown.length, s.count).replace('{n}', num(shown.length))}
+                </Text>
+                {anySet && (
+                  <Pressable onPress={() => setFilters(NO_FILTERS)} accessibilityRole="button" hitSlop={12} style={({ pressed }) => pressed && styles.pressed}>
+                    <Text style={[styles.clear, { color: colors.primary, fontFamily: fonts.semiBold }]}>{s.clear}</Text>
+                  </Pressable>
+                )}
+              </View>
             </View>
           }
           renderItem={({ item }) => (
@@ -196,35 +150,25 @@ export default function ProfessionalsListScreen() {
                 title={item.name}
                 subtitle={item.role}
                 description={item.summary}
-                onPress={() =>
-                  router.push({ pathname: '/directory/professionals/[slug]', params: { slug: item.slug } })
-                }
+                onlineLabel={online.has(item.slug) ? s.online : undefined}
+                onPress={() => router.push({ pathname: '/directory/professionals/[slug]', params: { slug: item.slug } })}
               />
             </View>
           )}
-          ListEmptyComponent={
-            !loading ? (
-              <Text style={[styles.empty, { color: colors.textTertiary, fontFamily: fonts.regular }]}>
-                {common.noResults}
-              </Text>
-            ) : null
-          }
-          ListFooterComponent={
-            <View style={styles.footer}>
-              {loadingMore ? (
-                <ActivityIndicator color={colors.primary} />
-              ) : !hasMore && therapists.length > 0 ? (
-                <Text style={[styles.endText, { color: colors.textTertiary, fontFamily: fonts.regular }]}>
-                  {common.reachedEnd}
-                </Text>
-              ) : null}
-              {!!(error && therapists.length > 0) && (
-                <InlineError message={error} retryLabel={common.tryAgain} onRetry={handleRetry} />
-              )}
-            </View>
-          }
+          ListEmptyComponent={<Text style={[styles.empty, { color: colors.textTertiary, fontFamily: fonts.regular }]}>{s.noMatch}</Text>}
         />
       )}
+      {(['profession', 'country', 'age'] as const).map((k) => (
+        <FilterSheet
+          key={k}
+          visible={sheet === k}
+          title={titles[k]}
+          value={filters[k]}
+          options={options[k]}
+          onChange={(v) => setFilters((f) => ({ ...f, [k]: v }))}
+          onClose={() => setSheet(null)}
+        />
+      ))}
     </SafeAreaView>
   );
 }
@@ -233,59 +177,51 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
   },
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.md,
-  },
-  backBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  flip: {
-    transform: [{ scaleX: -1 }],
-  },
-  title: {
-    fontSize: typography.fontSize.xl,
+  stateWrap: {
+    flex: 1,
+    width: '100%',
+    maxWidth: layout.maxContentWidth,
+    alignSelf: 'center',
+    padding: grid(2),
   },
   listContent: {
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xxl,
+    width: '100%',
+    maxWidth: layout.maxContentWidth,
+    alignSelf: 'center',
+    padding: grid(2),
+    paddingBottom: grid(5),
   },
-  filterPanel: {
-    borderRadius: radius.lg,
-    borderWidth: 1,
-    padding: spacing.md,
-    marginBottom: spacing.md,
+  listHeader: {
+    gap: grid(2),
+    marginBottom: grid(1.5),
   },
-  resetText: {
-    fontSize: typography.fontSize.sm,
-    marginTop: spacing.xs,
+  pills: {
+    flexDirection: 'row',
+    gap: grid(1),
+  },
+  countRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   count: {
-    fontSize: typography.fontSize.xs,
-    marginBottom: spacing.sm,
+    fontSize: 13,
+    lineHeight: 16,
+  },
+  clear: {
+    fontSize: 14,
+  },
+  pressed: {
+    opacity: 0.6,
   },
   itemWrap: {
-    marginBottom: spacing.sm,
+    marginBottom: grid(1.5),
   },
   empty: {
     textAlign: 'center',
-    fontSize: typography.fontSize.sm,
-    paddingVertical: spacing.xxl,
-  },
-  footer: {
-    paddingVertical: spacing.lg,
-    alignItems: 'center',
-  },
-  endText: {
-    fontSize: typography.fontSize.xs,
+    fontSize: 14,
+    lineHeight: 20,
+    paddingVertical: grid(6),
+    paddingHorizontal: grid(2),
   },
 });

@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { secureSessionStorage } from './secureSessionStorage';
 import { Platform } from 'react-native';
 
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL;
@@ -17,14 +17,18 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
  * Auth (Alias accounts), Postgres (profiles), and Storage (avatars).
  *
  * `detectSessionInUrl` is web-only: on native there's no browser URL to
- * inspect, and leaving it on there throws. AsyncStorage as the auth token
- * store is what makes sign-in survive an app restart.
+ * inspect, and leaving it on there throws. The saved session is what makes
+ * sign-in survive an app restart; it's kept encrypted, its key in the phone's
+ * secure store (lib/secureSessionStorage.ts). PKCE: a sign-in redirect carries a
+ * one-time code, not the tokens, and only this app (holding the verifier) can exchange it, so
+ * another app registering the `houna` scheme and catching the redirect gets nothing it can use.
  */
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
-    storage: AsyncStorage,
+    storage: secureSessionStorage,
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: Platform.OS === 'web',
+    flowType: 'pkce',
   },
 });

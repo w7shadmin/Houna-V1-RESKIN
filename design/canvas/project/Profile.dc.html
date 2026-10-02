@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Profile</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;family=Figtree:wght@400;500;600&amp;family=Marcellus&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B1026;font-family:'Figtree',system-ui,sans-serif;color:#F2ECDD}
+a{color:#F2ECDD;text-decoration:none}a:hover{color:#FFFFFF}
+.stars{background-image:radial-gradient(circle at 24px 40px,rgba(242,236,221,.55) 0 1px,transparent 1.6px),radial-gradient(circle at 150px 96px,rgba(242,236,221,.35) 0 1px,transparent 1.6px),radial-gradient(circle at 300px 30px,rgba(242,236,221,.5) 0 1.2px,transparent 1.8px),radial-gradient(circle at 80px 230px,rgba(242,236,221,.3) 0 1px,transparent 1.6px),radial-gradient(circle at 350px 190px,rgba(242,236,221,.45) 0 1px,transparent 1.6px);background-size:390px 380px}
+</style>
+</helmet>
+<div class="stars" style="position: relative; width: 390px; height: 1320px; overflow: hidden; box-sizing: border-box; background-color: #0B1026; font-family: 'Figtree', system-ui, sans-serif; color: #F2ECDD; display: flex; flex-direction: column; gap: 22px; padding: 20px 20px 40px">
+
+<div style="display: flex; align-items: center; justify-content: space-between">
+<a href="Main.dc.html" aria-label="Back to Home" style="width: 44px; height: 44px; border-radius: 999px; display: flex; align-items: center; justify-content: center; background: rgba(242,236,221,0.06); border: 1px solid rgba(242,236,221,0.12)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5m6-6-6 6 6 6"></path></svg></a>
+<span style="font-size: 16px; font-weight: 600; color: #F2ECDD">Profile</span>
+<span aria-hidden="true" style="width: 44px; height: 44px"></span>
+</div>
+
+<sc-if value="{{member}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center">
+<span aria-hidden="true" style="width: 92px; height: 92px; border-radius: 999px; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle at 30% 25%, #D9FAF6 0, #6FD6CF 55%, #2E8F8A 100%); box-shadow: 0 0 0 4px #0B1026, 0 0 0 5px rgba(111,214,207,0.5); font-family: 'Marcellus', serif; font-size: 34px; color: #0B1026">[A]</span>
+<span style="font-family: 'Marcellus', serif; font-size: 28px; color: #F2ECDD">[username]</span>
+<span style="display: flex; align-items: center; gap: 6px; font-size: 14px; color: #B6BAD6"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg>[Country] · <a href="#edit" style="color: #6FD6CF; font-weight: 500">Edit</a></span>
+</div>
+
+<a href="Recap.dc.html" style="position: relative; display: flex; align-items: center; gap: 14px; min-height: 120px; padding: 20px; border-radius: 24px; overflow: hidden; box-sizing: border-box; background: radial-gradient(90% 120% at 90% 0%, rgba(179,167,245,0.55), rgba(179,167,245,0) 60%), radial-gradient(80% 110% at 0% 100%, rgba(111,214,207,0.40), rgba(111,214,207,0) 60%), #121A3E; border: 1px solid rgba(179,167,245,0.30)">
+<span style="flex-grow: 1; display: flex; flex-direction: column; gap: 6px">
+<span style="font-family: 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.16em; color: #F2ECDD">YOUR [MONTH] RECAP</span>
+<span style="font-family: 'Marcellus', serif; font-size: 25px; line-height: 1.15; color: #F2ECDD">See your month in Houna</span>
+</span>
+<span style="flex-shrink: 0; width: 52px; height: 52px; border-radius: 999px; background: #F2ECDD; color: #0B1026; display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"></path></svg></span>
+</a>
+
+<section style="display: flex; align-items: center; gap: 16px; padding: 16px; border-radius: 22px; background: rgba(242,236,221,0.045); border: 1px solid rgba(242,236,221,0.10)">
+<svg width="120" height="120" viewBox="0 0 120 120" aria-hidden="true" style="flex-shrink: 0">
+<polygon points="60.0,14.0 99.8,37.0 99.8,83.0 60.0,106.0 20.2,83.0 20.2,37.0" fill="none" stroke="rgba(242,236,221,0.18)"></polygon>
+<polygon points="60.0,29.3 86.6,44.7 86.6,75.3 60.0,90.7 33.4,75.3 33.4,44.7" fill="none" stroke="rgba(242,236,221,0.10)"></polygon>
+<polygon points="60.0,26.9 81.9,47.4 93.5,79.3 60.0,79.3 33.7,75.2 40.1,48.5" fill="rgba(179,167,245,0.30)" stroke="#B3A7F5" stroke-width="1.6" stroke-linejoin="round"></polygon>
+</svg>
+<span style="flex-grow: 1; display: flex; flex-direction: column; gap: 6px">
+<span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.14em; color: #B3A7F5">YOUR TRAITS</span>
+<span style="font-size: 15.5px; font-weight: 600; color: #F2ECDD">From [Test name]</span>
+<span style="font-size: 13px; color: #8990B5">Taken [date] · not a diagnosis</span>
+<a href="TestResult.dc.html" style="font-size: 14px; font-weight: 600; color: #B3A7F5">View results</a>
+</span>
+</section>
+
+<section style="display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: 22px; background: rgba(242,236,221,0.045); border: 1px solid rgba(242,236,221,0.10)">
+<span aria-hidden="true" style="flex-shrink: 0; width: 46px; height: 46px; border-radius: 14px; display: flex; align-items: center; justify-content: center; background: rgba(111,214,207,0.12); border: 1px solid rgba(111,214,207,0.28); color: #6FD6CF"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10a3 3 0 1 0-3-3"></path><path d="M3 12h15a3 3 0 1 1-3 3"></path><path d="M3 16h7"></path></svg></span>
+<span style="flex-grow: 1; display: flex; flex-direction: column; gap: 3px"><span style="font-size: 15.5px; font-weight: 600; color: #F2ECDD">[N]-day practice streak</span><span style="font-size: 13px; color: #8990B5">Breathing and meditation only — never mood</span></span>
+<a href="#stats" style="font-size: 14px; font-weight: 500; color: #6FD6CF">Stats</a>
+</section>
+</sc-if>
+
+<sc-if value="{{guest}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 26px 20px; border-radius: 24px; text-align: center; background: rgba(242,236,221,0.045); border: 1px solid rgba(242,236,221,0.10)">
+<img src="/_blob/7dff467aa09ab880cc53e60ff6e989f6" alt="" style="width: 64px; height: 64px">
+<span style="font-family: 'Marcellus', serif; font-size: 24px; line-height: 1.2; color: #F2ECDD">You’re browsing as a guest</span>
+<span style="font-size: 14.5px; line-height: 1.5; color: #B6BAD6">Claim an alias — no real name or email needed — to keep your recap, streak and results in one place.</span>
+<div style="display: flex; gap: 10px">
+<a href="#sign-in" style="display: flex; align-items: center; height: 48px; padding: 0 20px; border-radius: 999px; border: 1px solid rgba(242,236,221,0.20); color: #F2ECDD; font-size: 15px; font-weight: 500">Sign in</a>
+<a href="#sign-up" style="display: flex; align-items: center; height: 48px; padding: 0 20px; border-radius: 999px; background: #F2ECDD; color: #0B1026; font-size: 15px; font-weight: 600">Create alias</a>
+</div>
+</div>
+</sc-if>
+
+<section style="display: flex; flex-direction: column; border-radius: 22px; overflow: hidden; background: rgba(242,236,221,0.045); border: 1px solid rgba(242,236,221,0.10)">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 60px; padding: 0 16px; border-bottom: 1px solid rgba(242,236,221,0.08)">
+<span style="font-size: 15px; font-weight: 500; color: #F2ECDD">Language</span>
+<div style="display: flex; gap: 4px; padding: 3px; border-radius: 999px; background: rgba(242,236,221,0.06)">
+<button type="button" aria-pressed="true" style="height: 32px; padding: 0 14px; border-radius: 999px; border: 0; background: #F2ECDD; color: #0B1026; font-family: 'Figtree', sans-serif; font-size: 13.5px; font-weight: 600">English</button>
+<a href="HomeAr.dc.html" style="display: flex; align-items: center; height: 32px; padding: 0 14px; border-radius: 999px; color: #B6BAD6; font-size: 14px">العربية</a>
+</div>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 60px; padding: 0 16px; border-bottom: 1px solid rgba(242,236,221,0.08)">
+<span style="font-size: 15px; font-weight: 500; color: #F2ECDD">Appearance</span>
+<div role="radiogroup" aria-label="Appearance" style="display: flex; gap: 4px; padding: 3px; border-radius: 999px; background: rgba(242,236,221,0.06)">
+<sc-for list="{{themes}}" as="t" hint-placeholder-count="3">
+<button type="button" role="radio" aria-checked="{{t.sel}}" onClick="{{t.pick}}" style="height: 32px; padding: 0 12px; border-radius: 999px; border: 0; background: {{t.bg}}; color: {{t.fg}}; font-family: 'Figtree', sans-serif; font-size: 13.5px; font-weight: 600">{{t.label}}</button>
+</sc-for>
+</div>
+</div>
+<a href="#notifications" style="display: flex; align-items: center; justify-content: space-between; min-height: 56px; padding: 0 16px; border-bottom: 1px solid rgba(242,236,221,0.08)"><span style="font-size: 15px; font-weight: 500; color: #F2ECDD">Notifications</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8990B5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg></a>
+<a href="#community" style="display: flex; align-items: center; justify-content: space-between; min-height: 56px; padding: 0 16px; border-bottom: 1px solid rgba(242,236,221,0.08)"><span style="font-size: 15px; font-weight: 500; color: #F2ECDD">Community map</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8990B5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg></a>
+<a href="#export" style="display: flex; align-items: center; justify-content: space-between; min-height: 56px; padding: 0 16px"><span style="font-size: 15px; font-weight: 500; color: #F2ECDD">Export my journal</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8990B5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg></a>
+</section>
+
+<sc-if value="{{member}}" hint-placeholder-val="{{ true }}">
+<button type="button" style="align-self: center; height: 44px; padding: 0 20px; border-radius: 999px; background: transparent; border: 0; color: #B6BAD6; font-family: 'Figtree', sans-serif; font-size: 15px; font-weight: 500">Sign out</button>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"guest":{"editor":"boolean","default":false},"$preview":{"width":390,"height":1320}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { theme: 'night' };
+  }
+  renderVals() {
+    const guest = !!this.props.guest;
+    const th = this.state.theme;
+    const themes = [
+      { id: 'sunrise', label: 'Sunrise' },
+      { id: 'day', label: 'Dusk' },
+      { id: 'night', label: 'Night' }
+    ].map((t) => {
+      const on = t.id === th;
+      return { label: t.label, sel: on ? 'true' : 'false', bg: on ? '#F2ECDD' : 'transparent', fg: on ? '#0B1026' : '#B6BAD6', pick: () => this.setState({ theme: t.id }) };
+    });
+    return { guest, member: !guest, themes };
+  }
+}
+</script>
+</body>
+</html>

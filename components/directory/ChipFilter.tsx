@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, typography } from '@/constants/theme';
+import { View, ScrollView, StyleSheet } from 'react-native';
+import { spacing } from '@/constants/theme';
+import Chip from '@/components/ui/Chip';
+import Label from '@/components/ui/Label';
 
 export interface ChipOption {
   value: string;
@@ -17,38 +18,18 @@ interface ChipFilterProps {
 
 /** Single-select horizontal chip row — RN's stand-in for the old MVP's <select>. */
 export default function ChipFilter({ label, options, value, onChange }: ChipFilterProps) {
-  const { fonts } = useLanguage();
-
   return (
     <View style={styles.wrap}>
-      <Text style={[styles.label, { color: colors.textTertiary, fontFamily: fonts.semiBold }]}>{label}</Text>
+      <Label style={styles.label}>{label}</Label>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
-        {options.map((opt) => {
-          const active = opt.value === value;
-          return (
-            <Pressable
-              key={opt.value}
-              onPress={() => onChange(opt.value)}
-              style={({ pressed }) => [
-                styles.chip,
-                {
-                  backgroundColor: active ? colors.primary : colors.surface,
-                  borderColor: active ? colors.primary : colors.border,
-                },
-                pressed && !active && { backgroundColor: colors.cardPressed },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.chipText,
-                  { color: active ? colors.onPrimary : colors.textSecondary, fontFamily: fonts.semiBold, lineHeight: typography.lineHeight.xs },
-                ]}
-              >
-                {opt.label}
-              </Text>
-            </Pressable>
-          );
-        })}
+        {options.map((opt) => (
+          <Chip
+            key={opt.value}
+            label={opt.label}
+            selected={opt.value === value}
+            onPress={() => onChange(opt.value)}
+          />
+        ))}
       </ScrollView>
     </View>
   );
@@ -59,23 +40,9 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   label: {
-    fontSize: typography.fontSize.xs,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: spacing.xs,
+    marginBottom: spacing.sm,
   },
   row: {
-    gap: spacing.xs,
-  },
-  chip: {
-    height: 28,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  chipText: {
-    fontSize: typography.fontSize.xs,
+    gap: spacing.sm,
   },
 });

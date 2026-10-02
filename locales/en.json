@@ -1,0 +1,5 @@
+{
+  "ios": {
+    "NSPhotoLibraryUsageDescription": "Houna opens your photos only when you choose one as the picture for your Alias."
+  }
+}

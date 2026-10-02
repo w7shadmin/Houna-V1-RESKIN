@@ -2,13 +2,15 @@ import React from 'react';
 import { View, Text, Pressable, ActivityIndicator, StyleSheet } from 'react-native';
 import { RotateCw } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, radius, typography } from '@/constants/theme';
+import { spacing, radius, typography } from '@/constants/theme';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface LoadingStateProps {
   label: string;
 }
 
 export function LoadingState({ label }: LoadingStateProps) {
+  const { colors } = useTheme();
   const { fonts } = useLanguage();
   return (
     <View style={styles.center}>
@@ -25,6 +27,7 @@ interface ErrorStateProps {
 }
 
 export function ErrorState({ message, retryLabel, onRetry }: ErrorStateProps) {
+  const { colors } = useTheme();
   const { fonts } = useLanguage();
   return (
     <View style={styles.center}>
@@ -34,6 +37,8 @@ export function ErrorState({ message, retryLabel, onRetry }: ErrorStateProps) {
       <Text style={[styles.message, { color: colors.text, fontFamily: fonts.semiBold }]}>{message}</Text>
       <Pressable
         onPress={onRetry}
+        accessibilityRole="button"
+        hitSlop={{ top: 5, bottom: 5 }}
         style={({ pressed }) => [styles.retryBtn, { backgroundColor: colors.primary }, pressed && { opacity: 0.9 }]}
       >
         <RotateCw size={16} color={colors.onPrimary} />
@@ -51,11 +56,12 @@ interface InlineErrorProps {
 
 /** Smaller error banner shown below already-loaded content (e.g. a failed "load more"). */
 export function InlineError({ message, retryLabel, onRetry }: InlineErrorProps) {
+  const { colors } = useTheme();
   const { fonts } = useLanguage();
   return (
     <View style={[styles.inline, { backgroundColor: colors.accent + '14', borderColor: colors.accent + '30' }]}>
       <Text style={[styles.inlineText, { color: colors.accent, fontFamily: fonts.regular }]}>{message}</Text>
-      <Pressable onPress={onRetry} style={({ pressed }) => pressed && { opacity: 0.6 }}>
+      <Pressable onPress={onRetry} accessibilityRole="button" hitSlop={12} style={({ pressed }) => pressed && { opacity: 0.6 }}>
         <Text style={[styles.inlineRetry, { color: colors.primary, fontFamily: fonts.semiBold }]}>{retryLabel}</Text>
       </Pressable>
     </View>

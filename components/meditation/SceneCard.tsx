@@ -34,6 +34,9 @@ export default function SceneCard({ scene, title, description, fontBold, fontReg
   return (
     <Pressable
       onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      accessibilityHint={description}
       onHoverIn={showPreview}
       onHoverOut={hidePreview}
       onPressIn={showPreview}
@@ -117,6 +120,6 @@ const styles = StyleSheet.create({
   cardDesc: {
     color: 'rgba(255,255,255,0.85)',
     fontSize: typography.fontSize.xs,
-    marginTop: 2,
+    marginTop: 4,
   },
 });

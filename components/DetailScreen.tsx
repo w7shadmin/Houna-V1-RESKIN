@@ -4,15 +4,20 @@ import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrowLeft } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { colors, spacing, typography, radius } from '@/constants/theme';
+import { spacing, typography, radius } from '@/constants/theme';
+import PageMarkGlow from '@/components/ui/PageMarkGlow';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface DetailScreenProps {
   title: string;
   children: React.ReactNode;
+  /** The mark as a soft glow behind the header (plain pages: About, Contact, Get involved). */
+  markGlow?: boolean;
 }
 
 /** Shared shell for pushed detail screens: header with a back button + title. */
-export default function DetailScreen({ title, children }: DetailScreenProps) {
+export default function DetailScreen({ title, children, markGlow = false }: DetailScreenProps) {
+  const { colors } = useTheme();
   const router = useRouter();
   const { t, isRTL, fonts } = useLanguage();
 
@@ -21,6 +26,7 @@ export default function DetailScreen({ title, children }: DetailScreenProps) {
       style={[styles.safe, { backgroundColor: colors.background }]}
       edges={['top']}
     >
+      {markGlow && <PageMarkGlow />}
       <View style={styles.header}>
         <Pressable
           onPress={() => router.back()}
@@ -32,12 +38,12 @@ export default function DetailScreen({ title, children }: DetailScreenProps) {
             pressed && { opacity: 0.7 },
           ]}
         >
-          <ArrowLeft
+          <View style={isRTL ? styles.flip : undefined}>
+<ArrowLeft
             size={20}
             color={colors.text}
-            strokeWidth={2}
-            style={isRTL ? styles.flip : undefined}
-          />
+            strokeWidth={2} />
+</View>
         </Pressable>
         <Text
           style={[

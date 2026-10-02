@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Round 3 — the mark in one spot</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=DM+Mono:wght@400;500&amp;family=Figtree:wght@300;400;500;600&amp;family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&amp;family=Marcellus&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font:inherit;color:inherit}
+@keyframes twinkle { 0%,100% { opacity: 0.25 } 50% { opacity: 1 } }
+@keyframes drift { 0% { transform: translate(0,0) scale(1) } 50% { transform: translate(24px,-18px) scale(1.08) } 100% { transform: translate(0,0) scale(1) } }
+@keyframes drift2 { 0% { transform: translate(0,0) scale(1.05) } 50% { transform: translate(-30px,22px) scale(0.95) } 100% { transform: translate(0,0) scale(1.05) } }
+@keyframes spin { to { transform: rotate(360deg) } }
+@keyframes spinBack { to { transform: rotate(-360deg) } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: none } }
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes glowPulse { 0%,100% { opacity: 0.55 } 50% { opacity: 1 } }
+@keyframes bars { 0%,100% { transform: scaleY(0.35) } 50% { transform: scaleY(1) } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important } }
+
+</style>
+</helmet>
+<div style="position: relative; width: 3480px; height: 1324px; overflow: hidden; box-sizing: border-box; font-family: 'Figtree', system-ui, sans-serif; background: #070B1C">
+<div style="position: absolute; left: 40px; top: 40px; width: 390px; height: 844px; border-radius: 34px; overflow: hidden; box-shadow: 0 0 0 1px rgba(242,236,221,0.12), 0 20px 50px rgba(0,0,0,0.35)">
+<img src="img/r3/home.png" alt="Home" style="position: absolute; inset: 0; width: 390px; height: 844px">
+<span style="position: absolute; left: 0; right: 0; top: 199px; height: 0; border-top: 1.5px dashed #6FD6CF; opacity: 0.9"></span>
+
+<span style="position: absolute; left: 188px; top: 192px; width: 14px; height: 14px; border-radius: 999px; border: 2px solid #6FD6CF; box-sizing: border-box"></span>
+<span style="position: absolute; left: 12px; top: 173px; padding: 3px 8px; border-radius: 999px; background: rgba(11,16,38,0.8); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: #6FD6CF">199</span>
+
+</div>
+<div style="position: absolute; left: 40px; top: 902px; width: 390px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 15px; font-weight: 600; color: #F2ECDD">Home</span><span style="font-size: 13px; line-height: 1.45; color: #B6BAD6">The anchor: the mark, or the body it rests in, 199 below the top (on a phone, 199 below the status bar).</span></div>
+<div style="position: absolute; left: 470px; top: 40px; width: 390px; height: 844px; border-radius: 34px; overflow: hidden; box-shadow: 0 0 0 1px rgba(242,236,221,0.12), 0 20px 50px rgba(0,0,0,0.35)">
+<img src="img/r3/tanafas.png" alt="Tanafas · Breathe" style="position: absolute; inset: 0; width: 390px; height: 844px">
+<span style="position: absolute; left: 0; right: 0; top: 199px; height: 0; border-top: 1.5px dashed #6FD6CF; opacity: 0.9"></span>
+<span style="position: absolute; left: 0; right: 0; top: 243px; height: 0; border-top: 1.5px solid #F2B880; opacity: 0.9"></span>
+<span style="position: absolute; left: 356px; top: 199px; width: 2px; height: 44px; background: #F2B880"></span>
+<span style="position: absolute; left: 188px; top: 236px; width: 14px; height: 14px; border-radius: 999px; border: 2px solid #F2B880; box-sizing: border-box"></span>
+<span style="position: absolute; left: 12px; top: 173px; padding: 3px 8px; border-radius: 999px; background: rgba(11,16,38,0.8); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: #6FD6CF">199</span>
+<span style="position: absolute; right: 12px; top: 249px; padding: 3px 8px; border-radius: 999px; background: rgba(11,16,38,0.8); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: #F2B880">243 · 44 lower</span>
+</div>
+<div style="position: absolute; left: 470px; top: 902px; width: 390px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 15px; font-weight: 600; color: #F2ECDD">Tanafas · Breathe</span><span style="font-size: 13px; line-height: 1.45; color: #B6BAD6">The stage, and everything under it, up 44: more room above the play button. In a 4-7-8 session the mark stays put rather than lifting; the word sits a little lower in the orb.</span></div>
+<div style="position: absolute; left: 900px; top: 40px; width: 390px; height: 844px; border-radius: 34px; overflow: hidden; box-shadow: 0 0 0 1px rgba(242,236,221,0.12), 0 20px 50px rgba(0,0,0,0.35)">
+<img src="img/r3/profile.png" alt="Profile" style="position: absolute; inset: 0; width: 390px; height: 844px">
+<span style="position: absolute; left: 0; right: 0; top: 199px; height: 0; border-top: 1.5px dashed #6FD6CF; opacity: 0.9"></span>
+<span style="position: absolute; left: 0; right: 0; top: 168px; height: 0; border-top: 1.5px solid #F2B880; opacity: 0.9"></span>
+<span style="position: absolute; left: 356px; top: 168px; width: 2px; height: 31px; background: #F2B880"></span>
+<span style="position: absolute; left: 188px; top: 161px; width: 14px; height: 14px; border-radius: 999px; border: 2px solid #F2B880; box-sizing: border-box"></span>
+<span style="position: absolute; left: 12px; top: 173px; padding: 3px 8px; border-radius: 999px; background: rgba(11,16,38,0.8); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: #6FD6CF">199</span>
+<span style="position: absolute; right: 12px; top: 174px; padding: 3px 8px; border-radius: 999px; background: rgba(11,16,38,0.8); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: #F2B880">168 · 31 higher</span>
+</div>
+<div style="position: absolute; left: 900px; top: 902px; width: 390px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 15px; font-weight: 600; color: #F2ECDD">Profile</span><span style="font-size: 13px; line-height: 1.45; color: #B6BAD6">The ring down 31: a little more air under the back button.</span></div>
+<div style="position: absolute; left: 1330px; top: 40px; width: 390px; height: 844px; border-radius: 34px; overflow: hidden; box-shadow: 0 0 0 1px rgba(242,236,221,0.12), 0 20px 50px rgba(0,0,0,0.35)">
+<img src="img/r3/welcome.png" alt="The first breath" style="position: absolute; inset: 0; width: 390px; height: 844px">
+<span style="position: absolute; left: 0; right: 0; top: 199px; height: 0; border-top: 1.5px dashed #6FD6CF; opacity: 0.9"></span>
+<span style="position: absolute; left: 0; right: 0; top: 348px; height: 0; border-top: 1.5px solid #F2B880; opacity: 0.9"></span>
+<span style="position: absolute; left: 356px; top: 199px; width: 2px; height: 149px; background: #F2B880"></span>
+<span style="position: absolute; left: 188px; top: 341px; width: 14px; height: 14px; border-radius: 999px; border: 2px solid #F2B880; box-sizing: border-box"></span>
+<span style="position: absolute; left: 12px; top: 173px; padding: 3px 8px; border-radius: 999px; background: rgba(11,16,38,0.8); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: #6FD6CF">199</span>
+<span style="position: absolute; right: 12px; top: 354px; padding: 3px 8px; border-radius: 999px; background: rgba(11,16,38,0.8); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: #F2B880">348 · 149 lower</span>
+</div>
+<div style="position: absolute; left: 1330px; top: 902px; width: 390px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 15px; font-weight: 600; color: #F2ECDD">The first breath</span><span style="font-size: 13px; line-height: 1.45; color: #B6BAD6">The orb up 149, the words just under it, Continue at the foot.</span></div>
+<div style="position: absolute; left: 1760px; top: 40px; width: 390px; height: 844px; border-radius: 34px; overflow: hidden; box-shadow: 0 0 0 1px rgba(242,236,221,0.12), 0 20px 50px rgba(0,0,0,0.35)">
+<img src="img/r3/badge.png" alt="A new badge" style="position: absolute; inset: 0; width: 390px; height: 844px">
+<span style="position: absolute; left: 0; right: 0; top: 199px; height: 0; border-top: 1.5px dashed #6FD6CF; opacity: 0.9"></span>
+<span style="position: absolute; left: 0; right: 0; top: 287px; height: 0; border-top: 1.5px solid #F2B880; opacity: 0.9"></span>
+<span style="position: absolute; left: 356px; top: 199px; width: 2px; height: 88px; background: #F2B880"></span>
+<span style="position: absolute; left: 188px; top: 280px; width: 14px; height: 14px; border-radius: 999px; border: 2px solid #F2B880; box-sizing: border-box"></span>
+<span style="position: absolute; left: 12px; top: 173px; padding: 3px 8px; border-radius: 999px; background: rgba(11,16,38,0.8); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: #6FD6CF">199</span>
+<span style="position: absolute; right: 12px; top: 293px; padding: 3px 8px; border-radius: 999px; background: rgba(11,16,38,0.8); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: #F2B880">287 · 88 lower</span>
+</div>
+<div style="position: absolute; left: 1760px; top: 902px; width: 390px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 15px; font-weight: 600; color: #F2ECDD">A new badge</span><span style="font-size: 13px; line-height: 1.45; color: #B6BAD6">The gem up 88; its words follow it.</span></div>
+<div style="position: absolute; left: 2190px; top: 40px; width: 390px; height: 844px; border-radius: 34px; overflow: hidden; box-shadow: 0 0 0 1px rgba(242,236,221,0.12), 0 20px 50px rgba(0,0,0,0.35)">
+<img src="img/r3/starfield.png" alt="The starfield" style="position: absolute; inset: 0; width: 390px; height: 844px">
+<span style="position: absolute; left: 0; right: 0; top: 199px; height: 0; border-top: 1.5px dashed #6FD6CF; opacity: 0.9"></span>
+<span style="position: absolute; left: 0; right: 0; top: 354px; height: 0; border-top: 1.5px solid #F2B880; opacity: 0.9"></span>
+<span style="position: absolute; left: 356px; top: 199px; width: 2px; height: 155px; background: #F2B880"></span>
+<span style="position: absolute; left: 188px; top: 347px; width: 14px; height: 14px; border-radius: 999px; border: 2px solid #F2B880; box-sizing: border-box"></span>
+<span style="position: absolute; left: 12px; top: 173px; padding: 3px 8px; border-radius: 999px; background: rgba(11,16,38,0.8); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: #6FD6CF">199</span>
+<span style="position: absolute; right: 12px; top: 360px; padding: 3px 8px; border-radius: 999px; background: rgba(11,16,38,0.8); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: #F2B880">354 · 155 lower</span>
+</div>
+<div style="position: absolute; left: 2190px; top: 902px; width: 390px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 15px; font-weight: 600; color: #F2ECDD">The starfield</span><span style="font-size: 13px; line-height: 1.45; color: #B6BAD6">The moon glides from Home’s spot down to 354. The question below.</span></div>
+<div style="position: absolute; left: 2620px; top: 40px; width: 390px; height: 844px; border-radius: 34px; overflow: hidden; box-shadow: 0 0 0 1px rgba(242,236,221,0.12), 0 20px 50px rgba(0,0,0,0.35)">
+<img src="img/r3/sunrise.png" alt="The sunrise" style="position: absolute; inset: 0; width: 390px; height: 844px">
+<span style="position: absolute; left: 0; right: 0; top: 199px; height: 0; border-top: 1.5px dashed #6FD6CF; opacity: 0.9"></span>
+<span style="position: absolute; left: 0; right: 0; top: 354px; height: 0; border-top: 1.5px solid #F2B880; opacity: 0.9"></span>
+<span style="position: absolute; left: 356px; top: 199px; width: 2px; height: 155px; background: #F2B880"></span>
+<span style="position: absolute; left: 188px; top: 347px; width: 14px; height: 14px; border-radius: 999px; border: 2px solid #F2B880; box-sizing: border-box"></span>
+<span style="position: absolute; left: 12px; top: 173px; padding: 3px 8px; border-radius: 999px; background: rgba(11,16,38,0.8); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: #6FD6CF">199</span>
+<span style="position: absolute; right: 12px; top: 360px; padding: 3px 8px; border-radius: 999px; background: rgba(11,16,38,0.8); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: #F2B880">354 · 155 lower</span>
+</div>
+<div style="position: absolute; left: 2620px; top: 902px; width: 390px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 15px; font-weight: 600; color: #F2ECDD">The sunrise</span><span style="font-size: 13px; line-height: 1.45; color: #B6BAD6">The sun rises to 354 from below.</span></div>
+<div style="position: absolute; left: 3050px; top: 40px; width: 390px; height: 844px; border-radius: 34px; overflow: hidden; box-shadow: 0 0 0 1px rgba(242,236,221,0.12), 0 20px 50px rgba(0,0,0,0.35)">
+<img src="img/r3/dusk.png" alt="The dusk" style="position: absolute; inset: 0; width: 390px; height: 844px">
+<span style="position: absolute; left: 0; right: 0; top: 199px; height: 0; border-top: 1.5px dashed #6FD6CF; opacity: 0.9"></span>
+<span style="position: absolute; left: 0; right: 0; top: 464px; height: 0; border-top: 1.5px solid #F2B880; opacity: 0.9"></span>
+<span style="position: absolute; left: 356px; top: 199px; width: 2px; height: 265px; background: #F2B880"></span>
+<span style="position: absolute; left: 188px; top: 457px; width: 14px; height: 14px; border-radius: 999px; border: 2px solid #F2B880; box-sizing: border-box"></span>
+<span style="position: absolute; left: 12px; top: 173px; padding: 3px 8px; border-radius: 999px; background: rgba(11,16,38,0.8); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: #6FD6CF">199</span>
+<span style="position: absolute; right: 12px; top: 470px; padding: 3px 8px; border-radius: 999px; background: rgba(11,16,38,0.8); font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.08em; color: #F2B880">464 · 265 lower</span>
+</div>
+<div style="position: absolute; left: 3050px; top: 902px; width: 390px; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 15px; font-weight: 600; color: #F2ECDD">The dusk</span><span style="font-size: 13px; line-height: 1.45; color: #B6BAD6">The sun sets down to 464: lower, as a setting sun.</span></div>
+<div style="position: absolute; left: 40px; top: 1034px; width: 1250px; box-sizing: border-box; padding: 24px; border-radius: 22px; background: rgba(242,236,221,0.045); border: 1px solid rgba(242,236,221,0.1); display: flex; flex-direction: column; gap: 10px"><span style="font-size: 17px; font-weight: 600; color: #F2ECDD">The rule</span><span style="font-size: 14.5px; line-height: 1.55; color: #B6BAD6">One anchor: Home’s spot, 199 below the top of the screen (below the status bar on a phone). Wherever the mark is the centrepiece, the centre of the mark, or of the body, orb or gem it’s pressed into, sits on that line, horizontally centred. Sizes still differ (a small mark on Home, a large orb in 4-7-8); only the centre is shared, so moving between screens, it never jumps. The dashed teal line is the anchor; amber is where it sits today.</span></div>
+<div style="position: absolute; left: 1330px; top: 1034px; width: 1250px; box-sizing: border-box; padding: 24px; border-radius: 22px; background: rgba(242,236,221,0.045); border: 1px solid rgba(242,236,221,0.1); display: flex; flex-direction: column; gap: 10px"><span style="font-size: 17px; font-weight: 600; color: #F2ECDD">The scenes: a question</span><span style="font-size: 14.5px; line-height: 1.55; color: #B6BAD6"><b style="color: #F2ECDD">1 · Stay on the anchor.</b> The moon and suns grow where Home’s body was and stay there; the sky arrives round them. The mark never moves at all from Home to the scene and back.<br><br><b style="color: #F2ECDD">2 · Keep their journey.</b> They leave the anchor and settle lower as today (the moon and the rising sun at 354, the setting sun at 464), the scenes being the one place the mark travels, because the journey is the point of them.</span></div>
+<div style="position: absolute; left: 2620px; top: 1034px; width: 820px; box-sizing: border-box; padding: 24px; border-radius: 22px; background: rgba(242,236,221,0.045); border: 1px solid rgba(242,236,221,0.1); display: flex; flex-direction: column; gap: 10px"><span style="font-size: 17px; font-weight: 600; color: #F2ECDD">Everything else</span><span style="font-size: 14.5px; line-height: 1.55; color: #B6BAD6">Screens without the mark (the Directory, Events, More, Stats, Recap, the journal) are unchanged. The splash, when it’s switched on, would rise to the anchor too.</span></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":3480,"height":1324}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Houna starfield</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B1026;color:#F2ECDD}
+a{text-decoration:none}
+@keyframes halo-breath{0%{opacity:0.2;transform:scale(0.95)}50%{opacity:1;transform:scale(1.1)}100%{opacity:0.2;transform:scale(0.95)}}
+@keyframes ring-breath{0%{transform:scale(1)}50%{transform:scale(1.07)}100%{transform:scale(1)}}
+@keyframes ring-turn{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes halo-l0{from{transform:rotate(0deg) scale(1.04,0.96)}to{transform:rotate(360deg) scale(1.04,0.96)}}
+@keyframes halo-l1{from{transform:rotate(45deg) scale(0.96,1.04)}to{transform:rotate(-315deg) scale(0.96,1.04)}}
+@keyframes halo-l2{from{transform:rotate(100deg) scale(1.03,0.97)}to{transform:rotate(820deg) scale(1.03,0.97)}}
+@keyframes sky-turn{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes twinkle{0%{opacity:0.3}50%{opacity:1}100%{opacity:0.3}}
+@keyframes moonglow{0%{opacity:0.3;transform:scale(0.92)}50%{opacity:1;transform:scale(1.08)}100%{opacity:0.3;transform:scale(0.92)}}
+@keyframes shoot{0%{opacity:0;transform:translate(0,0) rotate(-24deg)}2%{opacity:1}14%{opacity:0.9}18%{opacity:0;transform:translate(-560px,250px) rotate(-24deg)}100%{opacity:0;transform:translate(-560px,250px) rotate(-24deg)}}
+@keyframes shoot-b{0%{opacity:0;transform:translate(0,0) rotate(20deg)}2%{opacity:1}14%{opacity:0.9}18%{opacity:0;transform:translate(540px,196px) rotate(20deg)}100%{opacity:0;transform:translate(540px,196px) rotate(20deg)}}
+@keyframes word{0%{opacity:0;transform:translateY(4px)}8%{opacity:1;transform:translateY(0)}30%{opacity:1}38%{opacity:0}100%{opacity:0}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important}}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; background: #0B1026">
+
+<div aria-hidden="true">
+<span style="position: absolute; left: 420px; top: 90px; width: 150px; height: 1.5px; border-radius: 999px; transform-origin: 0 50%; background: linear-gradient(90deg, rgba(242,236,221,0.95), rgba(242,236,221,0)); box-shadow: 0 0 6px rgba(242,236,221,0.5); opacity: 0; animation: shoot 11s ease-out 1.5s infinite"></span>
+<span style="position: absolute; left: -160px; top: 520px; width: 130px; height: 1.5px; border-radius: 999px; transform-origin: 100% 50%; background: linear-gradient(270deg, rgba(242,236,221,0.9), rgba(242,236,221,0)); box-shadow: 0 0 6px rgba(242,236,221,0.45); opacity: 0; animation: shoot-b 11s ease-out 7s infinite"></span>
+
+<div style="position: absolute; left: -275px; top: -116px; width: 940px; height: 940px; animation: sky-turn 480s linear infinite">
+<span style="position: absolute; left: 500.8px; top: 309.6px; width: 1.4px; height: 1.4px; border-radius: 999px; background: rgba(242,236,221,0.25)"></span>
+<span style="position: absolute; left: 767.8px; top: 227.5px; width: 1.7px; height: 1.7px; border-radius: 999px; background: rgba(242,236,221,0.51)"></span>
+<span style="position: absolute; left: 642.9px; top: 439.8px; width: 1.2px; height: 1.2px; border-radius: 999px; background: rgba(111,214,207,0.35)"></span>
+<span style="position: absolute; left: 647.2px; top: 605.1px; width: 1.7px; height: 1.7px; border-radius: 999px; background: rgba(242,236,221,0.39)"></span>
+<span style="position: absolute; left: 786.9px; top: 312.3px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(242,236,221,0.41)"></span>
+<span style="position: absolute; left: 523.9px; top: 685.5px; width: 1.0px; height: 1.0px; border-radius: 999px; background: rgba(242,236,221,0.29)"></span>
+<span style="position: absolute; left: 396.2px; top: 181.4px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(242,236,221,0.43)"></span>
+<span style="position: absolute; left: 868.9px; top: 484.0px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(242,236,221,0.46)"></span>
+<span style="position: absolute; left: 312.6px; top: 499.8px; width: 1.0px; height: 1.0px; border-radius: 999px; background: rgba(242,236,221,0.25)"></span>
+<span style="position: absolute; left: 597.0px; top: 596.3px; width: 0.9px; height: 0.9px; border-radius: 999px; background: rgba(242,236,221,0.41)"></span>
+<span style="position: absolute; left: 665.7px; top: 236.1px; width: 1.1px; height: 1.1px; border-radius: 999px; background: rgba(242,236,221,0.35)"></span>
+<span style="position: absolute; left: 824.9px; top: 104.4px; width: 1.0px; height: 1.0px; border-radius: 999px; background: rgba(242,236,221,0.26)"></span>
+<span style="position: absolute; left: 936.4px; top: 206.8px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(179,167,245,0.47)"></span>
+<span style="position: absolute; left: 866.6px; top: 831.5px; width: 0.9px; height: 0.9px; border-radius: 999px; background: rgba(242,236,221,0.29)"></span>
+<span style="position: absolute; left: 9.9px; top: 233.4px; width: 1.7px; height: 1.7px; border-radius: 999px; background: rgba(242,236,221,0.62)"></span>
+<span style="position: absolute; left: 460.0px; top: 646.3px; width: 0.8px; height: 0.8px; border-radius: 999px; background: rgba(242,236,221,0.33)"></span>
+<span style="position: absolute; left: 111.3px; top: 459.9px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(242,236,221,0.24)"></span>
+<span style="position: absolute; left: 846.0px; top: 176.8px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(179,167,245,0.34)"></span>
+<span style="position: absolute; left: 196.4px; top: 530.5px; width: 2.1px; height: 2.1px; border-radius: 999px; background: rgba(242,236,221,0.80)"></span>
+<span style="position: absolute; left: 30.8px; top: 103.7px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(242,236,221,0.36)"></span>
+<span style="position: absolute; left: 830.1px; top: 809.7px; width: 1.4px; height: 1.4px; border-radius: 999px; background: rgba(179,167,245,0.56)"></span>
+<span style="position: absolute; left: 684.0px; top: 829.3px; width: 2.4px; height: 2.4px; border-radius: 999px; background: rgba(242,236,221,0.83)"></span>
+<span style="position: absolute; left: 330.4px; top: 584.2px; width: 0.9px; height: 0.9px; border-radius: 999px; background: rgba(242,236,221,0.28)"></span>
+<span style="position: absolute; left: 293.0px; top: 926.4px; width: 1.5px; height: 1.5px; border-radius: 999px; background: rgba(242,236,221,0.57)"></span>
+<span style="position: absolute; left: 606.5px; top: 127.3px; width: 2.2px; height: 2.2px; border-radius: 999px; background: rgba(242,236,221,0.86)"></span>
+<span style="position: absolute; left: 175.9px; top: 419.9px; width: 1.1px; height: 1.1px; border-radius: 999px; background: rgba(242,236,221,0.37)"></span>
+<span style="position: absolute; left: 711.7px; top: 340.7px; width: 1.2px; height: 1.2px; border-radius: 999px; background: rgba(242,236,221,0.31)"></span>
+<span style="position: absolute; left: 679.6px; top: 273.5px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(242,236,221,0.44)"></span>
+<span style="position: absolute; left: 726.5px; top: 773.5px; width: 1.2px; height: 1.2px; border-radius: 999px; background: rgba(111,214,207,0.29)"></span>
+<span style="position: absolute; left: 716.3px; top: 565.0px; width: 1.8px; height: 1.8px; border-radius: 999px; background: rgba(179,167,245,0.55)"></span>
+<span style="position: absolute; left: 101.7px; top: 79.8px; width: 1.7px; height: 1.7px; border-radius: 999px; background: rgba(242,236,221,0.36)"></span>
+<span style="position: absolute; left: 190.1px; top: 634.4px; width: 1.2px; height: 1.2px; border-radius: 999px; background: rgba(242,236,221,0.42)"></span>
+<span style="position: absolute; left: 727.9px; top: 373.1px; width: 1.1px; height: 1.1px; border-radius: 999px; background: rgba(242,236,221,0.43)"></span>
+<span style="position: absolute; left: 143.3px; top: 870.0px; width: 0.8px; height: 0.8px; border-radius: 999px; background: rgba(242,236,221,0.24)"></span>
+<span style="position: absolute; left: 73.4px; top: 256.4px; width: 0.9px; height: 0.9px; border-radius: 999px; background: rgba(242,236,221,0.23)"></span>
+<span style="position: absolute; left: 388.6px; top: 295.6px; width: 1.1px; height: 1.1px; border-radius: 999px; background: rgba(179,167,245,0.30)"></span>
+<span style="position: absolute; left: 220.2px; top: 868.6px; width: 0.8px; height: 0.8px; border-radius: 999px; background: rgba(111,214,207,0.28)"></span>
+<span style="position: absolute; left: 752.9px; top: 622.1px; width: 1.7px; height: 1.7px; border-radius: 999px; background: rgba(242,236,221,0.48)"></span>
+<span style="position: absolute; left: 533.4px; top: 678.5px; width: 1.0px; height: 1.0px; border-radius: 999px; background: rgba(242,236,221,0.28)"></span>
+<span style="position: absolute; left: 929.0px; top: 411.8px; width: 1.2px; height: 1.2px; border-radius: 999px; background: rgba(242,236,221,0.36)"></span>
+<span style="position: absolute; left: 322.2px; top: 829.7px; width: 1.4px; height: 1.4px; border-radius: 999px; background: rgba(179,167,245,0.42)"></span>
+<span style="position: absolute; left: 223.9px; top: 750.6px; width: 1.7px; height: 1.7px; border-radius: 999px; background: rgba(242,236,221,0.64)"></span>
+<span style="position: absolute; left: 503.7px; top: 416.4px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(242,236,221,0.38)"></span>
+<span style="position: absolute; left: 408.0px; top: 371.4px; width: 1.6px; height: 1.6px; border-radius: 999px; background: rgba(242,236,221,0.61)"></span>
+<span style="position: absolute; left: 317.7px; top: 641.9px; width: 1.2px; height: 1.2px; border-radius: 999px; background: rgba(242,236,221,0.24)"></span>
+<span style="position: absolute; left: 123.9px; top: 373.4px; width: 1.4px; height: 1.4px; border-radius: 999px; background: rgba(179,167,245,0.44)"></span>
+<span style="position: absolute; left: 890.5px; top: 657.8px; width: 1.2px; height: 1.2px; border-radius: 999px; background: rgba(242,236,221,0.40)"></span>
+<span style="position: absolute; left: 763.2px; top: 556.1px; width: 0.9px; height: 0.9px; border-radius: 999px; background: rgba(111,214,207,0.34)"></span>
+<span style="position: absolute; left: 515.0px; top: 552.9px; width: 1.4px; height: 1.4px; border-radius: 999px; background: rgba(242,236,221,0.45)"></span>
+<span style="position: absolute; left: 42.7px; top: 576.5px; width: 1.7px; height: 1.7px; border-radius: 999px; background: rgba(242,236,221,0.57)"></span>
+<span style="position: absolute; left: 591.7px; top: 764.1px; width: 1.1px; height: 1.1px; border-radius: 999px; background: rgba(242,236,221,0.24)"></span>
+<span style="position: absolute; left: 744.5px; top: 620.1px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(242,236,221,0.19)"></span>
+<span style="position: absolute; left: 399.4px; top: 814.3px; width: 1.4px; height: 1.4px; border-radius: 999px; background: rgba(242,236,221,0.63)"></span>
+<span style="position: absolute; left: 676.5px; top: 145.3px; width: 1.7px; height: 1.7px; border-radius: 999px; background: rgba(242,236,221,0.62)"></span>
+<span style="position: absolute; left: 72.3px; top: 246.3px; width: 1.4px; height: 1.4px; border-radius: 999px; background: rgba(111,214,207,0.42)"></span>
+<span style="position: absolute; left: 28.0px; top: 441.6px; width: 2.3px; height: 2.3px; border-radius: 999px; background: rgba(242,236,221,0.89)"></span>
+<span style="position: absolute; left: 51.7px; top: 41.7px; width: 0.9px; height: 0.9px; border-radius: 999px; background: rgba(242,236,221,0.26)"></span>
+<span style="position: absolute; left: 480.1px; top: 658.4px; width: 1.2px; height: 1.2px; border-radius: 999px; background: rgba(242,236,221,0.30)"></span>
+<span style="position: absolute; left: 668.8px; top: 567.2px; width: 1.2px; height: 1.2px; border-radius: 999px; background: rgba(242,236,221,0.42)"></span>
+<span style="position: absolute; left: 405.3px; top: 512.1px; width: 1.4px; height: 1.4px; border-radius: 999px; background: rgba(242,236,221,0.37)"></span>
+<span style="position: absolute; left: 74.4px; top: 333.0px; width: 1.1px; height: 1.1px; border-radius: 999px; background: rgba(111,214,207,0.21)"></span>
+<span style="position: absolute; left: 1.5px; top: 785.6px; width: 0.9px; height: 0.9px; border-radius: 999px; background: rgba(179,167,245,0.34)"></span>
+<span style="position: absolute; left: 853.7px; top: 748.9px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(242,236,221,0.58)"></span>
+<span style="position: absolute; left: 31.2px; top: 162.3px; width: 1.4px; height: 1.4px; border-radius: 999px; background: rgba(242,236,221,0.23)"></span>
+<span style="position: absolute; left: 298.9px; top: 431.7px; width: 1.7px; height: 1.7px; border-radius: 999px; background: rgba(242,236,221,0.42)"></span>
+<span style="position: absolute; left: 468.6px; top: 814.7px; width: 1.0px; height: 1.0px; border-radius: 999px; background: rgba(242,236,221,0.40)"></span>
+<span style="position: absolute; left: 268.3px; top: 669.4px; width: 1.7px; height: 1.7px; border-radius: 999px; background: rgba(242,236,221,0.58)"></span>
+<span style="position: absolute; left: 767.0px; top: 438.9px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(242,236,221,0.22)"></span>
+<span style="position: absolute; left: 22.0px; top: 542.9px; width: 1.7px; height: 1.7px; border-radius: 999px; background: rgba(242,236,221,0.36)"></span>
+<span style="position: absolute; left: 195.0px; top: 528.7px; width: 1.6px; height: 1.6px; border-radius: 999px; background: rgba(242,236,221,0.61)"></span>
+<span style="position: absolute; left: 360.8px; top: 469.7px; width: 1.0px; height: 1.0px; border-radius: 999px; background: rgba(242,236,221,0.31)"></span>
+<span style="position: absolute; left: 577.2px; top: 518.6px; width: 1.2px; height: 1.2px; border-radius: 999px; background: rgba(242,236,221,0.37)"></span>
+<span style="position: absolute; left: 597.7px; top: 536.8px; width: 2.1px; height: 2.1px; border-radius: 999px; background: rgba(242,236,221,0.69)"></span>
+<span style="position: absolute; left: 822.1px; top: 605.5px; width: 0.9px; height: 0.9px; border-radius: 999px; background: rgba(242,236,221,0.21)"></span>
+<span style="position: absolute; left: 49.9px; top: 447.5px; width: 1.0px; height: 1.0px; border-radius: 999px; background: rgba(242,236,221,0.28)"></span>
+<span style="position: absolute; left: 93.6px; top: 789.8px; width: 0.9px; height: 0.9px; border-radius: 999px; background: rgba(242,236,221,0.34)"></span>
+<span style="position: absolute; left: 187.7px; top: 571.2px; width: 1.0px; height: 1.0px; border-radius: 999px; background: rgba(242,236,221,0.21)"></span>
+<span style="position: absolute; left: 643.3px; top: 113.3px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(242,236,221,0.38)"></span>
+<span style="position: absolute; left: 273.2px; top: 935.1px; width: 1.2px; height: 1.2px; border-radius: 999px; background: rgba(242,236,221,0.40)"></span>
+<span style="position: absolute; left: 680.0px; top: 513.9px; width: 0.9px; height: 0.9px; border-radius: 999px; background: rgba(242,236,221,0.26)"></span>
+<span style="position: absolute; left: 642.1px; top: 546.7px; width: 1.1px; height: 1.1px; border-radius: 999px; background: rgba(242,236,221,0.37)"></span>
+<span style="position: absolute; left: 577.3px; top: 650.5px; width: 2.0px; height: 2.0px; border-radius: 999px; background: rgba(242,236,221,0.61)"></span>
+<span style="position: absolute; left: 639.0px; top: 533.0px; width: 0.8px; height: 0.8px; border-radius: 999px; background: rgba(242,236,221,0.36)"></span>
+<span style="position: absolute; left: 811.1px; top: 613.7px; width: 1.2px; height: 1.2px; border-radius: 999px; background: rgba(179,167,245,0.32)"></span>
+<span style="position: absolute; left: 585.0px; top: 186.2px; width: 2.0px; height: 2.0px; border-radius: 999px; background: rgba(242,236,221,0.82)"></span>
+<span style="position: absolute; left: 533.6px; top: 734.0px; width: 1.1px; height: 1.1px; border-radius: 999px; background: rgba(111,214,207,0.29)"></span>
+<span style="position: absolute; left: 298.3px; top: 272.5px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(242,236,221,0.44)"></span>
+<span style="position: absolute; left: 511.0px; top: 406.0px; width: 1.0px; height: 1.0px; border-radius: 999px; background: rgba(242,236,221,0.29)"></span>
+<span style="position: absolute; left: 922.1px; top: 609.6px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(242,236,221,0.42)"></span>
+<span style="position: absolute; left: 790.2px; top: 104.9px; width: 1.2px; height: 1.2px; border-radius: 999px; background: rgba(179,167,245,0.19)"></span>
+<span style="position: absolute; left: 714.6px; top: 288.6px; width: 1.2px; height: 1.2px; border-radius: 999px; background: rgba(242,236,221,0.24)"></span>
+<span style="position: absolute; left: 722.3px; top: 896.5px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(242,236,221,0.18)"></span>
+<span style="position: absolute; left: 259.9px; top: 492.0px; width: 0.9px; height: 0.9px; border-radius: 999px; background: rgba(242,236,221,0.19)"></span>
+<span style="position: absolute; left: 107.6px; top: 579.7px; width: 1.7px; height: 1.7px; border-radius: 999px; background: rgba(111,214,207,0.59)"></span>
+<span style="position: absolute; left: 635.2px; top: 593.5px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(242,236,221,0.44)"></span>
+<span style="position: absolute; left: 150.6px; top: 835.9px; width: 1.4px; height: 1.4px; border-radius: 999px; background: rgba(242,236,221,0.43)"></span>
+<span style="position: absolute; left: 925.9px; top: 421.0px; width: 1.0px; height: 1.0px; border-radius: 999px; background: rgba(242,236,221,0.35)"></span>
+<span style="position: absolute; left: 787.6px; top: 316.2px; width: 1.2px; height: 1.2px; border-radius: 999px; background: rgba(242,236,221,0.21)"></span>
+<span style="position: absolute; left: 12.3px; top: 509.3px; width: 2.1px; height: 2.1px; border-radius: 999px; background: rgba(242,236,221,0.64)"></span>
+<span style="position: absolute; left: 597.2px; top: 409.6px; width: 1.5px; height: 1.5px; border-radius: 999px; background: rgba(111,214,207,0.41)"></span>
+<span style="position: absolute; left: 836.5px; top: 629.2px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(242,236,221,0.19)"></span>
+<span style="position: absolute; left: 1.0px; top: 114.9px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(242,236,221,0.25)"></span>
+<span style="position: absolute; left: 208.3px; top: 339.6px; width: 0.8px; height: 0.8px; border-radius: 999px; background: rgba(111,214,207,0.31)"></span>
+<span style="position: absolute; left: 639.9px; top: 811.0px; width: 0.9px; height: 0.9px; border-radius: 999px; background: rgba(242,236,221,0.24)"></span>
+<span style="position: absolute; left: 382.4px; top: 517.8px; width: 1.0px; height: 1.0px; border-radius: 999px; background: rgba(242,236,221,0.32)"></span>
+<span style="position: absolute; left: 695.0px; top: 880.3px; width: 1.7px; height: 1.7px; border-radius: 999px; background: rgba(242,236,221,0.47)"></span>
+<span style="position: absolute; left: 608.9px; top: 840.8px; width: 1.4px; height: 1.4px; border-radius: 999px; background: rgba(242,236,221,0.41)"></span>
+<span style="position: absolute; left: 650.4px; top: 575.2px; width: 1.1px; height: 1.1px; border-radius: 999px; background: rgba(242,236,221,0.29)"></span>
+<span style="position: absolute; left: 518.5px; top: 871.8px; width: 1.0px; height: 1.0px; border-radius: 999px; background: rgba(179,167,245,0.37)"></span>
+<span style="position: absolute; left: 860.4px; top: 862.3px; width: 1.4px; height: 1.4px; border-radius: 999px; background: rgba(242,236,221,0.35)"></span>
+<span style="position: absolute; left: 387.3px; top: 74.7px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(242,236,221,0.27)"></span>
+<span style="position: absolute; left: 373.2px; top: 392.3px; width: 1.0px; height: 1.0px; border-radius: 999px; background: rgba(179,167,245,0.26)"></span>
+<span style="position: absolute; left: 596.3px; top: 127.3px; width: 1.7px; height: 1.7px; border-radius: 999px; background: rgba(242,236,221,0.37)"></span>
+<span style="position: absolute; left: 174.8px; top: 910.8px; width: 1.0px; height: 1.0px; border-radius: 999px; background: rgba(242,236,221,0.19)"></span>
+<span style="position: absolute; left: 266.6px; top: 410.3px; width: 1.6px; height: 1.6px; border-radius: 999px; background: rgba(242,236,221,0.40)"></span>
+<span style="position: absolute; left: 206.6px; top: 585.5px; width: 1.0px; height: 1.0px; border-radius: 999px; background: rgba(111,214,207,0.23)"></span>
+<span style="position: absolute; left: 101.6px; top: 680.8px; width: 0.8px; height: 0.8px; border-radius: 999px; background: rgba(111,214,207,0.42)"></span>
+<span style="position: absolute; left: 229.4px; top: 155.6px; width: 1.2px; height: 1.2px; border-radius: 999px; background: rgba(179,167,245,0.32)"></span>
+<span style="position: absolute; left: 144.9px; top: 479.5px; width: 1.0px; height: 1.0px; border-radius: 999px; background: rgba(111,214,207,0.23)"></span>
+<span style="position: absolute; left: 862.5px; top: 634.5px; width: 1.9px; height: 1.9px; border-radius: 999px; background: rgba(242,236,221,0.75)"></span>
+<span style="position: absolute; left: 419.7px; top: 259.1px; width: 1.8px; height: 1.8px; border-radius: 999px; background: rgba(242,236,221,0.56)"></span>
+<span style="position: absolute; left: 764.3px; top: 801.0px; width: 1.0px; height: 1.0px; border-radius: 999px; background: rgba(242,236,221,0.38)"></span>
+<span style="position: absolute; left: 692.6px; top: 781.3px; width: 0.8px; height: 0.8px; border-radius: 999px; background: rgba(242,236,221,0.27)"></span>
+<span style="position: absolute; left: 526.3px; top: 2.0px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(179,167,245,0.27)"></span>
+<span style="position: absolute; left: 174.2px; top: 498.1px; width: 1.1px; height: 1.1px; border-radius: 999px; background: rgba(242,236,221,0.28)"></span>
+<span style="position: absolute; left: 805.8px; top: 628.7px; width: 0.8px; height: 0.8px; border-radius: 999px; background: rgba(242,236,221,0.37)"></span>
+<span style="position: absolute; left: 351.4px; top: 28.0px; width: 1.7px; height: 1.7px; border-radius: 999px; background: rgba(242,236,221,0.47)"></span>
+<span style="position: absolute; left: 188.9px; top: 5.9px; width: 0.9px; height: 0.9px; border-radius: 999px; background: rgba(242,236,221,0.19)"></span>
+<span style="position: absolute; left: 888.3px; top: 692.5px; width: 1.2px; height: 1.2px; border-radius: 999px; background: rgba(242,236,221,0.42)"></span>
+<span style="position: absolute; left: 493.9px; top: 483.4px; width: 1.2px; height: 1.2px; border-radius: 999px; background: rgba(242,236,221,0.20)"></span>
+<span style="position: absolute; left: 803.8px; top: 13.4px; width: 1.2px; height: 1.2px; border-radius: 999px; background: rgba(242,236,221,0.31)"></span>
+<span style="position: absolute; left: 202.8px; top: 36.8px; width: 1.2px; height: 1.2px; border-radius: 999px; background: rgba(179,167,245,0.43)"></span>
+<span style="position: absolute; left: 34.8px; top: 785.4px; width: 1.2px; height: 1.2px; border-radius: 999px; background: rgba(242,236,221,0.33)"></span>
+<span style="position: absolute; left: 85.6px; top: 273.5px; width: 1.5px; height: 1.5px; border-radius: 999px; background: rgba(242,236,221,0.45)"></span>
+<span style="position: absolute; left: 854.4px; top: 229.6px; width: 0.8px; height: 0.8px; border-radius: 999px; background: rgba(179,167,245,0.32)"></span>
+<span style="position: absolute; left: 576.7px; top: 329.3px; width: 0.8px; height: 0.8px; border-radius: 999px; background: rgba(242,236,221,0.40)"></span>
+<span style="position: absolute; left: 824.2px; top: 48.2px; width: 1.1px; height: 1.1px; border-radius: 999px; background: rgba(242,236,221,0.42)"></span>
+<span style="position: absolute; left: 226.9px; top: 371.1px; width: 1.1px; height: 1.1px; border-radius: 999px; background: rgba(242,236,221,0.31)"></span>
+<span style="position: absolute; left: 161.2px; top: 223.9px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(111,214,207,0.27)"></span>
+<span style="position: absolute; left: 64.9px; top: 573.5px; width: 1.4px; height: 1.4px; border-radius: 999px; background: rgba(242,236,221,0.36)"></span>
+<span style="position: absolute; left: 621.8px; top: 894.5px; width: 1.4px; height: 1.4px; border-radius: 999px; background: rgba(242,236,221,0.49)"></span>
+<span style="position: absolute; left: 106.3px; top: 471.1px; width: 0.9px; height: 0.9px; border-radius: 999px; background: rgba(242,236,221,0.39)"></span>
+<span style="position: absolute; left: 90.8px; top: 400.2px; width: 1.2px; height: 1.2px; border-radius: 999px; background: rgba(242,236,221,0.34)"></span>
+<span style="position: absolute; left: 693.5px; top: 310.7px; width: 2.2px; height: 2.2px; border-radius: 999px; background: rgba(242,236,221,0.85)"></span>
+<span style="position: absolute; left: 660.4px; top: 554.6px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(242,236,221,0.36)"></span>
+<span style="position: absolute; left: 132.3px; top: 800.9px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(242,236,221,0.36)"></span>
+<span style="position: absolute; left: 93.0px; top: 631.1px; width: 1.0px; height: 1.0px; border-radius: 999px; background: rgba(242,236,221,0.40)"></span>
+<span style="position: absolute; left: 19.2px; top: 212.3px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(242,236,221,0.57)"></span>
+<span style="position: absolute; left: 394.5px; top: 198.6px; width: 1.4px; height: 1.4px; border-radius: 999px; background: rgba(179,167,245,0.33)"></span>
+<span style="position: absolute; left: 890.1px; top: 149.6px; width: 1.9px; height: 1.9px; border-radius: 999px; background: rgba(242,236,221,0.67)"></span>
+<span style="position: absolute; left: 39.0px; top: 771.0px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(242,236,221,0.28)"></span>
+<span style="position: absolute; left: 632.5px; top: 318.3px; width: 1.0px; height: 1.0px; border-radius: 999px; background: rgba(242,236,221,0.41)"></span>
+<span style="position: absolute; left: 448.7px; top: 331.6px; width: 1.7px; height: 1.7px; border-radius: 999px; background: rgba(179,167,245,0.35)"></span>
+<span style="position: absolute; left: 726.0px; top: 482.2px; width: 1.5px; height: 1.5px; border-radius: 999px; background: rgba(242,236,221,0.35)"></span>
+<span style="position: absolute; left: 641.4px; top: 886.5px; width: 1.1px; height: 1.1px; border-radius: 999px; background: rgba(242,236,221,0.35)"></span>
+<span style="position: absolute; left: 92.3px; top: 504.3px; width: 1.7px; height: 1.7px; border-radius: 999px; background: rgba(242,236,221,0.60)"></span>
+<span style="position: absolute; left: 495.2px; top: 430.2px; width: 1.4px; height: 1.4px; border-radius: 999px; background: rgba(242,236,221,0.22)"></span>
+<span style="position: absolute; left: 42.0px; top: 172.7px; width: 1.2px; height: 1.2px; border-radius: 999px; background: rgba(242,236,221,0.20)"></span>
+<span style="position: absolute; left: 369.4px; top: 57.0px; width: 1.2px; height: 1.2px; border-radius: 999px; background: rgba(179,167,245,0.39)"></span>
+<span style="position: absolute; left: 801.5px; top: 178.3px; width: 1.7px; height: 1.7px; border-radius: 999px; background: rgba(242,236,221,0.51)"></span>
+<span style="position: absolute; left: 143.1px; top: 917.2px; width: 1.6px; height: 1.6px; border-radius: 999px; background: rgba(242,236,221,0.65)"></span>
+<span style="position: absolute; left: 697.8px; top: 812.2px; width: 1.1px; height: 1.1px; border-radius: 999px; background: rgba(242,236,221,0.19)"></span>
+<span style="position: absolute; left: 624.5px; top: 429.5px; width: 1.1px; height: 1.1px; border-radius: 999px; background: rgba(242,236,221,0.38)"></span>
+<span style="position: absolute; left: 464.7px; top: 333.6px; width: 1.0px; height: 1.0px; border-radius: 999px; background: rgba(111,214,207,0.26)"></span>
+<span style="position: absolute; left: 221.6px; top: 753.6px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(242,236,221,0.31)"></span>
+<span style="position: absolute; left: 299.9px; top: 117.0px; width: 1.1px; height: 1.1px; border-radius: 999px; background: rgba(242,236,221,0.29)"></span>
+<span style="position: absolute; left: 771.6px; top: 135.9px; width: 1.1px; height: 1.1px; border-radius: 999px; background: rgba(111,214,207,0.37)"></span>
+<span style="position: absolute; left: 530.7px; top: 3.0px; width: 1.5px; height: 1.5px; border-radius: 999px; background: rgba(242,236,221,0.53)"></span>
+<span style="position: absolute; left: 44.8px; top: 438.2px; width: 1.3px; height: 1.3px; border-radius: 999px; background: rgba(242,236,221,0.29)"></span>
+<span style="position: absolute; left: 96.6px; top: 408.8px; width: 1.4px; height: 1.4px; border-radius: 999px; background: rgba(242,236,221,0.29)"></span>
+<span style="position: absolute; left: 267.3px; top: 923.3px; width: 2.3px; height: 2.3px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 5.8px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out 0.00s infinite"></span>
+<span style="position: absolute; left: 243.6px; top: 828.6px; width: 1.6px; height: 1.6px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 4.1px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -3.33s infinite"></span>
+<span style="position: absolute; left: 877.1px; top: 783.1px; width: 2.1px; height: 2.1px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 5.3px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -6.66s infinite"></span>
+<span style="position: absolute; left: 394.5px; top: 238.5px; width: 2.5px; height: 2.5px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 6.1px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -0.99s infinite"></span>
+<span style="position: absolute; left: 199.7px; top: 698.1px; width: 2.0px; height: 2.0px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 5.0px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -4.32s infinite"></span>
+<span style="position: absolute; left: 359.7px; top: 740.4px; width: 2.2px; height: 2.2px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 5.4px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -7.65s infinite"></span>
+<span style="position: absolute; left: 920.9px; top: 63.9px; width: 2.1px; height: 2.1px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 5.2px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -1.98s infinite"></span>
+<span style="position: absolute; left: 624.0px; top: 572.8px; width: 2.4px; height: 2.4px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 6.0px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -5.31s infinite"></span>
+<span style="position: absolute; left: 396.5px; top: 759.6px; width: 1.8px; height: 1.8px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 4.5px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -8.64s infinite"></span>
+<span style="position: absolute; left: 571.7px; top: 556.9px; width: 2.6px; height: 2.6px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 6.5px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -2.97s infinite"></span>
+<span style="position: absolute; left: 182.7px; top: 551.3px; width: 2.4px; height: 2.4px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 5.9px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -6.30s infinite"></span>
+<span style="position: absolute; left: 850.3px; top: 645.0px; width: 1.9px; height: 1.9px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 4.6px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -0.63s infinite"></span>
+<span style="position: absolute; left: 209.5px; top: 711.0px; width: 2.5px; height: 2.5px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 6.2px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -3.96s infinite"></span>
+<span style="position: absolute; left: 65.6px; top: 655.7px; width: 2.4px; height: 2.4px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 6.0px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -7.29s infinite"></span>
+<span style="position: absolute; left: 627.5px; top: 17.5px; width: 2.4px; height: 2.4px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 6.0px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -1.62s infinite"></span>
+<span style="position: absolute; left: 524.3px; top: 558.7px; width: 1.6px; height: 1.6px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 3.9px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -4.95s infinite"></span>
+<span style="position: absolute; left: 126.6px; top: 816.3px; width: 1.4px; height: 1.4px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 3.5px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -8.28s infinite"></span>
+<span style="position: absolute; left: 147.8px; top: 558.8px; width: 2.0px; height: 2.0px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 5.1px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -2.61s infinite"></span>
+<span style="position: absolute; left: 15.6px; top: 523.7px; width: 2.2px; height: 2.2px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 5.4px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -5.94s infinite"></span>
+<span style="position: absolute; left: 303.3px; top: 346.0px; width: 1.7px; height: 1.7px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 4.3px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -0.27s infinite"></span>
+<span style="position: absolute; left: 480.1px; top: 765.0px; width: 2.1px; height: 2.1px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 5.2px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -3.60s infinite"></span>
+<span style="position: absolute; left: 854.7px; top: 427.0px; width: 1.6px; height: 1.6px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 4.0px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -6.93s infinite"></span>
+<span style="position: absolute; left: 866.9px; top: 600.2px; width: 2.0px; height: 2.0px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 5.0px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -1.26s infinite"></span>
+<span style="position: absolute; left: 135.1px; top: 906.2px; width: 2.4px; height: 2.4px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 6.0px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -4.59s infinite"></span>
+<span style="position: absolute; left: 750.3px; top: 362.1px; width: 1.5px; height: 1.5px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 3.8px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -7.92s infinite"></span>
+<span style="position: absolute; left: 536.9px; top: 505.9px; width: 1.6px; height: 1.6px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 4.1px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -2.25s infinite"></span>
+<span style="position: absolute; left: 88.8px; top: 838.2px; width: 2.2px; height: 2.2px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 5.6px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -5.58s infinite"></span>
+<span style="position: absolute; left: 747.8px; top: 744.6px; width: 1.9px; height: 1.9px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 4.7px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -8.91s infinite"></span>
+<span style="position: absolute; left: 550.0px; top: 825.9px; width: 2.2px; height: 2.2px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 5.6px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -3.24s infinite"></span>
+<span style="position: absolute; left: 465.0px; top: 806.0px; width: 1.6px; height: 1.6px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 3.9px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -6.57s infinite"></span>
+<span style="position: absolute; left: 260.8px; top: 334.1px; width: 2.3px; height: 2.3px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 5.6px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -0.90s infinite"></span>
+<span style="position: absolute; left: 483.7px; top: 254.2px; width: 2.4px; height: 2.4px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 5.9px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -4.23s infinite"></span>
+<span style="position: absolute; left: 585.8px; top: 558.6px; width: 2.2px; height: 2.2px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 5.4px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -7.56s infinite"></span>
+<span style="position: absolute; left: 846.9px; top: 901.4px; width: 1.8px; height: 1.8px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 4.4px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -1.89s infinite"></span>
+<span style="position: absolute; left: 774.5px; top: 895.9px; width: 1.7px; height: 1.7px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 4.1px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -5.22s infinite"></span>
+<span style="position: absolute; left: 168.8px; top: 205.7px; width: 2.4px; height: 2.4px; border-radius: 999px; background: #F2ECDD; box-shadow: 0 0 6.1px rgba(242,236,221,0.7); animation: twinkle 9s ease-in-out -8.55s infinite"></span>
+</div>
+
+<span style="position: absolute; left: -15px; top: 144px; width: 420px; height: 420px; border-radius: 999px; background: radial-gradient(circle closest-side, rgba(111,214,207,0.1) 20%, rgba(111,214,207,0) 100%); animation: moonglow 5s ease-in-out infinite"></span>
+</div>
+
+<a href="Main.dc.html" aria-label="Back to Home" style="position: absolute; left: 100px; top: 259px; width: 190px; height: 190px; display: block">
+<div aria-hidden="true" style="position: absolute; left: 39px; top: 39px; width: 112px; height: 112px; animation: halo-breath 5s ease-in-out infinite">
+<span style="position: absolute; left: 0; top: 0; width: 112px; height: 112px; border-radius: 999px; background: radial-gradient(circle closest-side, rgba(111,214,207,0) 45.5%, rgba(111,214,207,0.157) 55.4%, rgba(111,214,207,0) 100%); animation: halo-l0 120s linear infinite"></span>
+<span style="position: absolute; left: 0; top: 0; width: 112px; height: 112px; border-radius: 999px; background: radial-gradient(circle closest-side, rgba(111,214,207,0) 45.5%, rgba(111,214,207,0.157) 55.4%, rgba(111,214,207,0) 100%); animation: halo-l1 120s linear infinite"></span>
+<span style="position: absolute; left: 0; top: 0; width: 112px; height: 112px; border-radius: 999px; background: radial-gradient(circle closest-side, rgba(111,214,207,0) 45.5%, rgba(111,214,207,0.157) 55.4%, rgba(111,214,207,0) 100%); animation: halo-l2 120s linear infinite"></span>
+</div>
+<svg aria-hidden="true" width="70" height="70" viewBox="17 5.4 20.6 20.6" style="position: absolute; left: 60px; top: 60px"><g transform="translate(-10.7 -6.6)"><g transform="translate(29.24 13.384)"><path d="M50.18,33.714a6.82,6.82,0,0,1-2.116-1.448,7.132,7.132,0,0,1-1.448-2.116,6.565,6.565,0,0,1-.5-2.561,7.052,7.052,0,0,1,.5-2.617,6.228,6.228,0,0,1,1.448-2.116A7.132,7.132,0,0,1,50.18,21.41a6.565,6.565,0,0,1,2.561-.5,7.052,7.052,0,0,1,2.617.5,6.228,6.228,0,0,1,2.116,1.448,7.132,7.132,0,0,1,1.448,2.116,6.843,6.843,0,0,1,.5,2.617,6.565,6.565,0,0,1-.5,2.561,6.82,6.82,0,0,1-1.448,2.116,7.132,7.132,0,0,1-2.116,1.448,6.843,6.843,0,0,1-2.617.5,6.769,6.769,0,0,1-2.561-.5m-.835-14.253a8.809,8.809,0,0,0-2.784,1.893,8.2,8.2,0,0,0-1.893,2.839A8.871,8.871,0,0,0,44,27.646a9.074,9.074,0,0,0,.668,3.452,8.224,8.224,0,0,0,1.893,2.784,8.525,8.525,0,0,0,2.784,1.893,9.251,9.251,0,0,0,6.9,0,9.744,9.744,0,0,0,2.839-1.893A8.525,8.525,0,0,0,60.981,31.1a9.251,9.251,0,0,0,0-6.9,9.744,9.744,0,0,0-1.893-2.839,8.2,8.2,0,0,0-2.839-1.893,8.871,8.871,0,0,0-3.452-.668,7.232,7.232,0,0,0-3.452.668" transform="translate(-44 -18.785)" fill="#6FD6CF"></path></g><g transform="translate(31.801 13.392)"><path d="M48.6,24.924c0,3.4,6.124,5.679,6.124,8.685,0-3.006,6.124-5.289,6.124-8.685a6.124,6.124,0,0,0-12.248,0M57.452,24.367A2.672,2.672,0,1,1,54.779,21.695a2.71,2.71,0,0,1,2.672,2.672Z" transform="translate(-48.6 -18.8)" fill="#6FD6CF" fill-rule="evenodd"></path></g></g></svg>
+</a>
+
+<span style="position: absolute; left: 0; right: 0; bottom: 56px; text-align: center; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.3em; color: #8990B5; opacity: 0; animation: word 14s ease-in-out 1s infinite">TANAFAS</span>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

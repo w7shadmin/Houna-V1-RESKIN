@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { View, Text, Pressable, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import DetailScreen from '@/components/DetailScreen';
-import AuthField from '@/components/account/AuthField';
+import { AccountScreen, Field, FormMessage, OrDivider, SwitchLink } from '@/components/account/AccountKit';
+import Captcha from '@/components/account/Captcha';
+import { useRemoteConfig } from '@/hooks/useRemoteConfig';
 import GoogleButton from '@/components/account/GoogleButton';
+import Button from '@/components/ui/Button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { colors, spacing, radius, typography } from '@/constants/theme';
 
 export default function SignInScreen() {
   const router = useRouter();
-  const { t, fonts } = useLanguage();
+  const { t } = useLanguage();
   const { signInWithEmail, signInWithGoogle } = useAuth();
   const s = t.account.signIn;
   const errors = t.account.errors;
@@ -19,17 +19,26 @@ export default function SignInScreen() {
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  // The bot check, when app_config has its key: a token per try, then a fresh widget.
+  const { turnstileSiteKey } = useRemoteConfig();
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaRound, setCaptchaRound] = useState(0);
 
   const handleSubmit = async () => {
     setError('');
     setSubmitting(true);
-    const result = await signInWithEmail(email.trim(), password);
+    const result = await signInWithEmail(email.trim(), password, captchaToken ?? undefined);
     setSubmitting(false);
+    if (turnstileSiteKey) {
+      setCaptchaToken(null);
+      setCaptchaRound((r) => r + 1);
+    }
     if (result.error) {
       setError(errors[result.error]);
       return;
     }
-    router.back();
+    if (router.canGoBack()) router.back();
+    else router.replace('/profile');
   };
 
   const handleGoogle = async () => {
@@ -40,127 +49,36 @@ export default function SignInScreen() {
     }
   };
 
-  const canSubmit = email.trim().length > 0 && password.length > 0 && !submitting;
+  const canSubmit = email.trim().length > 0 && password.length > 0 && (!turnstileSiteKey || !!captchaToken);
 
   return (
-    <DetailScreen title={s.title}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-          <Text style={[styles.subtitle, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-            {s.subtitle}
-          </Text>
-
-          <AuthField
-            label={s.email}
-            value={email}
-            onChangeText={setEmail}
-            placeholder={s.emailPlaceholder}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-          <AuthField
-            label={s.password}
-            value={password}
-            onChangeText={setPassword}
-            placeholder={s.passwordPlaceholder}
-            secureTextEntry
-            autoCapitalize="none"
-          />
-
-          {!!error && (
-            <Text style={[styles.error, { color: colors.accent, fontFamily: fonts.regular }]}>{error}</Text>
-          )}
-
-          <Pressable
-            onPress={handleSubmit}
-            disabled={!canSubmit}
-            style={({ pressed }) => [
-              styles.submitBtn,
-              { backgroundColor: colors.primary },
-              (pressed || !canSubmit) && { opacity: 0.7 },
-            ]}
-          >
-            {submitting ? (
-              <ActivityIndicator color={colors.onPrimary} />
-            ) : (
-              <Text style={[styles.submitText, { color: colors.onPrimary, fontFamily: fonts.semiBold }]}>
-                {s.submit}
-              </Text>
-            )}
-          </Pressable>
-
-          <View style={styles.dividerRow}>
-            <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
-            <Text style={[styles.dividerText, { color: colors.textTertiary, fontFamily: fonts.regular }]}>
-              {s.or}
-            </Text>
-            <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
-          </View>
-
-          <GoogleButton label={s.google} onPress={handleGoogle} />
-
-          <View style={styles.footerRow}>
-            <Text style={[styles.footerText, { color: colors.textSecondary, fontFamily: fonts.regular }]}>
-              {s.noAccount}
-            </Text>
-            <Pressable onPress={() => router.replace('/account/sign-up')} hitSlop={8}>
-              <Text style={[styles.footerLink, { color: colors.primary, fontFamily: fonts.semiBold }]}>
-                {s.createOne}
-              </Text>
-            </Pressable>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </DetailScreen>
+    <AccountScreen title={s.title} subtitle={s.subtitle}>
+      <Field
+        label={s.email}
+        value={email}
+        onChangeText={setEmail}
+        placeholder={s.emailPlaceholder}
+        keyboardType="email-address"
+        autoCapitalize="none"
+        autoComplete="email"
+      />
+      <Field
+        label={s.password}
+        value={password}
+        onChangeText={setPassword}
+        placeholder={s.passwordPlaceholder}
+        secureTextEntry
+        autoCapitalize="none"
+        autoComplete="password"
+      />
+      {!!turnstileSiteKey && (
+        <Captcha key={captchaRound} siteKey={turnstileSiteKey} onToken={setCaptchaToken} onError={() => setError(errors.captcha_failed)} />
+      )}
+      {!!error && <FormMessage message={error} />}
+      <Button block label={s.submit} onPress={handleSubmit} disabled={!canSubmit} loading={submitting} />
+      <OrDivider label={s.or} />
+      <GoogleButton label={s.google} onPress={handleGoogle} />
+      <SwitchLink text={s.noAccount} link={s.createOne} onPress={() => router.replace('/account/sign-up')} />
+    </AccountScreen>
   );
 }
-
-const styles = StyleSheet.create({
-  scroll: {
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.xxl,
-  },
-  subtitle: {
-    fontSize: typography.fontSize.body,
-    marginBottom: spacing.lg,
-  },
-  error: {
-    fontSize: typography.fontSize.sm,
-    marginBottom: spacing.md,
-  },
-  submitBtn: {
-    height: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: radius.md,
-    marginBottom: spacing.lg,
-  },
-  submitText: {
-    fontSize: typography.fontSize.body,
-  },
-  dividerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    marginBottom: spacing.lg,
-  },
-  dividerLine: {
-    flex: 1,
-    height: StyleSheet.hairlineWidth,
-  },
-  dividerText: {
-    fontSize: typography.fontSize.xs,
-  },
-  footerRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: spacing.xs,
-    marginTop: spacing.xl,
-  },
-  footerText: {
-    fontSize: typography.fontSize.sm,
-  },
-  footerLink: {
-    fontSize: typography.fontSize.sm,
-  },
-});

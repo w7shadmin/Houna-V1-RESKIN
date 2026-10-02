@@ -1,34 +1,62 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Pressable, ActivityIndicator, StyleSheet } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Check, X } from 'lucide-react-native';
-import DetailScreen from '@/components/DetailScreen';
+import { AccountScreen, Field, FormMessage } from '@/components/account/AccountKit';
+import Button from '@/components/ui/Button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { supabase } from '@/lib/supabase';
-import { colors, spacing, radius, typography } from '@/constants/theme';
+import { formatEntryDateLong } from '@/lib/journal';
+import { arabicNumber } from '@/lib/arabicNumerals';
 
 const USERNAME_PATTERN = /^[A-Za-z0-9_]{3,20}$/;
 
-type Status = 'idle' | 'invalid' | 'checking' | 'available' | 'taken';
+type Status = 'idle' | 'same' | 'invalid' | 'checking' | 'available' | 'taken';
 
 export default function UsernameScreen() {
+  const { colors } = useTheme();
   const router = useRouter();
-  const { t, isRTL, fonts } = useLanguage();
-  const { claimUsername } = useAuth();
+  const { t, isRTL } = useLanguage();
+  const { profile, claimUsername, changeUsername } = useAuth();
   const s = t.account.username;
+  // Signed in with a name already: this screen renames it; otherwise it's the one-time claim at sign-up.
+  const current = profile?.username;
 
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState(current ?? '');
   const [status, setStatus] = useState<Status>('idle');
   const [submitting, setSubmitting] = useState(false);
+  // Renames left in the current 30 days (twice in any 30, enforced in the database); null until known.
+  const [allowance, setAllowance] = useState<{ remaining: number; nextAt: string | null } | null>(null);
+
+  const loadAllowance = React.useCallback(async () => {
+    const { data } = await supabase.rpc('get_username_change_allowance');
+    const row = Array.isArray(data) ? data[0] : data;
+    if (row) setAllowance({ remaining: row.remaining, nextAt: row.next_at });
+  }, []);
+
+  useEffect(() => {
+    if (current) loadAllowance();
+  }, [current, loadAllowance]);
+  const limited = !!current && allowance?.remaining === 0;
 
   useEffect(() => {
     if (username.length === 0) {
       setStatus('idle');
       return;
     }
+    if (current && username === current) {
+      setStatus('same');
+      return;
+    }
     if (!USERNAME_PATTERN.test(username)) {
       setStatus('invalid');
+      return;
+    }
+    // Only the case changed: still this person's own name.
+    if (current && username.toLowerCase() === current.toLowerCase()) {
+      setStatus('available');
       return;
     }
     setStatus('checking');
@@ -37,110 +65,59 @@ export default function UsernameScreen() {
       setStatus(data ? 'available' : 'taken');
     }, 400);
     return () => clearTimeout(handle);
-  }, [username]);
+  }, [username, current]);
 
   const handleSubmit = async () => {
     if (status !== 'available') return;
     setSubmitting(true);
-    const result = await claimUsername(username);
+    const result = current ? await changeUsername(username) : await claimUsername(username);
     setSubmitting(false);
     if (!result.error) {
-      router.replace('/(tabs)/more');
+      if (current) router.back();
+      else router.replace('/profile');
+    } else if (result.error === 'username_change_limit') {
+      await loadAllowance();
     } else {
       setStatus(result.error === 'username_taken' ? 'taken' : 'invalid');
     }
   };
 
-  const statusColor =
-    status === 'available' ? colors.primary : status === 'taken' || status === 'invalid' ? colors.accent : colors.textTertiary;
+  const statusIcon =
+    status === 'checking' ? (
+      <ActivityIndicator size="small" color={colors.textTertiary} />
+    ) : status === 'available' ? (
+      <Check size={20} color={colors.primary} strokeWidth={2} />
+    ) : status === 'taken' ? (
+      <X size={20} color={colors.danger} strokeWidth={2} />
+    ) : null;
 
   const statusLabel =
-    status === 'checking' ? s.checking : status === 'available' ? s.available : status === 'taken' ? s.taken : status === 'invalid' ? s.invalid : '';
+    status === 'same' ? s.same : status === 'checking' ? s.checking : status === 'available' ? s.available : status === 'taken' ? s.taken : status === 'invalid' ? s.invalid : '';
+  const statusTone = status === 'available' ? 'ok' : status === 'taken' || status === 'invalid' ? 'error' : 'muted';
+
+  const num = (n: number) => (isRTL ? arabicNumber(n) : String(n));
+  const limitNote = !current || !allowance
+    ? ''
+    : allowance.remaining >= 2
+      ? s.limitTwo
+      : allowance.remaining === 1
+        ? s.limitOne
+        : s.limitNone.replace('{date}', allowance.nextAt ? formatEntryDateLong(new Date(allowance.nextAt), t.journal.dateNames, num) : '');
 
   return (
-    <DetailScreen title={s.title}>
-      <Text style={[styles.subtitle, { color: colors.textSecondary, fontFamily: fonts.regular }]}>{s.subtitle}</Text>
-
-      <View style={styles.fieldWrap}>
-        <TextInput
-          value={username}
-          onChangeText={(text) => setUsername(text.trim())}
-          placeholder={s.placeholder}
-          placeholderTextColor={colors.placeholder}
-          autoCapitalize="none"
-          autoCorrect={false}
-          textAlign={isRTL ? 'right' : 'left'}
-          style={[
-            styles.input,
-            { borderColor: colors.border, backgroundColor: colors.inputBackground, color: colors.text, fontFamily: fonts.regular },
-          ]}
-        />
-        {(status === 'checking' || status === 'available' || status === 'taken') && (
-          <View style={styles.statusIcon}>
-            {status === 'checking' && <ActivityIndicator size="small" color={colors.textTertiary} />}
-            {status === 'available' && <Check size={20} color={colors.primary} />}
-            {status === 'taken' && <X size={20} color={colors.accent} />}
-          </View>
-        )}
-      </View>
-
-      {!!statusLabel && (
-        <Text style={[styles.statusLabel, { color: statusColor, fontFamily: fonts.regular }]}>{statusLabel}</Text>
-      )}
-
-      <Pressable
-        onPress={handleSubmit}
-        disabled={status !== 'available' || submitting}
-        style={({ pressed }) => [
-          styles.submitBtn,
-          { backgroundColor: colors.primary },
-          (pressed || status !== 'available' || submitting) && { opacity: 0.6 },
-        ]}
-      >
-        {submitting ? (
-          <ActivityIndicator color={colors.onPrimary} />
-        ) : (
-          <Text style={[styles.submitText, { color: colors.onPrimary, fontFamily: fonts.semiBold }]}>{s.submit}</Text>
-        )}
-      </Pressable>
-    </DetailScreen>
+    <AccountScreen title={current ? s.changeTitle : s.title} subtitle={current ? s.changeSubtitle : s.subtitle}>
+      <Field
+        label={s.label}
+        value={username}
+        onChangeText={(text) => setUsername(text.trim())}
+        placeholder={s.placeholder}
+        autoCapitalize="none"
+        autoComplete="username"
+        trailing={statusIcon}
+      />
+      {!!statusLabel && !limited && <FormMessage message={statusLabel} tone={statusTone} />}
+      {!!limitNote && <FormMessage message={limitNote} tone={limited ? 'error' : 'muted'} />}
+      <Button block label={current ? s.save : s.submit} onPress={handleSubmit} disabled={status !== 'available' || limited} loading={submitting} />
+    </AccountScreen>
   );
 }
-
-const styles = StyleSheet.create({
-  subtitle: {
-    fontSize: typography.fontSize.body,
-    marginTop: spacing.sm,
-    marginBottom: spacing.lg,
-  },
-  fieldWrap: {
-    position: 'relative',
-    justifyContent: 'center',
-  },
-  input: {
-    height: 48,
-    borderWidth: 1,
-    borderRadius: radius.md,
-    paddingHorizontal: spacing.md,
-    paddingEnd: spacing.xl + spacing.sm,
-    fontSize: typography.fontSize.body,
-  },
-  statusIcon: {
-    position: 'absolute',
-    end: spacing.md,
-  },
-  statusLabel: {
-    fontSize: typography.fontSize.sm,
-    marginTop: spacing.sm,
-  },
-  submitBtn: {
-    height: 48,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: radius.md,
-    marginTop: spacing.xl,
-  },
-  submitText: {
-    fontSize: typography.fontSize.body,
-  },
-});

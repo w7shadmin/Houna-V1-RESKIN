@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Motion — words that arrive</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=DM+Mono:wght@400;500&amp;family=Figtree:wght@300;400;500;600&amp;family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&amp;family=Marcellus&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font:inherit;color:inherit}
+@keyframes twinkle { 0%,100% { opacity: 0.25 } 50% { opacity: 1 } }
+@keyframes drift { 0% { transform: translate(0,0) scale(1) } 50% { transform: translate(24px,-18px) scale(1.08) } 100% { transform: translate(0,0) scale(1) } }
+@keyframes drift2 { 0% { transform: translate(0,0) scale(1.05) } 50% { transform: translate(-30px,22px) scale(0.95) } 100% { transform: translate(0,0) scale(1.05) } }
+@keyframes spin { to { transform: rotate(360deg) } }
+@keyframes spinBack { to { transform: rotate(-360deg) } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: none } }
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes glowPulse { 0%,100% { opacity: 0.55 } 50% { opacity: 1 } }
+@keyframes bars { 0%,100% { transform: scaleY(0.35) } 50% { transform: scaleY(1) } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important } }
+@keyframes letterA { from { opacity: 0; filter: blur(6px); transform: translateY(8px) } to { opacity: 1; filter: blur(0); transform: none } }
+@keyframes letterB { from { opacity: 0; filter: blur(6px); transform: translateY(8px) } to { opacity: 1; filter: blur(0); transform: none } }
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; box-sizing: border-box; font-family: 'Figtree', system-ui, sans-serif; background: #0B1026">
+
+<button type="button" onClick="{{replay}}" aria-label="Replay" style="position: absolute; right: 20px; top: 56px; width: 48px; height: 48px; border-radius: 999px; background: rgba(242,236,221,0.08); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(242,236,221,0.16); display: flex; align-items: center; justify-content: center; color: #F2ECDD; cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: block; flex-shrink: 0"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"></path><path d="M4.5 4.5v3.5H8"></path></svg></button>
+<div style="position: absolute; left: 32px; right: 32px; top: 200px; display: flex; flex-direction: column; gap: 14px">
+<span style="font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #8990B5; white-space: nowrap">Latin · letter by letter</span>
+<span style="font-family: 'Marcellus', serif; font-size: 38px; line-height: 1.25; color: #F2ECDD"><span style="white-space: nowrap"><span style="display: inline-block; animation: letter{{x}} 700ms ease 0ms both">T</span><span style="display: inline-block; animation: letter{{x}} 700ms ease 45ms both">a</span><span style="display: inline-block; animation: letter{{x}} 700ms ease 90ms both">k</span><span style="display: inline-block; animation: letter{{x}} 700ms ease 135ms both">e</span></span> <span style="white-space: nowrap"><span style="display: inline-block; animation: letter{{x}} 700ms ease 180ms both">a</span></span> <span style="white-space: nowrap"><span style="display: inline-block; animation: letter{{x}} 700ms ease 225ms both">s</span><span style="display: inline-block; animation: letter{{x}} 700ms ease 270ms both">l</span><span style="display: inline-block; animation: letter{{x}} 700ms ease 315ms both">o</span><span style="display: inline-block; animation: letter{{x}} 700ms ease 360ms both">w</span></span> <span style="white-space: nowrap"><span style="display: inline-block; animation: letter{{x}} 700ms ease 405ms both">b</span><span style="display: inline-block; animation: letter{{x}} 700ms ease 450ms both">r</span><span style="display: inline-block; animation: letter{{x}} 700ms ease 495ms both">e</span><span style="display: inline-block; animation: letter{{x}} 700ms ease 540ms both">a</span><span style="display: inline-block; animation: letter{{x}} 700ms ease 585ms both">t</span><span style="display: inline-block; animation: letter{{x}} 700ms ease 630ms both">h</span></span> <span style="white-space: nowrap"><span style="display: inline-block; animation: letter{{x}} 700ms ease 675ms both">w</span><span style="display: inline-block; animation: letter{{x}} 700ms ease 720ms both">i</span><span style="display: inline-block; animation: letter{{x}} 700ms ease 765ms both">t</span><span style="display: inline-block; animation: letter{{x}} 700ms ease 810ms both">h</span></span> <span style="white-space: nowrap"><span style="display: inline-block; animation: letter{{x}} 700ms ease 855ms both">u</span><span style="display: inline-block; animation: letter{{x}} 700ms ease 900ms both">s</span><span style="display: inline-block; animation: letter{{x}} 700ms ease 945ms both">.</span></span></span>
+</div>
+<div dir="rtl" style="position: absolute; left: 32px; right: 32px; top: 440px; display: flex; flex-direction: column; gap: 14px">
+<span style="font-family: 'IBM Plex Sans Arabic', sans-serif; font-size: 13px; font-weight: 500; color: #8990B5; white-space: nowrap">العربية · كلمة كلمة</span>
+<span lang="ar" style="font-family: 'Amiri', serif; font-weight: 700; font-size: 42px; line-height: 1.5; color: #F2ECDD"><span style="display: inline-block; animation: letter{{x}} 900ms ease 1490ms both">خذ</span> <span style="display: inline-block; animation: letter{{x}} 900ms ease 1750ms both">نفسًا</span> <span style="display: inline-block; animation: letter{{x}} 900ms ease 2010ms both">بطيئًا</span> <span style="display: inline-block; animation: letter{{x}} 900ms ease 2270ms both">معنا.</span></span>
+</div>
+<span style="position: absolute; left: 32px; right: 32px; top: 660px; font-size: 14.5px; line-height: 1.55; color: #B6BAD6">Arabic letters join, so they can't arrive one at a time; whole words fade and sharpen in, a little slower.</span>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { n: 0 };
+  }
+  renderVals() {
+    return { x: this.state.n % 2 ? 'B' : 'A', replay: () => this.setState({ n: this.state.n + 1 }) };
+  }
+}
+</script>
+</body>
+</html>

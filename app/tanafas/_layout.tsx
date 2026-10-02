@@ -1,12 +1,19 @@
 import React from 'react';
 import { Stack } from 'expo-router';
-import { colors } from '@/constants/theme';
+import { ThemeProvider, useTheme as useNavigationTheme } from '@react-navigation/native';
+import { useTheme } from '@/contexts/ThemeContext';
+import { nightPalette } from '@/constants/theme';
 
 /** Internal stack for everything opened from the raised Tanafas button — the
  * whole group is presented as one modal (see app/_layout.tsx), and this
- * navigator handles hub → breathing list → exercise within it. */
+ * navigator handles hub → journal, meditation and tests within it. */
 export default function TanafasLayout() {
+  const { colors } = useTheme();
+  const navTheme = useNavigationTheme();
+  // No default ground under the screens (the web paints one), so Home shows as the hub is dragged
+  // down; every screen here sets its own (screenOptions.contentStyle, or the hub itself).
   return (
+    <ThemeProvider value={{ ...navTheme, colors: { ...navTheme.colors, background: 'transparent' } }}>
     <Stack
       screenOptions={{
         headerShown: false,
@@ -14,23 +21,18 @@ export default function TanafasLayout() {
         animation: 'fade',
       }}
     >
-      <Stack.Screen name="index" />
-      <Stack.Screen name="breathing/index" />
-      <Stack.Screen name="breathing/anxiety-relief" />
-      <Stack.Screen name="breathing/steady-mind" />
-      <Stack.Screen name="breathing/panic-relief" />
-      <Stack.Screen name="breathing/nervous-system-reset" />
-      <Stack.Screen name="breathing/tension-release" />
+      {/* The hub paints its own ground, so Home shows as it's dragged down (app/_layout.tsx). */}
+      <Stack.Screen name="index" options={{ contentStyle: { backgroundColor: 'transparent' } }} />
       <Stack.Screen name="meditation/index" />
       <Stack.Screen
         name="meditation/[scene]"
-        options={{ animation: 'fade', contentStyle: { backgroundColor: '#000000' } }}
+        options={{ animation: 'fade', contentStyle: { backgroundColor: nightPalette.midnight } }}
       />
+      <Stack.Screen name="discover/[testId]" />
+      <Stack.Screen name="discover/result/[resultId]" />
       <Stack.Screen name="journal/index" />
       <Stack.Screen name="journal/entry/[id]" />
-      <Stack.Screen name="voices/index" />
-      <Stack.Screen name="voices/submit" />
-      <Stack.Screen name="voices/[id]" />
     </Stack>
+    </ThemeProvider>
   );
 }

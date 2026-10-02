@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Mood check-in (Day)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&amp;family=Figtree:wght@400;500;600&amp;family=Marcellus&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#CBC7BD;font-family:'Figtree',system-ui,sans-serif;color:#1B2140}
+a{color:#1B2140;text-decoration:none}a:hover{color:#000000}
+textarea::placeholder{color:#646A8E}
+@keyframes breathe{0%,100%{transform:scale(0.95)}50%{transform:scale(1.05)}}
+.breathe{animation:breathe 6s ease-in-out infinite;transform-origin:50% 50%}
+@keyframes glowpulse{0%,100%{opacity:.65}50%{opacity:1}}
+.glowpulse{animation:glowpulse 6s ease-in-out infinite}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 900px; overflow: hidden; box-sizing: border-box; background: #CBC7BD; font-family: 'Figtree', system-ui, sans-serif; color: #1B2140; padding-top: 28px">
+<div style="position: relative; height: 100%; box-sizing: border-box; border-radius: 30px 30px 0 0; background: #FBF8F2; border: 1px solid rgba(27,33,64,0.08); border-bottom: 0; display: flex; flex-direction: column; gap: 16px; padding: 12px 20px 36px">
+
+<div style="display: flex; flex-direction: column; align-items: center; gap: 10px">
+<span aria-hidden="true" style="width: 40px; height: 5px; border-radius: 999px; background: rgba(27,33,64,0.25)"></span>
+<div style="align-self: stretch; display: flex; justify-content: flex-end">
+<a href="HomeDay.dc.html" aria-label="Close" style="width: 44px; height: 44px; border-radius: 999px; display: flex; align-items: center; justify-content: center; background: #FFFFFF; border: 1px solid rgba(27,33,64,0.14)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"></path></svg></a>
+</div>
+<h1 style="margin: 0; font-family: 'Marcellus', serif; font-weight: 400; font-size: 29px; line-height: 1.15; text-align: center; color: #1B2140; max-width: 300px">How are you feeling right now?</h1>
+</div>
+
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px">
+<div aria-hidden="true" style="position: relative; width: 250px; height: 250px; display: flex; align-items: center; justify-content: center">
+<span class="glowpulse" style="position: absolute; left: 0; top: 0; width: 250px; height: 250px; border-radius: 999px; background: radial-gradient(closest-side, {{b.glow}}, rgba(251,248,242,0))"></span>
+<svg class="breathe" width="200" height="200" viewBox="0 0 200 200">
+<defs><radialGradient id="leafGrad" cx="50%" cy="40%" r="60%"><stop offset="0" stop-color="{{b.hi}}"></stop><stop offset="1" stop-color="{{b.c}}"></stop></radialGradient></defs>
+<circle cx="100" cy="100" r="84" fill="none" stroke="{{b.c}}" stroke-width="12" opacity="{{b.ringO}}"></circle>
+<path d="M100 152 C 72 142 50 116 54 84 C 80 90 98 116 100 152 Z" fill="url(#leafGrad)" transform="rotate({{b.fl}} 100 152)"></path>
+<path d="M100 152 C 128 142 150 116 146 84 C 120 90 102 116 100 152 Z" fill="url(#leafGrad)" transform="rotate({{b.fr}} 100 152)"></path>
+<circle cx="100" cy="{{b.hy}}" r="16" fill="{{b.hi}}"></circle>
+</svg>
+</div>
+<span style="font-family: 'Marcellus', serif; font-size: 30px; color: #1B2140">{{b.label}}</span>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px">
+<input type="range" min="1" max="7" step="1" value="{{v}}" onChange="{{slide}}" aria-label="Mood" aria-valuetext="{{b.label}}" style="width: 100%; height: 32px; margin: 0; accent-color: #1B2140">
+<div aria-hidden="true" style="display: flex; justify-content: space-between; padding: 0 8px">
+<sc-for list="{{ticks}}" as="t" hint-placeholder-count="7">
+<span style="width: 6px; height: 6px; border-radius: 999px; background: {{t.c}}"></span>
+</sc-for>
+</div>
+<div style="display: flex; justify-content: space-between; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.14em; color: #646A8E">
+<span>HEAVIER</span><span>LIGHTER</span>
+</div>
+</div>
+
+<p style="margin: 0; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13.5px; color: #4A5078"><span aria-hidden="true" style="width: 6px; height: 6px; border-radius: 999px; background: #6353C9"></span>You’re not alone — [N] people felt this way today</p>
+
+<label style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-family: 'DM Mono', monospace; font-size: 11.5px; letter-spacing: 0.14em; color: #646A8E">ADD A FEW WORDS · OPTIONAL</span>
+<textarea rows="2" placeholder="What’s on your mind?" style="box-sizing: border-box; width: 100%; padding: 14px 16px; border-radius: 18px; background: #FFFFFF; border: 1px solid rgba(27,33,64,0.12); color: #1B2140; font-family: 'Figtree', sans-serif; font-size: 15px; line-height: 1.5; resize: none; outline: 0"></textarea>
+</label>
+
+<div style="margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 8px">
+<a href="HomeDay.dc.html" style="align-self: stretch; display: flex; align-items: center; justify-content: center; height: 56px; border-radius: 999px; background: #1B2140; color: #F5F1E8; font-size: 16px; font-weight: 600">Save to journal</a>
+<span style="font-size: 12.5px; color: #646A8E">Saved privately in your journal on this phone.</span>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":900}}'>
+const BLOOMS = [
+  { id: 'angry', label: 'Angry', c: '#E36F5E', hi: '#FFE1DA', glow: 'rgba(227,111,94,0.42)', fold: 38, hy: 76, ringO: 0.4 },
+  { id: 'anxious', label: 'Anxious', c: '#F0B27A', hi: '#FFEEDC', glow: 'rgba(240,178,122,0.42)', fold: 24, hy: 72, ringO: 0.48 },
+  { id: 'sad', label: 'Sad', c: '#82A4EE', hi: '#E2EBFF', glow: 'rgba(130,164,238,0.42)', fold: 12, hy: 78, ringO: 0.55 },
+  { id: 'neutral', label: 'Neutral', c: '#D2CBB9', hi: '#FFFFFF', glow: 'rgba(210,203,185,0.34)', fold: -6, hy: 66, ringO: 0.7 },
+  { id: 'calm', label: 'Calm', c: '#62D2C9', hi: '#E4FBF7', glow: 'rgba(98,210,201,0.48)', fold: -18, hy: 63, ringO: 0.85 },
+  { id: 'hopeful', label: 'Hopeful', c: '#9BD67E', hi: '#EEF9E4', glow: 'rgba(155,214,126,0.44)', fold: -26, hy: 60, ringO: 0.95 },
+  { id: 'joyful', label: 'Joyful', c: '#F2C76B', hi: '#FFF3D6', glow: 'rgba(242,199,107,0.46)', fold: -34, hy: 57, ringO: 1 }
+];
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { v: 5 };
+  }
+  renderVals() {
+    const v = this.state.v;
+    const x = BLOOMS[v - 1];
+    const b = { ...x, fl: x.fold, fr: -x.fold };
+    const ticks = BLOOMS.map((_, k) => ({ c: k === v - 1 ? '#1B2140' : 'rgba(27,33,64,0.25)' }));
+    return { v, b, ticks, slide: (e) => this.setState({ v: Number(e.target.value) }) };
+  }
+}
+</script>
+</body>
+</html>

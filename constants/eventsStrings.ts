@@ -9,6 +9,11 @@ export const eventsStrings = {
   en: {
     list: {
       title: 'Events',
+      eyebrow: 'Talks & workshops',
+      intro: 'Conversations with mental health professionals, in person and online.',
+      sort: 'Sort',
+      am: 'AM',
+      pm: 'PM',
       loading: 'Loading events...',
       error: 'Failed to load events',
       all: 'All',
@@ -17,8 +22,7 @@ export const eventsStrings = {
       past: 'Past',
       sortNewest: 'Sort by newest',
       sortOldest: 'Sort by oldest',
-      countOne: 'event',
-      countOther: 'events',
+      count: { one: '{n} event', few: '{n} events' },
       readMore: 'Read More',
       noEvents: 'No events found',
       speakers: 'Speakers',
@@ -28,6 +32,17 @@ export const eventsStrings = {
       aboutEvent: 'About this event',
       watch: 'Watch',
     },
+    // A Houna event streamed live (app_config.live_event): Home's and Events' banner, and app/live.tsx.
+    live: {
+      title: 'Live',
+      now: 'Live now',
+      soon: 'Starting at {time}',
+      a11yNow: 'Live now: {title}. Opens the stream.',
+      a11ySoon: 'Starting at {time}: {title}. Opens the stream.',
+      chat: 'Open on YouTube for the chat',
+      aboutEvent: 'About this event',
+      none: 'Nothing is live right now. Upcoming events are in Events.',
+    },
     speaker: {
       loading: 'Loading speaker...',
       about: 'About',
@@ -36,6 +51,11 @@ export const eventsStrings = {
   ar: {
     list: {
       title: 'الفعاليات',
+      eyebrow: 'حوارات وورش عمل',
+      intro: 'لقاءات مع مختصين في الصحة النفسية، حضوريًا وعبر الإنترنت.',
+      sort: 'الترتيب',
+      am: 'ص',
+      pm: 'م',
       loading: 'جاري تحميل الفعاليات...',
       error: 'فشل تحميل الفعاليات',
       all: 'الكل',
@@ -44,8 +64,7 @@ export const eventsStrings = {
       past: 'السابقة',
       sortNewest: 'الترتيب: الأحدث',
       sortOldest: 'الترتيب: الأقدم',
-      countOne: 'فعالية',
-      countOther: 'فعاليات',
+      count: { one: 'فعالية واحدة', two: 'فعاليتان', few: '{n} فعاليات', many: '{n} فعالية' },
       readMore: 'اقرأ المزيد',
       noEvents: 'لا توجد فعاليات',
       speakers: 'المتحدثون',
@@ -54,6 +73,16 @@ export const eventsStrings = {
       loading: 'جاري تحميل الفعالية...',
       aboutEvent: 'عن هذه الفعالية',
       watch: 'شاهد',
+    },
+    live: {
+      title: 'بث مباشر',
+      now: 'مباشر الآن',
+      soon: 'يبدأ الساعة {time}',
+      a11yNow: 'مباشر الآن: {title}. يفتح البث.',
+      a11ySoon: 'يبدأ الساعة {time}: {title}. يفتح البث.',
+      chat: 'افتح على YouTube للمحادثة',
+      aboutEvent: 'عن هذه الفعالية',
+      none: 'لا يوجد بث مباشر الآن. الفعاليات القادمة في صفحة الفعاليات.',
     },
     speaker: {
       loading: 'جاري تحميل بيانات المتحدث...',

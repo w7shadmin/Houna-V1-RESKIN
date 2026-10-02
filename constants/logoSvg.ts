@@ -56,3 +56,37 @@ export const LOGO_WHITE_XML = `<svg xmlns="http://www.w3.org/2000/svg" width="93
     <path id="w-Path_11806" d="M60.245,26.672A2.672,2.672,0,1,1,57.572,24a2.71,2.71,0,0,1,2.672,2.672" transform="translate(-19.592 -7.713)" fill="#3baaa7"/>
   </g>
 </svg>`;
+
+/** The pin's heart ("figure"), in its own coordinates (offset translate(-27.499 -12.008) in the logo). */
+export const FIGURE_D = 'M48.6,24.924c0,3.4,6.124,5.679,6.124,8.685,0-3.006,6.124-5.289,6.124-8.685a6.124,6.124,0,0,0-12.248,0';
+
+/**
+ * The pin's head circle moved into the figure's coordinates: the source
+ * draws it separately at translate(-30.292 -14.313), i.e. (-2.793, -2.305)
+ * from the figure. Same arc data, shifted start/end points.
+ */
+const HEAD_IN_FIGURE_D = 'M57.452,24.367A2.672,2.672,0,1,1,54.779,21.695a2.71,2.71,0,0,1,2.672,2.672Z';
+
+/**
+ * Heart with the head knocked out — render with `fillRule="evenodd"`. The
+ * source art paints the head as a separate disc in the background colour,
+ * which only matches a flat background: over a glow (Home, Profile, Recap)
+ * it showed as a solid cream/navy dot on phones. A real hole lets whatever
+ * is behind the mark show through.
+ */
+export const FIGURE_WITH_HEAD_HOLE_D = FIGURE_D + HEAD_IN_FIGURE_D;
+
+const HEAD_ELEMENT =
+  '<path id="g-Path_11806" d="M60.245,26.672A2.672,2.672,0,1,1,57.572,24a2.71,2.71,0,0,1,2.672,2.672" transform="translate(-19.592 -7.713)" fill="#fff"/>';
+
+/**
+ * The official logo recoloured for the Nightlight / Daylight themes (teal →
+ * `primary`, grey → `secondary`), with the pin's head cut out of the heart
+ * rather than painted — see `FIGURE_WITH_HEAD_HOLE_D`.
+ */
+export function tintedLogoXml(primary: string, secondary: string): string {
+  return LOGO_GREEN_XML.replace(HEAD_ELEMENT, '')
+    .replace(`<path d="${FIGURE_D}"`, `<path d="${FIGURE_WITH_HEAD_HOLE_D}" fill-rule="evenodd"`)
+    .replace(/fill="#3baaa7"/g, `fill="${primary}"`)
+    .replace(/fill="#525052"/g, `fill="${secondary}"`);
+}

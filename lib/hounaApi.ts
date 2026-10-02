@@ -62,6 +62,25 @@ export function resolveImageUrl(raw: string | null | undefined): string | null {
   }
 }
 
+/**
+ * An image link that arrived from outside the app's own data (a deep link's params): only
+ * https images from houna.org itself are loaded, so a crafted link can't make the phone fetch
+ * from someone else's server (and tell them this person uses Houna).
+ */
+export function trustedImageUrl(raw: string | null | undefined): string | null {
+  const url = resolveImageUrl(raw);
+  if (!url) return null;
+  try {
+    const { protocol, hostname } = new URL(url);
+    return protocol === 'https:' && (hostname === 'houna.org' || hostname.endsWith('.houna.org')) ? url : null;
+  } catch {
+    return null;
+  }
+}
+
+/** A slug or id from a route, as one path segment: never able to climb to another endpoint. */
+const seg = (value: string) => encodeURIComponent(value);
+
 export interface Therapist {
   name: string;
   role: string;
@@ -170,7 +189,7 @@ export async function fetchTherapists(
 }
 
 export async function fetchTherapistDetail(slug: string, lang: 'en' | 'ar' = 'en'): Promise<TherapistDetail> {
-  const resp = await apiFetch(`/therapists/${slug}`, { lang });
+  const resp = await apiFetch(`/therapists/${seg(slug)}`, { lang });
   if (!resp.ok) throw new Error(`Failed to load profile (${resp.status})`);
   return resp.json();
 }
@@ -182,7 +201,7 @@ export async function fetchOrganizations(country?: string, lang: 'en' | 'ar' = '
 }
 
 export async function fetchOrganizationDetail(id: string, lang: 'en' | 'ar' = 'en'): Promise<OrganizationDetail> {
-  const resp = await apiFetch(`/organizations/${id}`, { lang });
+  const resp = await apiFetch(`/organizations/${seg(id)}`, { lang });
   if (!resp.ok) throw new Error(`Failed to load organization (${resp.status})`);
   return resp.json();
 }
@@ -222,7 +241,7 @@ export async function fetchWellnessCenters(
 }
 
 export async function fetchWellnessCenterDetail(id: string, lang: 'en' | 'ar' = 'en'): Promise<WellnessCenterDetail> {
-  const resp = await apiFetch(`/wellness-centers/${id}`, { lang });
+  const resp = await apiFetch(`/wellness-centers/${seg(id)}`, { lang });
   if (!resp.ok) throw new Error(`Failed to load wellness center (${resp.status})`);
   return resp.json();
 }
@@ -278,7 +297,7 @@ export async function fetchEvents(lang: 'en' | 'ar' = 'en'): Promise<EventListRe
 }
 
 export async function fetchEventDetail(slug: string, lang: 'en' | 'ar' = 'en'): Promise<EventDetail> {
-  const resp = await apiFetch(`/events/${slug}`, { lang });
+  const resp = await apiFetch(`/events/${seg(slug)}`, { lang });
   if (!resp.ok) throw new Error(`Failed to load event (${resp.status})`);
   return resp.json();
 }
@@ -313,7 +332,7 @@ export async function fetchSpeakers(lang: 'en' | 'ar' = 'en'): Promise<SpeakerLi
 }
 
 export async function fetchSpeakerDetail(slug: string, lang: 'en' | 'ar' = 'en'): Promise<SpeakerDetail> {
-  const resp = await apiFetch(`/speakers/${slug}`, { lang });
+  const resp = await apiFetch(`/speakers/${seg(slug)}`, { lang });
   if (!resp.ok) throw new Error(`Failed to load speaker (${resp.status})`);
   return resp.json();
 }
@@ -406,8 +425,108 @@ export async function fetchResourceDirectory(lang: 'en' | 'ar' = 'en'): Promise<
 }
 
 export async function fetchResourceDetail(slug: string, lang: 'en' | 'ar' = 'en'): Promise<ResourceDetailData> {
-  const resp = await apiFetch(`/resources/${slug}`, { lang });
+  const resp = await apiFetch(`/resources/${seg(slug)}`, { lang });
   if (!resp.ok) throw new Error(`Failed to load topic (${resp.status})`);
   return resp.json();
 }
 
+
+/* ── Search index (the houna-search-index edge function, supabase/functions/houna-search-index) ── */
+
+export interface ProfessionalFacts {
+  slug: string;
+  /** Location, languages, organizations, work with: labels in the page's language. */
+  info: Record<string, string>;
+  specialties: string | null;
+}
+
+export interface SearchIndexResponse {
+  builtAt: string;
+  lang: 'en' | 'ar';
+  professionals: ProfessionalFacts[];
+}
+
+/**
+ * What each professional's own page says (where they are, their languages,
+ * who they work with, specialties), gathered once a day on the server for the
+ * directory search. `null` while the very first build is still running.
+ */
+export async function fetchSearchIndex(lang: 'en' | 'ar' = 'en'): Promise<SearchIndexResponse | null> {
+  const url = new URL(`${SUPABASE_URL}/functions/v1/houna-search-index`);
+  url.searchParams.set('lang', lang);
+  const resp = await fetch(url.toString(), { headers });
+  if (resp.status === 202) return null;
+  if (!resp.ok) throw new Error(`Failed to load the search index (${resp.status})`);
+  return resp.json();
+}
+
+/** Every professional, and their countries, as one list (the bundle below assembles all the pages). */
+export interface AllProfessionals {
+  therapists: Therapist[];
+  countries: CountryOption[];
+  /** Slugs of those houna.org lists as offering online sessions (the full bundle only). */
+  online?: string[];
+}
+
+/** Directory search's lists for one language, each as its own list route returns it. */
+export interface SearchBundle {
+  professionals: AllProfessionals;
+  articles: ArticleListResponse;
+  podcasts: PodcastListResponse;
+  organizations: OrgListResponse;
+  wellness: WellnessCenterListResponse;
+  events: EventListResponse;
+  speakers: SpeakerListResponse;
+}
+
+async function searchBundleFetch<T>(params: Record<string, string>): Promise<T> {
+  const url = new URL(`${SUPABASE_URL}/functions/v1/houna-search-bundle`);
+  Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+  const resp = await fetch(url.toString(), { headers });
+  if (!resp.ok) throw new Error(`Failed to load the directory for search (${resp.status})`);
+  return resp.json();
+}
+
+/**
+ * Everything directory search needs in one language, in one call (the `houna-search-bundle` Edge
+ * Function keeps it for everyone, rebuilt from houna-proxy's lists every few hours), instead of a
+ * call per list and per page of professionals.
+ */
+export function fetchSearchBundle(lang: 'en' | 'ar' = 'en'): Promise<SearchBundle> {
+  return searchBundleFetch({ lang });
+}
+
+/** Every professional in one of houna.org's countries (its numeric id), all pages in one call. */
+export function fetchProfessionalsInCountry(lang: 'en' | 'ar', country: string): Promise<AllProfessionals> {
+  return searchBundleFetch({ lang, country });
+}
+
+/** A link as a key for spotting the same item in both languages' lists. */
+const sameLink = (url: string) => url.trim().replace(/^https?:\/\/(www\.)?/i, '').replace(/[?#].*$/, '').replace(/\/+$/, '').toLowerCase();
+
+/** One language's list, then what only the other language has (houna.org splits them by language). */
+export function mergeLanguages<T extends { url: string }>(mine: T[], other: T[]): T[] {
+  const seen = new Set(mine.map((i) => sameLink(i.url)));
+  return [...mine, ...other.filter((i) => !seen.has(sameLink(i.url)))];
+}
+
+/**
+ * Articles in every language, the reader's first: houna.org lists each language's separately, and
+ * Houna shows them all until they're translated. If one language fails to load, the other still shows.
+ */
+export async function fetchAllArticles(lang: 'en' | 'ar' = 'en'): Promise<ArticleListResponse> {
+  const other = lang === 'en' ? 'ar' : 'en';
+  const [mine, theirs] = await Promise.allSettled([fetchArticles(lang), fetchArticles(other)]);
+  if (mine.status === 'rejected' && theirs.status === 'rejected') throw mine.reason;
+  const list = (r: PromiseSettledResult<ArticleListResponse>) => (r.status === 'fulfilled' ? r.value.articles : []);
+  return { articles: mergeLanguages(list(mine), list(theirs)) };
+}
+
+/** Podcasts in every language, the reader's first (as `fetchAllArticles`). */
+export async function fetchAllPodcasts(lang: 'en' | 'ar' = 'en'): Promise<PodcastListResponse> {
+  const other = lang === 'en' ? 'ar' : 'en';
+  const [mine, theirs] = await Promise.allSettled([fetchPodcasts(lang), fetchPodcasts(other)]);
+  if (mine.status === 'rejected' && theirs.status === 'rejected') throw mine.reason;
+  const list = (r: PromiseSettledResult<PodcastListResponse>) => (r.status === 'fulfilled' ? r.value.podcasts : []);
+  return { podcasts: mergeLanguages(list(mine), list(theirs)) };
+}

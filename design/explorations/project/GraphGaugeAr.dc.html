@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>هذا الأسبوع — مقياس</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&amp;family=DM+Mono:wght@400;500&amp;family=Figtree:wght@300;400;500;600&amp;family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&amp;family=Marcellus&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font:inherit;color:inherit}
+@keyframes twinkle { 0%,100% { opacity: 0.25 } 50% { opacity: 1 } }
+@keyframes drift { 0% { transform: translate(0,0) scale(1) } 50% { transform: translate(24px,-18px) scale(1.08) } 100% { transform: translate(0,0) scale(1) } }
+@keyframes drift2 { 0% { transform: translate(0,0) scale(1.05) } 50% { transform: translate(-30px,22px) scale(0.95) } 100% { transform: translate(0,0) scale(1.05) } }
+@keyframes spin { to { transform: rotate(360deg) } }
+@keyframes spinBack { to { transform: rotate(-360deg) } }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px) } to { opacity: 1; transform: none } }
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes glowPulse { 0%,100% { opacity: 0.55 } 50% { opacity: 1 } }
+@keyframes bars { 0%,100% { transform: scaleY(0.35) } 50% { transform: scaleY(1) } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important } }
+@keyframes drawA { from { stroke-dashoffset: var(--len) } to { stroke-dashoffset: 0 } }
+@keyframes drawB { from { stroke-dashoffset: var(--len) } to { stroke-dashoffset: 0 } }
+@keyframes knob { from { opacity: 0 } to { opacity: 1 } }
+</style>
+</helmet>
+<div dir="rtl" style="position: relative; width: 390px; height: 844px; overflow: hidden; box-sizing: border-box; font-family: 'IBM Plex Sans Arabic', sans-serif; background: #0B1026">
+
+<span style="position: absolute; inset: 0; background: radial-gradient(90% 55% at 50% 0%, #13304A 0%, #0B1026 60%)"></span>
+<button type="button" onClick="{{replay}}" aria-label="Replay" style="position: absolute; left: 20px; top: 56px; width: 48px; height: 48px; border-radius: 999px; background: rgba(242,236,221,0.08); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(242,236,221,0.16); display: flex; align-items: center; justify-content: center; color: #F2ECDD; cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: block; flex-shrink: 0"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"></path><path d="M4.5 4.5v3.5H8"></path></svg></button>
+<span style="position: absolute; left: 0; right: 0; top: 70px; text-align: center; font-size: 17px; color: #F2ECDD">تنفّسك هذا الأسبوع</span>
+<svg width="390" height="560" viewBox="0 0 390 560" aria-hidden="true" style="position: absolute; left: 0; top: 0; transform: scaleX(-1)">
+<path d="M75.5 429.0 A138 138 0 1 1 314.5 429.0" fill="none" stroke="rgba(242,236,221,0.08)" stroke-width="10" stroke-linecap="round"></path>
+<path d="M72.6 423.7 A138 138 0 0 1 124.8 241.2" fill="none" stroke="#6FD6CF" stroke-width="10" stroke-linecap="round" stroke-dasharray="209.3" style="animation: draw{{x}} 900ms cubic-bezier(.3,.7,.3,1) 0ms both; --len: 209.3px"></path><path d="M135.4 235.5 A138 138 0 0 1 285.4 255.7" fill="none" stroke="#B3A7F5" stroke-width="10" stroke-linecap="round" stroke-dasharray="160.1" style="animation: draw{{x}} 900ms cubic-bezier(.3,.7,.3,1) 250ms both; --len: 160.1px"></path><path d="M294.1 264.0 A138 138 0 0 1 325.9 316.3" fill="none" stroke="#F2B880" stroke-width="10" stroke-linecap="round" stroke-dasharray="61.8" style="animation: draw{{x}} 900ms cubic-bezier(.3,.7,.3,1) 500ms both; --len: 61.8px"></path><path d="M329.2 327.9 A138 138 0 0 1 317.4 423.7" fill="none" stroke="#EA90A8" stroke-width="10" stroke-linecap="round" stroke-dasharray="98.6" style="animation: draw{{x}} 900ms cubic-bezier(.3,.7,.3,1) 750ms both; --len: 98.6px"></path>
+<circle cx="314.5" cy="429.0" r="8" fill="#0B1026" stroke="#F2ECDD" stroke-width="3" style="animation: knob 400ms ease 1.3s both"></circle>
+</svg>
+<div style="position: absolute; left: 0; right: 0; top: 270px; display: flex; flex-direction: column; align-items: center; gap: 10px">
+<span style="font-family: 'IBM Plex Sans Arabic', sans-serif; font-size: 14px; font-weight: 500; color: #6FD6CF; white-space: nowrap">هذا الأسبوع</span>
+<span style="font-family: 'Amiri', serif; font-weight: 700; font-size: 100.8px; line-height: 1.1; color: #F2ECDD">٤٧</span>
+<span style="font-family: 'Amiri', serif; font-size: 22px; color: #B6BAD6">دقيقة</span>
+</div>
+<div style="position: absolute; left: 0; right: 0; top: 540px; display: flex; flex-direction: column; align-items: center; gap: 6px">
+<span style="font-family: 'IBM Plex Sans Arabic', sans-serif; font-size: 13px; font-weight: 500; color: #8990B5; white-space: nowrap">الأسبوع الماضي</span>
+<span style="font-family: 'Amiri', serif; font-weight: 700; font-size: 36px; line-height: 1.1; color: #B6BAD6">٣٨</span>
+</div>
+<div style="position: absolute; left: 24px; right: 24px; top: 650px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px"><div style="padding: 12px 14px; border-radius: 16px; background: rgba(242,236,221,0.045); display: flex; align-items: center; gap: 10px"><span style="width: 8px; height: 8px; border-radius: 999px; background: #6FD6CF; box-shadow: 0 0 8px #6FD6CF"></span><span style="flex: 1; font-size: 14px; color: #B6BAD6">٤-٧-٨</span><span style="font-family: 'IBM Plex Sans Arabic', sans-serif; font-weight: 500; font-size: 18px; color: #F2ECDD">١٨</span></div><div style="padding: 12px 14px; border-radius: 16px; background: rgba(242,236,221,0.045); display: flex; align-items: center; gap: 10px"><span style="width: 8px; height: 8px; border-radius: 999px; background: #B3A7F5; box-shadow: 0 0 8px #B3A7F5"></span><span style="flex: 1; font-size: 14px; color: #B6BAD6">التنفس المربّع</span><span style="font-family: 'IBM Plex Sans Arabic', sans-serif; font-weight: 500; font-size: 18px; color: #F2ECDD">١٤</span></div><div style="padding: 12px 14px; border-radius: 16px; background: rgba(242,236,221,0.045); display: flex; align-items: center; gap: 10px"><span style="width: 8px; height: 8px; border-radius: 999px; background: #F2B880; box-shadow: 0 0 8px #F2B880"></span><span style="flex: 1; font-size: 14px; color: #B6BAD6">الحواس الخمس</span><span style="font-family: 'IBM Plex Sans Arabic', sans-serif; font-weight: 500; font-size: 18px; color: #F2ECDD">٦</span></div><div style="padding: 12px 14px; border-radius: 16px; background: rgba(242,236,221,0.045); display: flex; align-items: center; gap: 10px"><span style="width: 8px; height: 8px; border-radius: 999px; background: #EA90A8; box-shadow: 0 0 8px #EA90A8"></span><span style="flex: 1; font-size: 14px; color: #B6BAD6">الاسترخاء</span><span style="font-family: 'IBM Plex Sans Arabic', sans-serif; font-weight: 500; font-size: 18px; color: #F2ECDD">٩</span></div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { n: 0 };
+  }
+  renderVals() {
+    return { x: this.state.n % 2 ? 'B' : 'A', replay: () => this.setState({ n: this.state.n + 1 }) };
+  }
+}
+</script>
+</body>
+</html>
