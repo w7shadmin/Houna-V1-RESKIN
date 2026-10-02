@@ -1,5 +1,5 @@
-import React from 'react';
-import Svg, { G, Path } from 'react-native-svg';
+import React, { useId } from 'react';
+import Svg, { Defs, G, Mask, Path, Rect } from 'react-native-svg';
 import { useTheme } from '@/contexts/ThemeContext';
 import { FIGURE_WITH_HEAD_HOLE_D } from '@/constants/logoSvg';
 
@@ -20,12 +20,26 @@ interface HounaMarkProps {
 export default function HounaMark({ size, color, outline }: HounaMarkProps) {
   const { colors } = useTheme();
   const fill = color ?? colors.logo.primary;
+  const maskId = `markOutline${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
 
   return (
     <Svg width={size} height={size} viewBox={HOUNA_MARK_VIEWBOX}>
       {outline ? (
-        // The viewBox is 20.6 units across `size` pixels.
-        <HounaMarkShape fill="none" stroke={fill} strokeWidth={(outline * 20.6) / size} />
+        // The outline of the mark as one shape: the ring and the figure overlap at the top, so
+        // stroking each drew a second line through the overlap. Each is stroked twice as wide, and
+        // the mark's own filled shape masks the inner half away, leaving one line round the outside
+        // of the whole (the head's hole and the ring's middle keep theirs). 20.6 units span `size` px.
+        <>
+          <Defs>
+            <Mask id={maskId} maskUnits="userSpaceOnUse" x="15" y="3.4" width="24.6" height="24.6">
+              <Rect x="15" y="3.4" width="24.6" height="24.6" fill="#FFFFFF" />
+              <HounaMarkShape fill="#000000" />
+            </Mask>
+          </Defs>
+          <G mask={`url(#${maskId})`}>
+            <HounaMarkShape fill="none" stroke={fill} strokeWidth={(2 * outline * 20.6) / size} />
+          </G>
+        </>
       ) : (
         <HounaMarkShape fill={fill} />
       )}
